@@ -1,0 +1,27 @@
+[project]
+name = "kltn04"
+version = "0.1.0"
+description = "AI hỗ trợ quản lý tiến độ dự án lập trình"
+authors = [
+    {name = "Youaremyhome",email = "ltn66441@GMAIL.COM"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)",
+    "uvicorn[standard] (>=0.34.0,<0.35.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "authlib (>=1.5.2,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+ruff = "^0.11.4"
+mypy = "^1.15.0"
+
