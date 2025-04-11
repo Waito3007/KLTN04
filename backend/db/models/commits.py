@@ -1,5 +1,6 @@
+# backend\db\models\commits.py
 from sqlalchemy import Table, Column, Integer, String, Text, TIMESTAMP, ForeignKey
-from backend.db.database import metadata
+from db.database import metadata
 
 commits = Table(
     "commits",

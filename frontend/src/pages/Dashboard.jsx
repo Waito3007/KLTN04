@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import RepoList from "../components/RepoList";
+import RepoList from "../components/repo/RepoList";
 import { Button, Typography, Avatar, Space } from "antd";
 
 const { Title, Text } = Typography;
