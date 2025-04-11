@@ -1,6 +1,6 @@
-# backend/api/routes/auth.py
 from fastapi import APIRouter, Request
 from core.oauth import oauth
+from fastapi.responses import RedirectResponse
 import os
 
 auth_router = APIRouter()
@@ -13,19 +13,21 @@ async def login(request: Request):
 @auth_router.get("/auth/callback")
 async def auth_callback(request: Request):
     token = await oauth.github.authorize_access_token(request)
-
-    # Lấy thông tin user từ GitHub
     resp = await oauth.github.get("user", token=token)
     profile = resp.json()
 
-    # Lấy email nếu chưa có trong profile
     if not profile.get("email"):
         emails_resp = await oauth.github.get("user/emails", token=token)
         emails = emails_resp.json()
         primary_email = next((e["email"] for e in emails if e["primary"]), None)
         profile["email"] = primary_email
 
-    return {
-        "token": token,
-        "profile": profile
-    }
+    redirect_url = (
+        f"http://localhost:5173/api/auth-success"
+        f"?token={token['access_token']}"
+        f"&username={profile['login']}"
+        f"&email={profile['email']}"
+        f"&avatar_url={profile['avatar_url']}"
+    )
+
+    return RedirectResponse(redirect_url)
