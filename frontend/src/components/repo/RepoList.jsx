@@ -2,12 +2,15 @@
 import { useEffect, useState } from "react";
 import { List, Avatar, Typography, Spin, message } from "antd";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
+import { Button } from "antd";
+import { GithubOutlined } from "@ant-design/icons";
 const { Title } = Typography;
 
 const RepoList = () => {
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRepos = async () => {
@@ -42,18 +45,21 @@ const RepoList = () => {
     <div style={{ marginTop: "2rem" }}>
       <Title level={3}>📂 Repository của bạn</Title>
       <List
-        itemLayout="horizontal"
-        dataSource={repos}
-        renderItem={(repo) => (
-          <List.Item>
-            <List.Item.Meta
-              avatar={<Avatar src={repo.owner.avatar_url} />}
-              title={<a href={repo.html_url} target="_blank" rel="noreferrer">{repo.name}</a>}
-              description={repo.description || "Không có mô tả"}
-            />
-          </List.Item>
-        )}
+  itemLayout="horizontal"
+  dataSource={repos}
+  renderItem={(repo) => (
+    <List.Item
+      style={{ cursor: "pointer" }}
+      onClick={() => navigate(`/repo/${repo.owner.login}/${repo.name}`)}
+    >
+      <List.Item.Meta
+        avatar={<Avatar src={repo.owner.avatar_url} />}
+        title={<span>{repo.name}</span>}
+        description={repo.description || "Không có mô tả"}
       />
+    </List.Item>
+  )}
+/>
     </div>
   );
 };

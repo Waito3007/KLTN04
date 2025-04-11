@@ -1,0 +1,31 @@
+frontend/
+├── public/                       # Tệp tĩnh (favicon, hình ảnh, manifest,...)
+├── src/
+│   ├── api/                      # Gọi API (axios, hooks...)
+│   │   └── github.js
+│   ├── assets/                   # Hình ảnh, icon, font...
+│   ├── components/               # Reusable UI components (buttons, inputs, layout)
+│   ├── features/                 # Tính năng cụ thể (GitHub fetcher, Dashboard, ...)
+│   │   └── github/
+│   │       ├── GithubRepoFetcher.jsx
+│   │       ├── GithubRepoCard.jsx
+│   │       └── githubSlice.js (nếu dùng Redux Toolkit)
+│   ├── hooks/                    # Custom hooks (nếu có)
+│   ├── layouts/                  # Các layout như AdminLayout, AuthLayout,...
+│   ├── pages/                    # Các trang chính (routes)
+│   │   ├── Home.jsx
+│   │   ├── Dashboard.jsx
+│   │   └── GithubFetcherPage.jsx
+│   ├── routes/                   # Cấu hình route chính
+│   │   └── index.jsx
+│   ├── styles/                   # CSS/Tailwind/custom SCSS
+│   │   └── main.css
+│   ├── utils/                    # Hàm tiện ích (formatDate, handleError, ...)
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── config.js                 # Biến môi trường/ cấu hình (API base URL,...)
+├── .gitignore
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md
