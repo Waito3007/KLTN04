@@ -21,3 +21,6 @@ setup_middlewares(app)
 # Include routers trực tiếp
 app.include_router(auth_router, prefix="/api")
 app.include_router(github_router, prefix="/api")
+@app.get("/")
+def root():
+    return {"message": "TaskFlowAI backend is running 🚀"}
