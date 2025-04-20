@@ -17,6 +17,9 @@ from services.github_service import fetch_commits  # hàm gọi GitHub API
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.commit import CommitOut
 from db.database import database
+def get_db():
+    return database
+
 github_router = APIRouter()
 
 @github_router.get("/github/{owner}/{repo}")
@@ -120,8 +123,7 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
     return {"message": "Commits saved successfully!"}
 
 
-def get_db():
-    return database
+
 
 @github_router.get("/commits")
 async def get_commits(db = Depends(get_db)):

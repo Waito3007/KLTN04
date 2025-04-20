@@ -9,4 +9,5 @@ users = Table(
     Column("email", String(255), nullable=False, unique=True),  # Email
     Column("created_at", TIMESTAMP, server_default=func.now()),  # Thời gian tạo
     Column("updated_at", TIMESTAMP, server_default=func.now(), onupdate=func.now()),  # Thời gian cập nhật
+    extend_existing=True  # Thêm dòng này
 )

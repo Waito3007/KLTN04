@@ -13,4 +13,6 @@ commits = Table(
     Column("date", TIMESTAMP, nullable=False),  # Ngày commit
     Column("repo_id", Integer, ForeignKey("repositories.id"), nullable=False),  # Liên kết với bảng repositories
     Column("created_at", TIMESTAMP, server_default=func.now()),  # Thời gian tạo
+        extend_existing=True  # Thêm dòng này
+
 )
