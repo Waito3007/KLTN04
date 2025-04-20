@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, func
-from backend.db.metadata import metadata  # Import metadata từ metadata.py
+from db.metadata import metadata  # Import metadata từ metadata.py
 
 assignments = Table(
     "assignments",
