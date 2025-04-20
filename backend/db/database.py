@@ -22,5 +22,12 @@ sync_engine = create_engine(
     DATABASE_URL.replace("asyncpg", "psycopg2")  # Thay asyncpg bằng psycopg2
 )
 
+# Kiểm tra kết nối cơ sở dữ liệu
+try:
+    with sync_engine.connect() as connection:
+        print("Kết nối cơ sở dữ liệu thành công!")
+except Exception as e:
+    print(f"Lỗi kết nối cơ sở dữ liệu: {e}")
+
 # Tạo các bảng
 metadata.create_all(sync_engine)
