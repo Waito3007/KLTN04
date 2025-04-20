@@ -144,6 +144,7 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
         raise HTTPException(status_code=401, detail="Missing or invalid token")
 
     # Lấy commit từ GitHub API
+    # Lấy commit từ GitHub API
     async with httpx.AsyncClient() as client:
         url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
         headers = {"Authorization": token}
@@ -151,17 +152,23 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
+
         commit_list = resp.json()
 
     # Lưu commit vào database
+    # Lưu commit vào database
     repo_id = await get_repo_id_by_owner_and_name(owner, repo)
     if not repo_id:
+        raise HTTPException(status_code=404, detail="Repository not found")
         raise HTTPException(status_code=404, detail="Repository not found")
 
     for commit in commit_list:
         commit_data = {
             "sha": commit["sha"],
             "message": commit["commit"]["message"],
+            "author_name": commit["commit"]["author"]["name"],
+            "author_email": commit["commit"]["author"]["email"],
+            "date": commit["commit"]["author"]["date"],
             "author_name": commit["commit"]["author"]["name"],
             "author_email": commit["commit"]["author"]["email"],
             "date": commit["commit"]["author"]["date"],
