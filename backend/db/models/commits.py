@@ -11,6 +11,9 @@ commits = Table(
     Column("author_name", String(255), nullable=False),  # Tên tác giả
     Column("author_email", String(255), nullable=False),  # Email tác giả
     Column("date", TIMESTAMP, nullable=False),  # Ngày commit
+    Column("insertions", Integer, default=0),  # Số dòng thêm
+    Column("deletions", Integer, default=0),  # Số dòng xóa
+    Column("files_changed", Integer, default=0),  # Số file thay đổi
     Column("repo_id", Integer, ForeignKey("repositories.id"), nullable=False),  # Liên kết với bảng repositories
     Column("created_at", TIMESTAMP, server_default=func.now()),  # Thời gian tạo
 )
