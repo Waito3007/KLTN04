@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import AuthSuccess from "./pages/AuthSuccess";
-import Dashboard from "./pages/Dashboard"; // nếu có
+import Dashboard from "./pages/Dashboard"; 
 import RepoDetails from "./pages/RepoDetails";
 import CommitTable from './components/commits/CommitTable';
 

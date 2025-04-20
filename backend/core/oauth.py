@@ -16,5 +16,6 @@ oauth.register(
     authorize_url='https://github.com/login/oauth/authorize',
     authorize_params=None,
     api_base_url='https://api.github.com/',  # <--- Cái này đang bị thiếu
-    client_kwargs={'scope': 'read:user user:email'},
+    client_kwargs={'scope': 'read:user user:email repo'}
+
 )

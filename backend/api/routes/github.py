@@ -23,7 +23,6 @@ github_router = APIRouter()
 async def fetch_repo(owner: str, repo: str):
     return await get_repo_data(owner, repo)
 
-
 @github_router.get("/github/repos")
 async def get_user_repos(request: Request):
     token = request.headers.get("Authorization")
@@ -40,6 +39,56 @@ async def get_user_repos(request: Request):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
     
     return resp.json()
+
+# @github_router.get("/github/repos")
+# async def get_user_repos(request: Request):
+#     # 1. Extract token CHUẨN GitHub
+#     auth_header = request.headers.get("Authorization")
+#     if not auth_header:
+#         raise HTTPException(status_code=401, detail="Missing Authorization header")
+    
+#     # 2. Chuẩn hóa token (nhận cả 'token ' và 'Bearer ')
+#     token = auth_header.replace("Bearer ", "").replace("token ", "")
+#     if not token:
+#         raise HTTPException(status_code=401, detail="Invalid token format")
+
+#     async with httpx.AsyncClient() as client:
+#         # 3. Gọi API với headers ĐẦY ĐỦ
+#         headers = {
+#             "Authorization": f"Bearer {token}",
+#             "Accept": "application/vnd.github+json",
+#             "X-GitHub-Api-Version": "2022-11-28"
+#         }
+        
+#         # 4. Gọi /repos với params ĐÚNG
+#         try:
+#             resp = await client.get(
+#                 "https://api.github.com/user/repos",
+#                 headers=headers,
+#                 params={
+#                     "visibility": "all",  # Bắt buộc cho private repos
+#                     "sort": "updated",
+#                     "direction": "desc",
+#                     "per_page": 100  # Lấy tối đa 100 repo/request
+#                 },
+#                 timeout=30.0
+#             )
+#             resp.raise_for_status()  # Tự động raise lỗi 4xx/5xx
+#             return resp.json()
+            
+#         except httpx.HTTPStatusError as e:
+#             # 5. Debug chi tiết khi lỗi
+#             error_detail = {
+#                 "request_url": e.request.url,
+#                 "status_code": e.response.status_code,
+#                 "response_body": e.response.text,
+#                 "headers": dict(e.response.headers)
+#             }
+#             print(f"GitHub API Error: {error_detail}")
+#             raise HTTPException(
+#                 status_code=e.response.status_code,
+#                 detail=f"GitHub API error: {e.response.text}"
+#             )
 
 @github_router.get("/github/{owner}/{repo}/commits")
 async def get_commits(owner: str, repo: str, request: Request, branch: str = "main"):
@@ -58,6 +107,19 @@ async def get_commits(owner: str, repo: str, request: Request, branch: str = "ma
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
         return resp.json()
+
+def get_db():
+    return database
+
+@github_router.get("/github/{owner}/{repo}/commits")
+async def get_commits_from_db(owner: str, repo: str, db: AsyncSession = Depends(get_db)):
+    repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+    if not repo_id:
+        raise HTTPException(status_code=404, detail="Repository not found")
+
+    query = select(commits).where(commits.c.repo_id == repo_id)
+    result = await db.fetch_all(query)
+    return result
 
 @github_router.get("/github/{owner}/{repo}/branches")
 async def get_branches(owner: str, repo: str, request: Request):
@@ -81,66 +143,29 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
 
-    # Lấy commit từ GitHub
+    # Lấy commit từ GitHub API
     async with httpx.AsyncClient() as client:
         url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
         headers = {"Authorization": token}
         resp = await client.get(url, headers=headers)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        
+
         commit_list = resp.json()
 
-    # Giả sử đã có user_id và repo_id (em có thể truyền vào hoặc ánh xạ theo repo)
-    for commit in commit_list:
-        commit_data = {
-            "sha": commit["sha"],
-            "message": commit["commit"]["message"],
-            "author_id": None,  # TODO: ánh xạ user GitHub nếu có
-            "repo_id": None,    # TODO: ánh xạ repo nếu đã lưu vào DB
-            "committed_at": commit["commit"]["author"]["date"],
-            "insertions": 0,    # TODO: lấy từ GitHub nếu cần detail
-            "deletions": 0,
-            "files_changed": 0
-        }
-        await save_commit(commit_data)
-
-    return {"message": "Commits saved successfully!"}
-
-
-
-@github_router.post("/github/{owner}/{repo}/save-commits")
-async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = "main"):
-    token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
-
-    async with httpx.AsyncClient() as client:
-        url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
-        headers = {"Authorization": token}
-        resp = await client.get(url, headers=headers)
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        
-        commit_list = resp.json()
-
+    # Lưu commit vào database
     repo_id = await get_repo_id_by_owner_and_name(owner, repo)
     if not repo_id:
-        raise HTTPException(status_code=404, detail="Repository not found in database")
+        raise HTTPException(status_code=404, detail="Repository not found")
 
     for commit in commit_list:
-        gh_author = commit["author"]["login"] if commit.get("author") else None
-        author_id = await get_user_id_by_github_username(gh_author) if gh_author else None
-
         commit_data = {
             "sha": commit["sha"],
             "message": commit["commit"]["message"],
-            "author_id": author_id,
+            "author_name": commit["commit"]["author"]["name"],
+            "author_email": commit["commit"]["author"]["email"],
+            "date": commit["commit"]["author"]["date"],
             "repo_id": repo_id,
-            "committed_at": commit["commit"]["author"]["date"],
-            "insertions": 0,
-            "deletions": 0,
-            "files_changed": 0
         }
         await save_commit(commit_data)
 
