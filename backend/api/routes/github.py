@@ -23,7 +23,7 @@ github_router = APIRouter()
 async def fetch_repo(owner: str, repo: str):
     return await get_repo_data(owner, repo)
 
-
+# Lấy danh sách repository của người dùng
 @github_router.get("/github/repos")
 async def get_user_repos(request: Request):
     token = request.headers.get("Authorization")
@@ -40,7 +40,7 @@ async def get_user_repos(request: Request):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
     
     return resp.json()
-
+# Lấy danh sách commit từ GitHub API.
 @github_router.get("/github/{owner}/{repo}/commits")
 async def get_commits(owner: str, repo: str, request: Request, branch: str = "main"):
     token = request.headers.get("Authorization")
@@ -58,7 +58,7 @@ async def get_commits(owner: str, repo: str, request: Request, branch: str = "ma
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
         return resp.json()
-
+# Lấy danh sách branches từ GitHub API.
 @github_router.get("/github/{owner}/{repo}/branches")
 async def get_branches(owner: str, repo: str, request: Request):
     token = request.headers.get("Authorization")
@@ -74,7 +74,7 @@ async def get_branches(owner: str, repo: str, request: Request):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
         return resp.json()
-
+# Lưu danh sách commit từ GitHub vào cơ sở dữ liệu.
 @github_router.post("/github/{owner}/{repo}/save-commits")
 async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = "main"):
     token = request.headers.get("Authorization")
@@ -149,7 +149,7 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
 
 def get_db():
     return database
-
+# Lấy danh sách commit từ cơ sở dữ liệu.
 @github_router.get("/commits")
 async def get_commits(db = Depends(get_db)):
     query = commits.select()
@@ -157,7 +157,7 @@ async def get_commits(db = Depends(get_db)):
     return result
 
 # Thêm vào cuối file github.py
-
+# Đồng bộ commit từ GitHub vào cơ sở dữ liệu.
 @github_router.get("/sync-commits")
 async def sync_commits(
     repo_id: int,
