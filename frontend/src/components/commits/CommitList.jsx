@@ -63,6 +63,11 @@ const CommitList = ({ owner, repo, branch }) => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
+    if (!branch) return;
+
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
     const fetchCommits = async () => {
       try {
         const response = await axios.get(
@@ -82,6 +87,7 @@ const CommitList = ({ owner, repo, branch }) => {
       }
     };
 
+    setLoading(true);
     setLoading(true);
     fetchCommits();
   }, [owner, repo, branch]);

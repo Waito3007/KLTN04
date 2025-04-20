@@ -163,6 +163,9 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
         raise HTTPException(status_code=404, detail="Repository not found")
 
     for commit in commit_list:
+        gh_author = commit["author"]["login"] if commit.get("author") else None
+        author_id = await get_user_id_by_github_username(gh_author) if gh_author else None
+
         commit_data = {
             "sha": commit["sha"],
             "message": commit["commit"]["message"],
@@ -173,6 +176,10 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
             "author_email": commit["commit"]["author"]["email"],
             "date": commit["commit"]["author"]["date"],
             "repo_id": repo_id,
+            "committed_at": commit["commit"]["author"]["date"],
+            "insertions": 0,
+            "deletions": 0,
+            "files_changed": 0
         }
         await save_commit(commit_data)
 
