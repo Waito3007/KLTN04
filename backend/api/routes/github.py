@@ -40,6 +40,7 @@ async def get_user_repos(request: Request):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
     
     return resp.json()
+
 # Lấy danh sách commit từ GitHub API.
 @github_router.get("/github/{owner}/{repo}/commits")
 async def get_commits(owner: str, repo: str, request: Request, branch: str = "main"):
@@ -58,6 +59,7 @@ async def get_commits(owner: str, repo: str, request: Request, branch: str = "ma
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
         return resp.json()
+
 # Lấy danh sách branches từ GitHub API.
 @github_router.get("/github/{owner}/{repo}/branches")
 async def get_branches(owner: str, repo: str, request: Request):
@@ -74,6 +76,7 @@ async def get_branches(owner: str, repo: str, request: Request):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
 
         return resp.json()
+
 # Lưu danh sách commit từ GitHub vào cơ sở dữ liệu.
 @github_router.post("/github/{owner}/{repo}/save-commits")
 async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = "main"):
@@ -106,8 +109,6 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
         await save_commit(commit_data)
 
     return {"message": "Commits saved successfully!"}
-
-
 
 @github_router.post("/github/{owner}/{repo}/save-commits")
 async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = "main"):
@@ -145,10 +146,41 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
         await save_commit(commit_data)
 
     return {"message": "Commits saved successfully!"}
+# Lưu Pull Requests từ GitHub vào cơ sở dữ liệu.
+@github_router.post("/github/{owner}/{repo}/save-pull-requests")
+async def save_pull_requests(owner: str, repo: str, request: Request):
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
 
+    async with httpx.AsyncClient() as client:
+        url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
+        headers = {"Authorization": token}
+        resp = await client.get(url, headers=headers)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+
+        pull_requests_data = resp.json()
+
+    repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+    if not repo_id:
+        raise HTTPException(status_code=404, detail="Repository not found in database")
+
+    for pr in pull_requests_data:
+        query = pull_requests.insert().values(
+            github_id=pr["id"],
+            title=pr["title"],
+            description=pr.get("body"),
+            state=pr["state"],
+            repo_id=repo_id
+        )
+        await database.execute(query)
+
+    return {"message": "Pull requests saved successfully!"}
 
 def get_db():
     return database
+
 # Lấy danh sách commit từ cơ sở dữ liệu.
 @github_router.get("/commits")
 async def get_commits(db = Depends(get_db)):
@@ -156,7 +188,36 @@ async def get_commits(db = Depends(get_db)):
     result = await db.fetch_all(query)
     return result
 
-# Thêm vào cuối file github.py
+# Lưu danh sách repository từ GitHub vào cơ sở dữ liệu.
+@github_router.post("/github/save-repos")
+async def save_repos(request: Request):
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            "https://api.github.com/user/repos",
+            headers={"Authorization": token}
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+
+        repos = resp.json()
+
+    for repo in repos:
+        query = repositories.insert().values(
+            github_id=repo["id"],
+            owner=repo["owner"]["login"],
+            name=repo["name"],
+            description=repo.get("description"),
+            created_at=repo["created_at"],
+            updated_at=repo["updated_at"]
+        )
+        await database.execute(query)
+
+    return {"message": "Repositories saved successfully!"}
+
 # Đồng bộ commit từ GitHub vào cơ sở dữ liệu.
 @github_router.get("/sync-commits")
 async def sync_commits(
