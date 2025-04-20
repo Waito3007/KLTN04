@@ -1,5 +1,7 @@
 .env
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
+.python-version
