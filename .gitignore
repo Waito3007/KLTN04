@@ -1,0 +1,30 @@
+.env
+.env
+# Bỏ qua môi trường ảo
+venv/
+ENV/
+env/
+.venv/
+
+# File cấu hình môi trường
+.env
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# IDE files
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# PostgreSQL config hoặc dump
+*.sql
+*.dump

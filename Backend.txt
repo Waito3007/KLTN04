@@ -1,0 +1,44 @@
+KLTN04/
+├── backend/
+│   ├── __init__.py
+│   ├── main.py                  # Entry point FastAPI
+│   ├── core/
+│   │   ├── config.py            # Đọc biến môi trường (.env)
+│   │   ├── logging_config.py    # Setup logging (nếu cần)
+│   │   └── security.py          # Xử lý token, OAuth
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── database.py          # Kết nối PostgreSQL
+│   │   └── models/              # SQLAlchemy models
+│   │       ├── __init__.py
+│   │       ├── user.py
+│   │       ├── repository.py
+│   │       ├── commit.py
+│   │       ├── pull_request.py
+│   │       └── assignment.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── deps.py              # Dependency dùng chung
+│   │   ├── routes/
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py          # OAuth login GitHub/GitLab
+│   │   │   ├── users.py
+│   │   │   ├── github.py        # Lấy commit, PR từ GitHub
+│   │   │   ├── gitlab.py
+│   │   │   ├── repo.py
+│   │   │   └── ai_suggestions.py # Gợi ý phân công bằng AI
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── github_service.py
+│   │   ├── gitlab_service.py
+│   │   ├── ai_model.py          # Xử lý XGBoost/spaCy/SHAP
+│   │   └── report_generator.py  # Tạo báo cáo PDF
+│   └── utils/
+│       ├── __init__.py
+│       ├── formatter.py         # Tiện ích định dạng
+│       └── scheduler.py         # Tự động hóa (nếu có)
+├── frontend/                    # React + Ant Design
+├── .env
+├── README.md
+├── pyproject.toml
+├── poetry.lock
