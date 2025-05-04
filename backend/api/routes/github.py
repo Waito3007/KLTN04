@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, HTTPException
 import httpx
 from services.repo_service import get_repo_data
-from services.commit_service import save_repo_commits
+from services.commit_service import save_commit
 from services.repo_service import get_repo_id_by_owner_and_name
 from services.user_service import get_user_id_by_github_username
 from services.branch_service import save_branch
@@ -20,7 +20,6 @@ from schemas.commit import CommitOut
 from db.database import database
 
 from services.branch_service import save_branches
-from services.commit_service import save_repo_commits
 from services.issue_service import save_issues
 github_router = APIRouter()
 
@@ -98,7 +97,7 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
 
-    # Lấy commit từ GitHub API
+    # Lấy danh sách commit từ GitHub API
     async with httpx.AsyncClient() as client:
         url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
         headers = {"Authorization": token}
@@ -108,21 +107,34 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
 
         commit_list = resp.json()
 
-    # Lưu commit vào database
+    # Lấy repo_id từ cơ sở dữ liệu
     repo_id = await get_repo_id_by_owner_and_name(owner, repo)
     if not repo_id:
         raise HTTPException(status_code=404, detail="Repository not found")
 
-    for commit in commit_list:
-        commit_data = {
-            "sha": commit["sha"],
-            "message": commit["commit"]["message"],
-            "author_name": commit["commit"]["author"]["name"],
-            "author_email": commit["commit"]["author"]["email"],
-            "date": commit["commit"]["author"]["date"],
-            "repo_id": repo_id,
-        }
-        await save_commit(commit_data)
+    # Lưu từng commit vào cơ sở dữ liệu
+    async with httpx.AsyncClient() as client:
+        for commit in commit_list:
+            # Lấy thông tin chi tiết của commit
+            commit_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit['sha']}"
+            commit_resp = await client.get(commit_url, headers={"Authorization": token})
+            if commit_resp.status_code != 200:
+                continue  # Bỏ qua commit nếu không lấy được thông tin chi tiết
+
+            commit_details = commit_resp.json()
+            stats = commit_details.get("stats", {})
+            commit_data = {
+                "sha": commit["sha"],
+                "message": commit["commit"]["message"],
+                "author_name": commit["commit"]["author"]["name"],
+                "author_email": commit["commit"]["author"]["email"],
+                "date": datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ"),
+                "insertions": stats.get("additions", 0),
+                "deletions": stats.get("deletions", 0),
+                "files_changed": stats.get("total", 0),
+                "repo_id": repo_id,
+            }
+            await save_commit(commit_data)
 
     return {"message": "Commits saved successfully!"}
 #lưu branchbranch vào database
