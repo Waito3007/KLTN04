@@ -2,7 +2,7 @@ from db.models.commits import commits
 from db.database import database
 from sqlalchemy import select
 
-async def save_commit(commit_data):
+async def save_repo_commits(commit_data):
     # Kiểm tra commit đã tồn tại chưa
     query = select(commits).where(commits.c.sha == commit_data["sha"])
     result = await database.fetch_one(query)
