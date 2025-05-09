@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Request, HTTPException  # Framework web và xử lý request
 import httpx  # Thư viện HTTP client async
 from services.repo_service import get_repo_data  # Service xử lý repository
-from services.commit_service import save_commit  # Service lưu commit
+# from services.commit_service import save_commit  # Service lưu commit
 from services.repo_service import get_repo_id_by_owner_and_name  # Lấy ID repo theo tên
 from services.user_service import get_user_id_by_github_username  # Lấy ID user theo GitHub username
 from sqlalchemy.future import select  # Câu lệnh SQL select async

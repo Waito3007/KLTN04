@@ -34,3 +34,6 @@ Thumbs.db
 # PostgreSQL config hoặc dump
 *.sql
 *.dump
+
+#dataset
+*.csv
