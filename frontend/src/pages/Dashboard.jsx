@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message, Spin } from 'antd';
+import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge } from 'antd';
 import { LogoutOutlined, GithubOutlined, NotificationOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
@@ -8,7 +8,6 @@ import OverviewCard from '../components/Dashboard/OverviewCard';
 import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
 import RepoListFilter from '../components/Dashboard/RepoListFilter';
 import TaskBoard from '../components/Dashboard/TaskBoard';
-import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -123,46 +122,9 @@ const NotificationBadge = styled(Badge)`
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // Removed unused activeTab state
   const navigate = useNavigate();
   const screens = useBreakpoint();
-
-  const syncAllRepositories = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      message.error('Vui lòng đăng nhập lại!');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:8000/api/github/repos', {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      });
-
-      const repositories = response.data;
-      for (const repo of repositories) {
-        await axios.post(
-          `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-all`,
-          {},
-          {
-            headers: {
-              Authorization: `token ${token}`,
-            },
-          }
-        );
-      }
-
-      message.success('Đồng bộ tất cả repository thành công!');
-    } catch (error) {
-      console.error('Lỗi khi đồng bộ repository:', error);
-      message.error('Không thể đồng bộ repository!');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     const storedProfile = localStorage.getItem('github_profile');
@@ -171,7 +133,6 @@ const Dashboard = () => {
     } else {
       setUser(JSON.parse(storedProfile));
     }
-    syncAllRepositories();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -187,10 +148,6 @@ const Dashboard = () => {
   const handleStatusChange = (taskId, newStatus) => {
     console.log(`Updated task ${taskId} status to ${newStatus}`);
   };
-
-  if (loading) {
-    return <Spin tip="Đang đồng bộ dữ liệu..." size="large" />;
-  }
 
   return (
     <DashboardContainer>

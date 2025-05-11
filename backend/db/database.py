@@ -9,8 +9,6 @@ from db.models.repositories import repositories
 from db.models.users import users
 from db.models.pull_requests import pull_requests
 from db.models.assignments import assignments
-from db.models.issues import issues
-from db.models.branches import branches
 
 load_dotenv()
 

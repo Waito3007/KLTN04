@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from db.metadata import metadata  # Import metadata từ metadata.py
+from db.metadata import metadata
 
 # Nạp biến môi trường từ file .env
 load_dotenv()

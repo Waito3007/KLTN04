@@ -1,8 +1,7 @@
 # backend/services/repo_service.py
 from .github_service import fetch_from_github
 from db.models.repositories import repositories
-from sqlalchemy import select, update
-from sqlalchemy.sql import func
+from sqlalchemy import select
 from db.database import database
 
 async def get_repo_data(owner: str, repo: str):
@@ -35,32 +34,3 @@ async def get_repo_id_by_owner_and_name(owner: str, repo_name: str):
     if result:
         return result.id
     return None
-
-
-async def save_repository(repo_entry):
-    # Kiểm tra xem repository đã tồn tại chưa
-    query = select(repositories).where(repositories.c.github_id == repo_entry["github_id"])
-    existing_repo = await database.fetch_one(query)
-
-    if existing_repo:
-        # Nếu repository đã tồn tại, cập nhật thông tin (nếu cần)
-        update_query = (
-            update(repositories)
-            .where(repositories.c.github_id == repo_entry["github_id"])
-            .values(
-                name=repo_entry["name"],
-                owner=repo_entry["owner"],
-                description=repo_entry["description"],
-                stars=repo_entry["stars"],
-                forks=repo_entry["forks"],
-                language=repo_entry["language"],
-                open_issues=repo_entry["open_issues"],
-                url=repo_entry["url"],
-                updated_at=func.now(),
-            )
-        )
-        await database.execute(update_query)
-    else:
-        # Nếu repository chưa tồn tại, chèn mới
-        query = repositories.insert().values(repo_entry)
-        await database.execute(query)

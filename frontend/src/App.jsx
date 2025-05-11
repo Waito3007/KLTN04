@@ -14,7 +14,7 @@ function App() {
 
         {/* Các route chính */}
         <Route path="/login" element={<Login />} />
-        <Route path="/auth-success" element={<AuthSuccess />} />
+        <Route path="/api/auth-success" element={<AuthSuccess />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
         <Route path="/commits" element={<CommitTable />} />
