@@ -1,11 +1,10 @@
 # KLTN04\backend\api\routes\auth.py
-# Import các thư viện cần thiết
-from fastapi import APIRouter, Request  # APIRouter để tạo routes, Request để xử lý request HTTP
-from core.oauth import oauth  # Module tự định nghĩa chứa cấu hình OAuth
-from fastapi.responses import RedirectResponse  # Để thực hiện chuyển hướng
-import os  # Để làm việc với biến môi trường
+from fastapi import APIRouter, Request, HTTPException
+from core.oauth import oauth
+from fastapi.responses import RedirectResponse
+from services.user_service import save_user  # Import hàm lưu người dùng
+import os
 
-# Khởi tạo router cho các endpoint xác thực
 auth_router = APIRouter()
 
 # Endpoint /login để bắt đầu quá trình xác thực với GitHub
@@ -20,14 +19,18 @@ async def login(request: Request):
 # Endpoint /auth/callback - GitHub sẽ gọi lại endpoint này sau khi xác thực thành công
 @auth_router.get("/auth/callback")
 async def auth_callback(request: Request):
-    # Lấy access token từ response của GitHub
+    code = request.query_params.get("code")
+    if not code:
+        raise HTTPException(status_code=400, detail="Missing code")
+
+    # Lấy access token từ GitHub
     token = await oauth.github.authorize_access_token(request)
     
     # Gọi API GitHub để lấy thông tin user cơ bản
     resp = await oauth.github.get("user", token=token)
     profile = resp.json()  # Chuyển response thành dictionary
 
-    # Xử lý trường hợp profile không có email
+    # Lấy email nếu không có trong profile
     if not profile.get("email"):
         # Gọi API riêng để lấy danh sách email
         emails_resp = await oauth.github.get("user/emails", token=token)
@@ -39,13 +42,26 @@ async def auth_callback(request: Request):
         # Gán email chính vào profile
         profile["email"] = primary_email
 
-    # Tạo URL để chuyển hướng về frontend (React) với các thông tin user
+    # Kiểm tra thông tin bắt buộc
+    if not profile.get("email") or not profile.get("login"):
+        raise HTTPException(status_code=400, detail="Missing required user information")
+
+    # Lưu thông tin người dùng vào cơ sở dữ liệu
+    user_data = {
+        "github_id": profile["id"],
+        "github_username": profile["login"],
+        "email": profile["email"],
+        "avatar_url": profile["avatar_url"],
+    }
+    await save_user(user_data)
+
+    # Redirect về frontend với token và thông tin người dùng
     redirect_url = (
-        f"http://localhost:5173/api/auth-success"  # URL frontend
-        f"?token={token['access_token']}"          # Access token
-        f"&username={profile['login']}"           # Tên đăng nhập GitHub
-        f"&email={profile['email']}"              # Email user
-        f"&avatar_url={profile['avatar_url']}"    # URL avatar
+        f"http://localhost:5173/auth-success"
+        f"?token={token['access_token']}"
+        f"&username={profile['login']}"
+        f"&email={profile['email']}"
+        f"&avatar_url={profile['avatar_url']}"
     )
 
     # Thực hiện chuyển hướng về frontend

@@ -1,25 +1,9 @@
 import { useEffect, useState } from "react";
-import { 
-  Avatar, 
-  Typography, 
-  Spin, 
-  message, 
-  Card, 
-  Tag, 
-  Pagination,
-  Space
-} from "antd";
+import { Avatar, Typography, Spin, message, Card, Tag, Pagination } from "antd";
 import { useNavigate } from "react-router-dom";
-import { 
-  GithubOutlined, 
-  StarFilled, 
-  EyeFilled, 
-  ForkOutlined, 
-  CalendarOutlined 
-} from "@ant-design/icons";
+import { GithubOutlined, StarFilled, EyeFilled, ForkOutlined, CalendarOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import axios from "axios";
-import AnalyzeGitHubCommits from '../commits/AnalyzeGitHubCommits';
 
 const { Title, Text } = Typography;
 
@@ -126,9 +110,10 @@ const RepoList = () => {
         setLoading(true);
         const response = await axios.get("http://localhost:8000/api/github/repos", {
           headers: { Authorization: `token ${token}` },
-          params: { sort: 'updated', direction: 'desc' }
+          params: { sort: 'updated', direction: 'desc' } // Sắp xếp theo mới nhất
         });
         
+        // Sắp xếp lại để đảm bảo mới nhất lên đầu
         const sortedRepos = response.data.sort((a, b) => 
           new Date(b.updated_at) - new Date(a.updated_at)
         );
@@ -180,7 +165,10 @@ const RepoList = () => {
       </div>
 
       {paginatedRepos.map((repo) => (
-        <RepoCard key={repo.id} onClick={() => navigate(`/repo/${repo.owner.login}/${repo.name}`)}>
+        <RepoCard 
+          key={repo.id} 
+          onClick={() => navigate(`/repo/${repo.owner.login}/${repo.name}`)}
+        >
           <RepoHeader>
             <Avatar 
               src={repo.owner.avatar_url} 
@@ -208,47 +196,41 @@ const RepoList = () => {
           </RepoHeader>
 
           <RepoMeta>
-            <Space size="middle">
+            <MetaItem>
+              <StarFilled style={{ color: '#ffc53d' }} />
+              <Text strong>{repo.stargazers_count}</Text>
+              <Text>stars</Text>
+            </MetaItem>
+            
+            <MetaItem>
+              <EyeFilled style={{ color: '#1890ff' }} />
+              <Text strong>{repo.watchers_count}</Text>
+              <Text>watchers</Text>
+            </MetaItem>
+            
+            <MetaItem>
+              <ForkOutlined style={{ color: '#73d13d' }} />
+              <Text strong>{repo.forks_count}</Text>
+              <Text>forks</Text>
+            </MetaItem>
+            
+            {repo.language && (
               <MetaItem>
-                <StarFilled style={{ color: '#ffc53d' }} />
-                <Text strong>{repo.stargazers_count}</Text>
+                <div style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  backgroundColor: '#1890ff',
+                  marginRight: 6
+                }} />
+                <Text>{repo.language}</Text>
               </MetaItem>
-              
-              <MetaItem>
-                <EyeFilled style={{ color: '#1890ff' }} />
-                <Text strong>{repo.watchers_count}</Text>
-              </MetaItem>
-              
-              <MetaItem>
-                <ForkOutlined style={{ color: '#73d13d' }} />
-                <Text strong>{repo.forks_count}</Text>
-              </MetaItem>
-              
-              {repo.language && (
-                <MetaItem>
-                  <div style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    backgroundColor: '#1890ff',
-                    marginRight: 6
-                  }} />
-                  <Text>{repo.language}</Text>
-                </MetaItem>
-              )}
-            </Space>
-
-            <Space size="middle" style={{ marginLeft: 'auto' }}>
-              <MetaItem>
-                <CalendarOutlined />
-                <Text>{formatDate(repo.updated_at)}</Text>
-              </MetaItem>
-              
-              {/* Thêm AnalyzeGitHubCommits ở đây */}
-              <div onClick={(e) => e.stopPropagation()}>
-                <AnalyzeGitHubCommits repo={repo} />
-              </div>
-            </Space>
+            )}
+            
+            <MetaItem style={{ marginLeft: 'auto' }}>
+              <CalendarOutlined />
+              <Text>Cập nhật: {formatDate(repo.updated_at)}</Text>
+            </MetaItem>
           </RepoMeta>
         </RepoCard>
       ))}
