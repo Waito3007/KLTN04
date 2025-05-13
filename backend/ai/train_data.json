@@ -1,0 +1,2868 @@
+[
+  {
+    "text": "Merge pull request #1 from Waito3007/UpdateModel\n\nUpdate model",
+    "meta": {
+      "sha": "6107cd32708a80e9699cb5656d254d4ab826709a",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2025-05-04 14:47:42",
+      "insertions": 9077,
+      "deletions": 0,
+      "files_changed": 9077,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "feat:  Thêm model issues, lưu dữ liệu vào database",
+    "meta": {
+      "sha": "1e6c48e810d313e03e244a2a84c32a04301fe06b",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-05-04 14:45:40",
+      "insertions": 1503,
+      "deletions": 207,
+      "files_changed": 1710,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 1.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "feat: thêm api lưu pull requests và repositories",
+    "meta": {
+      "sha": "1cdf12c9f5b99b41a04bb52d998dda97939ca408",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-20 16:56:26",
+      "insertions": 64,
+      "deletions": 3,
+      "files_changed": 67,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 1.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "refactor: update comments để biết nv của từng api",
+    "meta": {
+      "sha": "1f21ac9681b7f687382ac7814fbe79a603ffce5d",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-20 16:30:16",
+      "insertions": 6,
+      "deletions": 6,
+      "files_changed": 12,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 1.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "feat: cập nhât alembic để update model",
+    "meta": {
+      "sha": "cec668675c0dbc4c49f1e09a13b5a93d8b3ef94d",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-20 15:30:37",
+      "insertions": 247,
+      "deletions": 1,
+      "files_changed": 248,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 1.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "feat: Triển khai quản lý phiên cơ sở dữ liệu",
+    "meta": {
+      "sha": "eabba3c3a5c2ea4a6a179764a3a83ea815d02ab9",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-20 14:14:33",
+      "insertions": 102,
+      "deletions": 45,
+      "files_changed": 147,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 1.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "feat: Update database",
+    "meta": {
+      "sha": "fd43043ed94ec52666bf6855fec9181c85e33d76",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-19 17:29:03",
+      "insertions": 101,
+      "deletions": 157,
+      "files_changed": 258,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 1.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "update: bỏ qua việc push các file thư viện",
+    "meta": {
+      "sha": "9d9fad3659c140e2c31984a9e6558dc452b27334",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-04-13 08:32:39",
+      "insertions": 31,
+      "deletions": 0,
+      "files_changed": 31,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'NghiaDemo' of https://github.com/Waito3007/KLTN04 into NghiaDemo",
+    "meta": {
+      "sha": "5b9ad1be75b42fcbe630a23abf9c17f3555f313c",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 22:56:37",
+      "insertions": 0,
+      "deletions": 5,
+      "files_changed": 5,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Update SECRET_KEY in .env and ensure .env is ignored in .gitignore",
+    "meta": {
+      "sha": "6a350ad7a451b480e1d89858172956c344f97098",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 22:55:30",
+      "insertions": 2,
+      "deletions": 1,
+      "files_changed": 3,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Delete .env",
+    "meta": {
+      "sha": "1853be2b8b76b75fae693e1db332b7ca613bfe21",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2025-04-11 22:54:42",
+      "insertions": 0,
+      "deletions": 5,
+      "files_changed": 5,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add .env to .gitignore to prevent sensitive information from being tracked",
+    "meta": {
+      "sha": "8e38bf66d26c4fe098426871d264b26680a4d61a",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 22:53:50",
+      "insertions": 1,
+      "deletions": 0,
+      "files_changed": 1,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Refactor backend models and services; add commit and user handling\n\n- Updated `commits.py`, `repositories.py`, and `users.py` models to use `server_default` for timestamps and constraints.\n- Introduced new `fetch_commits` function in `github_service.py` to retrieve commits from GitHub.\n- Added `get_repo_id_by_owner_and_name` function in `repo_service.py` for repository ID retrieval.\n- Removed deprecated `RepoList` component and adjusted imports in `Dashboard.jsx`.\n- Created new `RepoDetails` and `CommitTable` components for detailed repository and commit views.\n- Implemented `BranchSelector` for branch selection in repositories.\n- Enhanced `CommitList` to display commit details with author information.\n- Added `save_commit` function in `commit_service.py` to handle commit data storage.\n- Introduced `get_user_id_by_github_username` in `user_service.py` for user ID retrieval.\n- Updated frontend routing and component structure for improved user experience.",
+    "meta": {
+      "sha": "d4b1d84db5d53eb9a86217a850b6b5c56be76b6d",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 22:48:35",
+      "insertions": 570,
+      "deletions": 24,
+      "files_changed": 594,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 1.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "Implement GitHub OAuth flow with login, callback, and user repository fetching",
+    "meta": {
+      "sha": "ee43c543e6ad74e89f95d8dec0e143091239b859",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 21:41:20",
+      "insertions": 266,
+      "deletions": 26,
+      "files_changed": 292,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "thiết lập cấu trúc",
+    "meta": {
+      "sha": "641306a58ab0bc20c1a51891326da3b9bb444115",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-11 20:17:11",
+      "insertions": 396,
+      "deletions": 200,
+      "files_changed": 596,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add initial project configuration with pyproject.toml\n\n- Set project name, version, and description.\n- Specify author information and license type.\n- Define Python version requirement and dependencies for the project.\n- Include development dependencies for code formatting and type checking.",
+    "meta": {
+      "sha": "675418a4bc4e14abb1a460b0e3be9f10ee114cfd",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2025-04-06 15:59:21",
+      "insertions": 6463,
+      "deletions": 0,
+      "files_changed": 6463,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Update README.md",
+    "meta": {
+      "sha": "0bed43e28594b8f91f1e571813d6100224b2b568",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2025-04-01 20:12:01",
+      "insertions": 74,
+      "deletions": 2,
+      "files_changed": 76,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Initial commit",
+    "meta": {
+      "sha": "fb41c91b25b30b214dfdbc977ef45ad0cdd974dc",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2025-03-05 05:04:51",
+      "insertions": 2,
+      "deletions": 0,
+      "files_changed": 2,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #2 from Waito3007/UpdateModel\n\nfix: lưu commit",
+    "meta": {
+      "sha": "1e7af5c313093c59d83e33cf9f904371f0ebef99",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2025-05-04 15:51:32",
+      "insertions": 61,
+      "deletions": 28,
+      "files_changed": 89,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 1.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "fix: lưu commit",
+    "meta": {
+      "sha": "1f541f69955ba56677dc679b6a52cdc1f48e3766",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2025-05-04 15:49:40",
+      "insertions": 61,
+      "deletions": 28,
+      "files_changed": 89,
+      "repo_id": 5
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 1.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0
+    }
+  },
+  {
+    "text": "Merge pull request #26 from Waito3007/Waito3007-patch-4\n\nUpdate README.md",
+    "meta": {
+      "sha": "8ee623e3b2c8333ef39b08c6d1aa1e310827f66f",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-19 18:04:03",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Update README.md",
+    "meta": {
+      "sha": "6bef6cd55fdc4ae33d075f8ca110dcaf87d0f09f",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-19 18:03:52",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #25 from Waito3007/Waito3007-patch-3\n\nUpdate README.md",
+    "meta": {
+      "sha": "452e780e2f8adee24942ba3f3462aea26e3fbb8f",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:48:46",
+      "insertions": 2,
+      "deletions": 2,
+      "files_changed": 4,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Update README.md",
+    "meta": {
+      "sha": "02e394fc5d4db6686c6cce9d5a7754a2e319c060",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:48:35",
+      "insertions": 2,
+      "deletions": 2,
+      "files_changed": 4,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #24 from Waito3007/Waito3007-patch-2\n\nUpdate README.md",
+    "meta": {
+      "sha": "8a3bf877de231b73326d4cc036b44d44f9c81ea2",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:47:04",
+      "insertions": 3,
+      "deletions": 4,
+      "files_changed": 7,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Update README.md",
+    "meta": {
+      "sha": "3dd2996b4fb6a6a911cc54de5ff86fa49470d0ef",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:46:52",
+      "insertions": 3,
+      "deletions": 4,
+      "files_changed": 7,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #23 from Waito3007/Waito3007-patch-1\n\nCreate README.md",
+    "meta": {
+      "sha": "3f00dc7bf5711b6db25431c8c103a0ed2adaa7b6",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:44:06",
+      "insertions": 176,
+      "deletions": 0,
+      "files_changed": 176,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Create README.md",
+    "meta": {
+      "sha": "84f589889043e06e972b572355c48faa3b9cb347",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:43:54",
+      "insertions": 176,
+      "deletions": 0,
+      "files_changed": 176,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #22 from Waito3007/Master\n\n.env enpty",
+    "meta": {
+      "sha": "060e279a02d548a535c38f39f5ff3e8957508b9f",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-18 16:30:02",
+      "insertions": 6,
+      "deletions": 1,
+      "files_changed": 7,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": ".env enpty",
+    "meta": {
+      "sha": "1fb2cedb32b0ee408507c7612b0af61d56df3494",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-18 16:29:19",
+      "insertions": 6,
+      "deletions": 1,
+      "files_changed": 7,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge pull request #21 from Waito3007/Master\n\nMaster",
+    "meta": {
+      "sha": "b058eecb6b3dd4e01b42ef14f4ee97e59b59c8df",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-17 10:30:34",
+      "insertions": 920,
+      "deletions": 483,
+      "files_changed": 1403,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "detailroom",
+    "meta": {
+      "sha": "c9f86a1cd618bbfef6d06b8d19cd57da9d7bd307",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 17:34:28",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'MergeSign' into capcuu",
+    "meta": {
+      "sha": "30e8b7904b3b470d14fa02dd8a0044fdeec2b574",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 17:34:15",
+      "insertions": 85,
+      "deletions": 15,
+      "files_changed": 100,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "capcuu",
+    "meta": {
+      "sha": "f8035145fcd609aa1d85cee9522b2e6fae006ad2",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 15:52:05",
+      "insertions": 5,
+      "deletions": 58,
+      "files_changed": 63,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'capcuu' into MergeSign",
+    "meta": {
+      "sha": "7011cf50b4422c70d55fc519acaa91007cea109c",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 06:46:10",
+      "insertions": 441,
+      "deletions": 225,
+      "files_changed": 666,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "thay đổi logic đặt phòng",
+    "meta": {
+      "sha": "559a92783c2c9fbf3351f63c165e75c4dec0cc53",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 06:42:24",
+      "insertions": 8,
+      "deletions": 23,
+      "files_changed": 31,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "searchplace",
+    "meta": {
+      "sha": "07f1e72fe5dbbe41cacc08a4a0cc7bdb8f417c4a",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 06:05:09",
+      "insertions": 4,
+      "deletions": 4,
+      "files_changed": 8,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "hien thi phong con trong hay chua",
+    "meta": {
+      "sha": "6833a9016ba4a4fbb23ed4e19d9a13837571603b",
+      "author_name": "hoanghuy",
+      "author_email": "dinhhoanghuy20044@gmail.com",
+      "date": "2024-11-16 05:09:19",
+      "insertions": 61,
+      "deletions": 12,
+      "files_changed": 73,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'capcuu' of https://github.com/Waito3007/WEB-DAT-PHONG into capcuu",
+    "meta": {
+      "sha": "47e0e062a00369f34ad663c85bf6ee52c2b22a7e",
+      "author_name": "hoanghuy",
+      "author_email": "dinhhoanghuy20044@gmail.com",
+      "date": "2024-11-16 04:46:36",
+      "insertions": 3,
+      "deletions": 15,
+      "files_changed": 18,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "gomen remainingRooms",
+    "meta": {
+      "sha": "968c7c76ecdd8fb41ea86f1998c43e2c68e2ee92",
+      "author_name": "hoanghuy",
+      "author_email": "dinhhoanghuy20044@gmail.com",
+      "date": "2024-11-16 04:46:31",
+      "insertions": 211,
+      "deletions": 157,
+      "files_changed": 368,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "DetailRoom",
+    "meta": {
+      "sha": "3edcac2ab48107d0f162b120ec6097be73c2f1ef",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 04:43:46",
+      "insertions": 3,
+      "deletions": 15,
+      "files_changed": 18,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "chúng tôi chơi hệ cháy nổ",
+    "meta": {
+      "sha": "81a4e8b0b0272f6e9a8331546b545636fa3abb63",
+      "author_name": "hoanghuy",
+      "author_email": "dinhhoanghuy20044@gmail.com",
+      "date": "2024-11-16 04:29:21",
+      "insertions": 181,
+      "deletions": 56,
+      "files_changed": 237,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "việt hóa",
+    "meta": {
+      "sha": "c12a9a2a32b5457cd5b383938fc458bec625c71d",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-16 04:26:50",
+      "insertions": 57,
+      "deletions": 15,
+      "files_changed": 72,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "front end",
+    "meta": {
+      "sha": "00917ee2bdf7eec6ff6af1b949195f13d74225de",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2024-11-15 20:44:26",
+      "insertions": 24,
+      "deletions": 11,
+      "files_changed": 35,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'MergeSign' of https://github.com/Waito3007/WEB-DAT-PHONG into MergeSign",
+    "meta": {
+      "sha": "1d38df921b888910e5eab9c5d2f51ee02873062f",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2024-11-15 20:14:05",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Cập nhật",
+    "meta": {
+      "sha": "c0196600c07fbe28cecc2fe479613e1b92666001",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2024-11-15 20:03:00",
+      "insertions": 28,
+      "deletions": 11,
+      "files_changed": 39,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "chỉnh sửa",
+    "meta": {
+      "sha": "5798ccfe7222b23a1cfc907ce0c7a99747950f20",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2024-11-15 19:24:39",
+      "insertions": 16,
+      "deletions": 15,
+      "files_changed": 31,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'MergeSign' of https://github.com/Waito3007/WEB-DAT-PHONG into MergeSign",
+    "meta": {
+      "sha": "633e12e42629fb76816f27e2637a28bc3d726cd1",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-15 18:47:02",
+      "insertions": 159,
+      "deletions": 105,
+      "files_changed": 264,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "tinhthanh",
+    "meta": {
+      "sha": "e49075adcde6ac672dd2b76d2f71cdf3e8ed4225",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-15 18:46:47",
+      "insertions": 2,
+      "deletions": 1,
+      "files_changed": 3,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'MergeSign' of https://github.com/Waito3007/WEB-DAT-PHONG into MergeSign",
+    "meta": {
+      "sha": "d2cac8413594fadd68a4b9eee2450015f55a46c0",
+      "author_name": "Youaremyhome",
+      "author_email": "ltn66441@GMAIL.COM",
+      "date": "2024-11-15 18:42:29",
+      "insertions": 231,
+      "deletions": 95,
+      "files_changed": 326,
+      "repo_id": 7
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add project files.",
+    "meta": {
+      "sha": "25c04cffc16614a4fe17c3ce572a7b56c23ff960",
+      "author_name": "codeTodies",
+      "author_email": "lethanhsang2004.lts@gmail.com",
+      "date": "2023-10-30 15:42:07",
+      "insertions": 89914,
+      "deletions": 0,
+      "files_changed": 89914,
+      "repo_id": 1
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add .gitattributes and .gitignore.",
+    "meta": {
+      "sha": "a76658721a3c3cc33b9537c13c0a2c9f40dca099",
+      "author_name": "codeTodies",
+      "author_email": "lethanhsang2004.lts@gmail.com",
+      "date": "2023-10-30 15:42:02",
+      "insertions": 426,
+      "deletions": 0,
+      "files_changed": 426,
+      "repo_id": 1
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Đã thêm Biểu đồ không có tiêu đề.drawio",
+    "meta": {
+      "sha": "f9c3b1b355b138cec70420005da3fdaa5b3368a8",
+      "author_name": "Sang Le",
+      "author_email": "119768979+codeTodies@users.noreply.github.com",
+      "date": "2023-11-17 08:30:17",
+      "insertions": 10,
+      "deletions": 0,
+      "files_changed": 10,
+      "repo_id": 8
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add project files.",
+    "meta": {
+      "sha": "200452e685f9a565647cc7665e44668622fda0f1",
+      "author_name": "codeTodies",
+      "author_email": "lethanhsang2004.lts@gmail.com",
+      "date": "2023-11-11 00:40:05",
+      "insertions": 90670,
+      "deletions": 0,
+      "files_changed": 90670,
+      "repo_id": 8
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add .gitattributes and .gitignore.",
+    "meta": {
+      "sha": "21f74bd23c85a66c44c2f2aeaf39f1eb2d4fccec",
+      "author_name": "codeTodies",
+      "author_email": "lethanhsang2004.lts@gmail.com",
+      "date": "2023-11-11 00:40:00",
+      "insertions": 426,
+      "deletions": 0,
+      "files_changed": 426,
+      "repo_id": 8
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Create jekyll-gh-pages.yml",
+    "meta": {
+      "sha": "06d4a543d0e21d28eb268dc6112b78f19e1fc077",
+      "author_name": "Waito",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-04-09 12:46:25",
+      "insertions": 51,
+      "deletions": 0,
+      "files_changed": 51,
+      "repo_id": 9
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Create static.yml",
+    "meta": {
+      "sha": "d167a5efebf704105255a4032dd57c61ab3cdd45",
+      "author_name": "Waito",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-04-09 12:46:13",
+      "insertions": 43,
+      "deletions": 0,
+      "files_changed": 43,
+      "repo_id": 9
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add project files.",
+    "meta": {
+      "sha": "16913f45527b9bca805e35b3567d14b877790e8b",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2023-10-31 06:27:48",
+      "insertions": 89727,
+      "deletions": 0,
+      "files_changed": 89727,
+      "repo_id": 9
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Add .gitattributes and .gitignore.",
+    "meta": {
+      "sha": "7c89e9ad543df37c36b77ec317b90bd356f52244",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2023-10-31 06:27:44",
+      "insertions": 426,
+      "deletions": 0,
+      "files_changed": 426,
+      "repo_id": 9
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "26/7: save...",
+    "meta": {
+      "sha": "dd0736dc736a4f2c12ca02393270fe171564c361",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-26 12:01:34",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "26/7: save...",
+    "meta": {
+      "sha": "8d297d14823a1ed22449bf2bf983200808ba7f8e",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-26 11:55:08",
+      "insertions": 51,
+      "deletions": 62,
+      "files_changed": 113,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "25/7: save...",
+    "meta": {
+      "sha": "18b80079614c116c919da19fa798190cf2a827e1",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-25 11:23:18",
+      "insertions": 307,
+      "deletions": 342,
+      "files_changed": 649,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "upf",
+    "meta": {
+      "sha": "25f550ecc72ba1504432ae34792adba14c015ffe",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-17 07:24:03",
+      "insertions": 25,
+      "deletions": 4,
+      "files_changed": 29,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "LikeP",
+    "meta": {
+      "sha": "61040b09c8ce1fb522f98d3f4a89fc2ecb41cac6",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-17 07:10:22",
+      "insertions": 33,
+      "deletions": 19,
+      "files_changed": 52,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Ban",
+    "meta": {
+      "sha": "712f0f4b03f2ffaa0b377d257f4bc7a10846ab59",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-17 06:12:03",
+      "insertions": 206,
+      "deletions": 24,
+      "files_changed": 230,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "18/7",
+    "meta": {
+      "sha": "f8f13a3a23b03cc4e71160165c4b170b0c369177",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-17 04:32:20",
+      "insertions": 355,
+      "deletions": 215,
+      "files_changed": 570,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/.ClaraZone",
+    "meta": {
+      "sha": "2cedb096842f101c46290842d7047486ddebed3c",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-15 05:25:33",
+      "insertions": 114,
+      "deletions": 55,
+      "files_changed": 169,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/.ClaraZone",
+    "meta": {
+      "sha": "3887d495a816d1ade543a6432f8dcf9547a272a6",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-15 05:25:13",
+      "insertions": 113,
+      "deletions": 47,
+      "files_changed": 160,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "18/7",
+    "meta": {
+      "sha": "60a9d7d4ea88d20cd738f597e11c04fe4bd441ad",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-15 05:24:56",
+      "insertions": 4,
+      "deletions": 4,
+      "files_changed": 8,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Dung lam tim kiem",
+    "meta": {
+      "sha": "8b36697593f7119e7605131625e7282b9693eb0a",
+      "author_name": "Admin",
+      "author_email": "iamvotandung26@gmail.com",
+      "date": "2024-07-15 05:23:25",
+      "insertions": 1477,
+      "deletions": 413,
+      "files_changed": 1890,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Dung lam tim kiem",
+    "meta": {
+      "sha": "b88bc4f34c70ac558abae3aca9fd229147876d95",
+      "author_name": "Admin",
+      "author_email": "iamvotandung26@gmail.com",
+      "date": "2024-07-15 04:42:54",
+      "insertions": 207,
+      "deletions": 53,
+      "files_changed": 260,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật profile 1%",
+    "meta": {
+      "sha": "62d7c7d091ae572b477bf2d61489e9fef3ad26ab",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-15 04:30:42",
+      "insertions": 113,
+      "deletions": 47,
+      "files_changed": 160,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật profile 1%",
+    "meta": {
+      "sha": "191e19711c4fd900451aef8d482c67e09ff87284",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-14 11:57:43",
+      "insertions": 6,
+      "deletions": 7,
+      "files_changed": 13,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật share bài viết",
+    "meta": {
+      "sha": "3b3a16cf4d2356b2092300c35da538d8b36bccb4",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-14 11:52:11",
+      "insertions": 888,
+      "deletions": 311,
+      "files_changed": 1199,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật share bài viết",
+    "meta": {
+      "sha": "0627e0000ca468e644b7367f9a9d7ac6fc5e21e7",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-14 11:45:57",
+      "insertions": 501,
+      "deletions": 20,
+      "files_changed": 521,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "17/7",
+    "meta": {
+      "sha": "0a80405ee00c89c70ba60a5da828e1f24f6492c5",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-14 11:45:38",
+      "insertions": 892,
+      "deletions": 319,
+      "files_changed": 1211,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật like bài viết",
+    "meta": {
+      "sha": "06e5af627959ff847bb5950b33b9f832bb6e3248",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-14 07:55:45",
+      "insertions": 845,
+      "deletions": 237,
+      "files_changed": 1082,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật like bài viết",
+    "meta": {
+      "sha": "2c61c6ad6efa38b66d5a9444b5266b35a1b019b1",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-12 13:09:19",
+      "insertions": 60,
+      "deletions": 24,
+      "files_changed": 84,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Change data",
+    "meta": {
+      "sha": "a9b60fd70b1841aeb3ee5374fb1f190df71d685a",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-10 08:02:22",
+      "insertions": 458,
+      "deletions": 32,
+      "files_changed": 490,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "follow",
+    "meta": {
+      "sha": "9e0a3c9fe69e6a329d80b6fe2f5cfcbc376a2e34",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-09 17:37:58",
+      "insertions": 192,
+      "deletions": 99,
+      "files_changed": 291,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "follow",
+    "meta": {
+      "sha": "e41ad70e6ce41f7926f4782b618aafe7d38db8f1",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 08:02:22",
+      "insertions": 192,
+      "deletions": 99,
+      "files_changed": 291,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/.ClaraZone",
+    "meta": {
+      "sha": "1cb741c468f0a2f4c66ee3f667c126870a15ef35",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 04:54:25",
+      "insertions": 277,
+      "deletions": 42,
+      "files_changed": 319,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "home",
+    "meta": {
+      "sha": "2503cdd632e2b3cf6a8980578a2c896ca50e12fd",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 04:49:31",
+      "insertions": 0,
+      "deletions": 4,
+      "files_changed": 4,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật like bài viết",
+    "meta": {
+      "sha": "23678c8871760d22e7af53d8a6873234b1368d49",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-08 04:48:04",
+      "insertions": 44,
+      "deletions": 33,
+      "files_changed": 77,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "grade",
+    "meta": {
+      "sha": "812a21e1f562cb71a5ababd9125474dc0416545b",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 04:33:45",
+      "insertions": 2,
+      "deletions": 2,
+      "files_changed": 4,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "cập nhật like bài viết",
+    "meta": {
+      "sha": "e24435ec7e9cdc03260f43c41ddd80bdbe606399",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-07-08 04:32:07",
+      "insertions": 206,
+      "deletions": 68,
+      "files_changed": 274,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/.ClaraZone",
+    "meta": {
+      "sha": "b518b0750266ecab39efb8413f56a7314e9d9ebd",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 04:12:46",
+      "insertions": 14,
+      "deletions": 7,
+      "files_changed": 21,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "comic tí",
+    "meta": {
+      "sha": "deb5eedca8344fa62c530db71d4cac248f935c31",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-07-08 04:12:41",
+      "insertions": 26,
+      "deletions": 28,
+      "files_changed": 54,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "dung trang thai",
+    "meta": {
+      "sha": "da29ec5edeedd48dc084d1560e28a2d7fa9d6495",
+      "author_name": "Admin",
+      "author_email": "iamvotandung26@gmail.com",
+      "date": "2024-07-08 04:11:05",
+      "insertions": 14,
+      "deletions": 7,
+      "files_changed": 21,
+      "repo_id": 10
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update lại",
+    "meta": {
+      "sha": "2cd587071a385b0bbadbf44359d6d0d38be942f9",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 12:41:22",
+      "insertions": 87,
+      "deletions": 18,
+      "files_changed": 105,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update lại",
+    "meta": {
+      "sha": "8da15f4457004ef87ea510fd9a31285565bc1567",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 12:27:36",
+      "insertions": 3,
+      "deletions": 0,
+      "files_changed": 3,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update lại",
+    "meta": {
+      "sha": "a7364a94f01a11e78da8e743276493b8500da25b",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 12:26:54",
+      "insertions": 81,
+      "deletions": 7,
+      "files_changed": 88,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "ad72c73de37969b3cfef134d2e52c01e579f4c54",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 12:24:32",
+      "insertions": 0,
+      "deletions": 65,
+      "files_changed": 65,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "141f2db7cfdf4eb9ac6141d40dd27845a0d2e508",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 12:23:07",
+      "insertions": 0,
+      "deletions": 1,
+      "files_changed": 1,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "1ac556bd79259d049807f29a8eb528de3b993e9e",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 12:18:37",
+      "insertions": 53,
+      "deletions": 1,
+      "files_changed": 54,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "8a424ee79e7fa4f233fb9aeae6bf723ea8f9c9cb",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 12:12:57",
+      "insertions": 31,
+      "deletions": 5,
+      "files_changed": 36,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update lại",
+    "meta": {
+      "sha": "cb0462acde24221754a5114a1a5486f8618f2a93",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 12:10:31",
+      "insertions": 114,
+      "deletions": 168,
+      "files_changed": 282,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update lại",
+    "meta": {
+      "sha": "e106fcc2bb702929a873455172f56ec4c326f116",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 12:04:03",
+      "insertions": 426,
+      "deletions": 754,
+      "files_changed": 1180,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "50281cfb44ac01402584b4e5d190f6392904ee7f",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 11:57:40",
+      "insertions": 50,
+      "deletions": 4,
+      "files_changed": 54,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "e4018d947a72389bcb4da4ad916fec3db237c02e",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 11:55:53",
+      "insertions": 7,
+      "deletions": 420,
+      "files_changed": 427,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "18b6d65fe48511b7dd1113a2f9d7a0aa96b7bee0",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 11:40:11",
+      "insertions": 72,
+      "deletions": 72,
+      "files_changed": 144,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update finish cho mot so act va fontend cho layout",
+    "meta": {
+      "sha": "897b5b85707a9f11c2d165610be68724ac49c693",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 11:13:02",
+      "insertions": 31,
+      "deletions": 9,
+      "files_changed": 40,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "3ca616735514541c57d5f874c7d21a85e5fe5d7d",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 11:10:46",
+      "insertions": 234,
+      "deletions": 70,
+      "files_changed": 304,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update finish cho mot so act va fontend cho layout",
+    "meta": {
+      "sha": "7f773ba5b25f062461ec2d0b43c47ac9647182e2",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 10:27:00",
+      "insertions": 50,
+      "deletions": 4,
+      "files_changed": 54,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "376bf1f7ae3015db5d91e243253a38437959c2aa",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 10:15:30",
+      "insertions": 1,
+      "deletions": 1,
+      "files_changed": 2,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'master' of https://github.com/Waito3007/GreenToon1.1",
+    "meta": {
+      "sha": "4cdb406d59bb9d7d3c812926164f77e7cba49472",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 10:14:28",
+      "insertions": 60,
+      "deletions": 0,
+      "files_changed": 60,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "a1405b8410be0f37a856e1cf24d361974f7787d8",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 10:10:49",
+      "insertions": 166,
+      "deletions": 73,
+      "files_changed": 239,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 26/3",
+    "meta": {
+      "sha": "df7b1c8f560fd21f332370a42a915faa4c7af61f",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-26 10:05:11",
+      "insertions": 302,
+      "deletions": 219,
+      "files_changed": 521,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update chuc nang like status",
+    "meta": {
+      "sha": "800ce30715fef33beae52bf530fc2244b35ca4db",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 07:35:14",
+      "insertions": 60,
+      "deletions": 0,
+      "files_changed": 60,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update chuc nang like status",
+    "meta": {
+      "sha": "abb4dcc56f22ca3507cec93ecd9f61320d475984",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-26 07:32:26",
+      "insertions": 279,
+      "deletions": 95,
+      "files_changed": 374,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/GreenToon1.1",
+    "meta": {
+      "sha": "536d40ce8de33d4626cd21c86ac1690c6d9f8716",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 11:36:27",
+      "insertions": 0,
+      "deletions": 11,
+      "files_changed": 11,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 25/3",
+    "meta": {
+      "sha": "52dcb0e13b90569e996f614f96ec794009246b3f",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-25 11:36:10",
+      "insertions": 0,
+      "deletions": 11,
+      "files_changed": 11,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'master' of https://github.com/Waito3007/GreenToon1.1\n\n# Conflicts:\n#\tapp/src/main/res/layout/user_list_item.xml",
+    "meta": {
+      "sha": "debc97a87050173c35226a2f6b7878015690c9fc",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-25 11:29:50",
+      "insertions": 213,
+      "deletions": 64,
+      "files_changed": 277,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Push nef angsenh",
+    "meta": {
+      "sha": "f1d0e2abe44975ebc6c2cebe074aac0204800bf1",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 11:29:23",
+      "insertions": 0,
+      "deletions": 25,
+      "files_changed": 25,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Push nef angsenh",
+    "meta": {
+      "sha": "4c5f047cbd980e7b89f0fc529590ee13a31c9ecc",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 11:26:57",
+      "insertions": 75,
+      "deletions": 6,
+      "files_changed": 81,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Push nef angsenh",
+    "meta": {
+      "sha": "61138ddddc2af53fdfe144e57423c133baec6cbc",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 11:22:03",
+      "insertions": 127,
+      "deletions": 8,
+      "files_changed": 135,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "update 25/3",
+    "meta": {
+      "sha": "c47c9e489ecc893916c01f51d97d7742fd7a496f",
+      "author_name": "AngSengZu",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-03-25 11:19:31",
+      "insertions": 75,
+      "deletions": 47,
+      "files_changed": 122,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Merge branch 'main' of https://github.com/Waito3007/GreenToon1.1",
+    "meta": {
+      "sha": "0c7e96aad9706c6f1168028ba9ee60598fc58366",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 08:09:19",
+      "insertions": 269,
+      "deletions": 144,
+      "files_changed": 413,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Push nef angsenh",
+    "meta": {
+      "sha": "d28bc92340ba713fdef5810060a75dadf1e26d0c",
+      "author_name": "Le Trong Nghia",
+      "author_email": "143071139+YouAreMyHome@users.noreply.github.com",
+      "date": "2024-03-25 08:08:27",
+      "insertions": 72,
+      "deletions": 58,
+      "files_changed": 130,
+      "repo_id": 11
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "ts",
+    "meta": {
+      "sha": "a30908e372fed467edd11e8a897fe94c08edea69",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-28 19:04:17",
+      "insertions": 10,
+      "deletions": 3,
+      "files_changed": 13,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "navbar",
+    "meta": {
+      "sha": "8d38242d932cb3186380eedb5aa77d34f9081b41",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-28 19:01:48",
+      "insertions": 840,
+      "deletions": 142,
+      "files_changed": 982,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "delete app",
+    "meta": {
+      "sha": "7f76b0266c34d318fb6db9e1bb6b4d857b6f98de",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-28 17:10:56",
+      "insertions": 0,
+      "deletions": 157,
+      "files_changed": 157,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "change location of readme",
+    "meta": {
+      "sha": "44fd82b80d810a07e50f2e177da69e32830d3352",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-28 17:07:21",
+      "insertions": 157,
+      "deletions": 0,
+      "files_changed": 157,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "firt commit",
+    "meta": {
+      "sha": "af54fc00968288a4c457394d9484c29ecd8010ba",
+      "author_name": "San",
+      "author_email": "sangvu2015dp1@gmai.com",
+      "date": "2024-11-28 17:05:49",
+      "insertions": 6074,
+      "deletions": 130,
+      "files_changed": 6204,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  },
+  {
+    "text": "Initial commit",
+    "meta": {
+      "sha": "7ad00d8448aff5b639384a845fbfa28cc9a66adc",
+      "author_name": "SAN",
+      "author_email": "80162938+Waito3007@users.noreply.github.com",
+      "date": "2024-11-28 16:39:25",
+      "insertions": 132,
+      "deletions": 0,
+      "files_changed": 132,
+      "repo_id": 12
+    },
+    "cats": {
+      "feat": 0.0,
+      "fix": 0.0,
+      "docs": 0.0,
+      "style": 0.0,
+      "refactor": 0.0,
+      "chore": 0.0,
+      "test": 0.0,
+      "uncategorized": 1.0
+    }
+  }
+]

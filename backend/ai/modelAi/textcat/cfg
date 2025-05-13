@@ -1,0 +1,14 @@
+{
+  "labels":[
+    "feat",
+    "fix",
+    "docs",
+    "style",
+    "refactor",
+    "chore",
+    "test",
+    "uncategorized"
+  ],
+  "threshold":0.0,
+  "positive_label":null
+}
