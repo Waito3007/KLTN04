@@ -92,10 +92,21 @@ async def get_branches(owner: str, repo: str, request: Request):
         return resp.json()
 
 @github_router.post("/github/{owner}/{repo}/save-commits")
-async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = "main"):
+async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = None):
     token = request.headers.get("Authorization")
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
+
+    # Nếu không truyền branch, lấy branch mặc định từ GitHub
+    if not branch:
+        async with httpx.AsyncClient() as client:
+            repo_url = f"https://api.github.com/repos/{owner}/{repo}"
+            headers = {"Authorization": token}
+            repo_resp = await client.get(repo_url, headers=headers)
+            if repo_resp.status_code != 200:
+                raise HTTPException(status_code=repo_resp.status_code, detail=repo_resp.text)
+            repo_data = repo_resp.json()
+            branch = repo_data.get("default_branch", "main")
 
     # Lấy danh sách commit từ GitHub API
     async with httpx.AsyncClient() as client:
