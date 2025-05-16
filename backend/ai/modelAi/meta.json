@@ -23,7 +23,7 @@
       "ORG",
       "PER"
     ],
-    "textcat":[
+    "textcat_multilabel":[
       "feat",
       "fix",
       "docs",
@@ -31,16 +31,26 @@
       "refactor",
       "chore",
       "test",
-      "uncategorized"
+      "uncategorized",
+      "auth",
+      "search",
+      "cart",
+      "order",
+      "profile",
+      "product",
+      "api",
+      "ui",
+      "notification",
+      "dashboard"
     ]
   },
   "pipeline":[
     "ner",
-    "textcat"
+    "textcat_multilabel"
   ],
   "components":[
     "ner",
-    "textcat"
+    "textcat_multilabel"
   ],
   "disabled":[
 

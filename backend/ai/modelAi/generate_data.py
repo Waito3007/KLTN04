@@ -66,7 +66,9 @@ def get_label_from_message(message):
     # Các từ khóa phổ biến trong commit
     categories = {
         "feat": {"feat": 1.0, "fix": 0.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
+        "thêm": {"feat": 1.0, "fix": 0.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
         "fix": {"feat": 0.0, "fix": 1.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
+        "sửa": {"feat": 0.0, "fix": 1.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
         "docs": {"feat": 0.0, "fix": 0.0, "docs": 1.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
         "style": {"feat": 0.0, "fix": 0.0, "docs": 0.0, "style": 1.0, "refactor": 0.0, "chore": 0.0, "test": 0.0},
         "refactor": {"feat": 0.0, "fix": 0.0, "docs": 0.0, "style": 0.0, "refactor": 1.0, "chore": 0.0, "test": 0.0},
