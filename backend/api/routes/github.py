@@ -20,7 +20,7 @@ from schemas.commit import CommitOut
 from db.database import database
 
 from services.branch_service import save_branches
-from services.issue_service import save_issues
+from services.issue_service import save_issue, save_issues # Import cả hai hàm
 github_router = APIRouter()
 
 # Endpoint lấy thông tin repository cụ thể

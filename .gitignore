@@ -37,3 +37,10 @@ Thumbs.db
 
 #dataset
 *.csv
+backend/ai/baseline/__init__.py
+backend/ai/models/__init__.py
+backend/ai/training/__init__.py
+frontend/package-lock.json
+collected_data/code_diffs.json
+backend/ai/data_preprocessing/__init__.py
+backend/ai/evaluation/__init__.py

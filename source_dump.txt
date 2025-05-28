@@ -1,5 +1,5 @@
 # ==================================================
-# Path: D:\Project\KLTN04
+# Path: D:\project\KLTN04
 # Detected tech: javascript, python, react, rust, typescript
 # ==================================================
 
@@ -11,6 +11,20 @@ KLTN04/
 ├── backend/
 │   ├── __pycache__/
 │   ├── ai/
+│   │   ├── __pycache__/
+│   │   ├── baseline/
+│   │   │   ├── __init__.py
+│   │   │   ├── bilstm_baseline.py
+│   │   │   └── tfidf_logreg_baseline.py
+│   │   ├── data_preprocessing/
+│   │   │   ├── __pycache__/
+│   │   │   ├── __init__.py
+│   │   │   ├── embedding_loader.py
+│   │   │   └── text_processor.py
+│   │   ├── evaluation/
+│   │   │   ├── __init__.py
+│   │   │   ├── attention_visualizer.py
+│   │   │   └── metrics_calculator.py
 │   │   ├── modelAi/
 │   │   │   ├── ner/
 │   │   │   │   ├── cfg
@@ -32,11 +46,25 @@ KLTN04/
 │   │   │   ├── generate_data.py
 │   │   │   ├── meta.json
 │   │   │   └── tokenizer
+│   │   ├── models/
+│   │   │   ├── __pycache__/
+│   │   │   ├── __init__.py
+│   │   │   ├── hierarchical_attention.py
+│   │   │   └── shared_layers.py
+│   │   ├── scripts/
+│   │   │   ├── extract_code_comments.py
+│   │   │   ├── extract_code_diffs.py
+│   │   │   └── extract_readme.py
+│   │   ├── training/
+│   │   │   ├── __init__.py
+│   │   │   ├── loss_functions.py
+│   │   │   └── multitask_trainer.py
 │   │   ├── __init__.py
 │   │   ├── predict.py
 │   │   ├── subintent_keywords.json
 │   │   ├── test_model.py
 │   │   ├── train_data.json
+│   │   ├── train_han_multitask.py
 │   │   └── train_spacy.py
 │   ├── api/
 │   │   ├── __pycache__/
@@ -153,7 +181,8 @@ KLTN04/
 ├── Frontend.txt
 ├── README.md
 ├── poetry.lock
-└── pyproject.toml
+├── pyproject.toml
+└── source_dump.txt
 ```
 
 ## FILE CONTENTS
@@ -234,6 +263,118 @@ for text in texts:
 
 ```
 
+### backend\ai\train_han_multitask.py
+```py
+# Pipeline huấn luyện HAN đa nhiệm cho commit message
+import torch
+from torch.utils.data import DataLoader, Dataset
+from ai.models.hierarchical_attention import HierarchicalAttentionNetwork
+from ai.data_preprocessing.text_processor import TextProcessor
+from ai.data_preprocessing.embedding_loader import EmbeddingLoader
+from ai.training.multitask_trainer import MultiTaskTrainer
+from ai.training.loss_functions import UncertaintyWeightingLoss
+from ai.evaluation.metrics_calculator import calc_metrics
+import numpy as np
+import json
+
+# Dummy dataset cho ví dụ
+class CommitDataset(Dataset):
+    def __init__(self, texts, labels, processor, embed_loader):
+        self.texts = texts
+        self.labels = labels
+        self.processor = processor
+        self.embed_loader = embed_loader
+    def __len__(self):
+        return len(self.texts)
+    def __getitem__(self, idx):
+        doc = self.processor.process_document(self.texts[idx])
+        # Chuyển từng từ thành embedding vector
+        embed_doc = np.zeros((self.processor.max_sent_len, self.processor.max_word_len, 768))
+        for i, sent in enumerate(doc):
+            for j, word in enumerate(sent):
+                # word là chỉ số, cần ánh xạ lại sang từ nếu dùng word2idx
+                embed_doc[i, j] = self.embed_loader.get_word_embedding(str(word))
+        item = {
+            'input': torch.tensor(embed_doc, dtype=torch.float32),
+            'labels': {k: torch.tensor(v[idx]) for k, v in self.labels.items()}
+        }
+        return item
+
+def load_commit_data(json_path):
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    texts = [item['text'] for item in data]
+    # Danh sách nhãn mục đích commit
+    purpose_keys = ['feat','fix','docs','style','refactor','chore','test','uncategorized']
+    # Danh sách nhãn tech_tag (ví dụ, lấy từ các key phụ trong cats)
+    tech_tag_keys = ['auth','search','cart','order','profile','product','api','ui','notification','dashboard']
+    purpose_labels = []
+    suspicious_labels = []
+    tech_tag_labels = []
+    sentiment_labels = []
+    for item in data:
+        cats = item['cats']
+        # Mục đích commit: nhãn lớn nhất trong nhóm purpose_keys
+        purpose = max(purpose_keys, key=lambda k: cats.get(k, 0))
+        purpose_labels.append(purpose_keys.index(purpose))
+        # Suspicious: nếu có trường 'suspicious', lấy nhãn, không thì gán 0
+        suspicious_labels.append(int(cats.get('suspicious', 0)))
+        # Tech tag: lấy nhãn lớn nhất trong nhóm tech_tag_keys
+        tech_tag = max(tech_tag_keys, key=lambda k: cats.get(k, 0))
+        tech_tag_labels.append(tech_tag_keys.index(tech_tag))
+        # Sentiment: nếu có trường 'sentiment', lấy nhãn, không thì gán 1 (neutral)
+        sentiment_labels.append(int(cats.get('sentiment', 1)))
+    labels = {
+        'purpose': purpose_labels,
+        'suspicious': suspicious_labels,
+        'tech_tag': tech_tag_labels,
+        'sentiment': sentiment_labels
+    }
+    return texts, labels
+
+def main():
+    # 1. Load dữ liệu thật từ train_data.json
+    texts, labels = load_commit_data('ai/train_data.json')
+    processor = TextProcessor()
+    embed_loader = EmbeddingLoader(embedding_type='codebert')
+    embed_loader.load()
+    dataset = CommitDataset(texts, labels, processor, embed_loader)
+    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
+
+    # 2. Khởi tạo mô hình
+    num_classes_dict = {
+        'purpose': 8,  # feat, fix, docs, style, refactor, chore, test, uncategorized
+        'tech_tag': 10, # auth, search, cart, order, profile, product, api, ui, notification, dashboard
+        'suspicious': 2,
+        'sentiment': 3
+    }
+    model = HierarchicalAttentionNetwork(embed_dim=768, hidden_dim=128, num_classes_dict=num_classes_dict).to('cpu')
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    loss_fns = {
+        'purpose': torch.nn.CrossEntropyLoss(),
+        'suspicious': torch.nn.CrossEntropyLoss(),
+        'tech_tag': torch.nn.CrossEntropyLoss(),
+        'sentiment': torch.nn.CrossEntropyLoss()
+    }
+    multitask_loss = UncertaintyWeightingLoss(num_tasks=4)
+    trainer = MultiTaskTrainer(model, optimizer, loss_fns, device='cpu')
+
+    # 3. Train 1 epoch (demo)
+    loss = trainer.train_epoch(dataloader)
+    print(f"Train loss: {loss}")
+
+    # 4. Validate (demo)
+    val_loss, preds, labels = trainer.validate(dataloader)
+    print(f"Val loss: {val_loss}")
+    for task in preds:
+        metrics = calc_metrics(labels[task].numpy(), preds[task].argmax(-1).numpy())
+        print(f"Task {task}: {metrics}")
+
+if __name__ == "__main__":
+    main()
+
+```
+
 ### backend\ai\train_spacy.py
 ```py
 import spacy
@@ -283,6 +424,242 @@ print(f"Model saved to {output_dir}")
 ```
 
 ### backend\ai\__init__.py
+```py
+
+```
+
+### backend\ai\baseline\bilstm_baseline.py
+```py
+# BiLSTM baseline cho so sánh
+import torch
+import torch.nn as nn
+
+class BiLSTMBaseline(nn.Module):
+    def __init__(self, embed_dim, hidden_dim, num_classes):
+        super().__init__()
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, bidirectional=True, batch_first=True)
+        self.fc = nn.Linear(hidden_dim*2, num_classes)
+    def forward(self, x):
+        # x: (batch, seq_len, embed_dim)
+        h, _ = self.lstm(x)
+        out = h[:, -1, :]
+        return self.fc(out)
+
+def train_bilstm(model, dataloader, optimizer, loss_fn, device):
+    model.train()
+    total_loss = 0
+    for batch in dataloader:
+        x = batch['input'].to(device)
+        y = batch['label'].to(device)
+        optimizer.zero_grad()
+        out = model(x)
+        loss = loss_fn(out, y)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    return total_loss / len(dataloader)
+
+def predict_bilstm(model, dataloader, device):
+    model.eval()
+    preds, labels = [], []
+    with torch.no_grad():
+        for batch in dataloader:
+            x = batch['input'].to(device)
+            y = batch['label'].to(device)
+            out = model(x)
+            preds.append(out.argmax(dim=1).cpu())
+            labels.append(y.cpu())
+    return torch.cat(preds), torch.cat(labels)
+
+```
+
+### backend\ai\baseline\tfidf_logreg_baseline.py
+```py
+# TF-IDF + Logistic Regression/SVM baseline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+
+class TfidfLogRegBaseline:
+    def __init__(self, model_type='logreg'):
+        self.vectorizer = TfidfVectorizer(max_features=1000)
+        if model_type == 'logreg':
+            self.model = LogisticRegression(max_iter=200)
+        else:
+            self.model = SVC(probability=True)
+    def train(self, X, y):
+        X_vec = self.vectorizer.fit_transform(X)
+        self.model.fit(X_vec, y)
+    def predict(self, X):
+        X_vec = self.vectorizer.transform(X)
+        return self.model.predict(X_vec)
+    def predict_proba(self, X):
+        X_vec = self.vectorizer.transform(X)
+        return self.model.predict_proba(X_vec)
+
+```
+
+### backend\ai\baseline\__init__.py
+```py
+
+```
+
+### backend\ai\data_preprocessing\embedding_loader.py
+```py
+import numpy as np
+from transformers import AutoTokenizer, AutoModel
+import torch
+
+# Tải embedding pre-trained (CodeBERT/FastText/GloVe)
+class EmbeddingLoader:
+    def __init__(self, embedding_type='codebert', model_name='microsoft/codebert-base'):
+        self.embedding_type = embedding_type
+        self.model_name = model_name
+        self.embeddings = None
+        self.tokenizer = None
+        self.model = None
+
+    def load(self, path=None):
+        if self.embedding_type == 'codebert':
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.model = AutoModel.from_pretrained(self.model_name)
+        elif self.embedding_type in ['glove', 'fasttext']:
+            self.embeddings = {}
+            with open(path, encoding='utf-8') as f:
+                for line in f:
+                    values = line.strip().split()
+                    word = values[0]
+                    vec = np.asarray(values[1:], dtype='float32')
+                    self.embeddings[word] = vec
+        else:
+            raise ValueError('Unknown embedding type')
+
+    def get_word_embedding(self, word):
+        if self.embedding_type == 'codebert':
+            # Trả về embedding của từ từ transformers
+            tokens = self.tokenizer(word, return_tensors='pt')
+            with torch.no_grad():
+                output = self.model(**tokens)
+            return output.last_hidden_state[0, 1:-1, :].mean(dim=0).numpy()
+        elif self.embedding_type in ['glove', 'fasttext']:
+            return self.embeddings.get(word, np.zeros(300))
+        else:
+            return None
+
+```
+
+### backend\ai\data_preprocessing\text_processor.py
+```py
+import re
+import numpy as np
+import nltk
+from nltk.tokenize import sent_tokenize, word_tokenize
+nltk.download('punkt', quiet=True)
+
+# Xử lý văn bản: làm sạch, tách câu, token hóa, padding
+class TextProcessor:
+    def __init__(self, max_sent_len=30, max_word_len=20):
+        self.max_sent_len = max_sent_len
+        self.max_word_len = max_word_len
+
+    def clean_text(self, text):
+        text = text.lower()
+        # Giữ lại chữ, số, dấu cách, dấu chấm, dấu gạch dưới, dấu ngoặc, dấu =, :, ;, #, @, /, \, ', ", <, >, -, +, *, %, &, |
+        text = re.sub(r'[^\w\s\.\_\(\)\[\]\{\}\=\:\;\#\@\/\\\'\"\<\>\-\+\*\%\&\|]', '', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    def sent_tokenize(self, text):
+        return sent_tokenize(text)
+
+    def word_tokenize(self, sentence):
+        return word_tokenize(sentence)
+
+    def pad_sequences(self, sequences, maxlen, pad_value=0):
+        padded = np.full((len(sequences), maxlen), pad_value)
+        for i, seq in enumerate(sequences):
+            trunc = seq[:maxlen]
+            padded[i, :len(trunc)] = trunc
+        return padded
+
+    def chunk_text(self, text, max_tokens=500):
+        """Chia văn bản dài thành các đoạn nhỏ hơn theo số lượng từ."""
+        words = self.word_tokenize(text)
+        chunks = []
+        for i in range(0, len(words), max_tokens):
+            chunk = ' '.join(words[i:i+max_tokens])
+            chunks.append(chunk)
+        return chunks
+
+    def process_document(self, text, word2idx=None):
+        text = self.clean_text(text)
+        sents = self.sent_tokenize(text)[:self.max_sent_len]
+        doc = []
+        for sent in sents:
+            words = self.word_tokenize(sent)[:self.max_word_len]
+            if word2idx:
+                words = [word2idx.get(w, word2idx.get('<unk>', 0)) for w in words]
+            doc.append(words)
+        # Padding từng câu
+        doc = [w + [0]*(self.max_word_len-len(w)) if len(w)<self.max_word_len else w for w in doc]
+        # Padding số câu
+        if len(doc) < self.max_sent_len:
+            doc += [[0]*self.max_word_len]*(self.max_sent_len-len(doc))
+        return np.array(doc)
+
+```
+
+### backend\ai\data_preprocessing\__init__.py
+```py
+
+```
+
+### backend\ai\evaluation\attention_visualizer.py
+```py
+# Visualize attention weights
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def visualize_attention(attn_weights, tokens, title='Attention', figsize=(10,2)):
+    plt.figure(figsize=figsize)
+    if len(attn_weights.shape) == 1:
+        attn_weights = attn_weights.reshape(1, -1)
+    sns.heatmap(attn_weights, annot=True, fmt='.2f', xticklabels=tokens, yticklabels=[''])
+    plt.title(title)
+    plt.tight_layout()
+    plt.show()
+
+```
+
+### backend\ai\evaluation\metrics_calculator.py
+```py
+# Tính F1, Precision, Recall, AUC cho từng task
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+import numpy as np
+
+def calc_metrics(y_true, y_pred, task_type='multiclass', average='macro'):
+    metrics = {}
+    if task_type == 'multiclass':
+        metrics['f1'] = f1_score(y_true, y_pred, average=average)
+        metrics['precision'] = precision_score(y_true, y_pred, average=average)
+        metrics['recall'] = recall_score(y_true, y_pred, average=average)
+        try:
+            metrics['auc'] = roc_auc_score(y_true, y_pred, multi_class='ovr', average=average)
+        except Exception:
+            metrics['auc'] = None
+    elif task_type == 'multilabel':
+        metrics['f1'] = f1_score(y_true, y_pred, average=average)
+        metrics['precision'] = precision_score(y_true, y_pred, average=average)
+        metrics['recall'] = recall_score(y_true, y_pred, average=average)
+        try:
+            metrics['auc'] = roc_auc_score(y_true, y_pred, average=average)
+        except Exception:
+            metrics['auc'] = None
+    return metrics
+
+```
+
+### backend\ai\evaluation\__init__.py
 ```py
 
 ```
@@ -379,6 +756,304 @@ def get_label_from_message(message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(convert_to_spacy_format())
+
+```
+
+### backend\ai\models\hierarchical_attention.py
+```py
+# Hierarchical Attention Network (HAN) - PyTorch
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class WordAttention(nn.Module):
+    def __init__(self, embed_dim, hidden_dim):
+        super().__init__()
+        self.bigru = nn.GRU(embed_dim, hidden_dim, bidirectional=True, batch_first=True)
+        self.attn = nn.Linear(hidden_dim*2, 1)
+        self.norm = nn.LayerNorm(hidden_dim*2)
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        # x: (batch, num_word, embed_dim)
+        h, _ = self.bigru(x)
+        attn_weights = torch.softmax(self.attn(h), dim=1)  # (batch, num_word, 1)
+        out = (h * attn_weights).sum(dim=1)  # (batch, hidden_dim*2)
+        out = self.norm(out)
+        out = self.dropout(out)
+        return out, attn_weights.squeeze(-1)
+
+class SentenceAttention(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.bigru = nn.GRU(hidden_dim*2, hidden_dim, bidirectional=True, batch_first=True)
+        self.attn = nn.Linear(hidden_dim*2, 1)
+        self.norm = nn.LayerNorm(hidden_dim*2)
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        # x: (batch, num_sent, hidden_dim*2)
+        h, _ = self.bigru(x)
+        attn_weights = torch.softmax(self.attn(h), dim=1)  # (batch, num_sent, 1)
+        out = (h * attn_weights).sum(dim=1)  # (batch, hidden_dim*2)
+        out = self.norm(out)
+        out = self.dropout(out)
+        return out, attn_weights.squeeze(-1)
+
+class HierarchicalAttentionNetwork(nn.Module):
+    def __init__(self, embed_dim, hidden_dim, num_classes_dict):
+        super().__init__()
+        self.word_attn = WordAttention(embed_dim, hidden_dim)
+        self.sent_attn = SentenceAttention(hidden_dim)
+        # Task-specific heads
+        self.heads = nn.ModuleDict({
+            'purpose': nn.Linear(hidden_dim*2, num_classes_dict['purpose']),
+            'suspicious': nn.Linear(hidden_dim*2, 2),
+            'tech_tag': nn.Linear(hidden_dim*2, num_classes_dict['tech_tag']),
+            'sentiment': nn.Linear(hidden_dim*2, 3)
+        })
+
+    def forward(self, x):
+        # x: (batch, num_sent, num_word, embed_dim)
+        batch, num_sent, num_word, embed_dim = x.size()
+        x = x.view(-1, num_word, embed_dim)  # (batch*num_sent, num_word, embed_dim)
+        word_vecs, word_attn = self.word_attn(x)  # (batch*num_sent, hidden*2)
+        word_vecs = word_vecs.view(batch, num_sent, -1)
+        sent_vec, sent_attn = self.sent_attn(word_vecs)  # (batch, hidden*2)
+        out = {
+            'purpose': self.heads['purpose'](sent_vec),
+            'suspicious': self.heads['suspicious'](sent_vec),
+            'tech_tag': self.heads['tech_tag'](sent_vec),
+            'sentiment': self.heads['sentiment'](sent_vec)
+        }
+        return out, word_attn, sent_attn
+
+```
+
+### backend\ai\models\shared_layers.py
+```py
+# Các lớp dùng chung hoặc private cho multi-task
+import torch.nn as nn
+
+class SharedDense(nn.Module):
+    def __init__(self, in_dim, out_dim):
+        super().__init__()
+        self.linear = nn.Linear(in_dim, out_dim)
+        self.relu = nn.ReLU()
+    def forward(self, x):
+        return self.relu(self.linear(x))
+
+```
+
+### backend\ai\models\__init__.py
+```py
+
+```
+
+### backend\ai\scripts\extract_code_comments.py
+```py
+import os
+import re
+import glob
+import json
+
+def extract_code_comments_from_file(filepath):
+    comments = []
+    ext = os.path.splitext(filepath)[1]
+    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+        lines = f.readlines()
+    if ext in ['.py']:
+        for line in lines:
+            match = re.match(r'\s*#(.*)', line)
+            if match:
+                comments.append(match.group(1).strip())
+    elif ext in ['.js', '.jsx', '.ts', '.tsx']:
+        in_block = False
+        for line in lines:
+            if '/*' in line:
+                in_block = True
+            if in_block:
+                comments.append(line.strip())
+            if '*/' in line:
+                in_block = False
+            match = re.match(r'\s*//(.*)', line)
+            if match:
+                comments.append(match.group(1).strip())
+    return comments
+
+def extract_comments_from_repo(repo_path, exts=['.py', '.js', '.jsx', '.ts', '.tsx']):
+    all_comments = []
+    for ext in exts:
+        for filepath in glob.glob(os.path.join(repo_path, f'**/*{ext}'), recursive=True):
+            comments = extract_code_comments_from_file(filepath)
+            for c in comments:
+                if c:
+                    all_comments.append({'text': c, 'source': filepath})
+    return all_comments
+
+def save_comments_to_json(comments, out_path):
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(comments, f, ensure_ascii=False, indent=2)
+
+if __name__ == '__main__':
+    repo_path = '../../'  # Đường dẫn tới repo gốc
+    comments = extract_comments_from_repo(repo_path)
+    save_comments_to_json(comments, 'ai/code_comments.json')
+    print(f'Extracted {len(comments)} comments.')
+
+```
+
+### backend\ai\scripts\extract_code_diffs.py
+```py
+import subprocess
+import json
+import re
+
+def extract_code_diffs(repo_path, max_commits=100):
+    os.chdir(repo_path)
+    # Lấy danh sách commit hash
+    hashes = subprocess.check_output(['git', 'rev-list', '--max-count', str(max_commits), 'HEAD'], encoding='utf-8').splitlines()
+    diffs = []
+    for h in hashes:
+        diff = subprocess.check_output(['git', 'show', h, '--unified=0', '--no-color'], encoding='utf-8', errors='ignore')
+        added = re.findall(r'^\+[^+][^\n]*', diff, re.MULTILINE)
+        removed = re.findall(r'^-[^-][^\n]*', diff, re.MULTILINE)
+        if added or removed:
+            diffs.append({'commit': h, 'added': added, 'removed': removed})
+    return diffs
+
+def save_diffs_to_json(diffs, out_path):
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(diffs, f, ensure_ascii=False, indent=2)
+
+if __name__ == '__main__':
+    repo_path = '../../'  # Đường dẫn tới repo gốc
+    diffs = extract_code_diffs(repo_path)
+    save_diffs_to_json(diffs, 'ai/code_diffs.json')
+    print(f'Extracted {len(diffs)} code diffs.')
+
+```
+
+### backend\ai\scripts\extract_readme.py
+```py
+import os
+import json
+
+def extract_readme(repo_path):
+    readme_path = None
+    for fname in os.listdir(repo_path):
+        if fname.lower().startswith('readme'):
+            readme_path = os.path.join(repo_path, fname)
+            break
+    if not readme_path or not os.path.isfile(readme_path):
+        return None
+    with open(readme_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    return content
+
+def save_readme_to_json(content, out_path):
+    data = {'text': content}
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+if __name__ == '__main__':
+    repo_path = '../../'  # Đường dẫn tới repo gốc
+    content = extract_readme(repo_path)
+    if content:
+        save_readme_to_json(content, 'ai/readme.json')
+        print('README extracted.')
+    else:
+        print('README not found.')
+
+```
+
+### backend\ai\training\loss_functions.py
+```py
+# Dynamic loss weighting cho multi-task
+import torch
+import torch.nn as nn
+
+def gradnorm_loss(losses, weights, grads, alpha=1.5):
+    # losses: list of task losses
+    # weights: nn.Parameter list
+    # grads: list of grad norms
+    avg_grad = torch.mean(torch.stack(grads))
+    loss_gradnorm = 0
+    for i, (l, w, g) in enumerate(zip(losses, weights, grads)):
+        loss_gradnorm += torch.abs(g - avg_grad * (l.detach() / torch.mean(torch.stack(losses).detach())) ** alpha)
+    return loss_gradnorm
+
+class UncertaintyWeightingLoss(nn.Module):
+    def __init__(self, num_tasks):
+        super().__init__()
+        self.log_vars = nn.Parameter(torch.zeros(num_tasks))
+    def forward(self, losses):
+        weighted = 0
+        for i, loss in enumerate(losses):
+            precision = torch.exp(-self.log_vars[i])
+            weighted += precision * loss + self.log_vars[i]
+        return weighted
+
+```
+
+### backend\ai\training\multitask_trainer.py
+```py
+import torch
+from tqdm import tqdm
+
+# Huấn luyện đa nhiệm cho HAN
+class MultiTaskTrainer:
+    def __init__(self, model, optimizer, loss_fns, device, loss_weights=None):
+        self.model = model
+        self.optimizer = optimizer
+        self.loss_fns = loss_fns  # dict: {task: loss_fn}
+        self.device = device
+        self.loss_weights = loss_weights or {k: 1.0 for k in loss_fns}
+
+    def train_epoch(self, dataloader):
+        self.model.train()
+        total_loss = 0
+        for batch in tqdm(dataloader):
+            x = batch['input'].to(self.device)
+            y = {k: v.to(self.device) for k, v in batch['labels'].items()}
+            self.optimizer.zero_grad()
+            out, _, _ = self.model(x)
+            loss = 0
+            for task, loss_fn in self.loss_fns.items():
+                task_loss = loss_fn(out[task], y[task])
+                loss += self.loss_weights[task] * task_loss
+            loss.backward()
+            self.optimizer.step()
+            total_loss += loss.item()
+        return total_loss / len(dataloader)
+
+    def validate(self, dataloader):
+        self.model.eval()
+        total_loss = 0
+        all_preds = {k: [] for k in self.loss_fns}
+        all_labels = {k: [] for k in self.loss_fns}
+        with torch.no_grad():
+            for batch in tqdm(dataloader):
+                x = batch['input'].to(self.device)
+                y = {k: v.to(self.device) for k, v in batch['labels'].items()}
+                out, _, _ = self.model(x)
+                loss = 0
+                for task, loss_fn in self.loss_fns.items():
+                    task_loss = loss_fn(out[task], y[task])
+                    loss += self.loss_weights[task] * task_loss
+                    all_preds[task].append(out[task].cpu())
+                    all_labels[task].append(y[task].cpu())
+                total_loss += loss.item()
+        # Gộp lại
+        for task in all_preds:
+            all_preds[task] = torch.cat(all_preds[task])
+            all_labels[task] = torch.cat(all_labels[task])
+        return total_loss / len(dataloader), all_preds, all_labels
+
+```
+
+### backend\ai\training\__init__.py
+```py
 
 ```
 
@@ -767,7 +1442,7 @@ from schemas.commit import CommitOut
 from db.database import database
 
 from services.branch_service import save_branches
-from services.issue_service import save_issues
+from services.issue_service import save_issue, save_issues # Import cả hai hàm
 github_router = APIRouter()
 
 # Endpoint lấy thông tin repository cụ thể

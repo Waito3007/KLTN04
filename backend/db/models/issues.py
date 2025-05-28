@@ -1,3 +1,4 @@
+# D:\Project\KLTN04\backend\db\models\issues.py
 from sqlalchemy import Table, Column, Integer, String, Text, TIMESTAMP, ForeignKey, func
 from db.metadata import metadata
 

@@ -2,6 +2,7 @@ import json
 from db.database import database
 from db.models.commits import commits  # Đảm bảo bạn đã import đúng model commits
 from datetime import datetime
+import re
 
 # Hàm để chuyển dữ liệu commit thành định dạng spaCy
 async def convert_to_spacy_format():
@@ -61,6 +62,51 @@ async def convert_to_spacy_format():
     # Ngắt kết nối cơ sở dữ liệu sau khi hoàn thành
     await database.disconnect()
 
+# Hàm thu thập commit messages và lưu theo định dạng unified JSON
+async def export_commit_messages_unified():
+    await database.connect()
+    query = commits.select()
+    rows = await database.fetch_all(query)
+    data = []
+    for row in rows:
+        sha = row["sha"]
+        message = row["message"]
+        author_name = row["author_name"]
+        author_email = row["author_email"]
+        date = row["date"]
+        insertions = row["insertions"]
+        deletions = row["deletions"]
+        files_changed = row["files_changed"]
+        repo_id = row["repo_id"]
+        if isinstance(date, datetime):
+            date = date.strftime('%Y-%m-%d %H:%M:%S')
+        if message:
+            data.append({
+                "id": sha,
+                "data_type": "commit_message",
+                "raw_text": message,
+                "source_info": {
+                    "repo_id": repo_id,
+                    "sha": sha,
+                    "author_name": author_name,
+                    "author_email": author_email,
+                    "date": date,
+                    "insertions": insertions,
+                    "deletions": deletions,
+                    "files_changed": files_changed
+                },
+                "labels": {
+                    "purpose": None,
+                    "suspicious": None,
+                    "tech_tag": None,
+                    "sentiment": None
+                }
+            })
+    with open("ai/collected_data/commit_messages_raw.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print("Đã xuất commit messages sang collected_data/commit_messages_raw.json!")
+    await database.disconnect()
+
 # Hàm phân loại label từ message (cần phải viết logic phân loại của bạn)
 def get_label_from_message(message):
     # Các từ khóa phổ biến trong commit
@@ -84,7 +130,89 @@ def get_label_from_message(message):
     # Nếu không có từ khóa nào trong message, phân loại là 'uncategorized'
     return {"feat": 0.0, "fix": 0.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0, "uncategorized": 1.0}
 
+def classify_commit_purpose(message: str) -> str:
+    message = message.lower()
+    # Bug Fix
+    if re.search(r"\b(fix|bug|error|sửa lỗi|vá lỗi|issue #|problem|resolve|patch|hotfix|defect|repair|correct|debug)\b", message):
+        return 'Bug Fix'
+    # Feature Implementation
+    if re.search(r"\b(feat|add|implement|thêm|phát triển|tính năng mới|feature|introduce|support|create|build)\b", message):
+        return 'Feature Implementation'
+    # Refactoring
+    if re.search(r"\b(refactor|restructure|tái cấu trúc|optimi[sz]e|clean up|cleanup|improve structure|refactoring)\b", message):
+        return 'Refactoring'
+    # Documentation Update
+    if re.search(r"\b(docs|update readme|document|tài liệu|hướng dẫn|readme|docstring|documentation|manual|guide)\b", message):
+        return 'Documentation Update'
+    # Test Update
+    if re.search(r"\b(test|unit test|integration test|add test|update test|kiểm thử|bổ sung test|testcase|test case|testing)\b", message):
+        return 'Test Update'
+    # Security Patch
+    if re.search(r"\b(security|bảo mật|vulnerability|cve-|patch security|fix security|secure|xss|csrf|injection|auth bypass|exploit)\b", message):
+        return 'Security Patch'
+    # Code Style/Formatting
+    if re.search(r"\b(style|format|formatting|code style|reformat|lint|prettier|black|flake8|isort|format code|format lại|chuẩn hóa mã)\b", message):
+        return 'Code Style/Formatting'
+    # Build/CI/CD Script Update
+    if re.search(r"\b(build|ci|cd|pipeline|deploy|release|workflow|github actions|jenkins|travis|circleci|update script|build script|ci/cd|docker|compose|build system|deployment)\b", message):
+        return 'Build/CI/CD Script Update'
+    # Default fallback
+    return 'Other'
+
+def is_suspicious_commit(message: str) -> int:
+    if not message or len(message.strip()) < 5:
+        return 1  # Quá ngắn hoặc không có nội dung
+    if len(message) > 200:
+        return 1  # Quá dài bất thường
+    suspicious_keywords = [
+        'hack', 'backdoor', 'temp fix', 'quick fix', 'todo: fix', 'xxx', 'hack', 'workaround',
+        'bypass', 'disable security', 'hardcode', 'debug', 'remove check', 'skip test', 'patch quick', 'urgent fix'
+    ]
+    msg_lower = message.lower()
+    for kw in suspicious_keywords:
+        if kw in msg_lower:
+            return 1
+    # Toàn bộ viết hoa hoặc chứa nhiều ký tự đặc biệt
+    if message.isupper() or sum(1 for c in message if not c.isalnum() and c not in ' .,:;') > len(message) * 0.3:
+        return 1
+    return 0
+
+def extract_tech_tags(text: str) -> list:
+    tech_vocab = [
+        'python', 'fastapi', 'react', 'javascript', 'typescript', 'docker', 'sqlalchemy', 'pytorch', 'spacy',
+        'css', 'html', 'postgresql', 'mysql', 'mongodb', 'redis', 'vue', 'angular', 'flask', 'django',
+        'node', 'express', 'graphql', 'rest', 'api', 'gitlab', 'github', 'ci', 'cd', 'kubernetes', 'helm',
+        'pytest', 'unittest', 'junit', 'cicd', 'github actions', 'travis', 'jenkins', 'circleci', 'webpack',
+        'babel', 'vite', 'npm', 'yarn', 'pip', 'poetry', 'black', 'flake8', 'isort', 'prettier', 'eslint',
+        'jwt', 'oauth', 'sso', 'celery', 'rabbitmq', 'kafka', 'grpc', 'protobuf', 'swagger', 'openapi',
+        'sentry', 'prometheus', 'grafana', 'nginx', 'apache', 'linux', 'ubuntu', 'windows', 'macos',
+        'aws', 'azure', 'gcp', 'firebase', 'heroku', 'netlify', 'vercel', 'tailwind', 'bootstrap', 'material ui'
+    ]
+    found = set()
+    text_lower = text.lower()
+    for tech in tech_vocab:
+        if tech in text_lower:
+            found.add(tech)
+    return list(found)
+
+def classify_sentiment(message: str) -> str:
+    message = message.lower()
+    positive_keywords = [
+        'cải thiện', 'tốt', 'thành công', 'hoàn thành', 'ổn định', 'tối ưu', 'đẹp', 'gọn', 'sạch', 'great', 'awesome', 'improved', 'cleaned up', 'ok', 'hoàn tất', 'đã xong', 'resolved', 'fixed', 'passed', 'success', 'hoan thanh', 'tot', 'cam on', 'thanks', 'thank you', 'well done', 'hoàn thiện', 'đúng', 'đúng chức năng', 'đúng yêu cầu'
+    ]
+    negative_keywords = [
+        'lỗi', 'fail', 'broke', 'revert', 'issue', 'bug', 'không chạy', 'không hoạt động', 'sai', 'chưa xong', 'chưa hoàn thành', 'chưa đúng', 'problem', 'error', 'crash', 'exception', 'bad', 'xóa bỏ', 'rollback', 'undo', 'fixme', 'todo', 'tạm thời', 'workaround', 'hack', 'tạm vá', 'không ổn', 'không tốt', 'chưa ổn', 'chưa tốt', 'chưa hoàn thiện', 'chưa đúng chức năng', 'chưa đúng yêu cầu'
+    ]
+    for word in positive_keywords:
+        if word in message:
+            return 'positive'
+    for word in negative_keywords:
+        if word in message:
+            return 'negative'
+    return 'neutral'
+
 # Chạy hàm convert_to_spacy_format
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(convert_to_spacy_format())
+    #asyncio.run(convert_to_spacy_format())
+    asyncio.run(export_commit_messages_unified())
