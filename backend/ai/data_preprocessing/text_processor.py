@@ -2,7 +2,10 @@ import re
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
-nltk.download('punkt', quiet=True)
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', quiet=True)
 
 # Xử lý văn bản: làm sạch, tách câu, token hóa, padding
 class TextProcessor:
