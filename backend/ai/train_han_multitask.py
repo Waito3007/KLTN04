@@ -127,10 +127,13 @@ class CommitDataset(Dataset):
         sample = self.samples[idx]
         raw_text = sample.get('raw_text', '')
         doc_tokens = self.processor.process_document(raw_text) # list of lists of words/tokens
+          # Khởi tạo embed_doc
+        # Kích thước embedding từ model config
+        if self.embed_loader.embedding_type == 'codebert':
+            embed_dim = self.embed_loader.model.config.hidden_size
+        else:
+            embed_dim = 768  # Giá trị mặc định
         
-        # Khởi tạo embed_doc
-        # Kích thước embedding là embed_loader.model.config.hidden_size nếu là CodeBERT, hoặc kích thước cố định khác
-        embed_dim = getattr(self.embed_loader.model, 'config', {}).get('hidden_size', 768) if self.embed_loader.embedding_type == 'codebert' else 768 # Mặc định 768
         embed_doc = np.zeros((self.processor.max_sent_len, self.processor.max_word_len, embed_dim), dtype=np.float32)
 
         # Use cached embeddings
@@ -297,6 +300,9 @@ def main():
         author_map=mappings['author_map'],
         repo_map=mappings['repo_map']
     )
+      # Optimize batch size based on GPU memory
+    batch_size = 64 if device.type == 'cuda' else 8
+    num_workers = 6 if device.type == 'cuda' else 0 # Giữ nguyên logic này
     
     # Chỉ tạo val_dataset và val_loader nếu có val_samples
     val_loader = None
@@ -310,9 +316,9 @@ def main():
         )
         val_loader = DataLoader(
             val_dataset,
-            batch_size=batch_size, # batch_size cần được định nghĩa trước
+            batch_size=batch_size,
             shuffle=False,
-            num_workers=num_workers, # num_workers cần được định nghĩa trước
+            num_workers=num_workers,
             pin_memory=True if device.type == 'cuda' else False
         )
     else:
@@ -344,9 +350,14 @@ def main():
         'source_repo': len(mappings['repo_map']) if mappings['repo_map'] else 1,
         'commit_type': len(train_dataset.commit_type_map)
     }
-    
+      # Lấy kích thước embedding từ model config
+    if embed_loader.embedding_type == 'codebert':
+        embed_dim = embed_loader.model.config.hidden_size
+    else:
+        embed_dim = 768  # Giá trị mặc định
+        
     model = HierarchicalAttentionNetwork(
-        embed_dim=getattr(embed_loader.model, 'config', {}).get('hidden_size', 768) if embed_loader.embedding_type == 'codebert' else 768, # Lấy embed_dim từ model
+        embed_dim=embed_dim,
         hidden_dim=128,
         num_classes_dict=num_classes_dict
     ).to(device)
