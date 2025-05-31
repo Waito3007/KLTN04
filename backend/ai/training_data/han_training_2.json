@@ -1,0 +1,5441 @@
+[
+    {
+      "id": "dd6c0b03c11c42445329d3180f71cb1c87018d94",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #147 from trantienduchn/correct-docker-build\n\nalign docker build and maven build output version",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "dd6c0b03c11c42445329d3180f71cb1c87018d94",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-12-07 02:54:53",
+        "insertions": 4,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4cdf871080b01c25eb439df2c7aaf95e07820d36",
+      "data_type": "commit_message",
+      "raw_text": "align docker build and maven build output version\n\nmaven use the hardcoded version `8.7.0` and output zip file with `8.7.0` in file name suffix. This breaks COPY command",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4cdf871080b01c25eb439df2c7aaf95e07820d36",
+        "author_name": "Tran Tien Duc",
+        "author_email": "trantienduchn@gmail.com",
+        "date": "2023-12-06 09:51:58",
+        "insertions": 4,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f1916c0ca7c19475bebe3febc5817c5e3aa3cd91",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #141 from duydo/dependabot/maven/com.google.guava-guava-32.0.0-jre\n\nBump guava from 31.1-jre to 32.0.0-jre",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f1916c0ca7c19475bebe3febc5817c5e3aa3cd91",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-06-22 04:28:35",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "2b2d7ff4005e495d4b67400557198f01e0436f9a",
+      "data_type": "commit_message",
+      "raw_text": "Bump guava from 31.1-jre to 32.0.0-jre\n\nBumps [guava](https://github.com/google/guava) from 31.1-jre to 32.0.0-jre.\n- [Release notes](https://github.com/google/guava/releases)\n- [Commits](https://github.com/google/guava/commits)\n\n---\nupdated-dependencies:\n- dependency-name: com.google.guava:guava\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "2b2d7ff4005e495d4b67400557198f01e0436f9a",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2023-06-14 22:52:14",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a6004a4d002c943980018238e6f8a72ce5917bc0",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #139 from duydo/duydo-patch-1\n\nUpdate README.md",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a6004a4d002c943980018238e6f8a72ce5917bc0",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-23 15:26:06",
+        "insertions": 2,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0ad7efa39678f8cc5d2362f38878d5940649ceaf",
+      "data_type": "commit_message",
+      "raw_text": "Update README.md\n\nUpdated supported versions",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0ad7efa39678f8cc5d2362f38878d5940649ceaf",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-23 15:06:43",
+        "insertions": 2,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "2d9288b82248fcb87874d45592e4471ed9847cfa",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v8.7.0'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "2d9288b82248fcb87874d45592e4471ed9847cfa",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 07:39:41",
+        "insertions": 233,
+        "deletions": 229,
+        "files_changed": 14
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "9de1e09c4ce543801f658cc3de203bbf88c3d40e",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'develop' of github.com:duydo/elasticsearch-analysis-vietnamese into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "9de1e09c4ce543801f658cc3de203bbf88c3d40e",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 07:26:26",
+        "insertions": 233,
+        "deletions": 229,
+        "files_changed": 14
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d00e2202915e4fc2d36c57fec2b048df67bf59a3",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #136 from duydo/feature/upgrade-to-es-8.x\n\nFeature/upgrade to es 8.x",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d00e2202915e4fc2d36c57fec2b048df67bf59a3",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 07:26:15",
+        "insertions": 235,
+        "deletions": 231,
+        "files_changed": 14
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "5ca2dfa0cd885177054ed63a373eec0926826441",
+      "data_type": "commit_message",
+      "raw_text": "ES 8.7.0 requires jdk 17+",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "5ca2dfa0cd885177054ed63a373eec0926826441",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 06:56:14",
+        "insertions": 0,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4945d10382607fbf377cf522b80c65e46309600d",
+      "data_type": "commit_message",
+      "raw_text": "Exported LD_LIBRARY_PATH point to /usr/local/lib",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4945d10382607fbf377cf522b80c65e46309600d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 05:22:57",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "214ad195710f1d69b438b2e671a894c1b63480a0",
+      "data_type": "commit_message",
+      "raw_text": "Refactored Dockerfile, docker-compose.yaml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "214ad195710f1d69b438b2e671a894c1b63480a0",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 05:13:27",
+        "insertions": 36,
+        "deletions": 37,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "c6cc5a9b62f12ae5e07cf718de6d29167a61c0b6",
+      "data_type": "commit_message",
+      "raw_text": "Updated README for v8.7.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "c6cc5a9b62f12ae5e07cf718de6d29167a61c0b6",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 05:12:20",
+        "insertions": 29,
+        "deletions": 16,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f445b562190ee985051ec44106c2b04c46609ad5",
+      "data_type": "commit_message",
+      "raw_text": "Refactor Unsafe, removed unused code",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f445b562190ee985051ec44106c2b04c46609ad5",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 05:11:42",
+        "insertions": 94,
+        "deletions": 168,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4272a35387505d54abacd49a14ab63d9dc5f6db5",
+      "data_type": "commit_message",
+      "raw_text": "Unit tests with single node cluster",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4272a35387505d54abacd49a14ab63d9dc5f6db5",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-08 03:54:35",
+        "insertions": 5,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "2b748d30dacda673af8481cecd9cdb57fed45d4f",
+      "data_type": "commit_message",
+      "raw_text": "Deleted FUNDING.yml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "2b748d30dacda673af8481cecd9cdb57fed45d4f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-07 04:43:52",
+        "insertions": 3,
+        "deletions": 15,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "fcbcf5851a5acc32f439e6d5513ff27ea26ea632",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'master' of github.com:duydo/elasticsearch-analysis-vietnamese into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "fcbcf5851a5acc32f439e6d5513ff27ea26ea632",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-07 02:19:19",
+        "insertions": 5,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "11ca5d11d73f13714d294e08144e6041b63fc2aa",
+      "data_type": "commit_message",
+      "raw_text": "Updated README",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "11ca5d11d73f13714d294e08144e6041b63fc2aa",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-07 02:18:50",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "7f3cbc714ae7c32c875080ce4b153f787d4bcd05",
+      "data_type": "commit_message",
+      "raw_text": "upgraded to ES v8.7",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "7f3cbc714ae7c32c875080ce4b153f787d4bcd05",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-05 02:07:28",
+        "insertions": 9,
+        "deletions": 9,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "092829c36d61b8308cc6f334db9ab19556322574",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #135 from keenlok/v7.17.8\n\nV7.17.8",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "092829c36d61b8308cc6f334db9ab19556322574",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-05-05 02:04:51",
+        "insertions": 5,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0b41547e0ccf6c8f4b49f430fd5c68ad1fbc5791",
+      "data_type": "commit_message",
+      "raw_text": "Test v7.17.8",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0b41547e0ccf6c8f4b49f430fd5c68ad1fbc5791",
+        "author_name": "keenlok.lai",
+        "author_email": "keenlok.lai@grabtaxi.com",
+        "date": "2023-05-03 07:31:54",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3662b6ef392d4aec5ca6edc251e1af90d2b3f2c8",
+      "data_type": "commit_message",
+      "raw_text": "Fix type",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3662b6ef392d4aec5ca6edc251e1af90d2b3f2c8",
+        "author_name": "keenlok.lai",
+        "author_email": "keenlok.lai@grabtaxi.com",
+        "date": "2023-05-03 07:29:38",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d6156986bee6b7a7f20f0743122d82a3d192e3cf",
+      "data_type": "commit_message",
+      "raw_text": "Updated pom.xml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d6156986bee6b7a7f20f0743122d82a3d192e3cf",
+        "author_name": "keenlok.lai",
+        "author_email": "keenlok.lai@grabtaxi.com",
+        "date": "2023-05-03 07:24:55",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ef41af853113805bf253942641ae5b98211662c8",
+      "data_type": "commit_message",
+      "raw_text": "Fix imports",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ef41af853113805bf253942641ae5b98211662c8",
+        "author_name": "keenlok.lai",
+        "author_email": "keenlok.lai@grabtaxi.com",
+        "date": "2023-05-03 07:23:21",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "85d45ac76e22f7c7178d2f1e48c63a0e6fc4d43f",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #132 from scrapnode/feature/upgrade-to-es-8.x\n\nupgrade: docker-compose with version 8.x",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "85d45ac76e22f7c7178d2f1e48c63a0e6fc4d43f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2023-04-14 15:46:26",
+        "insertions": 94,
+        "deletions": 19,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "dd6362bbe0cd6a3a6168256de4594616d4115e78",
+      "data_type": "commit_message",
+      "raw_text": "upgrade: docker-compose with version 8.x",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "dd6362bbe0cd6a3a6168256de4594616d4115e78",
+        "author_name": "Tuan Nguyen",
+        "author_email": "tuan.nguyen930708@gmail.com",
+        "date": "2023-04-14 11:17:42",
+        "insertions": 94,
+        "deletions": 19,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "811728731758d83ca02c7bfad8bca8cdae739f9f",
+      "data_type": "commit_message",
+      "raw_text": "Upgraded to Elasticsearch 8.3.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "811728731758d83ca02c7bfad8bca8cdae739f9f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-08-19 11:56:30",
+        "insertions": 19,
+        "deletions": 18,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "487f8707c72467f89bc719eea16df85cf20d61bd",
+      "data_type": "commit_message",
+      "raw_text": "Merge tag 'v7.17.1.1' into develop\n\nv7.17.1 - Keep tokens as original cases for vi_tokenizer",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "487f8707c72467f89bc719eea16df85cf20d61bd",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-28 13:55:28",
+        "insertions": 0,
+        "deletions": 0,
+        "files_changed": 0
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "da51fef87438e4d447e9d5087aa48ebfbdd87ca5",
+      "data_type": "commit_message",
+      "raw_text": "Keep tokens as orinal cases for vi_tokenizer7.17.1.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "da51fef87438e4d447e9d5087aa48ebfbdd87ca5",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-28 13:51:24",
+        "insertions": 126,
+        "deletions": 82,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a8fc2dcf8e4eab430ae37055302a839e7ca97d92",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/keep-tokens-as-original-case' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a8fc2dcf8e4eab430ae37055302a839e7ca97d92",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-28 13:46:14",
+        "insertions": 126,
+        "deletions": 82,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e37fd58ef92135784513288675d05229e47c9fc3",
+      "data_type": "commit_message",
+      "raw_text": "Updated README: 1) Guided to create custom analyser with vi_tokenizer 2) Added Issues section",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e37fd58ef92135784513288675d05229e47c9fc3",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-28 12:35:36",
+        "insertions": 112,
+        "deletions": 42,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3899314355198aec0268335154ee6c8d3b7d6343",
+      "data_type": "commit_message",
+      "raw_text": "Refactor Tokenizer.segment()",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3899314355198aec0268335154ee6c8d3b7d6343",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-28 09:43:03",
+        "insertions": 9,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ac308e273ed5f3fd2810f6552f65fd2b99d9e6fa",
+      "data_type": "commit_message",
+      "raw_text": "Removed unused variables in segment method",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ac308e273ed5f3fd2810f6552f65fd2b99d9e6fa",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-27 06:31:12",
+        "insertions": 0,
+        "deletions": 10,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "03b285c682d8499a7c13f5e7496a7d0421381b6a",
+      "data_type": "commit_message",
+      "raw_text": "Used lowercase filter for vi_analyzer by default",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "03b285c682d8499a7c13f5e7496a7d0421381b6a",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-27 06:20:03",
+        "insertions": 3,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "2818390c5bcd3f898fc3bd179400f7ffa5f229d6",
+      "data_type": "commit_message",
+      "raw_text": "Keep tokens as original cases, remove unsed method",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "2818390c5bcd3f898fc3bd179400f7ffa5f229d6",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-27 06:18:42",
+        "insertions": 5,
+        "deletions": 16,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "54613adf78acdff828f4f68ef59f6d1aaa536be9",
+      "data_type": "commit_message",
+      "raw_text": "Merge tag 'v7.17.1' into develop\n\n- Fixed loading coccoc native lib issue\n- Added CI",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "54613adf78acdff828f4f68ef59f6d1aaa536be9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 05:41:37",
+        "insertions": 0,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0985dd7f28259e09b65d58af1f813be4414d8e7d",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v7.17.1'\n\n- Fixed loading coccoc native lib thread safety issue\n- Added CI",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0985dd7f28259e09b65d58af1f813be4414d8e7d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 05:36:13",
+        "insertions": 69,
+        "deletions": 15,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "c370112cf9fe165adced37631cad1b4c2038a934",
+      "data_type": "commit_message",
+      "raw_text": "Update README",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "c370112cf9fe165adced37631cad1b4c2038a934",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 05:32:20",
+        "insertions": 0,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e9e97bcc26209c78b2ce23b723c18f2eeee4792c",
+      "data_type": "commit_message",
+      "raw_text": "Test on master branch",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e9e97bcc26209c78b2ce23b723c18f2eeee4792c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 04:28:45",
+        "insertions": 0,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "35a7fb34aea326c109a02c978a9703fee247abb1",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/add-ci' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "35a7fb34aea326c109a02c978a9703fee247abb1",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 04:24:38",
+        "insertions": 40,
+        "deletions": 0,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "7b2115e2faf2dffc1ba6923898de19122b63c504",
+      "data_type": "commit_message",
+      "raw_text": "Set LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "7b2115e2faf2dffc1ba6923898de19122b63c504",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 04:12:21",
+        "insertions": 3,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "aad816e1db1dee4c515417e3feae6e04196f9d57",
+      "data_type": "commit_message",
+      "raw_text": "Use feature/add-ci for testing workflow",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "aad816e1db1dee4c515417e3feae6e04196f9d57",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 04:05:25",
+        "insertions": 2,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "24b8bbdc0145c097b269f5f87de052ebf670a94d",
+      "data_type": "commit_message",
+      "raw_text": "Added CI status badge",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "24b8bbdc0145c097b269f5f87de052ebf670a94d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 03:24:54",
+        "insertions": 2,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "2690e29d3b13e8ff609d1113fa34b14e08e220e7",
+      "data_type": "commit_message",
+      "raw_text": "Added CI",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "2690e29d3b13e8ff609d1113fa34b14e08e220e7",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 03:17:36",
+        "insertions": 35,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0e3f018cca474b0d7aae7dcd9fb147d3620e36cd",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #125 from duydo/feature/search-issues\n\nFeature/search issues",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0e3f018cca474b0d7aae7dcd9fb147d3620e36cd",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 02:38:29",
+        "insertions": 7,
+        "deletions": 6,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d8fe4cf13272b6b0d6a06e64b22beabd18721060",
+      "data_type": "commit_message",
+      "raw_text": "Rename Tokenizer.Loader.load() -> Tokenizer.Loader.get()\nUse project version as Elasticsearch version",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d8fe4cf13272b6b0d6a06e64b22beabd18721060",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 01:39:16",
+        "insertions": 4,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "98b3a92239dfcfbd6a05e8c2b6bd453f6dc165cc",
+      "data_type": "commit_message",
+      "raw_text": "pull origin master",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "98b3a92239dfcfbd6a05e8c2b6bd453f6dc165cc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-05-26 01:30:15",
+        "insertions": 7,
+        "deletions": 6,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "56ca27a894594b27e9de3d25822f9343a0908fad",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #122 from duydo/feature/search-issues\n\nFixed memory leak issues",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "56ca27a894594b27e9de3d25822f9343a0908fad",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-03-25 02:17:24",
+        "insertions": 35,
+        "deletions": 18,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "70e90b22e1d4b39e64cb7f3fc401648caefae81c",
+      "data_type": "commit_message",
+      "raw_text": "Upgraded plugin to ES v7.17.1, log4j v2.17.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "70e90b22e1d4b39e64cb7f3fc401648caefae81c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-03-25 02:08:46",
+        "insertions": 9,
+        "deletions": 11,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "572ec07024b06aa880db4f5f615f1e3711f69797",
+      "data_type": "commit_message",
+      "raw_text": "Make Tokenizer thread-safe",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "572ec07024b06aa880db4f5f615f1e3711f69797",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-03-23 04:49:48",
+        "insertions": 26,
+        "deletions": 7,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "19adce299b513a446d183e16560efd6e663d4004",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #121 from hdhoang/es-7.16\n\ncập nhật tương thích 7.16, 7.17",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "19adce299b513a446d183e16560efd6e663d4004",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2022-03-18 02:31:18",
+        "insertions": 7,
+        "deletions": 6,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e41aaf95d3729b5e41c86b4460ab29d92776cb74",
+      "data_type": "commit_message",
+      "raw_text": "README: cập nhật bảng tương thích",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e41aaf95d3729b5e41c86b4460ab29d92776cb74",
+        "author_name": "Hoàng Đức Hiếu",
+        "author_email": "code@hdhoang.space",
+        "date": "2022-03-17 04:42:54",
+        "insertions": 4,
+        "deletions": 3,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "28bba59f23af7ad5421261197ddd0e506a555e1d",
+      "data_type": "commit_message",
+      "raw_text": "pom: dùng ES 7.17",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "28bba59f23af7ad5421261197ddd0e506a555e1d",
+        "author_name": "Hoàng Đức Hiếu",
+        "author_email": "code@hdhoang.space",
+        "date": "2022-03-17 04:41:30",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a9726381f087a6af3426c6009a09a09e61f2189a",
+      "data_type": "commit_message",
+      "raw_text": "test: sửa import cho ES 7.16, 7.17\n\nbreaking change: https://www.elastic.co/guide/en/elastic-stack/7.16/elasticsearch-breaking-changes.html#breaking_716_hlrc_changes",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a9726381f087a6af3426c6009a09a09e61f2189a",
+        "author_name": "Hoàng Đức Hiếu",
+        "author_email": "code@hdhoang.space",
+        "date": "2022-03-17 04:40:26",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3d1bebb5c58944a7de576b3a99dcea89410fb930",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #118 from duydo/dependabot/maven/org.apache.logging.log4j-log4j-core-2.17.0\n\nBump log4j-core from 2.16.0 to 2.17.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3d1bebb5c58944a7de576b3a99dcea89410fb930",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-12-19 05:38:45",
+        "insertions": 0,
+        "deletions": 0,
+        "files_changed": 0
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f2a670e258ff69a46ea02aad5c918c1116b6b118",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #117 from duydo/dependabot/maven/org.apache.logging.log4j-log4j-api-2.17.0\n\nBump log4j-api from 2.16.0 to 2.17.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f2a670e258ff69a46ea02aad5c918c1116b6b118",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-12-19 05:38:26",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "600c77b8468069525c3885fe8eae53263e8fc5e5",
+      "data_type": "commit_message",
+      "raw_text": "Bump log4j-core from 2.16.0 to 2.17.0\n\nBumps log4j-core from 2.16.0 to 2.17.0.\n\n---\nupdated-dependencies:\n- dependency-name: org.apache.logging.log4j:log4j-core\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "600c77b8468069525c3885fe8eae53263e8fc5e5",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2021-12-18 18:17:26",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "8059e3bfd8f51285accaa322b48f7841dc11bdfa",
+      "data_type": "commit_message",
+      "raw_text": "Bump log4j-api from 2.16.0 to 2.17.0\n\nBumps log4j-api from 2.16.0 to 2.17.0.\n\n---\nupdated-dependencies:\n- dependency-name: org.apache.logging.log4j:log4j-api\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "8059e3bfd8f51285accaa322b48f7841dc11bdfa",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2021-12-18 18:09:50",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f4c3bb0bdafc7cae339ae1d383cdcda7aa3817c4",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #115 from duydo/dependabot/maven/org.apache.logging.log4j-log4j-api-2.16.0\n\nBump log4j-api from 2.14.1 to 2.16.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f4c3bb0bdafc7cae339ae1d383cdcda7aa3817c4",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-12-16 08:52:26",
+        "insertions": 0,
+        "deletions": 0,
+        "files_changed": 0
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d0208bc27f97e31ac7b10f93d1d677b72eb1842d",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #116 from duydo/dependabot/maven/org.apache.logging.log4j-log4j-core-2.16.0\n\nBump log4j-core from 2.14.1 to 2.16.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d0208bc27f97e31ac7b10f93d1d677b72eb1842d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-12-16 08:52:07",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "279c95e1bd0c6b1541103460eaf83c801a709437",
+      "data_type": "commit_message",
+      "raw_text": "Bump log4j-core from 2.14.1 to 2.16.0\n\nBumps log4j-core from 2.14.1 to 2.16.0.\n\n---\nupdated-dependencies:\n- dependency-name: org.apache.logging.log4j:log4j-core\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "279c95e1bd0c6b1541103460eaf83c801a709437",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2021-12-14 21:10:31",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f81af72833f40cf2bcb495554e780c85882a34f1",
+      "data_type": "commit_message",
+      "raw_text": "Bump log4j-api from 2.14.1 to 2.16.0\n\nBumps log4j-api from 2.14.1 to 2.16.0.\n\n---\nupdated-dependencies:\n- dependency-name: org.apache.logging.log4j:log4j-api\n  dependency-type: direct:development\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f81af72833f40cf2bcb495554e780c85882a34f1",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2021-12-14 20:32:01",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "612372caf6f3276b3d22eb8474dcfbb99ca41e92",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #101 from imcvampire/patch-1\n\nUse Elasticsearch version for the plugin version.",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "612372caf6f3276b3d22eb8474dcfbb99ca41e92",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-05-18 04:53:03",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "bf7a112d5a7ca2a1b5e560ca9224ab02d8e8970d",
+      "data_type": "commit_message",
+      "raw_text": "Update README.md",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "bf7a112d5a7ca2a1b5e560ca9224ab02d8e8970d",
+        "author_name": "Quoc-Anh Nguyen",
+        "author_email": "quocanh96@gmail.com",
+        "date": "2021-05-18 04:28:35",
+        "insertions": 0,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "9da263798ecdbdc0662eecf92cdcdfc65fc2cdce",
+      "data_type": "commit_message",
+      "raw_text": "Update pom.xml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "9da263798ecdbdc0662eecf92cdcdfc65fc2cdce",
+        "author_name": "Quoc-Anh Nguyen",
+        "author_email": "quocanh96@gmail.com",
+        "date": "2021-05-18 04:28:19",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "7d78bf904040d526dd6a32476d7d1a9544350cde",
+      "data_type": "commit_message",
+      "raw_text": "Update README.md",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "7d78bf904040d526dd6a32476d7d1a9544350cde",
+        "author_name": "Quoc-Anh Nguyen",
+        "author_email": "quocanh96@gmail.com",
+        "date": "2021-05-18 04:08:26",
+        "insertions": 3,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "dd717fa0e703bb09bb4672bfecccab9b09fb2c25",
+      "data_type": "commit_message",
+      "raw_text": "Update pom.xml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "dd717fa0e703bb09bb4672bfecccab9b09fb2c25",
+        "author_name": "Quoc-Anh Nguyen",
+        "author_email": "quocanh96@gmail.com",
+        "date": "2021-05-18 04:04:51",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1003de73f2ff5152bdea26252559c2b0987f9068",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'master' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1003de73f2ff5152bdea26252559c2b0987f9068",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-24 02:40:20",
+        "insertions": 2,
+        "deletions": 52,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a9cad18140eb5043768a42f0f0082df797717f2f",
+      "data_type": "commit_message",
+      "raw_text": "Remove unused tests",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a9cad18140eb5043768a42f0f0082df797717f2f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-24 02:40:01",
+        "insertions": 2,
+        "deletions": 52,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "692c72329a53c0e576b80439bf6542f821217643",
+      "data_type": "commit_message",
+      "raw_text": "Merge tag 'fix-default-dict-path' into develop\n\nfix-default-dict-path",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "692c72329a53c0e576b80439bf6542f821217643",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 16:24:09",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "75b84238be95376745d9316da66423dafdcce118",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'hotfix/fix-default-dict-path'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "75b84238be95376745d9316da66423dafdcce118",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 16:23:57",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "19147d7bc0839ef31d430cdc8c65e88f16ee6758",
+      "data_type": "commit_message",
+      "raw_text": "Update default dict path to /usr/local/share/tokenizer/dicts",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "19147d7bc0839ef31d430cdc8c65e88f16ee6758",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 16:23:42",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d4f7bf74ac0005b940bc0c41531e479d3809ade9",
+      "data_type": "commit_message",
+      "raw_text": "Merge tag 'v7.12.1' into develop\n\n v7.12.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d4f7bf74ac0005b940bc0c41531e479d3809ade9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:43:52",
+        "insertions": 76,
+        "deletions": 0,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a816d9357cad9b07f190707cd7afa1acec232654",
+      "data_type": "commit_message",
+      "raw_text": "resolve conflicts",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a816d9357cad9b07f190707cd7afa1acec232654",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:43:14",
+        "insertions": 939,
+        "deletions": 294,
+        "files_changed": 19
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "b357cfbbbdd71cda0022bb520fdfe2b82a6dad2b",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/coccoc-tokenizer' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "b357cfbbbdd71cda0022bb520fdfe2b82a6dad2b",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:33:57",
+        "insertions": 966,
+        "deletions": 223,
+        "files_changed": 19
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "152f42e44c05f462d00497ff4725c1838aefc330",
+      "data_type": "commit_message",
+      "raw_text": "Update default dict path to /usr/share/tokenizer/dicts",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "152f42e44c05f462d00497ff4725c1838aefc330",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:31:44",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "707e8ac40c37a3023ba40101d4eaba90b79145bc",
+      "data_type": "commit_message",
+      "raw_text": "Update readme for building the plugin with CocCoc tokenizer library.",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "707e8ac40c37a3023ba40101d4eaba90b79145bc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:25:00",
+        "insertions": 110,
+        "deletions": 12,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e7ea57885e86bdafe08595c39abb7142a7e35b1a",
+      "data_type": "commit_message",
+      "raw_text": "Refactor the tokenizer, analyzer.",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e7ea57885e86bdafe08595c39abb7142a7e35b1a",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-20 15:25:03",
+        "insertions": 286,
+        "deletions": 118,
+        "files_changed": 11
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "8617939c5b33ca2551d01ded30a7cab325b7036a",
+      "data_type": "commit_message",
+      "raw_text": "Remove unused var",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "8617939c5b33ca2551d01ded30a7cab325b7036a",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-19 07:28:36",
+        "insertions": 1,
+        "deletions": 3,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "642247d377e96ead0ae6a00dde3412fe26f95f57",
+      "data_type": "commit_message",
+      "raw_text": "Remove unused imports",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "642247d377e96ead0ae6a00dde3412fe26f95f57",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-19 07:26:25",
+        "insertions": 4,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Code Refactoring",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "64ff993e580dc93de5af57e113af14008ef18a3d",
+      "data_type": "commit_message",
+      "raw_text": "Add tokenizer config",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "64ff993e580dc93de5af57e113af14008ef18a3d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-19 07:13:19",
+        "insertions": 106,
+        "deletions": 67,
+        "files_changed": 8
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d9ba2eb8452595e4bdaa4dfa9ddc6d2069750729",
+      "data_type": "commit_message",
+      "raw_text": "Update dependency: guava",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d9ba2eb8452595e4bdaa4dfa9ddc6d2069750729",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-19 06:50:30",
+        "insertions": 1,
+        "deletions": 3,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "36efc6c986eb4fb27a71215723d08ff19e6a2f74",
+      "data_type": "commit_message",
+      "raw_text": "Update version to 7.11.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "36efc6c986eb4fb27a71215723d08ff19e6a2f74",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-19 01:22:42",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "49a3ebb7ec757120865960a2fa6c8bfa3146d14a",
+      "data_type": "commit_message",
+      "raw_text": "Implement Vietnamese analysis plugin using CocCoc tokenizer",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "49a3ebb7ec757120865960a2fa6c8bfa3146d14a",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2021-04-15 16:04:33",
+        "insertions": 585,
+        "deletions": 142,
+        "files_changed": 13
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "08c94068c1cba0d439c2059c57d3de4ab5c5fe57",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #84 from duydo/dependabot/maven/log4j.version-2.13.3\n\nBump log4j.version from 2.7 to 2.13.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "08c94068c1cba0d439c2059c57d3de4ab5c5fe57",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-10-24 15:55:31",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a99ef9a54391c0ca804e6bc48e087409a030ddde",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #88 from tritoanst/master\n\nfix same word phrase and multi space bug",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a99ef9a54391c0ca804e6bc48e087409a030ddde",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-10-24 15:54:44",
+        "insertions": 16,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "80bf0209cce9207ad6d43407b07257a2d493d564",
+      "data_type": "commit_message",
+      "raw_text": "fix same word phrase and multi space bug",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "80bf0209cce9207ad6d43407b07257a2d493d564",
+        "author_name": "Tri Toan",
+        "author_email": "nguyentritoanst@gmail.com",
+        "date": "2020-09-24 08:03:15",
+        "insertions": 16,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "6426d0eac0db226f7d6fa2bb13842a1a5dd988bc",
+      "data_type": "commit_message",
+      "raw_text": "Bump log4j.version from 2.7 to 2.13.3\n\nBumps `log4j.version` from 2.7 to 2.13.3.\n\nUpdates `log4j-api` from 2.7 to 2.13.3\n\nUpdates `log4j-core` from 2.7 to 2.13.3\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "6426d0eac0db226f7d6fa2bb13842a1a5dd988bc",
+        "author_name": "dependabot[bot]",
+        "author_email": "49699333+dependabot[bot]@users.noreply.github.com",
+        "date": "2020-07-01 18:04:11",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "794d132172c42656bed624debc87d173041a33fc",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #82 from tyrantkhan/fix_double_spaces\n\n#67 #68 Fix double spaces",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "794d132172c42656bed624debc87d173041a33fc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-06-03 01:23:35",
+        "insertions": 70,
+        "deletions": 2,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a21f0b84964db3ac146804142509a8ff76b8ee00",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #81 from tyrantkhan/Expose_Stop_words_filter\n\nExpose Stop Filters Token",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a21f0b84964db3ac146804142509a8ff76b8ee00",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-06-03 01:22:50",
+        "insertions": 28,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "76bed29a8c663f78546f75956ae2304e5211c5bd",
+      "data_type": "commit_message",
+      "raw_text": "Fix Double Spaces",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "76bed29a8c663f78546f75956ae2304e5211c5bd",
+        "author_name": "Haris Khan",
+        "author_email": "hkhan@traackr.com",
+        "date": "2020-06-02 19:45:38",
+        "insertions": 70,
+        "deletions": 2,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "248ee37eafd5ef7e3ade1eaa46d8a98099fac06c",
+      "data_type": "commit_message",
+      "raw_text": "Expose Stop Filters Token",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "248ee37eafd5ef7e3ade1eaa46d8a98099fac06c",
+        "author_name": "Haris Khan",
+        "author_email": "hkhan@traackr.com",
+        "date": "2020-05-28 16:07:00",
+        "insertions": 28,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "c43d333a094774b4782a86e8e85258f73420d52b",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #74 from vchitai/feature/7.5.1\n\nFeature/7.5.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "c43d333a094774b4782a86e8e85258f73420d52b",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-02-11 05:09:34",
+        "insertions": 91,
+        "deletions": 11,
+        "files_changed": 9
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "640bf1b5288ccaff3378b1254b87c229c36272da",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #73 from vchitai/feature/7.3.2\n\nFeature/v7.3.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "640bf1b5288ccaff3378b1254b87c229c36272da",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2020-02-11 05:07:42",
+        "insertions": 3,
+        "deletions": 2,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "7905dec14271cccd01314efb23b1c6380e1e4b1c",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/7.4.1' into feature/7.5.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "7905dec14271cccd01314efb23b1c6380e1e4b1c",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:17:45",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "10aeab005a3bd9319ba8c6e825143a2ee0f3e23d",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/7.4.0' into feature/7.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "10aeab005a3bd9319ba8c6e825143a2ee0f3e23d",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:17:29",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "9023d0b534afa570862552206e3975293cbe5818",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/7.3.2' into feature/7.4.0\n\n# Conflicts:\n#\tREADME.md\n#\tpom.xml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "9023d0b534afa570862552206e3975293cbe5818",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:17:05",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ab911ad9d52d44412ce7ad2ca6e435059cacdb5e",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.5.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ab911ad9d52d44412ce7ad2ca6e435059cacdb5e",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:15:10",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4766157dd200e34112981986d03ca9c498f7c197",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/7.4.1' into feature/7.5.1\n\n# Conflicts:\n#\t.env.sample\n#\tpom.xml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4766157dd200e34112981986d03ca9c498f7c197",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:15:00",
+        "insertions": 2,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "41e9d34ed87b0bc4d3f12c75d54df5a166a70300",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "41e9d34ed87b0bc4d3f12c75d54df5a166a70300",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:14:27",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a9be98888239aa30e4be03b7c70b2ac719e5cc1f",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/7.4.0' into feature/7.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a9be98888239aa30e4be03b7c70b2ac719e5cc1f",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:14:08",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e23a25df345c91258f512c264d484235a4690a29",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.4.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e23a25df345c91258f512c264d484235a4690a29",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:13:51",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ca6147a46e93b841ee2b69f2e0c020a8a1fa9ee2",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.3.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ca6147a46e93b841ee2b69f2e0c020a8a1fa9ee2",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:13:21",
+        "insertions": 1,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "521446d71d05fe38ccf42e816490b938535c291b",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.5.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "521446d71d05fe38ccf42e816490b938535c291b",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:12:50",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "12ab98896d440ef0f85f44685e7615b9876bcf9a",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "12ab98896d440ef0f85f44685e7615b9876bcf9a",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:10:09",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1ec77389defd4c88026d62d3c77509677c437ea7",
+      "data_type": "commit_message",
+      "raw_text": "updated version to 7.3.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1ec77389defd4c88026d62d3c77509677c437ea7",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 07:08:38",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a120ed1dca920deb0ef0a07d3be736d211b38bb9",
+      "data_type": "commit_message",
+      "raw_text": "support es v7.4.0\n- AbstractTokenizerFactory interface changed\n- added docker-compose.yaml for manual testing",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a120ed1dca920deb0ef0a07d3be736d211b38bb9",
+        "author_name": "vchitai",
+        "author_email": "tai.vc@teko.vn",
+        "date": "2020-02-10 06:51:23",
+        "insertions": 88,
+        "deletions": 11,
+        "files_changed": 9
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "df95ddb59af15bfb7b27b25c52ddcc451aca599d",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v7.3.1' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "df95ddb59af15bfb7b27b25c52ddcc451aca599d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 14:46:14",
+        "insertions": 11,
+        "deletions": 10,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "47dca62ef4be8e107fa6ed72f7ecb0fed64fa8dd",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v7.3.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "47dca62ef4be8e107fa6ed72f7ecb0fed64fa8dd",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 14:45:46",
+        "insertions": 35,
+        "deletions": 12,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4077d84b72836021684e6c6b61284f58ae269123",
+      "data_type": "commit_message",
+      "raw_text": "change plugin version v7.3.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4077d84b72836021684e6c6b61284f58ae269123",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 14:45:18",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1420968300022756d2f4bc82a01f3d4a22f87688",
+      "data_type": "commit_message",
+      "raw_text": "support v7.3.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1420968300022756d2f4bc82a01f3d4a22f87688",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 14:42:42",
+        "insertions": 10,
+        "deletions": 9,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "c7b81fc18374d8628b050c5164a1d8ee4a4ec104",
+      "data_type": "commit_message",
+      "raw_text": "fix offset bug",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "c7b81fc18374d8628b050c5164a1d8ee4a4ec104",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 14:12:06",
+        "insertions": 24,
+        "deletions": 2,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0c593077c8f1b4c5b3d6b5cb64a1c310cafd4b4f",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #64 from nguyentienlong/support-es-v700\n\nFix failed test case for ES version 7.0.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0c593077c8f1b4c5b3d6b5cb64a1c310cafd4b4f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-26 12:28:27",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "fcb1c067716a6937525e5100e3bf5c206d681239",
+      "data_type": "commit_message",
+      "raw_text": "Support ES v700",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "fcb1c067716a6937525e5100e3bf5c206d681239",
+        "author_name": "longkyanh",
+        "author_email": "long@ahamove.com",
+        "date": "2019-08-22 15:47:30",
+        "insertions": 4,
+        "deletions": 4,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "5bbc810f0a28d8927b42e86626b184982d115f5e",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #2 from nguyentienlong/support-v653\n\nSupport es v6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "5bbc810f0a28d8927b42e86626b184982d115f5e",
+        "author_name": "long nguyen",
+        "author_email": "nguyentienlong88@gmail.com",
+        "date": "2019-08-22 08:22:43",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "60eb78579d87c98b423977d11ab378cf693b51ed",
+      "data_type": "commit_message",
+      "raw_text": "Support es v6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "60eb78579d87c98b423977d11ab378cf693b51ed",
+        "author_name": "longkyanh",
+        "author_email": "long@ahamove.com",
+        "date": "2019-08-22 08:20:14",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1ce6961e0b41ce8a77dd6cf23c4c31313788ee83",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #1 from duydo/master\n\nSync up change from author main branch",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1ce6961e0b41ce8a77dd6cf23c4c31313788ee83",
+        "author_name": "long nguyen",
+        "author_email": "nguyentienlong88@gmail.com",
+        "date": "2019-08-22 06:56:54",
+        "insertions": 93,
+        "deletions": 109,
+        "files_changed": 11
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "eabdbfe3373b96c675bf0f62ee1e97f0cb7d161c",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #62 from duydo/feature/v7.0.0\n\nFeature/v7.0.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "eabdbfe3373b96c675bf0f62ee1e97f0cb7d161c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-08-02 09:32:42",
+        "insertions": 56,
+        "deletions": 101,
+        "files_changed": 6
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "50c8f308677cd5206159af096c7236303c713bcc",
+      "data_type": "commit_message",
+      "raw_text": "Create FUNDING.yml",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "50c8f308677cd5206159af096c7236303c713bcc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-07-05 16:07:23",
+        "insertions": 12,
+        "deletions": 0,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "65e662e233e5650b37f49190791ea28ff1654cd8",
+      "data_type": "commit_message",
+      "raw_text": "upgrade v7.0.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "65e662e233e5650b37f49190791ea28ff1654cd8",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-06-11 03:33:24",
+        "insertions": 3,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "238722d8985fcc23d4bbaeeae8d5b8542ae3e0e8",
+      "data_type": "commit_message",
+      "raw_text": "merge master",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "238722d8985fcc23d4bbaeeae8d5b8542ae3e0e8",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-06-11 02:43:40",
+        "insertions": 38,
+        "deletions": 14,
+        "files_changed": 7
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "752f81fca366ed647f8d9df84f2e7a7f539865e8",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #56 from dungvo/master\n\nChange master README.md to 6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "752f81fca366ed647f8d9df84f2e7a7f539865e8",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-03-15 01:30:48",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "38ef3634dd3890760b9c5f08b92605bb246db1e9",
+      "data_type": "commit_message",
+      "raw_text": "Update README.md for ES 6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "38ef3634dd3890760b9c5f08b92605bb246db1e9",
+        "author_name": "Dung Chi Vo",
+        "author_email": "cdung.vo@gmail.com",
+        "date": "2019-03-14 11:00:59",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ae819863c79b8ca5ad61f85b557c5743093debfc",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #55 from dungvo/6.5.3\n\nUpgrade plugin for Elasticsearch 6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ae819863c79b8ca5ad61f85b557c5743093debfc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2019-03-14 07:47:46",
+        "insertions": 29,
+        "deletions": 12,
+        "files_changed": 6
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "150e4c75d6717fee92ae8f4db0e9c3c3e16ec71a",
+      "data_type": "commit_message",
+      "raw_text": "Upgrade plugin for Elasticsearch 6.5.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "150e4c75d6717fee92ae8f4db0e9c3c3e16ec71a",
+        "author_name": "Dung Chi Vo",
+        "author_email": "cdung.vo@gmail.com",
+        "date": "2019-03-14 04:39:33",
+        "insertions": 29,
+        "deletions": 12,
+        "files_changed": 6
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "04a53849786e3b6c22da0feab54e1dd2b9ebac6e",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #49 from nguyentienlong/fix-es-version-in-readme\n\nFix ES version in readme",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "04a53849786e3b6c22da0feab54e1dd2b9ebac6e",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2018-11-04 05:04:28",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "6f2335a314617fdc328ac6b0ec3201009f026530",
+      "data_type": "commit_message",
+      "raw_text": "fix es version in readme",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "6f2335a314617fdc328ac6b0ec3201009f026530",
+        "author_name": "LongKa Nguyen",
+        "author_email": "nguyentienlong88@gmail.com",
+        "date": "2018-11-04 01:13:46",
+        "insertions": 1,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "58e70e43381c91bc120d9997ff9468275ad84a5c",
+      "data_type": "commit_message",
+      "raw_text": "Merge pull request #44 from Usualme/upgrade-to-5.6.5\n\nupgrade to 5.6.5",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "58e70e43381c91bc120d9997ff9468275ad84a5c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2018-03-01 04:17:24",
+        "insertions": 5,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3551ec60926693191fb58b325a48d5298daa6c25",
+      "data_type": "commit_message",
+      "raw_text": "upgrade to 5.6.5",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3551ec60926693191fb58b325a48d5298daa6c25",
+        "author_name": "Vincent Cui",
+        "author_email": "hao.cui@shopee.com",
+        "date": "2018-02-06 09:03:50",
+        "insertions": 5,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3c847ecd7bb232aab8f7a30aa2499ae764a82c11",
+      "data_type": "commit_message",
+      "raw_text": "use new tokenizer",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3c847ecd7bb232aab8f7a30aa2499ae764a82c11",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-07-28 15:51:20",
+        "insertions": 37,
+        "deletions": 26,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "c5248261f0c6aa9a05c019c4f802ba96d46b1788",
+      "data_type": "commit_message",
+      "raw_text": "fix offset issues",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "c5248261f0c6aa9a05c019c4f802ba96d46b1788",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-07-26 15:50:04",
+        "insertions": 30,
+        "deletions": 80,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a439537d075e32af12b817d91f8134e2ce25801d",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v5.4.1' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a439537d075e32af12b817d91f8134e2ce25801d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-06-16 05:49:54",
+        "insertions": 5,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "8d1cd4cbaf79352c4d032293982f72411cb23b4e",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v5.4.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "8d1cd4cbaf79352c4d032293982f72411cb23b4e",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-06-16 05:49:39",
+        "insertions": 5,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "34c5f245ce592735d89ec755288f76a597a47cfb",
+      "data_type": "commit_message",
+      "raw_text": "upgrade to ES v5.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "34c5f245ce592735d89ec755288f76a597a47cfb",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-06-16 05:49:18",
+        "insertions": 5,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "e5a7df08d3a4c3fa3338b8a6daf25f71346d2ac9",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v5.3.1' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "e5a7df08d3a4c3fa3338b8a6daf25f71346d2ac9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-04-21 10:06:46",
+        "insertions": 1,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "6a9d3639d75fb6b73d32a1bf67d1c7c5d4b4be60",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v5.3.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "6a9d3639d75fb6b73d32a1bf67d1c7c5d4b4be60",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-04-21 10:06:19",
+        "insertions": 35,
+        "deletions": 70,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f9d3cf7edb2b0f012d362a6506f7bcac38fdc615",
+      "data_type": "commit_message",
+      "raw_text": "update README",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f9d3cf7edb2b0f012d362a6506f7bcac38fdc615",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-04-21 10:06:02",
+        "insertions": 1,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ac989806d93a927f3e798d0469e308636970edd9",
+      "data_type": "commit_message",
+      "raw_text": "update README",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ac989806d93a927f3e798d0469e308636970edd9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-04-21 09:58:23",
+        "insertions": 32,
+        "deletions": 66,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "5caf980a61f32e5963e88077aa7f18e2224d9b69",
+      "data_type": "commit_message",
+      "raw_text": "upgrade to Elasticsearch 5.3.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "5caf980a61f32e5963e88077aa7f18e2224d9b69",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-04-21 09:33:09",
+        "insertions": 3,
+        "deletions": 3,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "5ab50daf2ee6fb1d01ada7af70c665a4174d31fe",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v5.2.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "5ab50daf2ee6fb1d01ada7af70c665a4174d31fe",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-02-20 08:56:07",
+        "insertions": 271,
+        "deletions": 412,
+        "files_changed": 17
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4b1144b122a5ed698b8f6bddd40f8001cefbd8e3",
+      "data_type": "commit_message",
+      "raw_text": "upgrade v5.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4b1144b122a5ed698b8f6bddd40f8001cefbd8e3",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-02-20 08:53:47",
+        "insertions": 271,
+        "deletions": 412,
+        "files_changed": 17
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "42b81f7b1900334a29044efefb9ab14e8e45571f",
+      "data_type": "commit_message",
+      "raw_text": "add unit test",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "42b81f7b1900334a29044efefb9ab14e8e45571f",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-02-20 08:52:22",
+        "insertions": 127,
+        "deletions": 16,
+        "files_changed": 4
+      },
+      "labels": {
+        "purpose": "Test",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4dfffa9d83588b636588978b6a09b842d18f271a",
+      "data_type": "commit_message",
+      "raw_text": "upgrade to Elasticsearch 5.2.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4dfffa9d83588b636588978b6a09b842d18f271a",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2017-02-20 06:10:56",
+        "insertions": 193,
+        "deletions": 445,
+        "files_changed": 15
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "8a1c7eb26fc6df433b8ead705033d144ef8a1d65",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/v2.4.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "8a1c7eb26fc6df433b8ead705033d144ef8a1d65",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-11-02 02:01:51",
+        "insertions": 6,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4867793ca5b105c84e15a60021ee1e3f842b6fe2",
+      "data_type": "commit_message",
+      "raw_text": "upgrade to ES 2.4.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4867793ca5b105c84e15a60021ee1e3f842b6fe2",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-11-02 01:58:29",
+        "insertions": 6,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "b8a1072847a45ce906914c590bc8e1e3a34a807c",
+      "data_type": "commit_message",
+      "raw_text": "upgrade ES 2.4.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "b8a1072847a45ce906914c590bc8e1e3a34a807c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-09-09 02:35:42",
+        "insertions": 7,
+        "deletions": 6,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Feature Implementation",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "8eea3127cd1d20e8afc272bab76fc2963445ad40",
+      "data_type": "commit_message",
+      "raw_text": "merged",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "8eea3127cd1d20e8afc272bab76fc2963445ad40",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-23 05:41:53",
+        "insertions": 17,
+        "deletions": 10,
+        "files_changed": 3
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0edaa29541b5c317ce7ce4a31f0e27f5bec0356c",
+      "data_type": "commit_message",
+      "raw_text": "update versions",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0edaa29541b5c317ce7ce4a31f0e27f5bec0356c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:36:07",
+        "insertions": 2,
+        "deletions": 1,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "3ff0cf9c7cdcebd27c11b026087d34ecf1aedc3b",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'develop'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "3ff0cf9c7cdcebd27c11b026087d34ecf1aedc3b",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:34:50",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "55f3c360720d5090a03ec92e47f712cdf75f5c8e",
+      "data_type": "commit_message",
+      "raw_text": "update reademe",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "55f3c360720d5090a03ec92e47f712cdf75f5c8e",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:34:27",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4c0dfd17671444c40dfef27eab3dee69cfa0adcc",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.5' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4c0dfd17671444c40dfef27eab3dee69cfa0adcc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:27:43",
+        "insertions": 9,
+        "deletions": 4,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "417fff5dd4d3f9874d1b9398c9fc086d0336b35b",
+      "data_type": "commit_message",
+      "raw_text": "build version 2.3.5, update readme",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "417fff5dd4d3f9874d1b9398c9fc086d0336b35b",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:27:01",
+        "insertions": 9,
+        "deletions": 5,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "23409950a347e68447850cb23f168dbc0e5fc3a6",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.5",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "23409950a347e68447850cb23f168dbc0e5fc3a6",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:26:10",
+        "insertions": 7,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a256c0da48426a5e36d62836c4bc54753a6a3048",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.5",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a256c0da48426a5e36d62836c4bc54753a6a3048",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:21:31",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "517e1e09ca0c14f6b7e37cb031b96d0a7f07825c",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.4' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "517e1e09ca0c14f6b7e37cb031b96d0a7f07825c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:19:44",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1505896f8e00320db91869c1788ed38e7f5683d4",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.4'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1505896f8e00320db91869c1788ed38e7f5683d4",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:19:30",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "301344f9e9969f0f4b6c0c742677296972afd3c9",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.4",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "301344f9e9969f0f4b6c0c742677296972afd3c9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:18:08",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0b77988517266fe0e9b90492a522d599bc27d480",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.3' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0b77988517266fe0e9b90492a522d599bc27d480",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:16:24",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "58771b2bc45aa8daa615acd046362ccf6e7dce61",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.3'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "58771b2bc45aa8daa615acd046362ccf6e7dce61",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:16:14",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "764913b8f6436555c1b534a512eec6fafe2932c0",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.3",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "764913b8f6436555c1b534a512eec6fafe2932c0",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:16:07",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f5bd8dba0fb3a2208211234de22be54eabcc4707",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.2' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f5bd8dba0fb3a2208211234de22be54eabcc4707",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:12:24",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "67ff30b0bffc507fb1f08836a1edaf1a56ed720d",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.2'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "67ff30b0bffc507fb1f08836a1edaf1a56ed720d",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:12:09",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "661cbb294a9daf1d6da520e32f3069e125d3eb01",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.2",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "661cbb294a9daf1d6da520e32f3069e125d3eb01",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:11:45",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "7122aabc73e58b7610a2fd1e5d961e848cfc9148",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.1' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "7122aabc73e58b7610a2fd1e5d961e848cfc9148",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:07:23",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a221d335403681e0e4abe5922a5f69fbbe06a658",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.1'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a221d335403681e0e4abe5922a5f69fbbe06a658",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:06:51",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "4ccabdbe9b8bb19852a93281dbda1e20e5901343",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.1",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "4ccabdbe9b8bb19852a93281dbda1e20e5901343",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 23:05:18",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "1b4b6adfa1c2592d898cd30a88e3593933d9cecc",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.0' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "1b4b6adfa1c2592d898cd30a88e3593933d9cecc",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 22:53:57",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "de27c9cf31d462066d0f257aa1448c05216ed5df",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'release/2.3.0'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "de27c9cf31d462066d0f257aa1448c05216ed5df",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 22:53:08",
+        "insertions": 10,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "a9ab9f96af508506a3cffabc5d97be3c80a9df3e",
+      "data_type": "commit_message",
+      "raw_text": "build for es 2.3.0",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "a9ab9f96af508506a3cffabc5d97be3c80a9df3e",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 22:52:42",
+        "insertions": 2,
+        "deletions": 2,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Chore",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ff5be1304f60513df57bfceb897abed22a2d7622",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/0.2.3.5' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ff5be1304f60513df57bfceb897abed22a2d7622",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 22:43:31",
+        "insertions": 10,
+        "deletions": 15,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0a2cd6f9dc0f121d241564ca2d8c77c8704996fa",
+      "data_type": "commit_message",
+      "raw_text": "fix offset issue",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0a2cd6f9dc0f121d241564ca2d8c77c8704996fa",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 22:43:10",
+        "insertions": 7,
+        "deletions": 8,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "d06fc09515001ead2a8a447335169b7a75a7d2c5",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/0.2.3.5' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "d06fc09515001ead2a8a447335169b7a75a7d2c5",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 09:12:22",
+        "insertions": 10,
+        "deletions": 17,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "187a75bfa682caa27d808055bc8d34460ed7b9c4",
+      "data_type": "commit_message",
+      "raw_text": "fix offset issue",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "187a75bfa682caa27d808055bc8d34460ed7b9c4",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-22 09:10:49",
+        "insertions": 5,
+        "deletions": 8,
+        "files_changed": 1
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "0f2228287c03e1b03bf401cef6fa2fbe109a0d89",
+      "data_type": "commit_message",
+      "raw_text": "fix offset issue",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "0f2228287c03e1b03bf401cef6fa2fbe109a0d89",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-08-21 23:45:05",
+        "insertions": 9,
+        "deletions": 13,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "ac277a30bca65a82f9a1877b3d29c59f19074bd4",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'develop'",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "ac277a30bca65a82f9a1877b3d29c59f19074bd4",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-04-07 07:34:42",
+        "insertions": 18,
+        "deletions": 18,
+        "files_changed": 6
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "16845871140f3fbb61711674b1a51d4f30698645",
+      "data_type": "commit_message",
+      "raw_text": "Merge branch 'feature/fix-npe-indexing' into develop",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "16845871140f3fbb61711674b1a51d4f30698645",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-04-07 07:32:47",
+        "insertions": 18,
+        "deletions": 18,
+        "files_changed": 6
+      },
+      "labels": {
+        "purpose": "Merge",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "024e9af740c3c2d1e7c23bf1dc688de3e213d5d9",
+      "data_type": "commit_message",
+      "raw_text": "fix npe while indexing",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "024e9af740c3c2d1e7c23bf1dc688de3e213d5d9",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-04-07 07:32:10",
+        "insertions": 19,
+        "deletions": 5,
+        "files_changed": 5
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "41ad79f7066d2af86c91d9b46ab3d8ff8c1d80ff",
+      "data_type": "commit_message",
+      "raw_text": "fix lucene version",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "41ad79f7066d2af86c91d9b46ab3d8ff8c1d80ff",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-04-07 04:58:47",
+        "insertions": 2,
+        "deletions": 16,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Bug Fix",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "f67f481142df3c000c29c54a6a4ba1c34ff5886c",
+      "data_type": "commit_message",
+      "raw_text": "fix merge readme",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "f67f481142df3c000c29c54a6a4ba1c34ff5886c",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-02-17 03:08:40",
+        "insertions": 8,
+        "deletions": 6,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+    {
+      "id": "928de7a3ccd4a351c85fe126fa2d15c291fc8696",
+      "data_type": "commit_message",
+      "raw_text": "update readme",
+      "source_info": {
+        "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+        "sha": "928de7a3ccd4a351c85fe126fa2d15c291fc8696",
+        "author_name": "Duy Do",
+        "author_email": "doquocduy@gmail.com",
+        "date": "2016-02-17 02:50:15",
+        "insertions": 7,
+        "deletions": 6,
+        "files_changed": 2
+      },
+      "labels": {
+        "purpose": "Documentation Update",
+        "suspicious": null,
+        "tech_tag": null,
+        "sentiment": null
+      }
+    },
+        {
+          "id": "a6096bce58a06e5426b1f21afc98de8ed3ea2301",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "a6096bce58a06e5426b1f21afc98de8ed3ea2301",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-27 15:24:44",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "f20fcb266ff114723d4f393ebd01509d66f6fdff",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.2.1.1'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "f20fcb266ff114723d4f393ebd01509d66f6fdff",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-27 15:22:53",
+            "insertions": 6,
+            "deletions": 5,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "5644a28304ed00a7eaade152ef1c9e3d4ddf04f9",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'feature/0.2.1.1' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "5644a28304ed00a7eaade152ef1c9e3d4ddf04f9",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-27 15:22:13",
+            "insertions": 6,
+            "deletions": 5,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "b2357188857802b737f39b59ac640e5a25e2cd86",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "b2357188857802b737f39b59ac640e5a25e2cd86",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-27 15:21:14",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "02857f85837411fe6031f0b2bfd9b15e009cf2e5",
+          "data_type": "commit_message",
+          "raw_text": "es 2.1.1",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "02857f85837411fe6031f0b2bfd9b15e009cf2e5",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-27 15:20:06",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "febe3cf63677c00a47046af2d8e956919d2894a6",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "febe3cf63677c00a47046af2d8e956919d2894a6",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 10:30:26",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "44a1cb3ab73029b43f901c4fc253bc9c77d22710",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.2.1'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "44a1cb3ab73029b43f901c4fc253bc9c77d22710",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 10:24:02",
+            "insertions": 5,
+            "deletions": 4,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e3e0ba751f88c4b76cf47636d42dcf837230fc35",
+          "data_type": "commit_message",
+          "raw_text": "support es 2.1.0",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e3e0ba751f88c4b76cf47636d42dcf837230fc35",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 10:22:57",
+            "insertions": 5,
+            "deletions": 4,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "b8698605c128e52d5c37fba01ffca4bbe3e35b6a",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.2'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "b8698605c128e52d5c37fba01ffca4bbe3e35b6a",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 10:00:32",
+            "insertions": 67,
+            "deletions": 58,
+            "files_changed": 13
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "8b25d5d9b98c8d1085b9469cd0138f64aab708e1",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'feature/v2.0' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "8b25d5d9b98c8d1085b9469cd0138f64aab708e1",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:56:19",
+            "insertions": 67,
+            "deletions": 58,
+            "files_changed": 13
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "bd7da7dfa442ead5b1e10e48bf96afaf1b280264",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "bd7da7dfa442ead5b1e10e48bf96afaf1b280264",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:45:34",
+            "insertions": 2,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "314519f006d347be5fd08001ffc548fa593ed7f4",
+          "data_type": "commit_message",
+          "raw_text": "support es 2.0.0",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "314519f006d347be5fd08001ffc548fa593ed7f4",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:36:52",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "68daffd9de07e07cf53887fb5c44a416538affc1",
+          "data_type": "commit_message",
+          "raw_text": "es 2.1.0",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "68daffd9de07e07cf53887fb5c44a416538affc1",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:31:17",
+            "insertions": 3,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "a7697320e4d3b902e491c6a1259614d5ba62c5a5",
+          "data_type": "commit_message",
+          "raw_text": "delete target",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "a7697320e4d3b902e491c6a1259614d5ba62c5a5",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:29:16",
+            "insertions": 0,
+            "deletions": 65,
+            "files_changed": 23
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "27bb7a0a66f2c9d3633942bbe35f7d8a2148da8d",
+          "data_type": "commit_message",
+          "raw_text": "implement es 2.1.0",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "27bb7a0a66f2c9d3633942bbe35f7d8a2148da8d",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 09:28:15",
+            "insertions": 124,
+            "deletions": 52,
+            "files_changed": 33
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "afc37a78c1a5a9ea5089c4acd0f803f1649b8b55",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'develop' of github.com:duydo/elasticsearch-analysis-vietnamese into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "afc37a78c1a5a9ea5089c4acd0f803f1649b8b55",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-12-16 04:35:10",
+            "insertions": 0,
+            "deletions": 0,
+            "files_changed": 0
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "04ae15dcb76587bb3f72c12bd9573ec18d8e72a9",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.1.7' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "04ae15dcb76587bb3f72c12bd9573ec18d8e72a9",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:56:57",
+            "insertions": 8,
+            "deletions": 26,
+            "files_changed": 4
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "3beb2b2750c499188d5e1abae701d9aea0b167c3",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.1.7'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "3beb2b2750c499188d5e1abae701d9aea0b167c3",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:56:40",
+            "insertions": 8,
+            "deletions": 26,
+            "files_changed": 4
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "ac2ac3ad2a4cab05a8eeb6c03b55f35e314ef43a",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "ac2ac3ad2a4cab05a8eeb6c03b55f35e314ef43a",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:55:44",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "a0f2339ed3c027b297a16377ef91d77187995319",
+          "data_type": "commit_message",
+          "raw_text": "fix deperacted constructor",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "a0f2339ed3c027b297a16377ef91d77187995319",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:52:19",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "8de53e03551947bf724f8c5b6f63d02b82f7659d",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "8de53e03551947bf724f8c5b6f63d02b82f7659d",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:42:05",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "0c87859ec74fe94686b0ac605eac8b63f7396a19",
+          "data_type": "commit_message",
+          "raw_text": "remove deprecated methods",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "0c87859ec74fe94686b0ac605eac8b63f7396a19",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:41:10",
+            "insertions": 1,
+            "deletions": 20,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "2012c364d5d9294a51a2d70aa2e292eb38c18c36",
+          "data_type": "commit_message",
+          "raw_text": "update es 1.7",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "2012c364d5d9294a51a2d70aa2e292eb38c18c36",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:38:30",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "d9049bd30e9d5a661b32b35494b02ffe0234e3fc",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.1.6'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "d9049bd30e9d5a661b32b35494b02ffe0234e3fc",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:26:59",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "c7ec805c9afd4a6b922a8a263ccf31b97deb77c5",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'feature/v0.1.6' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "c7ec805c9afd4a6b922a8a263ccf31b97deb77c5",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:22:49",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "32ea4f7759cc44f3ce3e9728fd4317ddd0dde240",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'develop'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "32ea4f7759cc44f3ce3e9728fd4317ddd0dde240",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:17:25",
+            "insertions": 0,
+            "deletions": 0,
+            "files_changed": 0
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e8277f1804031f16d35d08f13c447990ef3fe4c7",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.1.6' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e8277f1804031f16d35d08f13c447990ef3fe4c7",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:15:32",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "7f4b4a6f567aa0f2b7a1eb833e141de437c46804",
+          "data_type": "commit_message",
+          "raw_text": "merge readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "7f4b4a6f567aa0f2b7a1eb833e141de437c46804",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:15:08",
+            "insertions": 5,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "9195408a65bbe8c24ee7c0e36baef2311f3228ad",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "9195408a65bbe8c24ee7c0e36baef2311f3228ad",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:13:50",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "b180ac9d322eba5f10f27ca310865278a4585d73",
+          "data_type": "commit_message",
+          "raw_text": "update ES 1.6",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "b180ac9d322eba5f10f27ca310865278a4585d73",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 08:12:44",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "0c540df5acff4ac8530d3eb17120826d309517cc",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'develop'",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "0c540df5acff4ac8530d3eb17120826d309517cc",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 07:47:40",
+            "insertions": 0,
+            "deletions": 0,
+            "files_changed": 0
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "222bf8d5c671531a3dab9295d870c5ad59920cef",
+          "data_type": "commit_message",
+          "raw_text": "Merge branch 'release/v0.1.5' into develop",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "222bf8d5c671531a3dab9295d870c5ad59920cef",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 07:41:55",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e0118abd617f8dda1e9296a4d57e72ffef862fa2",
+          "data_type": "commit_message",
+          "raw_text": "fix readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e0118abd617f8dda1e9296a4d57e72ffef862fa2",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 07:38:16",
+            "insertions": 14,
+            "deletions": 30,
+            "files_changed": 4
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "19a201768f4863f6458bdfd49c6600456f6da2d2",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "19a201768f4863f6458bdfd49c6600456f6da2d2",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 07:34:50",
+            "insertions": 4,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "837445b13cb6f07fd4fc29af4d44d8119d9936ed",
+          "data_type": "commit_message",
+          "raw_text": "update es 1.5",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "837445b13cb6f07fd4fc29af4d44d8119d9936ed",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-09-04 07:28:29",
+            "insertions": 7,
+            "deletions": 7,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "3b29173aa92078d54d19f7cff4b4d4732d115227",
+          "data_type": "commit_message",
+          "raw_text": "update gitignore",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "3b29173aa92078d54d19f7cff4b4d4732d115227",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2015-08-19 18:21:28",
+            "insertions": 2,
+            "deletions": 19,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "4ddfbb496707227a90fc21f42960e86b40140ba9",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "4ddfbb496707227a90fc21f42960e86b40140ba9",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 08:04:51",
+            "insertions": 0,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "ccbdafa4e0d06a9ad03b082dbcdf6e0041b8b29c",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "ccbdafa4e0d06a9ad03b082dbcdf6e0041b8b29c",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 08:04:12",
+            "insertions": 4,
+            "deletions": 4,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e817e9575f8b91fbbb283d7d8d49e973b7775d54",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e817e9575f8b91fbbb283d7d8d49e973b7775d54",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 08:02:18",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "967596b6a8460c923d1549d2cf4fcac5bd302dec",
+          "data_type": "commit_message",
+          "raw_text": "merge v0.1.1",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "967596b6a8460c923d1549d2cf4fcac5bd302dec",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 07:53:37",
+            "insertions": 31,
+            "deletions": 11,
+            "files_changed": 4
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "788af2371d512cc9f40d4c49bfcbef840b208dd1",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "788af2371d512cc9f40d4c49bfcbef840b208dd1",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 06:40:49",
+            "insertions": 2,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e5c0e0430de7d5285ea36605b87fefb6b582783e",
+          "data_type": "commit_message",
+          "raw_text": "upgare to ES 1.4",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e5c0e0430de7d5285ea36605b87fefb6b582783e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-12-05 06:29:10",
+            "insertions": 28,
+            "deletions": 10,
+            "files_changed": 3
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "8fa7ff7dbeb8ef1d6c808e253bcfc321c1259c54",
+          "data_type": "commit_message",
+          "raw_text": "remove duplicated license file",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "8fa7ff7dbeb8ef1d6c808e253bcfc321c1259c54",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-20 06:41:04",
+            "insertions": 0,
+            "deletions": 201,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "a996a171e39cdcbeaf9381f6d81a30f861cd1a8d",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "a996a171e39cdcbeaf9381f6d81a30f861cd1a8d",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 11:09:52",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "c897cda36707645eb976dabec5813dc82804789e",
+          "data_type": "commit_message",
+          "raw_text": "fix version",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "c897cda36707645eb976dabec5813dc82804789e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 10:44:13",
+            "insertions": 2,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e29f3df23b60f862601c39bad28bbeb598103c1e",
+          "data_type": "commit_message",
+          "raw_text": "fix readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e29f3df23b60f862601c39bad28bbeb598103c1e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 10:43:20",
+            "insertions": 1,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "956e52e352bd12b309dc72edd5724f52cdd1e4c7",
+          "data_type": "commit_message",
+          "raw_text": "merge v0.1",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "956e52e352bd12b309dc72edd5724f52cdd1e4c7",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 10:41:14",
+            "insertions": 1248,
+            "deletions": 1,
+            "files_changed": 17
+          },
+          "labels": {
+            "purpose": "Merge",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "0b545e5256ee27d74933476511b59489a34543f4",
+          "data_type": "commit_message",
+          "raw_text": "update readme",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "0b545e5256ee27d74933476511b59489a34543f4",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 10:25:20",
+            "insertions": 6,
+            "deletions": 0,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "310e526c7f3576f3ccb245b349eacbcea7e1aa37",
+          "data_type": "commit_message",
+          "raw_text": "update readme file",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "310e526c7f3576f3ccb245b349eacbcea7e1aa37",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 10:15:10",
+            "insertions": 42,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "4c64983d831f46ee41f26b83bcdb2c04c0ccfab1",
+          "data_type": "commit_message",
+          "raw_text": "fix token type",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "4c64983d831f46ee41f26b83bcdb2c04c0ccfab1",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 09:51:50",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "6dfeb6a103c4e2fca786b753009b7e69a957e9ae",
+          "data_type": "commit_message",
+          "raw_text": "add license header",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "6dfeb6a103c4e2fca786b753009b7e69a957e9ae",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 09:40:59",
+            "insertions": 28,
+            "deletions": 0,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "24367fc335209966e42e296271da21d21b69b988",
+          "data_type": "commit_message",
+          "raw_text": "add license header",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "24367fc335209966e42e296271da21d21b69b988",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 09:38:59",
+            "insertions": 126,
+            "deletions": 0,
+            "files_changed": 8
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "e7d23b07af14f1af8042737b16ed7c94170909bc",
+          "data_type": "commit_message",
+          "raw_text": "ignore data folder",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "e7d23b07af14f1af8042737b16ed7c94170909bc",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 08:18:21",
+            "insertions": 2,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "b81111cd1fd2e72bd2565ef26a560033b1977d3e",
+          "data_type": "commit_message",
+          "raw_text": "organize import",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "b81111cd1fd2e72bd2565ef26a560033b1977d3e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 08:17:19",
+            "insertions": 5,
+            "deletions": 5,
+            "files_changed": 3
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "2a8b9d82d10602e95d3b4a35827575eabc40d391",
+          "data_type": "commit_message",
+          "raw_text": "add comment",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "2a8b9d82d10602e95d3b4a35827575eabc40d391",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 08:16:07",
+            "insertions": 3,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "c834903e6e7207b533c1432dab1f4b02f63fe754",
+          "data_type": "commit_message",
+          "raw_text": "add @Assisted",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "c834903e6e7207b533c1432dab1f4b02f63fe754",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 08:12:21",
+            "insertions": 6,
+            "deletions": 4,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "d183ecfd3e8b5aacfe759801c27100f2275718a9",
+          "data_type": "commit_message",
+          "raw_text": "update pom.xml",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "d183ecfd3e8b5aacfe759801c27100f2275718a9",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:48:55",
+            "insertions": 69,
+            "deletions": 2,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "0b11b63e21af53021dbaf7defad8fc3f3b72f20d",
+          "data_type": "commit_message",
+          "raw_text": "add analysis settings for testing",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "0b11b63e21af53021dbaf7defad8fc3f3b72f20d",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:48:29",
+            "insertions": 4,
+            "deletions": 4,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "03dcbf636e6b7a18cd9e3e5f4fe5c000c1114e55",
+          "data_type": "commit_message",
+          "raw_text": "add class comment",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "03dcbf636e6b7a18cd9e3e5f4fe5c000c1114e55",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:47:55",
+            "insertions": 1,
+            "deletions": 0,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "8482753334d96bca0b78c4fe010b99d747f83a46",
+          "data_type": "commit_message",
+          "raw_text": "refactoring and add sentence detector, ambiguities resolved variables",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "8482753334d96bca0b78c4fe010b99d747f83a46",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:47:27",
+            "insertions": 22,
+            "deletions": 8,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "b8d69477dadfb306ae43940312bb04972442130a",
+          "data_type": "commit_message",
+          "raw_text": "read settings",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "b8d69477dadfb306ae43940312bb04972442130a",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:44:29",
+            "insertions": 8,
+            "deletions": 6,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "fd3f1f1372d21d8da37506abd730a1661ee9d93c",
+          "data_type": "commit_message",
+          "raw_text": "add unit test",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "fd3f1f1372d21d8da37506abd730a1661ee9d93c",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:44:12",
+            "insertions": 31,
+            "deletions": 5,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "666bf9039db588219120537cae6a0487af7b363f",
+          "data_type": "commit_message",
+          "raw_text": "add integration test",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "666bf9039db588219120537cae6a0487af7b363f",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-19 07:43:40",
+            "insertions": 69,
+            "deletions": 0,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "dcd6d2a3d3bd4a040b15b78a7a363b84c2558505",
+          "data_type": "commit_message",
+          "raw_text": "fix analyzer name",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "dcd6d2a3d3bd4a040b15b78a7a363b84c2558505",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 19:16:03",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Bug Fix",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "d8ca349b53da56cf18f869e265d4995996e8f34b",
+          "data_type": "commit_message",
+          "raw_text": "refactor, add unit test",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "d8ca349b53da56cf18f869e265d4995996e8f34b",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 19:12:47",
+            "insertions": 126,
+            "deletions": 116,
+            "files_changed": 12
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "511c02417598418c63d51dba7eb516135733172e",
+          "data_type": "commit_message",
+          "raw_text": "simple VietnameseAnalyzer unit test",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "511c02417598418c63d51dba7eb516135733172e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 16:59:48",
+            "insertions": 32,
+            "deletions": 0,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "5c6b83c8a32a85c5ab245ab17a9ca31d13c3b8e4",
+          "data_type": "commit_message",
+          "raw_text": "simple VietnameseTokenizer unit test",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "5c6b83c8a32a85c5ab245ab17a9ca31d13c3b8e4",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 16:33:59",
+            "insertions": 33,
+            "deletions": 0,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "12f22c864807f7fb4aaa91cfb2e42319fa814cd6",
+          "data_type": "commit_message",
+          "raw_text": "refactor",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "12f22c864807f7fb4aaa91cfb2e42319fa814cd6",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 10:40:01",
+            "insertions": 5,
+            "deletions": 7,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "236563036d73a06b816df58c7ff8f638fe1b7ae5",
+          "data_type": "commit_message",
+          "raw_text": "add constructor allow:  1) disable sentence detector 2) enable to enable ambiguities resolved",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "236563036d73a06b816df58c7ff8f638fe1b7ae5",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 10:15:29",
+            "insertions": 11,
+            "deletions": 96,
+            "files_changed": 4
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "f724eebc5d69f3cabcf200c36039af9cb02e3704",
+          "data_type": "commit_message",
+          "raw_text": "add constructor allow:  1) disable sentence detector 2) enable to enable ambiguities resolved",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "f724eebc5d69f3cabcf200c36039af9cb02e3704",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 09:46:42",
+            "insertions": 55,
+            "deletions": 21,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "6eb984aeb7ecc07b6868b0da37a5d5d4999ac88e",
+          "data_type": "commit_message",
+          "raw_text": "refactor variable wordLength -> length",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "6eb984aeb7ecc07b6868b0da37a5d5d4999ac88e",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-18 00:52:15",
+            "insertions": 4,
+            "deletions": 4,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "38c26e5a1e938bee3fc59c32e78ce3bcb79f1028",
+          "data_type": "commit_message",
+          "raw_text": "Set token type to standard format",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "38c26e5a1e938bee3fc59c32e78ce3bcb79f1028",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-17 12:02:03",
+            "insertions": 1,
+            "deletions": 1,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Code Refactoring",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "8cd71b761ae80cbad9742a91ebcc5d1089eb3548",
+          "data_type": "commit_message",
+          "raw_text": "Add tokenizer test (dirty)",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "8cd71b761ae80cbad9742a91ebcc5d1089eb3548",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-17 11:43:35",
+            "insertions": 54,
+            "deletions": 63,
+            "files_changed": 7
+          },
+          "labels": {
+            "purpose": "Test",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "69717aeb2ee264132bc56ab35bc773e5bcb03d13",
+          "data_type": "commit_message",
+          "raw_text": "Vietnamese Tokenizer",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "69717aeb2ee264132bc56ab35bc773e5bcb03d13",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-17 08:48:14",
+            "insertions": 21,
+            "deletions": 51,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "5464cc43646d72371a01d685480b0f87cff92e73",
+          "data_type": "commit_message",
+          "raw_text": "Add default Vietnamese stop words",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "5464cc43646d72371a01d685480b0f87cff92e73",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-10-17 08:47:26",
+            "insertions": 6,
+            "deletions": 5,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Feature Implementation",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "c29fbac926a3e55752dfe653095bb492fca92016",
+          "data_type": "commit_message",
+          "raw_text": "init commit",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "c29fbac926a3e55752dfe653095bb492fca92016",
+            "author_name": "Duy Do",
+            "author_email": "duy.do@sentifi.com",
+            "date": "2014-10-17 06:58:40",
+            "insertions": 883,
+            "deletions": 0,
+            "files_changed": 16
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "faa187c8128f66026b494cfcbc2f9b0bf1f6ebee",
+          "data_type": "commit_message",
+          "raw_text": "Initial commit",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "faa187c8128f66026b494cfcbc2f9b0bf1f6ebee",
+            "author_name": "Duy Do",
+            "author_email": "duy.do@sentifi.com",
+            "date": "2014-10-17 06:41:45",
+            "insertions": 0,
+            "deletions": 0,
+            "files_changed": 0
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "7cb6374043c855d711f696edb8bb0af1f0b96b94",
+          "data_type": "commit_message",
+          "raw_text": "Update README.md",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "7cb6374043c855d711f696edb8bb0af1f0b96b94",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-03-28 09:51:30",
+            "insertions": 3,
+            "deletions": 3,
+            "files_changed": 1
+          },
+          "labels": {
+            "purpose": "Documentation Update",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        },
+        {
+          "id": "08f0c9b0ed05f22a8d4a81c2952968c322dd55f3",
+          "data_type": "commit_message",
+          "raw_text": "Initial commit",
+          "source_info": {
+            "repo_id": "duydo/elasticsearch-analysis-vietnamese",
+            "sha": "08f0c9b0ed05f22a8d4a81c2952968c322dd55f3",
+            "author_name": "Duy Do",
+            "author_email": "doquocduy@gmail.com",
+            "date": "2014-03-28 09:45:32",
+            "insertions": 205,
+            "deletions": 0,
+            "files_changed": 2
+          },
+          "labels": {
+            "purpose": "Chore",
+            "suspicious": null,
+            "tech_tag": null,
+            "sentiment": null
+          }
+        }
+    ]

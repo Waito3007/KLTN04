@@ -238,8 +238,8 @@ def main():
     # Sử dụng đường dẫn tương đối để tìm file dữ liệu
     # Giả định 'collected_data' nằm cùng cấp với thư mục chứa script này (ví dụ 'ai')
     # hoặc một cấp trên thư mục chứa script này.
-    json_path_option1 = os.path.join(base_dir, "collected_data", "commit_messages_raw.json")
-    json_path_option2 = os.path.join(os.path.dirname(base_dir), "collected_data", "commit_messages_raw.json")
+    json_path_option1 = os.path.join(base_dir, "collected_data", "han_training_samples.json")
+    json_path_option2 = os.path.join(os.path.dirname(base_dir), "collected_data", "han_training_samples.json")
     
     if os.path.exists(json_path_option1):
         json_path = json_path_option1
@@ -247,11 +247,11 @@ def main():
         json_path = json_path_option2
     else:
         # Nếu không tìm thấy, thử tạo đường dẫn mặc định như trong code gốc của bạn
-        json_path = os.path.join(base_dir, "../collected_data/commit_messages_raw.json") # Thử đường dẫn này
+        json_path = os.path.join(base_dir, "../collected_data/han_training_samples.json") # Thử đường dẫn này
         if not os.path.exists(json_path):
              # Nếu vẫn không thấy, sử dụng một đường dẫn cố định và chấp nhận có thể lỗi hoặc dùng dữ liệu giả
-            print(f"Cảnh báo: Không tìm thấy commit_messages_raw.json ở các vị trí phổ biến. Sẽ thử đường dẫn gốc và có thể dùng dữ liệu giả nếu lỗi.")
-            json_path = "backend/ai/collected_data/commit_messages_raw.json" # Đường dẫn gốc bạn dùng
+            print(f"Cảnh báo: Không tìm thấy han_training_samples.json ở các vị trí phổ biến. Sẽ thử đường dẫn gốc và có thể dùng dữ liệu giả nếu lỗi.")
+            json_path = "backend/ai/collected_data/han_training_samples.json" # Đường dẫn gốc bạn dùng
             # raise FileNotFoundError(f"Không tìm thấy file dữ liệu huấn luyện ở: {json_path_option1} hoặc {json_path_option2} hoặc {json_path}")
 
     print("Loading data...")
@@ -401,6 +401,54 @@ def main():
     
     print(f"Starting training on {device}...")
     
+    # Remove old training data and start fresh
+    print("Removing old training data...")
+    old_model_path = os.path.join(base_dir, "models", "han_multitask_best.pth")
+    if os.path.exists(old_model_path):
+        os.remove(old_model_path)
+        print(f"Deleted old model at {old_model_path}")
+    else:
+        print("No old model found to delete.")
+
+    # Initialize fresh training
+    print("Starting fresh training...")
+    num_classes_dict = {
+        'purpose': len(train_dataset.purpose_map),
+        'tech_tag': len(train_dataset.tech_vocab),
+        'suspicious': 2,
+        'sentiment': len(train_dataset.sentiment_map),
+        'author': len(mappings['author_map']),
+        'source_repo': len(mappings['repo_map']),
+        'commit_type': len(train_dataset.commit_type_map)
+    }
+
+    model = HierarchicalAttentionNetwork(
+        embed_dim=embed_dim,
+        hidden_dim=128,
+        num_classes_dict=num_classes_dict
+    ).to(device)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    if device.type == 'cuda':
+        print("Enabling CUDA optimizations...")
+        torch.backends.cudnn.benchmark = True
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs!")
+            model = torch.nn.DataParallel(model)
+
+    loss_fns = {
+        'purpose': torch.nn.CrossEntropyLoss(),
+        'suspicious': torch.nn.CrossEntropyLoss(),
+        'tech_tag': torch.nn.CrossEntropyLoss(),
+        'sentiment': torch.nn.CrossEntropyLoss(),
+        'author': torch.nn.CrossEntropyLoss(),
+        'source_repo': torch.nn.CrossEntropyLoss(),
+        'commit_type': torch.nn.CrossEntropyLoss()
+    }
+
+    trainer = MultiTaskTrainer(model, optimizer, loss_fns, device=device)
+
     try:
         for epoch in range(num_epochs):
             print(f"\nEpoch {epoch+1}/{num_epochs}")
