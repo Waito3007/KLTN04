@@ -37,3 +37,28 @@ class EmbeddingLoader:
             return self.embeddings.get(word, np.zeros(300))
         else:
             return None
+        
+    def get_embeddings_for_doc(self, doc):
+        """Lấy embeddings cho toàn bộ document.
+        
+        Args:
+            doc: numpy array có shape (num_sents, max_words) chứa các token id
+            
+        Returns:
+            numpy array có shape (num_sents, max_words, embed_dim)
+        """
+        num_sents, max_words = doc.shape
+        if self.embedding_type == 'codebert':
+            embed_dim = 768
+        else:
+            embed_dim = 300
+            
+        embeddings = np.zeros((num_sents, max_words, embed_dim))
+        
+        for i in range(num_sents):
+            for j in range(max_words):
+                if doc[i,j] != 0:  # Không tính embedding cho padding token
+                    word = str(doc[i,j])
+                    embeddings[i,j] = self.get_word_embedding(word)
+                    
+        return embeddings

@@ -1,5 +1,5 @@
 # ==================================================
-# Path: D:\project\KLTN04
+# Path: C:\SAN\KLTN\KLTN04
 # Detected tech: javascript, python, react, rust, typescript
 # ==================================================
 
@@ -9,23 +9,30 @@ KLTN04/
 ├── .git/
 ├── .venv/
 ├── backend/
+│   ├── .venv/
 │   ├── __pycache__/
 │   ├── ai/
 │   │   ├── __pycache__/
 │   │   ├── baseline/
-│   │   │   ├── __init__.py
 │   │   │   ├── bilstm_baseline.py
 │   │   │   └── tfidf_logreg_baseline.py
+│   │   ├── collected_data/
+│   │   │   ├── .gitkeep
+│   │   │   └── commit_messages_raw.json
+│   │   ├── data_preparation/
+│   │   │   ├── balance_training_data.py
+│   │   │   ├── build_training_data.py
+│   │   │   └── clean_training_data.py
 │   │   ├── data_preprocessing/
 │   │   │   ├── __pycache__/
-│   │   │   ├── __init__.py
 │   │   │   ├── embedding_loader.py
 │   │   │   └── text_processor.py
 │   │   ├── evaluation/
-│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__/
 │   │   │   ├── attention_visualizer.py
 │   │   │   └── metrics_calculator.py
 │   │   ├── modelAi/
+│   │   │   ├── __pycache__/
 │   │   │   ├── ner/
 │   │   │   │   ├── cfg
 │   │   │   │   ├── model
@@ -43,28 +50,47 @@ KLTN04/
 │   │   │   │   ├── vectors
 │   │   │   │   └── vectors.cfg
 │   │   │   ├── config.cfg
+│   │   │   ├── fetch_github_commits.py
 │   │   │   ├── generate_data.py
 │   │   │   ├── meta.json
 │   │   │   └── tokenizer
 │   │   ├── models/
 │   │   │   ├── __pycache__/
-│   │   │   ├── __init__.py
+│   │   │   ├── han_multitask.pth
+│   │   │   ├── han_multitask_best.pth
+│   │   │   ├── han_multitask_final.pth
 │   │   │   ├── hierarchical_attention.py
 │   │   │   └── shared_layers.py
+│   │   ├── scriptPhantich/
+│   │   │   └── analyze_data_balance.py
 │   │   ├── scripts/
 │   │   │   ├── extract_code_comments.py
 │   │   │   ├── extract_code_diffs.py
 │   │   │   └── extract_readme.py
+│   │   ├── taotukhoa/
+│   │   │   ├── subintent_keywords.json
+│   │   │   └── taotukhoa.py
+│   │   ├── testmodel/
+│   │   │   ├── test_han.py
+│   │   │   └── test_model.py
 │   │   ├── training/
-│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__/
 │   │   │   ├── loss_functions.py
 │   │   │   └── multitask_trainer.py
+│   │   ├── training_data/
+│   │   │   └── han_training_samples.json
+│   │   ├── training_logs/
+│   │   │   ├── training_log_20250531_173345.txt
+│   │   │   ├── training_log_20250531_173411.txt
+│   │   │   ├── training_log_20250531_173727.txt
+│   │   │   ├── training_log_20250531_174058.txt
+│   │   │   ├── training_log_20250531_174334.txt
+│   │   │   ├── training_log_20250531_174738.txt
+│   │   │   └── training_log_20250531_174946.txt
 │   │   ├── __init__.py
+│   │   ├── analyze_data_balance.py
 │   │   ├── predict.py
-│   │   ├── subintent_keywords.json
-│   │   ├── test_model.py
-│   │   ├── train_data.json
-│   │   ├── train_han_multitask.py
+│   │   ├── train_han_multitask_fixed.py
 │   │   └── train_spacy.py
 │   ├── api/
 │   │   ├── __pycache__/
@@ -89,14 +115,17 @@ KLTN04/
 │   │   └── security.py
 │   ├── db/
 │   ├── migrations/
+│   │   ├── __pycache__/
+│   │   ├── versions/
+│   │   │   └── __pycache__/
 │   │   ├── README
 │   │   ├── env.py
 │   │   └── script.py.mako
 │   ├── models/
-│   │   ├── __pycache__/
 │   │   ├── commit_classifier.joblib
 │   │   ├── commit_classifier_v1.joblib
 │   │   ├── commit_model.py
+│   │   ├── han_multitask.pth
 │   │   └── task_model.py
 │   ├── notebooks/
 │   │   └── Model_Training.ipynb
@@ -124,7 +153,6 @@ KLTN04/
 │   │   ├── __init__.py
 │   │   ├── formatter.py
 │   │   └── scheduler.py
-│   ├── .env
 │   ├── __init__.py
 │   ├── alembic.ini
 │   ├── main.py
@@ -176,6 +204,7 @@ KLTN04/
 │   ├── package-lock.json
 │   ├── package.json
 │   └── vite.config.js
+├── .env
 ├── .gitignore
 ├── Backend.txt
 ├── Frontend.txt
@@ -227,45 +256,22 @@ def root():
 
 ```
 
+### backend\ai\analyze_data_balance.py
+```py
+
+```
+
 ### backend\ai\predict.py
 ```py
 # Gọi mô hình để phân loại message
 ```
 
-### backend\ai\test_model.py
+### backend\ai\train_han_multitask_fixed.py
 ```py
-import spacy
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Load mô hình đã train
-nlp = spacy.load("modelAi")
-
-# Các câu commit cần test
-texts = [
-    "feat: Thêm tính năng xử lý lỗi",
-    "fix: Sửa lỗi hiển thị trên giao diện người dùng",
-    "docs: Cập nhật tài liệu API",
-    "refactor: Tối ưu code module tìm kiếm",
-    "style: Chỉnh sửa format code",
-    "test: Thêm test case cho hàm login",
-    "chore: Cập nhật dependencies",
-    "uncategorized: Thay đổi cấu trúc thư mục",
-    "feat: Thêm API thanh toán mới",
-    "fix: Sửa layout bị cách ra ngoài",
-]
-
-for text in texts:
-    doc = nlp(text)
-    print(f"Văn bản: {text}")
-    for label, score in doc.cats.items():
-        if score > 0.05:  # Tùy chỉnh ngưỡng lọc nhãn
-            print(f"{label}: {score:.4f}")
-    print()
-
-```
-
-### backend\ai\train_han_multitask.py
-```py
-# Pipeline huấn luyện HAN đa nhiệm cho commit message
 import torch
 from torch.utils.data import DataLoader, Dataset
 from ai.models.hierarchical_attention import HierarchicalAttentionNetwork
@@ -276,99 +282,360 @@ from ai.training.loss_functions import UncertaintyWeightingLoss
 from ai.evaluation.metrics_calculator import calc_metrics
 import numpy as np
 import json
+import glob
+import time
+from datetime import datetime
 
-# Dummy dataset cho ví dụ
+# Kiểm tra và thiết lập device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+if device.type == 'cuda':
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"Available memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+
+def save_training_log(epoch, train_loss, val_loss, task_metrics, log_file):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_file, 'a', encoding='utf-8') as f:
+        f.write(f"\n=== Epoch {epoch} ({timestamp}) ===\n")
+        f.write(f"Train Loss: {train_loss:.4f}\n")
+        f.write(f"Val Loss: {val_loss:.4f}\n")
+        for task, metrics in task_metrics.items():
+            f.write(f"{task}: {metrics}\n")
+        f.write("-" * 50 + "\n")
+
 class CommitDataset(Dataset):
-    def __init__(self, texts, labels, processor, embed_loader):
-        self.texts = texts
-        self.labels = labels
+    def __init__(self, samples, processor, embed_loader, author_map=None, repo_map=None):
+        self.samples = samples
         self.processor = processor
         self.embed_loader = embed_loader
+        self.author_map = author_map or {}
+        self.repo_map = repo_map or {}
+        self.embedding_cache = {}
+        
+        # Chuẩn hóa ánh xạ nhãn cho từng task
+        self.purpose_map = {
+            'Feature Implementation': 0,
+            'Bug Fix': 1,
+            'Refactoring': 2,
+            'Documentation Update': 3,
+            'Test Update': 4,
+            'Security Patch': 5,
+            'Code Style/Formatting': 6,
+            'Build/CI/CD Script Update': 7,
+            'Other': 8
+        }
+        self.sentiment_map = {'positive': 0, 'neutral': 1, 'negative': 2}
+        self.tech_vocab = [
+            'python', 'fastapi', 'react', 'javascript', 'typescript', 'docker', 'sqlalchemy', 'pytorch', 'spacy',
+            'css', 'html', 'postgresql', 'mysql', 'mongodb', 'redis', 'vue', 'angular', 'flask', 'django',
+            'node', 'express', 'graphql', 'rest', 'api', 'gitlab', 'github', 'ci', 'cd', 'kubernetes', 'helm',
+            'pytest', 'unittest', 'junit', 'cicd', 'github actions', 'travis', 'jenkins', 'circleci', 'webpack',
+            'babel', 'vite', 'npm', 'yarn', 'pip', 'poetry', 'black', 'flake8', 'isort', 'prettier', 'eslint',
+            'jwt', 'oauth', 'sso', 'celery', 'rabbitmq', 'kafka', 'grpc', 'protobuf', 'swagger', 'openapi',
+            'sentry', 'prometheus', 'grafana', 'nginx', 'apache', 'linux', 'ubuntu', 'windows', 'macos',
+            'aws', 'azure', 'gcp', 'firebase', 'heroku', 'netlify', 'vercel', 'tailwind', 'bootstrap', 'material ui'
+        ]
+        
+        # Add mapping for commit types
+        self.commit_type_map = {
+            'feat': 0,
+            'fix': 1,
+            'docs': 2,
+            'refactor': 3,
+            'style': 4,
+            'test': 5,
+            'chore': 6,
+            'uncategorized': 7
+        }
+
+        # Track user-specific commit statistics
+        self.user_commit_stats = {}
+        for sample in self.samples:
+            user = sample.get('source_info', {}).get('author_name', 'Unknown')
+            commit_type = sample.get('commit_type', 'uncategorized')
+            if user not in self.user_commit_stats:
+                self.user_commit_stats[user] = {ctype: 0 for ctype in self.commit_type_map.keys()}
+            if commit_type in self.commit_type_map:
+                self.user_commit_stats[user][commit_type] += 1
+
+        # Pre-compute embeddings for all words in the dataset
+        print("Pre-computing word embeddings...")
+        self._precompute_embeddings()
+        
+    def _precompute_embeddings(self):
+        # Collect all unique words
+        unique_words = set()
+        for sample in self.samples:
+            doc = self.processor.process_document(sample['raw_text'])
+            for sent in doc:
+                unique_words.update(str(word) for word in sent)
+        
+        # Pre-compute embeddings
+        for word in unique_words:
+            if word not in self.embedding_cache:
+                self.embedding_cache[word] = self.embed_loader.get_word_embedding(word)
+        print(f"Cached embeddings for {len(self.embedding_cache)} unique words")
+
+    def _detect_commit_type(self, raw_text):
+        # Detect commit type from raw text based on conventional commit format
+        if ':' not in raw_text:
+            return 'uncategorized'
+        prefix = raw_text.split(':')[0].lower().strip()
+        if prefix in self.commit_type_map:
+            return prefix
+        if 'feat' in prefix or 'feature' in prefix:
+            return 'feat'
+        if 'fix' in prefix or 'bug' in prefix:
+            return 'fix'
+        if 'doc' in prefix:
+            return 'docs'
+        if 'refactor' in prefix:
+            return 'refactor'
+        if 'style' in prefix or 'format' in prefix:
+            return 'style'
+        if 'test' in prefix:
+            return 'test'
+        if 'chore' in prefix or 'build' in prefix or 'ci' in prefix:
+            return 'chore'
+        return 'uncategorized'
+
     def __len__(self):
-        return len(self.texts)
+        return len(self.samples)
+
     def __getitem__(self, idx):
-        doc = self.processor.process_document(self.texts[idx])
-        # Chuyển từng từ thành embedding vector
+        sample = self.samples[idx]
+        doc = self.processor.process_document(sample['raw_text'])
         embed_doc = np.zeros((self.processor.max_sent_len, self.processor.max_word_len, 768))
+        
+        # Use cached embeddings
         for i, sent in enumerate(doc):
             for j, word in enumerate(sent):
-                # word là chỉ số, cần ánh xạ lại sang từ nếu dùng word2idx
-                embed_doc[i, j] = self.embed_loader.get_word_embedding(str(word))
-        item = {
-            'input': torch.tensor(embed_doc, dtype=torch.float32),
-            'labels': {k: torch.tensor(v[idx]) for k, v in self.labels.items()}
+                word_str = str(word)
+                embed_doc[i, j] = self.embedding_cache[word_str]
+        
+        # Convert numpy array to torch tensor, keep on CPU
+        embed_doc = torch.tensor(embed_doc, dtype=torch.float32)
+        
+        # Detect commit type from raw text
+        raw_text = sample.get('raw_text', '')
+        commit_type = self._detect_commit_type(raw_text)
+        commit_type_idx = self.commit_type_map.get(commit_type, 7)  # 7 for uncategorized
+
+        # Get other labels
+        purpose = self.purpose_map.get(sample.get('purpose', 'Other'), 8)
+        suspicious = int(sample.get('suspicious', 0))
+        tech_tags = sample.get('tech_tags', [])
+        if isinstance(tech_tags, list) and tech_tags and tech_tags[0] in self.tech_vocab:
+            tech_idx = self.tech_vocab.index(tech_tags[0])
+        else:
+            tech_idx = 0
+        sentiment = self.sentiment_map.get(sample.get('sentiment', 'neutral'), 1)
+        
+        # Workload labels
+        source_info = sample.get('source_info', {})
+        author_idx = self.author_map.get(source_info.get('author_name', 'Unknown'), 0)
+        repo_idx = self.repo_map.get(source_info.get('repo_id', 'Unknown'), 0)
+        
+        labels_tensor_dict = {
+            'commit_type': torch.tensor(commit_type_idx),
+            'purpose': torch.tensor(purpose),
+            'suspicious': torch.tensor(suspicious),
+            'tech_tag': torch.tensor(tech_idx),
+            'sentiment': torch.tensor(sentiment),
+            'author': torch.tensor(author_idx),
+            'source_repo': torch.tensor(repo_idx)
         }
-        return item
+        
+        return {
+            'input': embed_doc,
+            'labels': labels_tensor_dict
+        }
 
 def load_commit_data(json_path):
     with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    texts = [item['text'] for item in data]
-    # Danh sách nhãn mục đích commit
-    purpose_keys = ['feat','fix','docs','style','refactor','chore','test','uncategorized']
-    # Danh sách nhãn tech_tag (ví dụ, lấy từ các key phụ trong cats)
-    tech_tag_keys = ['auth','search','cart','order','profile','product','api','ui','notification','dashboard']
-    purpose_labels = []
-    suspicious_labels = []
-    tech_tag_labels = []
-    sentiment_labels = []
-    for item in data:
-        cats = item['cats']
-        # Mục đích commit: nhãn lớn nhất trong nhóm purpose_keys
-        purpose = max(purpose_keys, key=lambda k: cats.get(k, 0))
-        purpose_labels.append(purpose_keys.index(purpose))
-        # Suspicious: nếu có trường 'suspicious', lấy nhãn, không thì gán 0
-        suspicious_labels.append(int(cats.get('suspicious', 0)))
-        # Tech tag: lấy nhãn lớn nhất trong nhóm tech_tag_keys
-        tech_tag = max(tech_tag_keys, key=lambda k: cats.get(k, 0))
-        tech_tag_labels.append(tech_tag_keys.index(tech_tag))
-        # Sentiment: nếu có trường 'sentiment', lấy nhãn, không thì gán 1 (neutral)
-        sentiment_labels.append(int(cats.get('sentiment', 1)))
-    labels = {
-        'purpose': purpose_labels,
-        'suspicious': suspicious_labels,
-        'tech_tag': tech_tag_labels,
-        'sentiment': sentiment_labels
-    }
-    return texts, labels
+        samples = json.load(f)
+
+    print(f"Loaded {len(samples)} samples from {json_path}")
+    
+    # Build author and repo mappings
+    authors = set()
+    repos = set()
+    for item in samples:
+        source_info = item.get('source_info', {})
+        authors.add(source_info.get('author_name', 'Unknown'))
+        repos.add(source_info.get('repo_id', 'Unknown'))
+    
+    author_map = {author: idx for idx, author in enumerate(sorted(authors))}
+    repo_map = {repo: idx for idx, repo in enumerate(sorted(repos))}
+    
+    print(f"Found {len(authors)} unique authors and {len(repos)} unique repositories")
+    return samples, {'author_map': author_map, 'repo_map': repo_map}
 
 def main():
-    # 1. Load dữ liệu thật từ train_data.json
-    texts, labels = load_commit_data('ai/train_data.json')
+    # 1. Load training data
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_dir, "collected_data", "commit_messages_raw.json")
+    if not os.path.exists(json_path):
+        json_path = os.path.join(base_dir, "../collected_data/commit_messages_raw.json")
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"Không tìm thấy file dữ liệu huấn luyện: {json_path}")
+        
+    print("Loading data...")
+    samples, mappings = load_commit_data(json_path)
     processor = TextProcessor()
     embed_loader = EmbeddingLoader(embedding_type='codebert')
     embed_loader.load()
-    dataset = CommitDataset(texts, labels, processor, embed_loader)
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
 
-    # 2. Khởi tạo mô hình
+    # Split data
+    print("Splitting data...")
+    train_size = int(0.8 * len(samples))
+    train_samples = samples[:train_size]
+    val_samples = samples[train_size:]
+    print(f"Train samples: {len(train_samples)}, Validation samples: {len(val_samples)}")
+
+    # Create datasets
+    train_dataset = CommitDataset(
+        train_samples, 
+        processor, 
+        embed_loader,
+        author_map=mappings['author_map'],
+        repo_map=mappings['repo_map']
+    )
+    val_dataset = CommitDataset(
+        val_samples,
+        processor,
+        embed_loader,
+        author_map=mappings['author_map'],
+        repo_map=mappings['repo_map']
+    )
+
+    # Optimize batch size based on GPU memory
+    batch_size = 64 if device.type == 'cuda' else 8
+    num_workers = 6 if device.type == 'cuda' else 0
+
+    # Create dataloaders
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True if device.type == 'cuda' else False
+    )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True if device.type == 'cuda' else False
+    )
+
+    # Initialize model
+    print("Initializing model...")
     num_classes_dict = {
-        'purpose': 8,  # feat, fix, docs, style, refactor, chore, test, uncategorized
-        'tech_tag': 10, # auth, search, cart, order, profile, product, api, ui, notification, dashboard
+        'purpose': 9,
+        'tech_tag': len(train_dataset.tech_vocab),
         'suspicious': 2,
-        'sentiment': 3
+        'sentiment': 3,
+        'author': len(mappings['author_map']),
+        'source_repo': len(mappings['repo_map']),
+        'commit_type': 8
     }
-    model = HierarchicalAttentionNetwork(embed_dim=768, hidden_dim=128, num_classes_dict=num_classes_dict).to('cpu')
+    
+    model = HierarchicalAttentionNetwork(
+        embed_dim=768, 
+        hidden_dim=128,
+        num_classes_dict=num_classes_dict
+    ).to(device)
+    
+    # Optimizer and losses
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    
+    # GPU optimizations
+    if device.type == 'cuda':
+        print("Enabling CUDA optimizations...")
+        torch.backends.cudnn.benchmark = True
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs!")
+            model = torch.nn.DataParallel(model)
+    
     loss_fns = {
         'purpose': torch.nn.CrossEntropyLoss(),
         'suspicious': torch.nn.CrossEntropyLoss(),
         'tech_tag': torch.nn.CrossEntropyLoss(),
-        'sentiment': torch.nn.CrossEntropyLoss()
+        'sentiment': torch.nn.CrossEntropyLoss(),
+        'author': torch.nn.CrossEntropyLoss(),
+        'source_repo': torch.nn.CrossEntropyLoss(),
+        'commit_type': torch.nn.CrossEntropyLoss()
     }
-    multitask_loss = UncertaintyWeightingLoss(num_tasks=4)
-    trainer = MultiTaskTrainer(model, optimizer, loss_fns, device='cpu')
+    
+    multitask_loss = UncertaintyWeightingLoss(num_tasks=len(loss_fns))
+    trainer = MultiTaskTrainer(model, optimizer, loss_fns, device=device)
 
-    # 3. Train 1 epoch (demo)
-    loss = trainer.train_epoch(dataloader)
-    print(f"Train loss: {loss}")
+    # Setup logging
+    log_dir = os.path.join(base_dir, "training_logs")
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, f"training_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # Save initial config to log
+    with open(log_file, 'w', encoding='utf-8') as f:
+        f.write(f"Training Configuration\n{'='*20}\n")
+        f.write(f"Device: {device}\n")
+        f.write(f"Batch size: {batch_size}\n")
+        f.write(f"Number of workers: {num_workers}\n")
+        f.write(f"Dataset sizes - Train: {len(train_dataset)}, Val: {len(val_dataset)}\n")
+        f.write(f"Model classes: {num_classes_dict}\n\n")
 
-    # 4. Validate (demo)
-    val_loss, preds, labels = trainer.validate(dataloader)
-    print(f"Val loss: {val_loss}")
-    for task in preds:
-        metrics = calc_metrics(labels[task].numpy(), preds[task].argmax(-1).numpy())
-        print(f"Task {task}: {metrics}")
+    # Training loop
+    num_epochs = 10
+    best_val_loss = float('inf')
+    val_loss = float('inf')
+    print(f"Starting training on {device}...")
+    
+    try:
+        for epoch in range(num_epochs):
+            # Training
+            train_loss = trainer.train_epoch(train_loader)
+
+            # Validation
+            val_loss, preds, true_labels = trainer.validate(val_loader)
+
+            # Calculate metrics
+            task_metrics = {}
+            for task in preds:
+                metrics = calc_metrics(true_labels[task].numpy(), preds[task].argmax(-1).numpy())
+                task_metrics[task] = metrics
+
+            # Save best model
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'val_loss': val_loss,
+                    'author_map': mappings['author_map'],
+                    'repo_map': mappings['repo_map']
+                }, os.path.join(base_dir, "models", "han_multitask_best.pth"))
+
+            # Memory cleanup for GPU
+            if device.type == 'cuda':
+                torch.cuda.empty_cache()
+
+    except KeyboardInterrupt:
+        print("\nTraining interrupted by user. Saving current model state...")
+    except Exception as e:
+        print(f"\nError occurred during training: {str(e)}")
+    finally:
+        # Save final model
+        torch.save({
+            'model_state_dict': model.state_dict(),
+            'author_map': mappings['author_map'],
+            'repo_map': mappings['repo_map'],
+            'final_val_loss': val_loss
+        }, os.path.join(base_dir, "models", "han_multitask_final.pth"))
+
+        print("Training finished!")
+        print(f"Best validation loss: {best_val_loss:.4f}")
 
 if __name__ == "__main__":
     main()
@@ -499,7 +766,174 @@ class TfidfLogRegBaseline:
 
 ```
 
-### backend\ai\baseline\__init__.py
+### backend\ai\data_preparation\balance_training_data.py
+```py
+import json
+import random
+from collections import Counter, defaultdict
+
+def load_json(filepath):
+    with open(filepath, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_json(data, filepath):
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def balance_dataset(data, min_samples_per_class=25):
+    samples = data['samples']
+    # Group samples by different attributes
+    by_purpose = defaultdict(list)
+    by_sentiment = defaultdict(list)
+    by_author = defaultdict(list)
+    by_repo = defaultdict(list)
+    
+    # First pass - collect statistics and group samples
+    for sample in samples:
+        purpose = sample['purpose']
+        sentiment = sample['sentiment']
+        author = sample['metadata']['author']
+        repo_id = sample['metadata']['source_repo']
+        
+        by_purpose[purpose].append(sample)
+        by_sentiment[sentiment].append(sample)
+        by_author[author].append(sample)
+        by_repo[repo_id].append(sample)
+      # Balance purposes first
+    balanced_samples = []
+    purposes = ['Feature Implementation', 'Bug Fix', 'Refactoring', 'Other']
+    
+    # Find minimum samples across purposes that have data
+    min_purpose = float('inf')
+    for purpose in purposes:
+        if by_purpose[purpose]:  # Only consider non-empty categories
+            min_purpose = min(min_purpose, len(by_purpose[purpose]))
+    
+    # Set target size per purpose, ensuring at least min_samples_per_class
+    target_size = max(min_purpose, min_samples_per_class)
+    
+    for purpose in purposes:
+        available = by_purpose[purpose]
+        if not available:
+            continue
+            
+        if len(available) < target_size:
+            # If we don't have enough samples, use bootstrapping
+            needed = target_size - len(available)
+            selected = available + [random.choice(available) for _ in range(needed)]
+        else:
+            # Sample randomly
+            selected = random.sample(available, target_size)
+        balanced_samples.extend(selected)
+      # Now balance sentiments while preserving purpose balance
+    sentiments = ['positive', 'negative', 'neutral']
+    sentiment_grouped = defaultdict(list)
+    for sample in balanced_samples:
+        sentiment = sample['sentiment']
+        sentiment_grouped[sentiment].append(sample)
+    
+    # Find average sentiment count for non-empty categories
+    total_samples = 0
+    non_empty_cats = 0
+    for sentiment in sentiments:
+        if sentiment_grouped[sentiment]:
+            total_samples += len(sentiment_grouped[sentiment])
+            non_empty_cats += 1
+    
+    target_sentiment = max(total_samples // non_empty_cats, min_samples_per_class//2)
+    
+    final_samples = []
+    for sentiment in sentiments:
+        available = sentiment_grouped[sentiment]
+        if len(available) < target_sentiment:
+            final_samples.extend(available)
+        else:
+            final_samples.extend(random.sample(available, target_sentiment))
+    
+    # Shuffle final samples
+    random.shuffle(final_samples)
+    return final_samples
+
+def main():
+    # Load original and existing balanced data
+    original_data = load_json('c:/SAN/KLTN/KLTN04/backend/ai/training_data/han_training_samples.json')
+    
+    # Balance the dataset
+    balanced_samples = balance_dataset(original_data)
+    
+    # Save balanced dataset
+    balanced_data = {'samples': balanced_samples}
+    save_json(balanced_data, 'c:/SAN/KLTN/KLTN04/backend/ai/training_data/han_training_samples_balanced.json')
+    
+    # Print statistics
+    print("\nDataset Statistics:")
+    print(f"Total samples: {len(balanced_data['samples'])}")
+    
+    print("\nPurpose Distribution:")
+    purposes = Counter(s['purpose'] for s in balanced_data['samples'])
+    for purpose, count in purposes.most_common():
+        print(f"{purpose}: {count} ({count/len(balanced_data['samples'])*100:.1f}%)")
+    
+    print("\nSentiment Distribution:")
+    sentiments = Counter(s['sentiment'] for s in balanced_data['samples'])
+    for sentiment, count in sentiments.most_common():
+        print(f"{sentiment}: {count} ({count/len(balanced_data['samples'])*100:.1f}%)")
+    
+    print("\nTop Authors:")
+    authors = Counter(s['metadata']['author'] for s in balanced_data['samples'])
+    for author, count in authors.most_common(5):
+        print(f"{author}: {count} ({count/len(balanced_data['samples'])*100:.1f}%)")
+    
+    print("\nRepository Distribution:")
+    repos = Counter(s['metadata']['source_repo'] for s in balanced_data['samples'])
+    for repo, count in repos.most_common():
+        print(f"Repo {repo}: {count} ({count/len(balanced_data['samples'])*100:.1f}%)")
+
+if __name__ == "__main__":
+    main()
+```
+
+### backend\ai\data_preparation\build_training_data.py
+```py
+import os
+import json
+from ai.modelAi.generate_data import classify_commit_purpose, is_suspicious_commit, extract_tech_tags, classify_sentiment
+
+def build_training_data(collected_dir, output_path):
+    all_samples = []
+    for file in os.listdir(collected_dir):
+        if not file.endswith('.json'):
+            continue
+        with open(os.path.join(collected_dir, file), 'r', encoding='utf-8') as f:
+            items = json.load(f)
+        for item in items:
+            text = item.get('raw_text', '')
+            # Gán nhãn tự động
+            labels = {
+                'purpose': classify_commit_purpose(text),
+                'suspicious': is_suspicious_commit(text),
+                'tech_tag': extract_tech_tags(text),
+                'sentiment': classify_sentiment(text)
+            }
+            item['labels'] = labels
+            all_samples.append(item)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(all_samples, f, ensure_ascii=False, indent=2)
+    print(f"Saved {len(all_samples)} samples to {output_path}")
+
+if __name__ == "__main__":
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    collected_dir = os.path.join(base_dir, "collected_data")
+    output_path = os.path.join(base_dir, "training_data", "han_training_samples.json")
+    build_training_data(
+        collected_dir=collected_dir,
+        output_path=output_path
+    )
+
+```
+
+### backend\ai\data_preparation\clean_training_data.py
 ```py
 
 ```
@@ -545,6 +979,31 @@ class EmbeddingLoader:
             return self.embeddings.get(word, np.zeros(300))
         else:
             return None
+        
+    def get_embeddings_for_doc(self, doc):
+        """Lấy embeddings cho toàn bộ document.
+        
+        Args:
+            doc: numpy array có shape (num_sents, max_words) chứa các token id
+            
+        Returns:
+            numpy array có shape (num_sents, max_words, embed_dim)
+        """
+        num_sents, max_words = doc.shape
+        if self.embedding_type == 'codebert':
+            embed_dim = 768
+        else:
+            embed_dim = 300
+            
+        embeddings = np.zeros((num_sents, max_words, embed_dim))
+        
+        for i in range(num_sents):
+            for j in range(max_words):
+                if doc[i,j] != 0:  # Không tính embedding cho padding token
+                    word = str(doc[i,j])
+                    embeddings[i,j] = self.get_word_embedding(word)
+                    
+        return embeddings
 
 ```
 
@@ -554,7 +1013,14 @@ import re
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
-nltk.download('punkt', quiet=True)
+
+# Download required NLTK resources
+resources = ['punkt', 'averaged_perceptron_tagger', 'stopwords']
+for resource in resources:
+    try:
+        nltk.data.find(f'tokenizers/{resource}')
+    except LookupError:
+        nltk.download(resource, quiet=True)
 
 # Xử lý văn bản: làm sạch, tách câu, token hóa, padding
 class TextProcessor:
@@ -609,11 +1075,6 @@ class TextProcessor:
 
 ```
 
-### backend\ai\data_preprocessing\__init__.py
-```py
-
-```
-
 ### backend\ai\evaluation\attention_visualizer.py
 ```py
 # Visualize attention weights
@@ -659,7 +1120,7 @@ def calc_metrics(y_true, y_pred, task_type='multiclass', average='macro'):
 
 ```
 
-### backend\ai\evaluation\__init__.py
+### backend\ai\modelAi\fetch_github_commits.py
 ```py
 
 ```
@@ -670,6 +1131,7 @@ import json
 from db.database import database
 from db.models.commits import commits  # Đảm bảo bạn đã import đúng model commits
 from datetime import datetime
+import re
 
 # Hàm để chuyển dữ liệu commit thành định dạng spaCy
 async def convert_to_spacy_format():
@@ -729,6 +1191,51 @@ async def convert_to_spacy_format():
     # Ngắt kết nối cơ sở dữ liệu sau khi hoàn thành
     await database.disconnect()
 
+# Hàm thu thập commit messages và lưu theo định dạng unified JSON
+async def export_commit_messages_unified():
+    await database.connect()
+    query = commits.select()
+    rows = await database.fetch_all(query)
+    data = []
+    for row in rows:
+        sha = row["sha"]
+        message = row["message"]
+        author_name = row["author_name"]
+        author_email = row["author_email"]
+        date = row["date"]
+        insertions = row["insertions"]
+        deletions = row["deletions"]
+        files_changed = row["files_changed"]
+        repo_id = row["repo_id"]
+        if isinstance(date, datetime):
+            date = date.strftime('%Y-%m-%d %H:%M:%S')
+        if message:
+            data.append({
+                "id": sha,
+                "data_type": "commit_message",
+                "raw_text": message,
+                "source_info": {
+                    "repo_id": repo_id,
+                    "sha": sha,
+                    "author_name": author_name,
+                    "author_email": author_email,
+                    "date": date,
+                    "insertions": insertions,
+                    "deletions": deletions,
+                    "files_changed": files_changed
+                },
+                "labels": {
+                    "purpose": None,
+                    "suspicious": None,
+                    "tech_tag": None,
+                    "sentiment": None
+                }
+            })
+    with open("ai/collected_data/commit_messages_raw.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print("Đã xuất commit messages sang collected_data/commit_messages_raw.json!")
+    await database.disconnect()
+
 # Hàm phân loại label từ message (cần phải viết logic phân loại của bạn)
 def get_label_from_message(message):
     # Các từ khóa phổ biến trong commit
@@ -752,10 +1259,92 @@ def get_label_from_message(message):
     # Nếu không có từ khóa nào trong message, phân loại là 'uncategorized'
     return {"feat": 0.0, "fix": 0.0, "docs": 0.0, "style": 0.0, "refactor": 0.0, "chore": 0.0, "test": 0.0, "uncategorized": 1.0}
 
+def classify_commit_purpose(message: str) -> str:
+    message = message.lower()
+    # Bug Fix
+    if re.search(r"\b(fix|bug|error|sửa lỗi|vá lỗi|issue #|problem|resolve|patch|hotfix|defect|repair|correct|debug)\b", message):
+        return 'Bug Fix'
+    # Feature Implementation
+    if re.search(r"\b(feat|add|implement|thêm|phát triển|tính năng mới|feature|introduce|support|create|build)\b", message):
+        return 'Feature Implementation'
+    # Refactoring
+    if re.search(r"\b(refactor|restructure|tái cấu trúc|optimi[sz]e|clean up|cleanup|improve structure|refactoring)\b", message):
+        return 'Refactoring'
+    # Documentation Update
+    if re.search(r"\b(docs|update readme|document|tài liệu|hướng dẫn|readme|docstring|documentation|manual|guide)\b", message):
+        return 'Documentation Update'
+    # Test Update
+    if re.search(r"\b(test|unit test|integration test|add test|update test|kiểm thử|bổ sung test|testcase|test case|testing)\b", message):
+        return 'Test Update'
+    # Security Patch
+    if re.search(r"\b(security|bảo mật|vulnerability|cve-|patch security|fix security|secure|xss|csrf|injection|auth bypass|exploit)\b", message):
+        return 'Security Patch'
+    # Code Style/Formatting
+    if re.search(r"\b(style|format|formatting|code style|reformat|lint|prettier|black|flake8|isort|format code|format lại|chuẩn hóa mã)\b", message):
+        return 'Code Style/Formatting'
+    # Build/CI/CD Script Update
+    if re.search(r"\b(build|ci|cd|pipeline|deploy|release|workflow|github actions|jenkins|travis|circleci|update script|build script|ci/cd|docker|compose|build system|deployment)\b", message):
+        return 'Build/CI/CD Script Update'
+    # Default fallback
+    return 'Other'
+
+def is_suspicious_commit(message: str) -> int:
+    if not message or len(message.strip()) < 5:
+        return 1  # Quá ngắn hoặc không có nội dung
+    if len(message) > 200:
+        return 1  # Quá dài bất thường
+    suspicious_keywords = [
+        'hack', 'backdoor', 'temp fix', 'quick fix', 'todo: fix', 'xxx', 'hack', 'workaround',
+        'bypass', 'disable security', 'hardcode', 'debug', 'remove check', 'skip test', 'patch quick', 'urgent fix'
+    ]
+    msg_lower = message.lower()
+    for kw in suspicious_keywords:
+        if kw in msg_lower:
+            return 1
+    # Toàn bộ viết hoa hoặc chứa nhiều ký tự đặc biệt
+    if message.isupper() or sum(1 for c in message if not c.isalnum() and c not in ' .,:;') > len(message) * 0.3:
+        return 1
+    return 0
+
+def extract_tech_tags(text: str) -> list:
+    tech_vocab = [
+        'python', 'fastapi', 'react', 'javascript', 'typescript', 'docker', 'sqlalchemy', 'pytorch', 'spacy',
+        'css', 'html', 'postgresql', 'mysql', 'mongodb', 'redis', 'vue', 'angular', 'flask', 'django',
+        'node', 'express', 'graphql', 'rest', 'api', 'gitlab', 'github', 'ci', 'cd', 'kubernetes', 'helm',
+        'pytest', 'unittest', 'junit', 'cicd', 'github actions', 'travis', 'jenkins', 'circleci', 'webpack',
+        'babel', 'vite', 'npm', 'yarn', 'pip', 'poetry', 'black', 'flake8', 'isort', 'prettier', 'eslint',
+        'jwt', 'oauth', 'sso', 'celery', 'rabbitmq', 'kafka', 'grpc', 'protobuf', 'swagger', 'openapi',
+        'sentry', 'prometheus', 'grafana', 'nginx', 'apache', 'linux', 'ubuntu', 'windows', 'macos',
+        'aws', 'azure', 'gcp', 'firebase', 'heroku', 'netlify', 'vercel', 'tailwind', 'bootstrap', 'material ui'
+    ]
+    found = set()
+    text_lower = text.lower()
+    for tech in tech_vocab:
+        if tech in text_lower:
+            found.add(tech)
+    return list(found)
+
+def classify_sentiment(message: str) -> str:
+    message = message.lower()
+    positive_keywords = [
+        'cải thiện', 'tốt', 'thành công', 'hoàn thành', 'ổn định', 'tối ưu', 'đẹp', 'gọn', 'sạch', 'great', 'awesome', 'improved', 'cleaned up', 'ok', 'hoàn tất', 'đã xong', 'resolved', 'fixed', 'passed', 'success', 'hoan thanh', 'tot', 'cam on', 'thanks', 'thank you', 'well done', 'hoàn thiện', 'đúng', 'đúng chức năng', 'đúng yêu cầu'
+    ]
+    negative_keywords = [
+        'lỗi', 'fail', 'broke', 'revert', 'issue', 'bug', 'không chạy', 'không hoạt động', 'sai', 'chưa xong', 'chưa hoàn thành', 'chưa đúng', 'problem', 'error', 'crash', 'exception', 'bad', 'xóa bỏ', 'rollback', 'undo', 'fixme', 'todo', 'tạm thời', 'workaround', 'hack', 'tạm vá', 'không ổn', 'không tốt', 'chưa ổn', 'chưa tốt', 'chưa hoàn thiện', 'chưa đúng chức năng', 'chưa đúng yêu cầu'
+    ]
+    for word in positive_keywords:
+        if word in message:
+            return 'positive'
+    for word in negative_keywords:
+        if word in message:
+            return 'negative'
+    return 'neutral'
+
 # Chạy hàm convert_to_spacy_format
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(convert_to_spacy_format())
+    #asyncio.run(convert_to_spacy_format())
+    asyncio.run(export_commit_messages_unified())
 
 ```
 
@@ -810,7 +1399,10 @@ class HierarchicalAttentionNetwork(nn.Module):
             'purpose': nn.Linear(hidden_dim*2, num_classes_dict['purpose']),
             'suspicious': nn.Linear(hidden_dim*2, 2),
             'tech_tag': nn.Linear(hidden_dim*2, num_classes_dict['tech_tag']),
-            'sentiment': nn.Linear(hidden_dim*2, 3)
+            'sentiment': nn.Linear(hidden_dim*2, 3),
+            'author': nn.Linear(hidden_dim*2, num_classes_dict['author']),
+            'source_repo': nn.Linear(hidden_dim*2, num_classes_dict['source_repo']),
+            'commit_type': nn.Linear(hidden_dim*2, num_classes_dict['commit_type'])
         })
 
     def forward(self, x):
@@ -824,7 +1416,10 @@ class HierarchicalAttentionNetwork(nn.Module):
             'purpose': self.heads['purpose'](sent_vec),
             'suspicious': self.heads['suspicious'](sent_vec),
             'tech_tag': self.heads['tech_tag'](sent_vec),
-            'sentiment': self.heads['sentiment'](sent_vec)
+            'sentiment': self.heads['sentiment'](sent_vec),
+            'author': self.heads['author'](sent_vec),
+            'source_repo': self.heads['source_repo'](sent_vec),
+            'commit_type': self.heads['commit_type'](sent_vec)
         }
         return out, word_attn, sent_attn
 
@@ -845,8 +1440,78 @@ class SharedDense(nn.Module):
 
 ```
 
-### backend\ai\models\__init__.py
+### backend\ai\scriptPhantich\analyze_data_balance.py
 ```py
+import json
+from collections import Counter
+import pandas as pd
+import os
+
+# Đọc dữ liệu huấn luyện
+file_path = "c:\\SAN\\KLTN\\KLTN04\\backend\\ai\\training_data\\han_training_samples.json"
+with open(file_path, 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+samples = data['samples']
+
+# Khởi tạo counters
+purpose_counter = Counter()
+sentiment_counter = Counter()
+tech_tags_counter = Counter()
+author_counter = Counter()
+repo_counter = Counter()
+
+# Đếm số lượng của mỗi nhãn
+for sample in samples:
+    purpose_counter[sample.get('purpose', 'Unknown')] += 1
+    sentiment_counter[sample.get('sentiment', 'Unknown')] += 1
+    
+    tech_tags = sample.get('tech_tags', [])
+    for tag in tech_tags:
+        tech_tags_counter[tag] += 1
+        
+    metadata = sample.get('metadata', {})
+    author_counter[metadata.get('author', 'Unknown')] += 1
+    repo_counter[metadata.get('source_repo', 'Unknown')] += 1
+
+# In phân tích
+print("\n=== Phân tích cân bằng dữ liệu ===")
+print(f"\nTổng số mẫu: {len(samples)}")
+
+print("\n--- Purpose Distribution ---")
+for purpose, count in purpose_counter.most_common():
+    print(f"{purpose}: {count} ({count/len(samples)*100:.1f}%)")
+
+print("\n--- Sentiment Distribution ---")
+for sentiment, count in sentiment_counter.most_common():
+    print(f"{sentiment}: {count} ({count/len(samples)*100:.1f}%)")
+
+print("\n--- Top 10 Tech Tags ---")
+for tag, count in tech_tags_counter.most_common(10):
+    print(f"{tag}: {count}")
+
+print("\n--- Author Distribution ---")
+for author, count in author_counter.most_common():
+    print(f"{author}: {count} ({count/len(samples)*100:.1f}%)")
+
+print("\n--- Repository Distribution ---")
+for repo, count in repo_counter.most_common():
+    print(f"{repo}: {count} ({count/len(samples)*100:.1f}%)")
+
+# Tính toán các chỉ số cân bằng
+def calculate_imbalance(counter):
+    total = sum(counter.values())
+    proportions = [count/total for count in counter.values()]
+    max_prop = max(proportions)
+    min_prop = min(proportions)
+    imbalance_ratio = max_prop / min_prop if min_prop > 0 else float('inf')
+    return imbalance_ratio
+
+print("\n=== Tỉ lệ mất cân bằng (max/min) ===")
+print(f"Purpose Imbalance: {calculate_imbalance(purpose_counter):.2f}")
+print(f"Sentiment Imbalance: {calculate_imbalance(sentiment_counter):.2f}")
+print(f"Author Imbalance: {calculate_imbalance(author_counter):.2f}")
+print(f"Repository Imbalance: {calculate_imbalance(repo_counter):.2f}")
 
 ```
 
@@ -860,8 +1525,11 @@ import json
 def extract_code_comments_from_file(filepath):
     comments = []
     ext = os.path.splitext(filepath)[1]
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-        lines = f.readlines()
+    try:
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            lines = f.readlines()
+    except Exception:
+        return comments  # Bỏ qua file không đọc được
     if ext in ['.py']:
         for line in lines:
             match = re.match(r'\s*#(.*)', line)
@@ -891,14 +1559,32 @@ def extract_comments_from_repo(repo_path, exts=['.py', '.js', '.jsx', '.ts', '.t
                     all_comments.append({'text': c, 'source': filepath})
     return all_comments
 
-def save_comments_to_json(comments, out_path):
+def save_comments_to_json(comments, out_path, repo_name=None):
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    output = []
+    for idx, c in enumerate(comments):
+        output.append({
+            "id": f"comment_{idx}",
+            "data_type": "code_comment",
+            "raw_text": c["text"] if isinstance(c, dict) else c,
+            "source_info": {
+                "repo_name": repo_name or "KLTN04",
+                "file_path": c["source"] if isinstance(c, dict) and "source" in c else None
+            },
+            "labels": {
+                "purpose": None,
+                "suspicious": None,
+                "tech_tag": None,
+                "sentiment": None
+            }
+        })
     with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump(comments, f, ensure_ascii=False, indent=2)
+        json.dump(output, f, ensure_ascii=False, indent=2)
 
 if __name__ == '__main__':
-    repo_path = '../../'  # Đường dẫn tới repo gốc
+    repo_path = '../../backend'  # Giới hạn quét trong backend
     comments = extract_comments_from_repo(repo_path)
-    save_comments_to_json(comments, 'ai/code_comments.json')
+    save_comments_to_json(comments, '../collected_data/code_comments.json')
     print(f'Extracted {len(comments)} comments.')
 
 ```
@@ -908,6 +1594,7 @@ if __name__ == '__main__':
 import subprocess
 import json
 import re
+import os
 
 def extract_code_diffs(repo_path, max_commits=100):
     os.chdir(repo_path)
@@ -922,14 +1609,52 @@ def extract_code_diffs(repo_path, max_commits=100):
             diffs.append({'commit': h, 'added': added, 'removed': removed})
     return diffs
 
-def save_diffs_to_json(diffs, out_path):
+def save_diffs_to_json(diffs, out_path, repo_name=None):
+    output = []
+    for idx, d in enumerate(diffs):
+        # Lưu từng dòng added/removed như một mục riêng biệt
+        for i, line in enumerate(d.get('added', [])):
+            output.append({
+                "id": f"diff_{d['commit']}_add_{i}",
+                "data_type": "code_diff_text",
+                "raw_text": line,
+                "source_info": {
+                    "repo_name": repo_name or "KLTN04",
+                    "commit_sha": d['commit'],
+                    "diff_type": "added"
+                },
+                "labels": {
+                    "purpose": None,
+                    "suspicious": None,
+                    "tech_tag": None,
+                    "sentiment": None
+                }
+            })
+        for i, line in enumerate(d.get('removed', [])):
+            output.append({
+                "id": f"diff_{d['commit']}_rm_{i}",
+                "data_type": "code_diff_text",
+                "raw_text": line,
+                "source_info": {
+                    "repo_name": repo_name or "KLTN04",
+                    "commit_sha": d['commit'],
+                    "diff_type": "removed"
+                },
+                "labels": {
+                    "purpose": None,
+                    "suspicious": None,
+                    "tech_tag": None,
+                    "sentiment": None
+                }
+            })
     with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump(diffs, f, ensure_ascii=False, indent=2)
+        json.dump(output, f, ensure_ascii=False, indent=2)
 
 if __name__ == '__main__':
-    repo_path = '../../'  # Đường dẫn tới repo gốc
+    repo_path = './backend'  # Đường dẫn repo backend (tương đối từ workspace)
     diffs = extract_code_diffs(repo_path)
-    save_diffs_to_json(diffs, 'ai/code_diffs.json')
+    os.makedirs('../collected_data', exist_ok=True)
+    save_diffs_to_json(diffs, '../collected_data/code_diffs.json')
     print(f'Extracted {len(diffs)} code diffs.')
 
 ```
@@ -951,19 +1676,230 @@ def extract_readme(repo_path):
         content = f.read()
     return content
 
-def save_readme_to_json(content, out_path):
-    data = {'text': content}
+def save_readme_to_json(content, out_path, repo_name=None):
+    output = [{
+        "id": "readme_1",
+        "data_type": "readme_content",
+        "raw_text": content,
+        "source_info": {
+            "repo_name": repo_name or "KLTN04",
+            "file_path": "README.md"
+        },
+        "labels": {
+            "purpose": None,
+            "suspicious": None,
+            "tech_tag": None,
+            "sentiment": None
+        }
+    }]
     with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(output, f, ensure_ascii=False, indent=2)
 
 if __name__ == '__main__':
-    repo_path = '../../'  # Đường dẫn tới repo gốc
+    repo_path = '.'  # Đường dẫn tới thư mục gốc dự án
     content = extract_readme(repo_path)
     if content:
-        save_readme_to_json(content, 'ai/readme.json')
+        save_readme_to_json(content, '../collected_data/readme_content.json')
         print('README extracted.')
     else:
         print('README not found.')
+
+```
+
+### backend\ai\taotukhoa\taotukhoa.py
+```py
+import json
+from collections import defaultdict
+
+# Danh sách nhãn
+categories = [
+    "auth", "search", "cart", "order", "profile", "product",
+    "api", "ui", "notification", "dashboard", "fix", "feat",
+    "refactor", "test", "style", "docs", "chore", "uncategorized"
+]
+
+# Từ khóa mẫu theo từng category
+keyword_seed = {
+    "auth": ["login", "logout", "register", "authentication", "authorization", "signin", "signup", "verify", "jwt", "token", "mã xác thực", "đăng nhập", "đăng ký"],
+    "search": ["search", "filter", "query", "lookup", "tìm kiếm", "lọc"],
+    "cart": ["cart", "add to cart", "remove from cart", "giỏ hàng", "thêm vào giỏ", "xóa khỏi giỏ"],
+    "order": ["order", "checkout", "invoice", "bill", "đặt hàng", "thanh toán", "hóa đơn", "giao hàng"],
+    "profile": ["profile", "account", "user info", "thông tin cá nhân", "hồ sơ", "avatar", "user"],
+    "product": ["product", "item", "goods", "sản phẩm", "thêm sản phẩm", "chỉnh sửa sản phẩm"],
+    "api": ["api", "endpoint", "request", "response", "swagger", "rest", "graphql"],
+    "ui": ["ui", "interface", "layout", "giao diện", "font", "màu sắc", "hiển thị", "style", "responsive", "theme"],
+    "notification": ["notification", "alert", "thông báo", "popup", "toast"],
+    "dashboard": ["dashboard", "admin", "panel", "thống kê", "biểu đồ", "quản trị", "báo cáo"],
+
+    "fix": ["fix", "bug", "sửa lỗi", "resolve", "patch", "hotfix", "lỗi", "error", "issue"],
+    "feat": ["feat", "feature", "thêm chức năng", "implement", "function", "module", "new feature"],
+    "refactor": ["refactor", "optimize", "tối ưu", "clean code", "cải tiến", "tái cấu trúc", "improve"],
+    "test": ["test", "unit test", "integration test", "test case", "kiểm thử", "viết test"],
+    "style": ["style", "format", "prettier", "indent", "reformat", "format lại", "chỉnh code"],
+    "docs": ["docs", "readme", "tài liệu", "viết tài liệu", "hướng dẫn", "documentation"],
+    "chore": ["chore", "cấu hình", "setup", "config", "update dependencies", "maintenance", "tooling"],
+    "uncategorized": ["misc", "other", "khác", "thay đổi cấu trúc", "cập nhật"]
+}
+
+# Mở rộng mỗi nhãn thành nhiều từ khóa (dựa trên các gốc từ)
+def expand_keywords(seed):
+    expanded = set()
+    for word in seed:
+        expanded.add(word.lower())
+        if " " in word:
+            expanded.add(word.replace(" ", "-"))
+            expanded.add(word.replace(" ", "_"))
+        if word.isalpha():
+            expanded.add(word + "s")
+            expanded.add(word + "ed")
+            expanded.add(word + "ing")
+    return list(expanded)
+
+# Xây dựng dict tổng hợp
+keyword_dict = defaultdict(list)
+
+for category, seed_words in keyword_seed.items():
+    keyword_dict[category] = expand_keywords(seed_words)
+
+# Xuất ra file JSON
+with open("subintent_keywords.json", "w", encoding="utf-8") as f:
+    json.dump(keyword_dict, f, ensure_ascii=False, indent=2)
+
+print("✅ Đã tạo file 'subintent_keywords.json' với từ khóa mở rộng.")
+
+```
+
+### backend\ai\testmodel\test_han.py
+```py
+import torch
+import sys
+# Add workspace root to Python path
+sys.path.append("c:\\SAN\\KLTN\\KLTN04\\backend")
+sys.path.append("c:\\SAN\\KLTN\\KLTN04\\backend\\ai")
+from ai.models.hierarchical_attention import HierarchicalAttentionNetwork
+from data_preprocessing.text_processor import TextProcessor
+
+# Load the trained HAN model
+model_path = "c:\\SAN\\KLTN\\KLTN04\\backend\\ai\\models\\han_multitask_best.pth"
+model = HierarchicalAttentionNetwork(embed_dim=768, hidden_dim=128, num_classes_dict={
+    'purpose': 10, 'suspicious': 2, 'tech_tag': 15, 'sentiment': 3, 'author': 20, 'source_repo': 5
+})
+
+# Extract model_state_dict from checkpoint
+checkpoint = torch.load(model_path)
+
+# Extract num_classes_dict from checkpoint
+num_classes_dict = checkpoint.get('num_classes_dict', {
+    'purpose': 9, 'suspicious': 2, 'tech_tag': 79, 'sentiment': 3, 'author': 7, 'source_repo': 7
+})
+
+# Reinitialize model with correct num_classes_dict
+model = HierarchicalAttentionNetwork(embed_dim=768, hidden_dim=128, num_classes_dict=num_classes_dict)
+model.load_state_dict(checkpoint['model_state_dict'])
+model.eval()
+
+# Initialize TextProcessor
+text_processor = TextProcessor()
+
+# Define a word2idx mapping for token conversion
+word2idx = {'<unk>': 0}  # Add actual word-to-index mapping here
+
+# Sample commit messages for testing
+commit_messages = [
+    "feat: Thêm tính năng xử lý lỗi",
+    "fix: Sửa lỗi hiển thị trên giao diện người dùng",
+    "docs: Cập nhật tài liệu API",
+    "refactor: Tối ưu code module tìm kiếm",
+    "style: Chỉnh sửa format code",
+    "test: Thêm test case cho hàm login",
+    "chore: Cập nhật dependencies",
+    "uncategorized: Thay đổi cấu trúc thư mục",
+    "feat: Thêm API thanh toán mới",
+    "fix: Sửa layout bị cách ra ngoài",
+]
+
+# Load or generate embeddings for words
+embedding_dim = 768  # Define embedding dimension
+embedding_loader = torch.nn.Embedding(len(word2idx), embedding_dim)
+
+# Ensure input tensor has the correct shape
+max_sent_len = 10  # Define maximum number of sentences
+max_word_len = 20  # Define maximum number of words per sentence
+
+# Define label mappings for each task
+label_mappings = {
+    'purpose': ['Thêm tính năng', 'Sửa lỗi', 'Cập nhật tài liệu', 'Tối ưu code', 'Chỉnh sửa format', 'Thêm test case', 'Cập nhật dependencies', 'Thay đổi cấu trúc', 'Thêm API mới', 'Khác'],
+    'sentiment': ['Tích cực', 'Tiêu cực', 'Trung lập'],
+    'tech_tag': ['Python', 'JavaScript', 'HTML', 'CSS', 'SQL', 'Docker', 'React', 'Angular', 'Vue', 'Khác'],
+    # Add mappings for other tasks as needed
+}
+
+# Preprocess and predict
+for message in commit_messages:
+    processed_message = text_processor.process_document(message, word2idx=word2idx)
+    # Pad processed_message to match expected dimensions
+    processed_message = [sent + [0]*(max_word_len-len(sent)) if len(sent)<max_word_len else sent for sent in processed_message]
+    if len(processed_message) < max_sent_len:
+        processed_message += [[0]*max_word_len]*(max_sent_len-len(processed_message))
+
+    # Convert processed_message to embeddings
+    embedded_message = [embedding_loader(torch.tensor(sent)) for sent in processed_message]
+    embedded_message = torch.stack(embedded_message)
+
+    # Ensure input tensor has the correct shape
+    input_tensor = embedded_message.unsqueeze(0)  # Add batch dimension
+    with torch.no_grad():
+        predictions = model(input_tensor)
+
+    # Extract predictions dictionary from model output
+    predictions_dict = predictions[0]  # First element contains the task-specific outputs
+
+    # Convert predictions to human-readable labels
+    readable_predictions = {}
+    for task, output in predictions_dict.items():
+        predicted_label_idx = torch.argmax(output).item()
+        # Ensure the index is within the range of label mappings
+        if predicted_label_idx < len(label_mappings.get(task, [])):
+            readable_predictions[task] = label_mappings.get(task, ['Unknown'])[predicted_label_idx]
+        else:
+            readable_predictions[task] = 'Unknown'
+
+    print(f"Commit message: {message}")
+    print("Predictions:")
+    for task, label in readable_predictions.items():
+        print(f"  {task}: {label}")
+    print()
+
+```
+
+### backend\ai\testmodel\test_model.py
+```py
+import spacy
+
+# Load mô hình đã train
+nlp = spacy.load("modelAi")
+
+# Các câu commit cần test
+texts = [
+    "feat: Thêm tính năng xử lý lỗi",
+    "fix: Sửa lỗi hiển thị trên giao diện người dùng",
+    "docs: Cập nhật tài liệu API",
+    "refactor: Tối ưu code module tìm kiếm",
+    "style: Chỉnh sửa format code",
+    "test: Thêm test case cho hàm login",
+    "chore: Cập nhật dependencies",
+    "uncategorized: Thay đổi cấu trúc thư mục",
+    "feat: Thêm API thanh toán mới",
+    "fix: Sửa layout bị cách ra ngoài",
+]
+
+for text in texts:
+    doc = nlp(text)
+    print(f"Văn bản: {text}")
+    for label, score in doc.cats.items():
+        if score > 0.05:  # Tùy chỉnh ngưỡng lọc nhãn
+            print(f"{label}: {score:.4f}")
+    print()
 
 ```
 
@@ -1049,11 +1985,6 @@ class MultiTaskTrainer:
             all_preds[task] = torch.cat(all_preds[task])
             all_labels[task] = torch.cat(all_labels[task])
         return total_loss / len(dataloader), all_preds, all_labels
-
-```
-
-### backend\ai\training\__init__.py
-```py
 
 ```
 

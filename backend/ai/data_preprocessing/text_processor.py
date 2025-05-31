@@ -2,10 +2,14 @@ import re
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', quiet=True)
+
+# Download required NLTK resources
+resources = ['punkt', 'averaged_perceptron_tagger', 'stopwords']
+for resource in resources:
+    try:
+        nltk.data.find(f'tokenizers/{resource}')
+    except LookupError:
+        nltk.download(resource, quiet=True)
 
 # Xử lý văn bản: làm sạch, tách câu, token hóa, padding
 class TextProcessor:

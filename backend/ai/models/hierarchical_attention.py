@@ -47,7 +47,10 @@ class HierarchicalAttentionNetwork(nn.Module):
             'purpose': nn.Linear(hidden_dim*2, num_classes_dict['purpose']),
             'suspicious': nn.Linear(hidden_dim*2, 2),
             'tech_tag': nn.Linear(hidden_dim*2, num_classes_dict['tech_tag']),
-            'sentiment': nn.Linear(hidden_dim*2, 3)
+            'sentiment': nn.Linear(hidden_dim*2, 3),
+            'author': nn.Linear(hidden_dim*2, num_classes_dict['author']),
+            'source_repo': nn.Linear(hidden_dim*2, num_classes_dict['source_repo']),
+            'commit_type': nn.Linear(hidden_dim*2, num_classes_dict['commit_type'])
         })
 
     def forward(self, x):
@@ -61,6 +64,9 @@ class HierarchicalAttentionNetwork(nn.Module):
             'purpose': self.heads['purpose'](sent_vec),
             'suspicious': self.heads['suspicious'](sent_vec),
             'tech_tag': self.heads['tech_tag'](sent_vec),
-            'sentiment': self.heads['sentiment'](sent_vec)
+            'sentiment': self.heads['sentiment'](sent_vec),
+            'author': self.heads['author'](sent_vec),
+            'source_repo': self.heads['source_repo'](sent_vec),
+            'commit_type': self.heads['commit_type'](sent_vec)
         }
         return out, word_attn, sent_attn
