@@ -1,0 +1,8 @@
+Training Configuration
+====================
+Device: cuda
+Batch size: 64
+Number of workers: 6
+Dataset sizes - Train: 97, Val: 25
+Model classes: {'purpose': 9, 'tech_tag': 79, 'suspicious': 2, 'sentiment': 3, 'author': 7, 'source_repo': 7, 'commit_type': 8}
+

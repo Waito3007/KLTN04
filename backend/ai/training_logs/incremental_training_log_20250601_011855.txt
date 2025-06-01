@@ -1,0 +1,10 @@
+Incremental Training Configuration
+==============================
+Base model: models/han_multitask_best.pth
+New data: training_data/han_training_2.json
+Device: cpu
+Batch size: 8
+Number of workers: 0
+Dataset sizes - Train: 207, Val: 52
+Model classes: {'purpose': 9, 'tech_tag': 79, 'suspicious': 2, 'sentiment': 3, 'author': 18, 'source_repo': 4, 'commit_type': 8}
+

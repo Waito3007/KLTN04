@@ -1,0 +1,151 @@
+{
+  "analysis_date": "2025-06-01T02:10:17.730678",
+  "total_authors": 7,
+  "authors": {
+    "Tran Tien Duc": {
+      "total_commits": 2,
+      "commit_type_distribution": {
+        "feature": 2
+      },
+      "commit_samples": [
+        {
+          "text": "align docker build and maven build output version\n\nmaven use the hardcoded version `8.7.0` and output zip file with `8.7.0` in file name suffix. This breaks COPY command",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        },
+        {
+          "text": "Refactor user authentication flow\n\nSplit monolithic auth service into smaller modules",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "feature",
+        "average_commits": 2
+      }
+    },
+    "Duy Do": {
+      "total_commits": 3,
+      "commit_type_distribution": {
+        "bugfix": 2,
+        "feature": 1
+      },
+      "commit_samples": [
+        {
+          "text": "Merge pull request #141 from duydo/dependabot/maven/com.google.guava-guava-32.0.0-jre\n\nBump guava from 31.1-jre to 32.0.0-jre",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 2
+        },
+        {
+          "text": "Refactor Unsafe, removed unused code",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        },
+        {
+          "text": "[ci skip] Fix typo in README.md\n\nFixed spelling mistakes in documentation",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 2
+        }
+      ],
+      "summary": {
+        "most_common_type": "bugfix",
+        "average_commits": 3
+      }
+    },
+    "Security Team": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "bugfix": 1
+      },
+      "commit_samples": [
+        {
+          "text": "Fix critical security vulnerability in authentication module\n\nUrgent patch for SQL injection vulnerability CVE-2023-1234",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 2
+        }
+      ],
+      "summary": {
+        "most_common_type": "bugfix",
+        "average_commits": 1
+      }
+    },
+    "QA Engineer": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "bugfix": 1
+      },
+      "commit_samples": [
+        {
+          "text": "Add comprehensive unit tests for user service\n\nIncreased test coverage to 85% with new integration tests",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 2
+        }
+      ],
+      "summary": {
+        "most_common_type": "bugfix",
+        "average_commits": 1
+      }
+    },
+    "Technical Writer": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "bugfix": 1
+      },
+      "commit_samples": [
+        {
+          "text": "Update documentation for API endpoints\n\nImproved swagger docs and added examples",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "bugfix",
+        "average_commits": 1
+      }
+    },
+    "Payment Team": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "feature": 1
+      },
+      "commit_samples": [
+        {
+          "text": "feat: implement new payment gateway\n\nAdded Stripe integration with webhook support",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "feature",
+        "average_commits": 1
+      }
+    },
+    "Dependabot": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "feature": 1
+      },
+      "commit_samples": [
+        {
+          "text": "chore: update dependencies\n\nBump spring-boot from 2.7.0 to 3.0.0",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "feature",
+        "average_commits": 1
+      }
+    }
+  }
+}

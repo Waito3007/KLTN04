@@ -1,0 +1,128 @@
+Training Configuration
+====================
+Device: cpu
+Batch size: 8
+Number of workers: 0
+Dataset sizes - Train: 160, Val: 40
+Model classes: {'purpose': 9, 'tech_tag': 79, 'suspicious': 2, 'sentiment': 3, 'author': 3, 'source_repo': 3, 'commit_type': 8}
+
+
+=== Epoch 1 (2025-05-31 20:14:34) ===
+Train Loss: 5.7188
+Val Loss: 4.1561
+purpose: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+suspicious: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+author: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+source_repo: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+commit_type: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+--------------------------------------------------
+
+=== Epoch 2 (2025-05-31 20:14:37) ===
+Train Loss: 4.3765
+Val Loss: 4.6585
+purpose: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+suspicious: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+author: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+source_repo: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+commit_type: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+--------------------------------------------------
+
+=== Epoch 3 (2025-05-31 20:14:39) ===
+Train Loss: 4.3765
+Val Loss: 4.7095
+purpose: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+suspicious: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+author: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+source_repo: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+commit_type: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+--------------------------------------------------
+
+=== Epoch 4 (2025-05-31 20:14:42) ===
+Train Loss: 4.3072
+Val Loss: 4.3607
+purpose: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+suspicious: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+author: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+source_repo: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+commit_type: {f1: 0.2857, precision: 0.2000, recall: 0.5000, auc: 0.5000}
+--------------------------------------------------
+
+=== Epoch 5 (2025-05-31 20:14:45) ===
+Train Loss: 4.2845
+Val Loss: 3.8679
+purpose: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+suspicious: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+author: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+source_repo: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+commit_type: {f1: 0.3750, precision: 0.3000, recall: 0.5000, auc: 0.5000}
+--------------------------------------------------
+
+=== Epoch 6 (2025-05-31 20:14:47) ===
+Train Loss: 3.2875
+Val Loss: 1.1763
+purpose: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+suspicious: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+author: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+source_repo: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+commit_type: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+--------------------------------------------------
+
+=== Epoch 7 (2025-05-31 20:14:50) ===
+Train Loss: 0.4519
+Val Loss: 0.0907
+purpose: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+suspicious: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+author: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+source_repo: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+commit_type: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+--------------------------------------------------
+
+=== Epoch 8 (2025-05-31 20:14:53) ===
+Train Loss: 0.0781
+Val Loss: 0.0389
+purpose: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+suspicious: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+author: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+source_repo: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+commit_type: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+--------------------------------------------------
+
+=== Epoch 9 (2025-05-31 20:14:56) ===
+Train Loss: 0.0415
+Val Loss: 0.0252
+purpose: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+suspicious: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+author: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+source_repo: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+commit_type: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+--------------------------------------------------
+
+=== Epoch 10 (2025-05-31 20:14:58) ===
+Train Loss: 0.0292
+Val Loss: 0.0197
+purpose: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+suspicious: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+tech_tag: {f1: 0.0000, precision: 0.0000, recall: 0.0000, auc: 0.0000}
+sentiment: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+author: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+source_repo: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+commit_type: {f1: 1.0000, precision: 1.0000, recall: 1.0000, auc: 1.0000}
+--------------------------------------------------
