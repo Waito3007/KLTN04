@@ -80,19 +80,41 @@ def analyze_commit_data(csv_file, sample_size=None):
         sample_df = pd.read_csv(csv_file, nrows=1000)
         print(f"📋 Columns: {list(sample_df.columns)}")
         print(f"📏 Sample shape: {sample_df.shape}")
-        
-        # Đọc toàn bộ hoặc sample
+          # Đọc toàn bộ hoặc sample một cách hiệu quả
         if sample_size:
-            # Đếm tổng số dòng
-            total_lines = sum(1 for line in open(csv_file, 'r', encoding='utf-8'))
-            skip_rows = np.random.choice(range(1, total_lines), 
-                                       size=max(0, total_lines-sample_size-1), 
-                                       replace=False)
-            df = pd.read_csv(csv_file, skiprows=skip_rows)
-            print(f"📊 Đã sample {len(df)} commits từ {total_lines} total")
+            print(f"📊 Sampling {sample_size:,} records...")
+            # Sử dụng chunk reading để memory-efficient sampling
+            chunk_size = 10000
+            sampled_chunks = []
+            total_read = 0
+            
+            for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
+                total_read += len(chunk)
+                
+                # Random sample từ chunk này
+                chunk_sample_size = min(sample_size // 10, len(chunk))
+                if chunk_sample_size > 0:
+                    chunk_sample = chunk.sample(n=chunk_sample_size)
+                    sampled_chunks.append(chunk_sample)
+                
+                # Dừng khi đã đủ data
+                total_sampled = sum(len(c) for c in sampled_chunks)
+                if total_sampled >= sample_size:
+                    break
+                
+                if total_read % 50000 == 0:
+                    print(f"  Đã đọc: {total_read:,} records...")
+            
+            # Combine chunks
+            df = pd.concat(sampled_chunks, ignore_index=True)
+            if len(df) > sample_size:
+                df = df.sample(n=sample_size).reset_index(drop=True)
+            
+            print(f"📊 Đã sample {len(df):,} commits từ {total_read:,} total")
         else:
+            print("📖 Đọc toàn bộ dataset (có thể mất thời gian)...")
             df = pd.read_csv(csv_file)
-            print(f"📊 Đã đọc {len(df)} commits")
+            print(f"📊 Đã đọc {len(df):,} commits")
         
         # Hiển thị thông tin cơ bản
         print(f"\n📈 THỐNG KÊ CƠ BẢN:")
@@ -144,15 +166,19 @@ def analyze_commit_data(csv_file, sample_size=None):
         print(f"  • Độ dài trung bình: {lengths.mean():.1f} chars")
         print(f"  • Độ dài median: {lengths.median():.1f} chars")
         print(f"  • Min/Max: {lengths.min()}/{lengths.max()} chars")
+          # Top words - sample để tránh quá tải memory
+        sample_size_for_words = min(5000, len(messages))
+        print(f"  • Analyzing words from {sample_size_for_words} samples...")
         
-        # Top words
         all_words = []
-        for msg in messages.head(10000):  # Sample để tránh quá tải
-            words = re.findall(r'\b[a-zA-Z]+\b', msg.lower())
+        sample_messages = messages.sample(n=sample_size_for_words) if len(messages) > sample_size_for_words else messages
+        
+        for msg in sample_messages:
+            words = re.findall(r'\b[a-zA-Z]+\b', str(msg).lower())
             all_words.extend(words)
         
         word_counts = Counter(all_words).most_common(20)
-        print(f"\n🔤 TOP 20 WORDS:")
+        print(f"\n🔤 TOP 20 WORDS (from {sample_size_for_words} samples):")
         for word, count in word_counts:
             print(f"    {word}: {count}")
         
@@ -172,17 +198,29 @@ def classify_commits(df, message_col):
     messages = df[message_col].astype(str).str.lower()
     classifications = []
     
-    for idx, message in enumerate(messages):
-        if idx % 10000 == 0:
-            print(f"  Đã xử lý: {idx:,}/{len(messages):,}")
+    # Process in batches để tránh memory issues
+    batch_size = 1000
+    total_batches = (len(messages) + batch_size - 1) // batch_size
+    
+    for batch_idx in range(total_batches):
+        start_idx = batch_idx * batch_size
+        end_idx = min((batch_idx + 1) * batch_size, len(messages))
+        batch_messages = messages[start_idx:end_idx]
         
-        labels = {
-            'commit_type': classify_commit_type(message),
-            'purpose': classify_purpose(message),
-            'sentiment': classify_sentiment(message),
-            'tech_tag': classify_tech_tag(message)
-        }
-        classifications.append(labels)
+        batch_classifications = []
+        for message in batch_messages:
+            labels = {
+                'commit_type': classify_commit_type(message),
+                'purpose': classify_purpose(message),
+                'sentiment': classify_sentiment(message),
+                'tech_tag': classify_tech_tag(message)
+            }
+            batch_classifications.append(labels)
+        
+        classifications.extend(batch_classifications)
+        
+        if (batch_idx + 1) % 10 == 0 or batch_idx == total_batches - 1:
+            print(f"  Đã xử lý: {end_idx:,}/{len(messages):,} ({(end_idx/len(messages)*100):.1f}%)")
     
     # Thống kê phân loại
     print(f"\n📊 THỐNG KÊ PHÂN LOẠI:")
@@ -364,24 +402,35 @@ def main():
     download_dir, csv_file = download_dataset(api)
     if not csv_file:
         return
-    
-    # Hỏi user về sample size
+      # Hỏi user về sample size
     print(f"\n📊 TÙY CHỌN PROCESSING:")
-    print("1. Xử lý toàn bộ dataset (có thể mất nhiều thời gian)")
-    print("2. Sample 50K commits (khuyên dùng)")
-    print("3. Sample 10K commits (nhanh)")
-    print("4. Sample 1K commits (test)")
+    print("1. Sample 1K commits (test nhanh)")
+    print("2. Sample 5K commits (demo)")
+    print("3. Sample 10K commits (khuyên dùng)")
+    print("4. Sample 50K commits (training tốt)")
+    print("5. Sample 100K commits (dataset lớn)")
+    print("6. Xử lý toàn bộ dataset (cảnh báo: có thể rất lâu)")
     
-    choice = input("Chọn option (1-4): ").strip()
+    choice = input("Chọn option (1-6): ").strip()
     
     sample_sizes = {
-        '1': None,
-        '2': 50000,
+        '1': 1000,
+        '2': 5000,
         '3': 10000,
-        '4': 1000
+        '4': 50000,
+        '5': 100000,
+        '6': None
     }
     
     sample_size = sample_sizes.get(choice, 10000)
+    
+    if sample_size is None:
+        print("⚠️  CẢNH BÁO: Bạn đã chọn xử lý toàn bộ dataset!")
+        print("   Điều này có thể mất rất nhiều thời gian và bộ nhớ.")
+        confirm = input("Bạn có chắc chắn không? (yes/no): ").lower()
+        if confirm != 'yes':
+            sample_size = 10000
+            print("🔄 Chuyển về sample 10K commits")
     
     # Analyze data
     df, message_col = analyze_commit_data(csv_file, sample_size)
