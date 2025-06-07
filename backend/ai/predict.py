@@ -1,1 +1,0 @@
-# Gọi mô hình để phân loại message
