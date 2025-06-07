@@ -113,7 +113,7 @@ class CommitDataset(Dataset):
         
         return {
             'input_ids': torch.tensor(input_ids, dtype=torch.long),
-            'labels': labels
+            'labels': labels  # This will be a dictionary
         }
 
 class SimpleTokenizer:
@@ -188,6 +188,16 @@ class SimpleTokenizer:
         
         return encoded_sentences
 
+def collate_fn(batch):
+    """Custom collate function for DataLoader"""
+    input_ids = torch.stack([item['input_ids'] for item in batch])
+    labels = [item['labels'] for item in batch]  # Keep as list of dicts
+    
+    return {
+        'input_ids': input_ids,
+        'labels': labels
+    }
+
 def load_github_dataset(data_file):
     """Load GitHub commits dataset"""
     print(f"📖 Loading dataset: {data_file}")
@@ -257,7 +267,7 @@ def train_epoch(model, dataloader, optimizers, criteria, device):
     
     for batch in dataloader:
         input_ids = batch['input_ids'].to(device)
-        labels = batch['labels']
+        batch_labels = batch['labels']
         
         # Forward pass
         outputs = model(input_ids)
@@ -265,24 +275,31 @@ def train_epoch(model, dataloader, optimizers, criteria, device):
         # Calculate losses for each task
         batch_losses = {}
         for task, criterion in criteria.items():
-            if task in labels[0]:  # Check if task exists in labels
-                task_labels = torch.tensor([label[task] for label in labels]).to(device)
-                task_loss = criterion(outputs[task], task_labels)
+            # Extract task labels from batch
+            task_labels = []
+            for label_dict in batch_labels:
+                if task in label_dict:
+                    task_labels.append(label_dict[task])
+            
+            if task_labels:  # Only if we have labels for this task
+                task_labels_tensor = torch.tensor(task_labels).to(device)
+                task_loss = criterion(outputs[task], task_labels_tensor)
                 batch_losses[task] = task_loss
                 total_losses[task] += task_loss.item()
         
-        # Combined loss
-        combined_loss = sum(batch_losses.values()) / len(batch_losses)
-        total_loss += combined_loss.item()
-        
-        # Backward pass
-        for optimizer in optimizers.values():
-            optimizer.zero_grad()
-        
-        combined_loss.backward()
-        
-        for optimizer in optimizers.values():
-            optimizer.step()
+        # Combined loss (only if we have any losses)
+        if batch_losses:
+            combined_loss = sum(batch_losses.values()) / len(batch_losses)
+            total_loss += combined_loss.item()
+            
+            # Backward pass
+            for optimizer in optimizers.values():
+                optimizer.zero_grad()
+            
+            combined_loss.backward()
+            
+            for optimizer in optimizers.values():
+                optimizer.step()
     
     # Calculate average losses
     avg_losses = {task: loss / len(dataloader) for task, loss in total_losses.items()}
@@ -300,22 +317,28 @@ def evaluate_model(model, dataloader, criteria, device):
     with torch.no_grad():
         for batch in dataloader:
             input_ids = batch['input_ids'].to(device)
-            labels = batch['labels']
+            batch_labels = batch['labels']
             
             # Forward pass
             outputs = model(input_ids)
             
             # Calculate losses and collect predictions
             for task, criterion in criteria.items():
-                if task in labels[0]:
-                    task_labels = torch.tensor([label[task] for label in labels]).to(device)
-                    task_loss = criterion(outputs[task], task_labels)
+                # Extract task labels from batch
+                task_labels = []
+                for label_dict in batch_labels:
+                    if task in label_dict:
+                        task_labels.append(label_dict[task])
+                
+                if task_labels:  # Only if we have labels for this task
+                    task_labels_tensor = torch.tensor(task_labels).to(device)
+                    task_loss = criterion(outputs[task], task_labels_tensor)
                     total_losses[task] += task_loss.item()
                     
                     # Predictions
                     _, predicted = torch.max(outputs[task], 1)
                     predictions[task].extend(predicted.cpu().numpy())
-                    true_labels[task].extend(task_labels.cpu().numpy())
+                    true_labels[task].extend(task_labels_tensor.cpu().numpy())
     
     # Calculate metrics
     metrics = {}
@@ -376,8 +399,8 @@ def main():
     val_dataset = CommitDataset(val_texts, val_labels, tokenizer)
     
     # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, collate_fn=collate_fn)
+    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False, collate_fn=collate_fn)
     
     # Create model
     model = SimpleHANModel(
