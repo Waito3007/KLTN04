@@ -1,0 +1,49 @@
+{
+  "analysis_date": "2025-06-01T02:05:11.774354",
+  "total_authors": 2,
+  "authors": {
+    "Tran Tien Duc": {
+      "total_commits": 1,
+      "commit_type_distribution": {
+        "feature": 1
+      },
+      "commit_samples": [
+        {
+          "text": "align docker build and maven build output version\n\nmaven use the hardcoded version `8.7.0` and output zip file with `8.7.0` in file name suffix. This breaks COPY command",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "feature",
+        "average_commits": 1
+      }
+    },
+    "Duy Do": {
+      "total_commits": 2,
+      "commit_type_distribution": {
+        "bugfix": 1,
+        "feature": 1
+      },
+      "commit_samples": [
+        {
+          "text": "Merge pull request #141 from duydo/dependabot/maven/com.google.guava-guava-32.0.0-jre\n\nBump guava from 31.1-jre to 32.0.0-jre",
+          "predicted_type": "bugfix",
+          "suspicious": true,
+          "sentiment": 2
+        },
+        {
+          "text": "Refactor Unsafe, removed unused code",
+          "predicted_type": "feature",
+          "suspicious": false,
+          "sentiment": 0
+        }
+      ],
+      "summary": {
+        "most_common_type": "bugfix",
+        "average_commits": 2
+      }
+    }
+  }
+}

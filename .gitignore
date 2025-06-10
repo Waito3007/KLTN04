@@ -1,0 +1,85 @@
+.env
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.env
+# Bỏ qua môi trường ảo
+venv/
+ENV/
+env/
+.venv/
+
+# File cấu hình môi trường
+.env
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Large training data files (>50MB)
+backend/ai/training_data/kaggle_github_commit_messages_dataset_*.json
+backend/ai/training_data/*_large.json
+backend/ai/training_data/*.csv
+backend/ai/training_data/improved_100k_multimodal_training.json
+backend/ai/deployment_packages/
+*.zip
+*.gz
+*.tar
+*.rar
+
+# Kaggle data files (very large)
+backend/ai/kaggle_data/
+backend/ai/kaggle_data/**/*.csv
+backend/ai/kaggle_data/**/*.json
+
+# Model files (>50MB)
+backend/ai/models/
+backend/ai/trained_models/
+backend/ai/deployment_packages/
+*.pth
+*.pkl
+*.h5
+*.model
+
+# Logs
+*.log
+*.logs
+
+# IDE files
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# PostgreSQL config hoặc dump
+*.sql
+*.dump
+
+#dataset
+*.csv
+backend/ai/baseline/__init__.py
+backend/ai/models/__init__.py
+backend/ai/training/__init__.py
+frontend/package-lock.json
+collected_data/code_diffs.json
+backend/ai/data_preprocessing/__init__.py
+backend/ai/evaluation/__init__.py
+backend/ai/training_data/kaggle_github_commit_messages_dataset_20250608.json
+
+# Specific large files found
+backend/ai/kaggle_data/github_commits/full.csv
+backend/ai/kaggle_data/github_commits/oneline.csv
+backend/ai/kaggle_data/full.csv
+backend/ai/kaggle_data/oneline.csv
+backend/ai/training_data/improved_100k_multimodal_training.json
+backend/ai/deployment_packages/multimodal_fusion_*/
+backend/ai/trained_models/multimodal_fusion/best_multimodal_fusion_model.pth
