@@ -6,16 +6,28 @@ Hệ thống phân tích commit sử dụng Hierarchical Attention Network (HAN)
 
 ```
 ai/
-├── README.md                     # Hướng dẫn này
-├── train_han_github.py           # Script train model HAN
-├── test_commit_analyzer.py       # Script test và phân tích commit
-├── simple_advanced_analysis.py   # Phân tích chi tiết và recommendations
-├── simple_dataset_creator.py     # Tạo dataset để train
-├── models/                       # Thư mục chứa model đã train
-│   └── han_github_model/
-│       └── best_model.pth        # Model HAN đã train xong
-├── test_results/                 # Kết quả test và báo cáo
-└── analysis_plots/              # Biểu đồ phân tích (nếu có)
+├── README.md                                    # Hướng dẫn này
+├── 📊 TRAINING SCRIPTS:
+│   ├── train_han_github.py                     # Train model HAN chính
+│   ├── train_100k_fixed.py                     # Train với 100k dataset
+│   ├── train_100k_multimodal_fusion.py         # Train multimodal fusion
+│   └── train_enhanced_100k_multimodal_fusion_final.py # Train enhanced multimodal
+├── 📥 DATA PROCESSING:
+│   ├── download_kaggle_dataset.py              # Download data từ Kaggle
+│   ├── download_github_commits.py              # Download GitHub data
+│   ├── clean_github_data.py                    # Clean và process data
+│   └── simple_dataset_creator.py               # Tạo synthetic data
+├── 🧪 TESTING & ANALYSIS:
+│   ├── test_commit_analyzer.py                 # Test model chính
+│   └── simple_advanced_analysis.py             # Phân tích chi tiết và recommendations
+├── 📁 CORE FOLDERS:
+│   ├── models/                                  # Model đã train
+│   │   └── han_github_model/
+│   │       └── best_model.pth                  # Model HAN chính (98.95% accuracy)
+│   ├── multimodal_fusion/                       # Multimodal components
+│   ├── training_data/                           # Dataset để train
+│   ├── training_logs/                           # Log quá trình train
+│   └── test_results/                            # Kết quả test và báo cáo
 ```
 
 ## 🚀 Hướng dẫn sử dụng
@@ -32,8 +44,25 @@ pip install matplotlib seaborn scikit-learn numpy pandas
 
 Model đã được train sẵn tại `models/han_github_model/best_model.pth`. Nếu muốn train lại:
 
+**Train model HAN cơ bản:**
 ```bash
 python train_han_github.py
+```
+
+**Train với 100k dataset từ Kaggle:**
+```bash
+# Download data trước
+python download_kaggle_dataset.py
+
+# Train với 100k samples
+python train_100k_fixed.py
+```
+
+**Train multimodal fusion model:**
+```bash
+python train_100k_multimodal_fusion.py
+# hoặc
+python train_enhanced_100k_multimodal_fusion_final.py
 ```
 
 **Chi tiết quá trình train:**
@@ -46,7 +75,31 @@ python train_han_github.py
 - Accuracy đạt được: **98.95%**
 - GPU Support: CUDA-enabled
 
-### 3. Test và Phân tích Commit
+### 3. Data Processing (Tùy chọn)
+
+Nếu muốn train với data mới:
+
+**Download và process data từ Kaggle:**
+```bash
+python download_kaggle_dataset.py
+```
+
+**Download GitHub commit data:**
+```bash
+python download_github_commits.py
+```
+
+**Clean và process data:**
+```bash
+python clean_github_data.py
+```
+
+**Tạo synthetic dataset:**
+```bash
+python simple_dataset_creator.py
+```
+
+### 4. Test và Phân tích Commit
 
 **Chạy phân tích cơ bản:**
 ```bash

@@ -1,0 +1,240 @@
+
+Epoch 1/20
+Epoch Time: 60.1s
+Train Loss: 0.3640
+  commit_type Train Loss: 0.3173
+  purpose Train Loss: 0.2751
+  sentiment Train Loss: 0.4243
+  tech_tag Train Loss: 0.4394
+Val Metrics: {'commit_type': {'loss': 0.05204871570966198, 'accuracy': 0.9883909914093336}, 'purpose': {'loss': 0.04069583948463174, 'accuracy': 0.9899001625261202}, 'sentiment': {'loss': 0.18192870897657354, 'accuracy': 0.9537961458091478}, 'tech_tag': {'loss': 0.11761967635563193, 'accuracy': 0.9778848386347806}}
+Avg Val Accuracy: 0.9775
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 2/20
+Epoch Time: 36.8s
+Train Loss: 0.0729
+  commit_type Train Loss: 0.0296
+  purpose Train Loss: 0.0245
+  sentiment Train Loss: 0.1683
+  tech_tag Train Loss: 0.0690
+Val Metrics: {'commit_type': {'loss': 0.017176392184157254, 'accuracy': 0.9960529370791734}, 'purpose': {'loss': 0.014352826519586005, 'accuracy': 0.9969816577664268}, 'sentiment': {'loss': 0.1354962737003172, 'accuracy': 0.9696424425354074}, 'tech_tag': {'loss': 0.04511075600419506, 'accuracy': 0.9916995588576736}}
+Avg Val Accuracy: 0.9886
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 3/20
+Epoch Time: 35.6s
+Train Loss: 0.0510
+  commit_type Train Loss: 0.0185
+  purpose Train Loss: 0.0144
+  sentiment Train Loss: 0.1304
+  tech_tag Train Loss: 0.0407
+Val Metrics: {'commit_type': {'loss': 0.0655470568842664, 'accuracy': 0.9845019735314604}, 'purpose': {'loss': 0.017859346549238764, 'accuracy': 0.9953563965637334}, 'sentiment': {'loss': 0.13006520917957065, 'accuracy': 0.9699907127931274}, 'tech_tag': {'loss': 0.04814791879961172, 'accuracy': 0.9896099373113536}}
+Avg Val Accuracy: 0.9849
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 4/20
+Epoch Time: 38.8s
+Train Loss: 0.0502
+  commit_type Train Loss: 0.0202
+  purpose Train Loss: 0.0169
+  sentiment Train Loss: 0.1247
+  tech_tag Train Loss: 0.0392
+Val Metrics: {'commit_type': {'loss': 0.015143334175407017, 'accuracy': 0.99669143255166}, 'purpose': {'loss': 0.01650368809110484, 'accuracy': 0.9967494775946134}, 'sentiment': {'loss': 0.11665226103036434, 'accuracy': 0.9747504063153006}, 'tech_tag': {'loss': 0.036746376640957534, 'accuracy': 0.9932087299744602}}
+Avg Val Accuracy: 0.9904
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 5/20
+Epoch Time: 39.6s
+Train Loss: 0.0468
+  commit_type Train Loss: 0.0176
+  purpose Train Loss: 0.0167
+  sentiment Train Loss: 0.1166
+  tech_tag Train Loss: 0.0364
+Val Metrics: {'commit_type': {'loss': 0.02562430304203286, 'accuracy': 0.9940213605758068}, 'purpose': {'loss': 0.013230851960664569, 'accuracy': 0.9974460181100534}, 'sentiment': {'loss': 0.11302860886945366, 'accuracy': 0.9757952170884606}, 'tech_tag': {'loss': 0.053513085647790254, 'accuracy': 0.988100766194567}}
+Avg Val Accuracy: 0.9888
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 6/20
+Epoch Time: 38.3s
+Train Loss: 0.0461
+  commit_type Train Loss: 0.0155
+  purpose Train Loss: 0.0193
+  sentiment Train Loss: 0.1100
+  tech_tag Train Loss: 0.0397
+Val Metrics: {'commit_type': {'loss': 0.013650759802879331, 'accuracy': 0.99721383793824}, 'purpose': {'loss': 0.024536760065465842, 'accuracy': 0.9947179010912468}, 'sentiment': {'loss': 0.11832361211304783, 'accuracy': 0.9746923612723474}, 'tech_tag': {'loss': 0.0357275557132682, 'accuracy': 0.9928024146737868}}
+Avg Val Accuracy: 0.9899
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 7/20
+Epoch Time: 34.8s
+Train Loss: 0.0432
+  commit_type Train Loss: 0.0144
+  purpose Train Loss: 0.0196
+  sentiment Train Loss: 0.1093
+  tech_tag Train Loss: 0.0295
+Val Metrics: {'commit_type': {'loss': 0.01467064653960681, 'accuracy': 0.99773624332482}, 'purpose': {'loss': 0.018377837385209803, 'accuracy': 0.9971557928952868}, 'sentiment': {'loss': 0.1286424173084619, 'accuracy': 0.9792779196656606}, 'tech_tag': {'loss': 0.03241685846782231, 'accuracy': 0.9944276758764802}}
+Avg Val Accuracy: 0.9921
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 8/20
+Epoch Time: 35.2s
+Train Loss: 0.0387
+  commit_type Train Loss: 0.0124
+  purpose Train Loss: 0.0150
+  sentiment Train Loss: 0.1039
+  tech_tag Train Loss: 0.0234
+Val Metrics: {'commit_type': {'loss': 0.024492501446419398, 'accuracy': 0.9953563965637334}, 'purpose': {'loss': 0.03159626466156916, 'accuracy': 0.9943696308335268}, 'sentiment': {'loss': 0.12115050685019206, 'accuracy': 0.976549802646854}, 'tech_tag': {'loss': 0.04539959065823664, 'accuracy': 0.9897840724402136}}
+Avg Val Accuracy: 0.9890
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 9/20
+Epoch Time: 35.1s
+Train Loss: 0.0405
+  commit_type Train Loss: 0.0143
+  purpose Train Loss: 0.0213
+  sentiment Train Loss: 0.1002
+  tech_tag Train Loss: 0.0263
+Val Metrics: {'commit_type': {'loss': 0.020945366802847618, 'accuracy': 0.9969236127234734}, 'purpose': {'loss': 0.017794527411667545, 'accuracy': 0.9965753424657534}, 'sentiment': {'loss': 0.13327568318205193, 'accuracy': 0.9754469468307406}, 'tech_tag': {'loss': 0.037988900516297344, 'accuracy': 0.9929765498026468}}
+Avg Val Accuracy: 0.9905
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 10/20
+Epoch Time: 34.3s
+Train Loss: 0.0371
+  commit_type Train Loss: 0.0107
+  purpose Train Loss: 0.0149
+  sentiment Train Loss: 0.1014
+  tech_tag Train Loss: 0.0216
+Val Metrics: {'commit_type': {'loss': 0.04842012790594268, 'accuracy': 0.9930345948456002}, 'purpose': {'loss': 0.016824621751404513, 'accuracy': 0.9966333875087068}, 'sentiment': {'loss': 0.16033966987564854, 'accuracy': 0.9755630369166474}, 'tech_tag': {'loss': 0.03637766615758128, 'accuracy': 0.9938472254469468}}
+Avg Val Accuracy: 0.9898
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 11/20
+Epoch Time: 34.5s
+Train Loss: 0.0327
+  commit_type Train Loss: 0.0070
+  purpose Train Loss: 0.0099
+  sentiment Train Loss: 0.0919
+  tech_tag Train Loss: 0.0218
+Val Metrics: {'commit_type': {'loss': 0.013060333905350946, 'accuracy': 0.99756210819596}, 'purpose': {'loss': 0.01685619004293068, 'accuracy': 0.9970977478523334}, 'sentiment': {'loss': 0.1523480362621556, 'accuracy': 0.977942883677734}, 'tech_tag': {'loss': 0.0444565906357882, 'accuracy': 0.9930345948456002}}
+Avg Val Accuracy: 0.9914
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 12/20
+Epoch Time: 34.0s
+Train Loss: 0.0302
+  commit_type Train Loss: 0.0043
+  purpose Train Loss: 0.0094
+  sentiment Train Loss: 0.0923
+  tech_tag Train Loss: 0.0146
+Val Metrics: {'commit_type': {'loss': 0.015144748989140384, 'accuracy': 0.9978523334107268}, 'purpose': {'loss': 0.024802177532027545, 'accuracy': 0.99634316229394}, 'sentiment': {'loss': 0.16601735972985243, 'accuracy': 0.976027397260274}, 'tech_tag': {'loss': 0.045902925526182, 'accuracy': 0.9940213605758068}}
+Avg Val Accuracy: 0.9911
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 13/20
+Epoch Time: 34.3s
+Train Loss: 0.0311
+  commit_type Train Loss: 0.0058
+  purpose Train Loss: 0.0081
+  sentiment Train Loss: 0.0958
+  tech_tag Train Loss: 0.0147
+Val Metrics: {'commit_type': {'loss': 0.01718031120072239, 'accuracy': 0.9973879730671}, 'purpose': {'loss': 0.022349501897161797, 'accuracy': 0.9964012073368934}, 'sentiment': {'loss': 0.1960741118884997, 'accuracy': 0.9754469468307406}, 'tech_tag': {'loss': 0.04366485895003709, 'accuracy': 0.9934409101462736}}
+Avg Val Accuracy: 0.9907
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 14/20
+Epoch Time: 34.1s
+Train Loss: 0.0302
+  commit_type Train Loss: 0.0044
+  purpose Train Loss: 0.0127
+  sentiment Train Loss: 0.0895
+  tech_tag Train Loss: 0.0143
+Val Metrics: {'commit_type': {'loss': 0.010334927282961669, 'accuracy': 0.9985488739261668}, 'purpose': {'loss': 0.030606475224917596, 'accuracy': 0.9952403064778268}, 'sentiment': {'loss': 0.18072008620250038, 'accuracy': 0.977072208033434}, 'tech_tag': {'loss': 0.04332060522729053, 'accuracy': 0.9939052704899002}}
+Avg Val Accuracy: 0.9912
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 15/20
+Epoch Time: 35.3s
+Train Loss: 0.0320
+  commit_type Train Loss: 0.0033
+  purpose Train Loss: 0.0100
+  sentiment Train Loss: 0.0911
+  tech_tag Train Loss: 0.0236
+Val Metrics: {'commit_type': {'loss': 0.011832447285452413, 'accuracy': 0.9987230090550268}, 'purpose': {'loss': 0.03241444040328265, 'accuracy': 0.9955885767355468}, 'sentiment': {'loss': 0.20187750717270322, 'accuracy': 0.9773624332482006}, 'tech_tag': {'loss': 0.05214272414015271, 'accuracy': 0.9932667750174136}}
+Avg Val Accuracy: 0.9912
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 16/20
+Epoch Time: 34.3s
+Train Loss: 0.0368
+  commit_type Train Loss: 0.0059
+  purpose Train Loss: 0.0157
+  sentiment Train Loss: 0.0973
+  tech_tag Train Loss: 0.0283
+Val Metrics: {'commit_type': {'loss': 0.01429321801902578, 'accuracy': 0.99843278384026}, 'purpose': {'loss': 0.03014014464999149, 'accuracy': 0.9959368469932668}, 'sentiment': {'loss': 0.18440553104356056, 'accuracy': 0.9750986765730206}, 'tech_tag': {'loss': 0.05810805285196986, 'accuracy': 0.9922800092872068}}
+Avg Val Accuracy: 0.9904
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 17/20
+Epoch Time: 34.3s
+Train Loss: 0.0275
+  commit_type Train Loss: 0.0022
+  purpose Train Loss: 0.0091
+  sentiment Train Loss: 0.0819
+  tech_tag Train Loss: 0.0167
+Val Metrics: {'commit_type': {'loss': 0.011144044691536037, 'accuracy': 0.99878105409798}, 'purpose': {'loss': 0.028355535610897105, 'accuracy': 0.9961109821221268}, 'sentiment': {'loss': 0.22102062824581553, 'accuracy': 0.975504991873694}, 'tech_tag': {'loss': 0.056376679674457156, 'accuracy': 0.9929185047596936}}
+Avg Val Accuracy: 0.9908
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 18/20
+Epoch Time: 35.3s
+Train Loss: 0.0274
+  commit_type Train Loss: 0.0014
+  purpose Train Loss: 0.0086
+  sentiment Train Loss: 0.0852
+  tech_tag Train Loss: 0.0145
+Val Metrics: {'commit_type': {'loss': 0.014914718693655751, 'accuracy': 0.9983166937543534}, 'purpose': {'loss': 0.02910242856845773, 'accuracy': 0.9965753424657534}, 'sentiment': {'loss': 0.2099887116453842, 'accuracy': 0.9761434873461806}, 'tech_tag': {'loss': 0.04941166989074968, 'accuracy': 0.9946018110053402}}
+Avg Val Accuracy: 0.9914
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 19/20
+Epoch Time: 35.3s
+Train Loss: 0.0264
+  commit_type Train Loss: 0.0020
+  purpose Train Loss: 0.0089
+  sentiment Train Loss: 0.0854
+  tech_tag Train Loss: 0.0093
+Val Metrics: {'commit_type': {'loss': 0.014991995387184088, 'accuracy': 0.9984908288832134}, 'purpose': {'loss': 0.03164857589148158, 'accuracy': 0.9957046668214534}, 'sentiment': {'loss': 0.22944633135326756, 'accuracy': 0.9754469468307406}, 'tech_tag': {'loss': 0.05175296562541552, 'accuracy': 0.9946598560482934}}
+Avg Val Accuracy: 0.9911
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 20/20
+Epoch Time: 36.6s
+Train Loss: 0.0246
+  commit_type Train Loss: 0.0010
+  purpose Train Loss: 0.0067
+  sentiment Train Loss: 0.0812
+  tech_tag Train Loss: 0.0096
+Val Metrics: {'commit_type': {'loss': 0.013072574062837359, 'accuracy': 0.99860691896912}, 'purpose': {'loss': 0.03225884756456704, 'accuracy': 0.9962851172509868}, 'sentiment': {'loss': 0.2373335351318342, 'accuracy': 0.9749245414441606}, 'tech_tag': {'loss': 0.06058914916766036, 'accuracy': 0.9936150452751336}}
+Avg Val Accuracy: 0.9909
+GPU Memory: 60.9 MB
+--------------------------------------------------
