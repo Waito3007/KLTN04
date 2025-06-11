@@ -208,7 +208,7 @@ def clean_github_data(csv_file: Path, sample_size: int = 20000) -> pd.DataFrame:
         # BƯỚC 4: Tạo metadata synthetic
         print(f"\n⚙️ BƯỚC 4: TẠO METADATA SYNTHETIC")
         generator = GitHubDataGenerator()
-          def create_synthetic_metadata():
+        def create_synthetic_metadata():
             """Tạo metadata synthetic cho mỗi commit"""
             sample = generator.generate_single_commit()
             return {

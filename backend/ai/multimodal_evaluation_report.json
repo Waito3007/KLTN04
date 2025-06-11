@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-10T16:31:44.837442",
+  "timestamp": "2025-06-10T18:15:54.497384",
   "model_structure": {
     "total_parameters": 175100,
     "trainable_parameters": 175100,
@@ -153,7 +153,7 @@
     },
     "loss_calculation": {
       "successful": true,
-      "total_loss": 4.232334136962891,
+      "total_loss": 4.484923362731934,
       "tasks_tested": [
         "risk_prediction",
         "complexity_prediction",
