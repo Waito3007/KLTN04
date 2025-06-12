@@ -64,3 +64,26 @@ async def save_repository(repo_entry):
         # Nếu repository chưa tồn tại, chèn mới
         query = repositories.insert().values(repo_entry)
         await database.execute(query)
+
+
+async def get_repo_by_owner_and_name(owner: str, repo: str):
+    """Get repository information by owner and name"""
+    query = select(repositories).where(
+        repositories.c.owner == owner,
+        repositories.c.name == repo
+    )
+    result = await database.fetch_one(query)
+    if result:
+        return dict(result)
+    return None
+
+
+async def get_github_repo_id(owner: str, repo: str):
+    """Get GitHub repository ID from GitHub API"""
+    try:
+        url = f"/repos/{owner}/{repo}"
+        data = await fetch_from_github(url)
+        return data.get("id")  # GitHub repo ID
+    except Exception as e:
+        print(f"Error getting GitHub repo ID: {e}")
+        return None

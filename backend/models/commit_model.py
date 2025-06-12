@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 import joblib
+import os
 
 class CommitClassifier:
     def __init__(self):
@@ -21,18 +22,32 @@ class CommitClassifier:
         X_new = self.vectorizer.transform(new_messages)
         return self.model.predict(X_new)
     
-    def save(self, path='models/commit_classifier.joblib'):
+    def save(self, path=None):
         """Lưu model"""
+        if path is None:
+            # Lấy đường dẫn tuyệt đối của file model
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            path = os.path.join(current_dir, 'commit_classifier.joblib')
+        
         joblib.dump({
             'vectorizer': self.vectorizer,
             'model': self.model
         }, path)
     
     @classmethod
-    def load(cls, path='models/commit_classifier.joblib'):
+    def load(cls, path=None):
         """Load model đã lưu"""
-        data = joblib.load(path)
-        classifier = cls()
-        classifier.vectorizer = data['vectorizer']
-        classifier.model = data['model']
-        return classifier
+        if path is None:
+            # Lấy đường dẫn tuyệt đối của file model
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            path = os.path.join(current_dir, 'commit_classifier.joblib')
+        
+        try:
+            data = joblib.load(path)
+            classifier = cls()
+            classifier.vectorizer = data['vectorizer']
+            classifier.model = data['model']
+            return classifier
+        except FileNotFoundError:
+            print(f"Warning: Model file not found at {path}. Creating new classifier.")
+            return cls()
