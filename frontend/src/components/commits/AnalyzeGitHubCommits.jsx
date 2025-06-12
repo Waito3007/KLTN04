@@ -91,10 +91,16 @@ const AnalyzeGitHubCommits = ({ repo }) => {
       ? <ExclamationCircleFilled /> 
       : <CheckCircleFilled />;
   };
-
   const renderContent = () => {
     if (loading) {
-      return <Spin size="small" tip="Analyzing commits..." />;
+      return (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Spin size="small" />
+          <div style={{ marginTop: 8 }}>
+            <Text type="secondary">Analyzing commits...</Text>
+          </div>
+        </div>
+      );
     }
 
     if (error) {

@@ -97,7 +97,16 @@ const CommitList = ({ owner, repo, branch }) => {
     currentPage * pageSize
   );
 
-  if (loading) return <Spin tip="Đang tải commit..." size="large" />;
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: 16 }}>
+          <Text>Đang tải commit...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '16px' }}>

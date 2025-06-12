@@ -4,11 +4,15 @@ import AuthSuccess from "./pages/AuthSuccess";
 import Dashboard from "./pages/Dashboard"; 
 import RepoDetails from "./pages/RepoDetails";
 import CommitTable from './components/commits/CommitTable';
+import TestPage from './pages/TestPage';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* ✅ Test route */}
+        <Route path="/test" element={<TestPage />} />
+        
         {/* ✅ Trang mặc định là Login */}
         <Route path="/" element={<Navigate to="/login" />} />
 

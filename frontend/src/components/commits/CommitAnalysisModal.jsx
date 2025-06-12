@@ -10,7 +10,6 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
 const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
   const [analysis, setAnalysis] = useState(null);
@@ -80,95 +79,110 @@ const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
           style={{ marginBottom: 20 }}
         />
       )}
-      
-      {analysis && (
-        <Tabs defaultActiveKey="1">
-          <TabPane tab={<><FileTextOutlined /> Commits</>} key="1">
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                <Progress
-                  type="circle"
-                  percent={criticalPercentage}
-                  width={80}
-                  format={percent => (
-                    <Text strong style={{ fontSize: 24, color: percent > 0 ? '#f5222d' : '#52c41a' }}>
-                      {percent}%
-                    </Text>
-                  )}
-                  status={criticalPercentage > 0 ? 'exception' : 'success'}
-                />
-                <div style={{ marginLeft: 20 }}>
-                  <Title level={4} style={{ marginBottom: 0 }}>
-                    {analysis.critical} of {analysis.total} commits are critical
-                  </Title>
-                  <Text type="secondary">
-                    {criticalPercentage > 0 
-                      ? 'This repository contains potentially critical changes'
-                      : 'No critical commits detected'}
-                  </Text>
-                </div>
-              </div>
-              
-              <List
-                size="large"
-                dataSource={analysis.details}
-                renderItem={item => (
-                  <List.Item>
-                    <div style={{ width: '100%' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Tag color={item.is_critical ? 'error' : 'success'}>
-                          {item.is_critical ? 'CRITICAL' : 'Normal'}
-                        </Tag>
-                        <Text type="secondary" copyable>
-                          {item.id.substring(0, 7)}
+        {analysis && (
+        <Tabs 
+          defaultActiveKey="1"
+          items={[
+            {
+              key: '1',
+              label: (
+                <span>
+                  <FileTextOutlined /> Commits
+                </span>
+              ),
+              children: (
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                    <Progress
+                      type="circle"
+                      percent={criticalPercentage}
+                      width={80}
+                      format={percent => (
+                        <Text strong style={{ fontSize: 24, color: percent > 0 ? '#f5222d' : '#52c41a' }}>
+                          {percent}%
                         </Text>
-                      </div>
-                      <Divider style={{ margin: '8px 0' }} />
-                      <Text style={{ color: item.is_critical ? '#f5222d' : 'inherit' }}>
-                        {item.message_preview}
+                      )}
+                      status={criticalPercentage > 0 ? 'exception' : 'success'}
+                    />
+                    <div style={{ marginLeft: 20 }}>
+                      <Title level={4} style={{ marginBottom: 0 }}>
+                        {analysis.critical} of {analysis.total} commits are critical
+                      </Title>
+                      <Text type="secondary">
+                        {criticalPercentage > 0 
+                          ? 'This repository contains potentially critical changes'
+                          : 'No critical commits detected'}
                       </Text>
                     </div>
-                  </List.Item>
-                )}
-              />
-            </div>
-          </TabPane>
-          
-          <TabPane tab={<><ExclamationCircleOutlined /> Critical Commits</>} key="2">
-            {analysis.critical > 0 ? (
-              <List
-                dataSource={analysis.details.filter(c => c.is_critical)}
-                renderItem={item => (
-                  <List.Item>
-                    <Alert
-                      message="Critical Commit"
-                      description={
-                        <>
-                          <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                  </div>
+                  
+                  <List
+                    size="large"
+                    dataSource={analysis.details}
+                    renderItem={item => (
+                      <List.Item>
+                        <div style={{ width: '100%' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Tag color={item.is_critical ? 'error' : 'success'}>
+                              {item.is_critical ? 'CRITICAL' : 'Normal'}
+                            </Tag>
+                            <Text type="secondary" copyable>
+                              {item.id.substring(0, 7)}
+                            </Text>
+                          </div>
+                          <Divider style={{ margin: '8px 0' }} />
+                          <Text style={{ color: item.is_critical ? '#f5222d' : 'inherit' }}>
                             {item.message_preview}
                           </Text>
-                          <Text type="secondary">Commit ID: {item.id.substring(0, 7)}</Text>
-                        </>
-                      }
-                      type="error"
-                      showIcon
-                    />
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a', marginBottom: 20 }} />
-                <Title level={4} style={{ color: '#52c41a' }}>
-                  No Critical Commits Found
-                </Title>
-                <Text type="secondary">
-                  All analyzed commits appear to be normal changes
-                </Text>
-              </div>
-            )}
-          </TabPane>
-        </Tabs>
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </div>
+              )
+            },
+            {
+              key: '2', 
+              label: (
+                <span>
+                  <ExclamationCircleOutlined /> Critical Commits
+                </span>
+              ),
+              children: analysis.critical > 0 ? (
+                <List
+                  dataSource={analysis.details.filter(c => c.is_critical)}
+                  renderItem={item => (
+                    <List.Item>
+                      <Alert
+                        message="Critical Commit"
+                        description={
+                          <>
+                            <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                              {item.message_preview}
+                            </Text>
+                            <Text type="secondary">Commit ID: {item.id.substring(0, 7)}</Text>
+                          </>
+                        }
+                        type="error"
+                        showIcon
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                  <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a', marginBottom: 20 }} />
+                  <Title level={4} style={{ color: '#52c41a' }}>
+                    No Critical Commits Found
+                  </Title>
+                  <Text type="secondary">
+                    All analyzed commits appear to be normal changes
+                  </Text>
+                </div>
+              )
+            }
+          ]}
+        />
       )}
     </Modal>
   );

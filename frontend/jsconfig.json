@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@dashboard/*": ["src/components/Dashboard/*"],
+      "@taskmanager/*": ["src/components/Dashboard/ProjectTaskManager/*"],
+      "@taskmanager": ["src/components/Dashboard/ProjectTaskManager/index.js"]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

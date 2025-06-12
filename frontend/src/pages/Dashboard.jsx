@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
 import OverviewCard from '../components/Dashboard/OverviewCard';
 import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
+import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
 import RepoListFilter from '../components/Dashboard/RepoListFilter';
 import TaskBoard from '../components/Dashboard/TaskBoard';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
@@ -28,6 +29,59 @@ const DashboardContainer = styled.div`
   @media (max-width: 768px) {
     padding: 16px;
     gap: 16px;
+  }
+`;
+
+const MainLayout = styled.div`
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  min-height: calc(100vh - 200px);
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 250px 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+`;
+
+const Sidebar = styled.div`
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    position: static;
+    order: 2;
+  }
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0; /* Để tránh overflow */
+`;
+
+const SidebarCard = styled(Card)`
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+  .ant-card-body {
+    padding: 16px;
+  }
+
+  .ant-card-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
   }
 `;
 
@@ -88,16 +142,6 @@ const UserInfoContainer = styled.div`
 const UserAvatar = styled(Avatar)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 2px solid #ffffff;
-`;
-
-const WidgetsRow = styled.div`
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 24px;
-
-  @media (max-width: 992px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const ContentSection = styled.section`
@@ -324,7 +368,8 @@ const Dashboard = () => {
                 {user?.email || 'No email provided'}
               </Text>
             </div>
-          </UserInfoContainer>            <Space size={screens.md ? 16 : 8}>
+          </UserInfoContainer>          <Space size={screens.md ? 16 : 8}>
+            
             <Button 
               type="default" 
               onClick={syncAllRepositories}
@@ -367,54 +412,102 @@ const Dashboard = () => {
             >
               {screens.md ? 'Log Out' : ''}
             </PrimaryButton>
-          </Space>
-        </Space>
+          </Space>        </Space>
       </HeaderCard>
 
-      {/* Overview Metrics */}
-      <DashboardCard bodyStyle={{ padding: '16px' }}>
-        <OverviewCard />
-      </DashboardCard>
+      {/* Main Layout với Sidebar và Content */}
+      <MainLayout>        {/* Sidebar bên trái */}
+        <Sidebar>
+          {/* Overview Metrics trong Sidebar */}
+          <OverviewCard sidebar={true} />
+          
+          {/* Quick Actions */}
+          <SidebarCard 
+            title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Thao tác nhanh</SectionTitle>}
+            size="small"
+          >
+            <Space direction="vertical" style={{ width: '100%' }} size="small">              <Button 
+                type="default" 
+                onClick={syncAllRepositories}
+                loading={isSyncing}
+                disabled={isSyncing}
+                block
+                size="small"
+                style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }}
+              >
+                {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ đầy đủ'}
+              </Button>
+            </Space>
+          </SidebarCard>
 
-      {/* AI Insights and Filters */}
-      <WidgetsRow>
-        <DashboardCard 
-          title={
-            <SectionTitle level={5}>
-              <GithubOutlined />
-              Repository Analysis
-            </SectionTitle>
-          }
-        >
-          <AIInsightWidget />
-        </DashboardCard>
-        
-        <DashboardCard 
-          title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
-        >
-          <RepoListFilter onFilterChange={handleFilterChange} />
-        </DashboardCard>
-      </WidgetsRow>
+          {/* Activity Summary */}
+          <SidebarCard 
+            title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Hoạt động gần đây</SectionTitle>}
+            size="small"
+          >
+            <Space direction="vertical" style={{ width: '100%' }} size="small">
+              <div style={{ fontSize: '12px', color: '#666' }}>
+                • Task "Trò game tăng độ khó" đã hoàn thành
+              </div>
+              <div style={{ fontSize: '12px', color: '#666' }}>
+                • 2 repositories mới được đồng bộ
+              </div>
+              <div style={{ fontSize: '12px', color: '#666' }}>
+                • AI phân tích 15 commits mới
+              </div>
+            </Space>
+          </SidebarCard>
+        </Sidebar>
 
-      {/* Main Content Sections */}
-      <ContentSection>
-        <DashboardCard 
-          title={
-            <SectionTitle level={5}>
-              My Repositories
-              <Text type="secondary" style={{ fontSize: 14, marginLeft: 8 }}>
-                (24 repositories)
-              </Text>
-            </SectionTitle>
-          }
-        >
-          <RepoList />
-        </DashboardCard>        <DashboardCard 
-          title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
-        >
-          <TaskBoard onStatusChange={handleStatusChange} />
-        </DashboardCard>
-      </ContentSection>
+        {/* Main Content bên phải */}
+        <MainContent>
+          {/* Project Task Manager - Full Width */}
+          <DashboardCard>
+            <ProjectTaskManager />
+          </DashboardCard>
+
+          {/* Repository Analysis */}
+          <DashboardCard 
+            title={
+              <SectionTitle level={5}>
+                <GithubOutlined />
+                Repository Analysis
+              </SectionTitle>
+            }
+          >
+            <AIInsightWidget />
+          </DashboardCard>
+
+          {/* Filters Section */}
+          <DashboardCard 
+            title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
+          >
+            <RepoListFilter onFilterChange={handleFilterChange} />
+          </DashboardCard>
+
+          {/* Main Content Sections */}
+          <ContentSection>
+            <DashboardCard 
+              title={
+                <SectionTitle level={5}>
+                  My Repositories
+                  <Text type="secondary" style={{ fontSize: 14, marginLeft: 8 }}>
+                    (24 repositories)
+                  </Text>
+                </SectionTitle>
+              }
+            >
+              <RepoList />
+            </DashboardCard>
+
+            <DashboardCard 
+              title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
+            >
+              <TaskBoard onStatusChange={handleStatusChange} />
+            </DashboardCard>
+          </ContentSection>
+        </MainContent>
+      </MainLayout>
 
       {/* Progress Notification */}
       <SyncProgressNotification
