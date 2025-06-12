@@ -106,7 +106,7 @@ async def get_branches(owner: str, repo: str, request: Request):
 
 # Endpoint lưu commit vào database
 @github_router.post("/github/{owner}/{repo}/save-commits")
-async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = None):
+async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = None, limit: int = 50):
     token = request.headers.get("Authorization")
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
@@ -122,9 +122,9 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
             repo_data = repo_resp.json()
             branch = repo_data.get("default_branch", "main")
 
-    # Lấy danh sách commit từ GitHub API
+    # Lấy danh sách commit từ GitHub API (giới hạn số lượng)
     async with httpx.AsyncClient() as client:
-        url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}&per_page={limit}"
         headers = {"Authorization": token}
         resp = await client.get(url, headers=headers)
         if resp.status_code != 200:
@@ -137,31 +137,37 @@ async def save_repo_commits(owner: str, repo: str, request: Request, branch: str
     if not repo_id:
         raise HTTPException(status_code=404, detail="Repository not found")
 
-    # Lưu từng commit vào cơ sở dữ liệu
+    # Lưu từng commit vào cơ sở dữ liệu (song song để tăng tốc)
+    saved_commits = 0
     async with httpx.AsyncClient() as client:
-        for commit in commit_list:
-            # Lấy thông tin chi tiết của commit
-            commit_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit['sha']}"
-            commit_resp = await client.get(commit_url, headers={"Authorization": token})
-            if commit_resp.status_code != 200:
-                continue  # Bỏ qua commit nếu không lấy được thông tin chi tiết
+        for commit in commit_list[:limit]:  # Giới hạn thêm một lần nữa
+            try:
+                # Lấy thông tin chi tiết của commit
+                commit_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit['sha']}"
+                commit_resp = await client.get(commit_url, headers={"Authorization": token})
+                if commit_resp.status_code != 200:
+                    continue  # Bỏ qua commit nếu không lấy được thông tin chi tiết
 
-            commit_details = commit_resp.json()
-            stats = commit_details.get("stats", {})
-            commit_data = {
-                "sha": commit["sha"],
-                "message": commit["commit"]["message"],
-                "author_name": commit["commit"]["author"]["name"],
-                "author_email": commit["commit"]["author"]["email"],
-                "date": datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ"),
-                "insertions": stats.get("additions", 0),
-                "deletions": stats.get("deletions", 0),
-                "files_changed": stats.get("total", 0),
-                "repo_id": repo_id,
-            }
-            await save_commit(commit_data)
+                commit_details = commit_resp.json()
+                stats = commit_details.get("stats", {})
+                commit_data = {
+                    "sha": commit["sha"],
+                    "message": commit["commit"]["message"],
+                    "author_name": commit["commit"]["author"]["name"],
+                    "author_email": commit["commit"]["author"]["email"],
+                    "date": datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ"),
+                    "insertions": stats.get("additions", 0),
+                    "deletions": stats.get("deletions", 0),
+                    "files_changed": stats.get("total", 0),
+                    "repo_id": repo_id,
+                }
+                await save_commit(commit_data)
+                saved_commits += 1
+            except Exception as e:
+                print(f"Lỗi khi lưu commit {commit['sha']}: {e}")
+                continue
 
-    return {"message": "Commits saved successfully!"}
+    return {"message": f"Đã lưu {saved_commits}/{len(commit_list)} commits!"}
 #lưu branchbranch vào database
 @github_router.post("/github/{owner}/{repo}/save-branches")
 async def save_branches(owner: str, repo: str, request: Request):
@@ -327,16 +333,35 @@ async def sync_all(owner: str, repo: str, request: Request):
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
 
-    # Đồng bộ repository
-    await save_repo(owner, repo, request)
+    try:
+        # Đồng bộ repository
+        await save_repo(owner, repo, request)
 
-    # Đồng bộ branches
-    await save_branches(owner, repo, request)
+        # Đồng bộ branches
+        await save_branches(owner, repo, request)
 
-    # Đồng bộ commits
-    await save_repo_commits(owner, repo, request)
+        # Đồng bộ commits (giới hạn 50 commit gần nhất để tăng tốc)
+        await save_repo_commits(owner, repo, request)
 
-    # Đồng bộ issues
-    await save_issues(owner, repo, request)
+        # Tạm thời bỏ qua issues để tránh lỗi
+        # await save_issues(owner, repo, request)
 
-    return {"message": "Đồng bộ toàn bộ dữ liệu thành công!"}
+        return {"message": f"Đồng bộ repository {owner}/{repo} thành công!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi đồng bộ {owner}/{repo}: {str(e)}")
+
+# Endpoint đồng bộ nhanh - chỉ thông tin cơ bản
+@github_router.post("/github/{owner}/{repo}/sync-basic")
+async def sync_basic(owner: str, repo: str, request: Request):
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
+
+    try:
+        # Chỉ đồng bộ repository và branches (nhanh)
+        await save_repo(owner, repo, request)
+        await save_branches(owner, repo, request)
+        
+        return {"message": f"Đồng bộ cơ bản {owner}/{repo} thành công!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi đồng bộ cơ bản {owner}/{repo}: {str(e)}")

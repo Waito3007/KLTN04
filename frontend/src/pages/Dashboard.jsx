@@ -8,6 +8,7 @@ import OverviewCard from '../components/Dashboard/OverviewCard';
 import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
 import RepoListFilter from '../components/Dashboard/RepoListFilter';
 import TaskBoard from '../components/Dashboard/TaskBoard';
+import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
@@ -123,19 +124,42 @@ const NotificationBadge = styled(Badge)`
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const navigate = useNavigate();
   const screens = useBreakpoint();
+  // Progress notification states
+  const [syncProgress, setSyncProgress] = useState({
+    visible: false,
+    totalRepos: 0,
+    completedRepos: 0,
+    currentRepo: '',
+    repoProgresses: [],
+    overallProgress: 0
+  });
 
-  const syncAllRepositories = async () => {
+  const [isSyncing, setIsSyncing] = useState(false);  const syncAllRepositories = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) {
       message.error('Vui lòng đăng nhập lại!');
       return;
     }
 
+    // Hiển thị progress ngay lập tức TRƯỚC khi set loading
+    setSyncProgress({
+      visible: true,
+      totalRepos: 0,
+      completedRepos: 0,
+      currentRepo: 'Đang lấy danh sách repository...',
+      repoProgresses: [],
+      overallProgress: 0
+    });
+
+    setIsSyncing(true);
+
     try {
-      setLoading(true);
+      // Thêm timeout nhỏ để đảm bảo UI render progress trước
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       const response = await axios.get('http://localhost:8000/api/github/repos', {
         headers: {
           Authorization: `token ${token}`,
@@ -143,36 +167,125 @@ const Dashboard = () => {
       });
 
       const repositories = response.data;
+      
+      // Cập nhật với danh sách repository thực tế
+      setSyncProgress(prev => ({
+        ...prev,
+        totalRepos: repositories.length,
+        currentRepo: 'Chuẩn bị đồng bộ...',
+        repoProgresses: repositories.map(repo => ({
+          name: `${repo.owner.login}/${repo.name}`,
+          status: 'pending',
+          progress: 0
+        }))
+      }));
+
+      let completedCount = 0;
+      
+      // Đồng bộ từng repository một cách tuần tự để tracking dễ hơn
       for (const repo of repositories) {
-        await axios.post(
-          `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-all`,
-          {},
-          {
-            headers: {
-              Authorization: `token ${token}`,
-            },
-          }
-        );
+        const repoName = `${repo.owner.login}/${repo.name}`;
+        
+        // Cập nhật repository hiện tại
+        setSyncProgress(prev => ({
+          ...prev,
+          currentRepo: repoName,
+          repoProgresses: prev.repoProgresses.map(r => 
+            r.name === repoName ? { ...r, status: 'syncing', progress: 0 } : r
+          )
+        }));
+
+        try {
+          // Đồng bộ repository
+          await axios.post(
+            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-all`,
+            {},
+            {
+              headers: {
+                Authorization: `token ${token}`,
+              },
+            }
+          );
+
+          completedCount++;
+          
+          // Cập nhật trạng thái hoàn thành
+          setSyncProgress(prev => ({
+            ...prev,
+            completedRepos: completedCount,
+            overallProgress: (completedCount / repositories.length) * 100,
+            repoProgresses: prev.repoProgresses.map(r => 
+              r.name === repoName ? { ...r, status: 'completed', progress: 100 } : r
+            )
+          }));
+
+        } catch (error) {
+          console.error(`Lỗi đồng bộ ${repoName}:`, error);
+          
+          // Cập nhật trạng thái lỗi
+          setSyncProgress(prev => ({
+            ...prev,
+            repoProgresses: prev.repoProgresses.map(r => 
+              r.name === repoName ? { ...r, status: 'error', progress: 0 } : r
+            )
+          }));
+          
+          completedCount++; // Vẫn tính là completed để tiếp tục
+        }
       }
 
-      message.success('Đồng bộ tất cả repository thành công!');
+      message.success('Đồng bộ tất cả repository hoàn thành!');
+
     } catch (error) {
-      console.error('Lỗi khi đồng bộ repository:', error);
-      message.error('Không thể đồng bộ repository!');
+      console.error('Lỗi khi lấy danh sách repository:', error);
+      message.error('Không thể lấy danh sách repository!');
+      setSyncProgress(prev => ({ ...prev, visible: false }));
     } finally {
-      setLoading(false);
+      setIsSyncing(false);
     }
   };
-
   useEffect(() => {
     const storedProfile = localStorage.getItem('github_profile');
     if (!storedProfile) {
       navigate('/login');
     } else {
       setUser(JSON.parse(storedProfile));
+      
+      // Đồng bộ cơ bản nhanh để hiển thị danh sách repo ngay lập tức
+      syncBasicRepositories();
     }
-    syncAllRepositories();
   }, [navigate]);
+
+  // Đồng bộ cơ bản (nhanh) - chỉ thông tin repo và branches
+  const syncBasicRepositories = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/github/repos', {
+        headers: { Authorization: `token ${token}` },
+      });
+
+      const repositories = response.data;
+      message.info(`Đồng bộ cơ bản ${repositories.length} repository...`);
+      
+      // Đồng bộ cơ bản song song (nhanh hơn)
+      Promise.all(
+        repositories.slice(0, 10).map(repo => // Chỉ đồng bộ 10 repo đầu tiên
+          axios.post(
+            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-basic`,
+            {},
+            { headers: { Authorization: `token ${token}` } }
+          ).catch(() => null)
+        )
+      ).then(() => {
+        message.success('Đồng bộ cơ bản hoàn thành!');
+      });
+
+    } catch (error) {
+      console.error('Lỗi đồng bộ cơ bản:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('github_profile');
@@ -211,9 +324,34 @@ const Dashboard = () => {
                 {user?.email || 'No email provided'}
               </Text>
             </div>
-          </UserInfoContainer>
-          
-          <Space size={screens.md ? 16 : 8}>
+          </UserInfoContainer>            <Space size={screens.md ? 16 : 8}>
+            <Button 
+              type="default" 
+              onClick={syncAllRepositories}
+              loading={isSyncing}
+              disabled={isSyncing}
+              style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }}
+            >
+              {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ đầy đủ'}
+            </Button>
+            
+            {/* Test button for instant progress */}
+            <Button 
+              onClick={() => {
+                setSyncProgress({
+                  visible: true,
+                  totalRepos: 5,
+                  completedRepos: 0,
+                  currentRepo: 'Test repository...',
+                  repoProgresses: [],
+                  overallProgress: 0
+                });
+              }}
+              style={{ background: '#10b981', borderColor: '#10b981', color: 'white' }}
+            >
+              Test Progress
+            </Button>
+            
             <NotificationBadge count={3} size="small">
               <Button 
                 icon={<NotificationOutlined />} 
@@ -271,14 +409,23 @@ const Dashboard = () => {
           }
         >
           <RepoList />
-        </DashboardCard>
-
-        <DashboardCard 
+        </DashboardCard>        <DashboardCard 
           title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
         >
           <TaskBoard onStatusChange={handleStatusChange} />
         </DashboardCard>
       </ContentSection>
+
+      {/* Progress Notification */}
+      <SyncProgressNotification
+        visible={syncProgress.visible}
+        onClose={() => setSyncProgress(prev => ({ ...prev, visible: false }))}
+        totalRepos={syncProgress.totalRepos}
+        completedRepos={syncProgress.completedRepos}
+        currentRepo={syncProgress.currentRepo}
+        repoProgresses={syncProgress.repoProgresses}
+        overallProgress={syncProgress.overallProgress}
+      />
     </DashboardContainer>
   );
 };
