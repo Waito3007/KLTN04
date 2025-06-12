@@ -2,6 +2,7 @@
 import os
 from databases import Database
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 from db.metadata import metadata  # Import metadata từ metadata.py
 from db.models.commits import commits
@@ -24,6 +25,17 @@ sync_engine = create_engine(
     DATABASE_URL.replace("asyncpg", "psycopg2")  # Thay asyncpg bằng psycopg2
 )
 
+# Session maker for SQLAlchemy ORM
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
+
+# Dependency for FastAPI
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # Kiểm tra kết nối cơ sở dữ liệu
 try:
     with sync_engine.connect() as connection:
@@ -33,3 +45,5 @@ except Exception as e:
 
 # Tạo các bảng
 metadata.create_all(sync_engine)
+
+engine = sync_engine
