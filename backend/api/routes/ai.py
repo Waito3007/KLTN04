@@ -9,6 +9,7 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 import logging
 
+from core.security import get_current_user, get_current_user_optional, CurrentUser
 from services.han_ai_service import get_han_ai_service
 from services.commit_service import get_commits_by_repo_id
 from services.repo_service import get_repo_by_owner_and_name, get_repo_id_by_owner_and_name
@@ -47,7 +48,10 @@ class DeveloperPatternsRequest(BaseModel):
 
 # AI Analysis Endpoints
 @ai_router.post("/analyze-commit", response_model=CommitAnalysisResponse)
-async def analyze_commit(request: CommitAnalysisRequest):
+async def analyze_commit(
+    request: CommitAnalysisRequest,
+    current_user: CurrentUser = Depends(get_current_user)
+):
     """
     Analyze a single commit message using HAN model
     
@@ -68,7 +72,10 @@ async def analyze_commit(request: CommitAnalysisRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 @ai_router.post("/analyze-commits-batch")
-async def analyze_commits_batch(request: BatchCommitAnalysisRequest):
+async def analyze_commits_batch(
+    request: BatchCommitAnalysisRequest,
+    current_user: CurrentUser = Depends(get_current_user)
+):
     """
     Analyze multiple commit messages in batch
     
@@ -95,7 +102,8 @@ async def analyze_commits_batch(request: BatchCommitAnalysisRequest):
 async def analyze_repository_commits(
     owner: str, 
     repo: str,
-    limit: int = 100
+    limit: int = 100,
+    current_user: CurrentUser = Depends(get_current_user)
 ):
     """
     Analyze all commits in a repository
@@ -213,7 +221,10 @@ async def get_developer_profile(owner: str, repo: str, developer: str):
 
 # Task Management Endpoints
 @ai_router.post("/suggest-task-assignment")
-async def suggest_task_assignment(request: TaskAssignmentRequest):
+async def suggest_task_assignment(
+    request: TaskAssignmentRequest,
+    current_user: CurrentUser = Depends(get_current_user)
+):
     """
     Suggest optimal task assignments based on AI analysis
     
@@ -237,7 +248,11 @@ async def suggest_task_assignment(request: TaskAssignmentRequest):
         raise HTTPException(status_code=500, detail=f"Task assignment failed: {str(e)}")
 
 @ai_router.get("/recommend-tasks/{owner}/{repo}")
-async def recommend_tasks_for_repo(owner: str, repo: str):
+async def recommend_tasks_for_repo(
+    owner: str, 
+    repo: str,
+    current_user: CurrentUser = Depends(get_current_user)
+):
     """
     Recommend task priorities and assignments for a repository
     
