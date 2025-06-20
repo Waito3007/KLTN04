@@ -5,26 +5,29 @@ import Dashboard from "./pages/Dashboard";
 import RepoDetails from "./pages/RepoDetails";
 import CommitTable from './components/commits/CommitTable';
 import TestPage from './pages/TestPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* ✅ Test route */}
-        <Route path="/test" element={<TestPage />} />
-        
-        {/* ✅ Trang mặc định là Login */}
-        <Route path="/" element={<Navigate to="/login" />} />
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          {/* ✅ Test route */}
+          <Route path="/test" element={<TestPage />} />
+          
+          {/* ✅ Trang mặc định là Login */}
+          <Route path="/" element={<Navigate to="/login" />} />
 
-        {/* Các route chính */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth-success" element={<AuthSuccess />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
-        <Route path="/commits" element={<CommitTable />} />
+          {/* Các route chính */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth-success" element={<AuthSuccess />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
+          <Route path="/commits" element={<CommitTable />} />
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

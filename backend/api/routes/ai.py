@@ -10,8 +10,8 @@ from pydantic import BaseModel, Field
 import logging
 
 from services.han_ai_service import get_han_ai_service
-from services.commit_service import get_commits_by_repo
-from services.repo_service import get_repo_by_owner_and_name
+from services.commit_service import get_commits_by_repo_id
+from services.repo_service import get_repo_by_owner_and_name, get_repo_id_by_owner_and_name
 
 logger = logging.getLogger(__name__)
 
@@ -101,13 +101,17 @@ async def analyze_repository_commits(
     Analyze all commits in a repository
     
     Provides:
-    - Complete commit analysis for the repository
-    - Repository-specific insights and patterns
+    - Complete commit analysis for the repository    - Repository-specific insights and patterns
     - Quality metrics and trends
     """
     try:
+        # Get repository ID first
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found")
+        
         # Get commits from database
-        commits = await get_commits_by_repo(owner, repo, limit)
+        commits = await get_commits_by_repo_id(repo_id, limit)
         
         if not commits:
             raise HTTPException(status_code=404, detail="No commits found for this repository")
@@ -172,12 +176,16 @@ async def get_developer_profile(owner: str, repo: str, developer: str):
     
     Provides:
     - Developer specialization analysis
-    - Commit pattern insights
-    - Productivity and focus area recommendations
+    - Commit pattern insights    - Productivity and focus area recommendations
     """
     try:
+        # Get repository ID first
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found")
+        
         # Get commits by this developer
-        commits = await get_commits_by_repo(owner, repo, limit=200)
+        commits = await get_commits_by_repo_id(repo_id, limit=200)
         developer_commits = [
             commit.message for commit in commits 
             if commit.author == developer and commit.message
@@ -238,14 +246,18 @@ async def recommend_tasks_for_repo(owner: str, repo: str):
     - Priority suggestions based on commit analysis
     - Developer assignment recommendations
     """
-    try:
-        # Get repository data
+    try:        # Get repository data
         repo_data = await get_repo_by_owner_and_name(owner, repo)
         if not repo_data:
             raise HTTPException(status_code=404, detail="Repository not found")
         
+        # Get repository ID
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository ID not found")
+        
         # Get recent commits for analysis
-        commits = await get_commits_by_repo(owner, repo, limit=100)
+        commits = await get_commits_by_repo_id(repo_id, limit=100)
         
         # Create project data structure
         project_data = {
@@ -304,12 +316,16 @@ async def get_repository_insights(owner: str, repo: str):
     Provides:
     - Repository health metrics
     - Development pattern analysis
-    - Quality assessment and recommendations
-    - Team productivity insights
+    - Quality assessment and recommendations    - Team productivity insights
     """
     try:
+        # Get repository ID first
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found")
+        
         # Get repository and commit data
-        commits = await get_commits_by_repo(owner, repo, limit=200)
+        commits = await get_commits_by_repo_id(repo_id, limit=200)
         
         if not commits:
             raise HTTPException(status_code=404, detail="No data found for analysis")

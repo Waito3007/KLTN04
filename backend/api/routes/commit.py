@@ -1,176 +1,839 @@
 # backend/api/routes/commit.py
-from fastapi import APIRouter, Request, HTTPException, Depends
+"""
+Commit API Routes - Comprehensive commit management system
+
+ENDPOINT CATEGORIES:
+1. DATABASE QUERIES (Fast, stored data):
+   - /commits/{owner}/{repo}/branches/{branch_name}/commits - Get commits by branch from DB
+   - /commits/{owner}/{repo}/commits - Get all repo commits from DB with filters
+   - /commits/{owner}/{repo}/branches - Get all branches with commit stats
+   - /commits/{owner}/{repo}/compare/{base}...{head} - Compare commits between branches
+   - /commits/{sha} - Get specific commit details
+
+2. GITHUB DIRECT FETCH (Real-time, live data):
+   - /github/{owner}/{repo}/branches/{branch_name}/commits - Fetch branch commits from GitHub API
+   - /github/{owner}/{repo}/commits - Fetch repo commits from GitHub API with full filters
+
+3. SYNC & MANAGEMENT:
+   - /github/{owner}/{repo}/sync-commits - Sync commits from GitHub to database
+   - /github/{owner}/{repo}/sync-all-branches-commits - Sync all branches' commits
+   - /commits/{owner}/{repo}/validate-commit-consistency - Validate & fix data consistency
+
+4. ANALYTICS & STATS:
+   - /github/{owner}/{repo}/commit-stats - Get comprehensive commit statistics
+
+USAGE GUIDELINES:
+- Use DATABASE endpoints for fast queries on stored data
+- Use GITHUB DIRECT endpoints for real-time, up-to-date data
+- Use SYNC endpoints to populate/update database from GitHub
+- Use ANALYTICS endpoints for insights and statistics
+"""
+from fastapi import APIRouter, Request, HTTPException, Query
 import httpx
-from services.commit_service import save_commit
-from services.repo_service import get_repo_id_by_owner_and_name
-from services.github_service import fetch_commits
-from sqlalchemy.future import select
-from sqlalchemy.ext.asyncio import AsyncSession
+import asyncio
+import logging
+from typing import Optional, List
+from services.commit_service import (
+    save_commit, save_multiple_commits, get_commits_by_repo_id, 
+    get_commit_by_sha, get_commit_statistics
+)
+from services.repo_service import get_repo_id_by_owner_and_name, get_repository
+from services.branch_service import get_branches_by_repo_id
+from services.github_service import fetch_commits, fetch_commit_details
 from datetime import datetime
-from db.models.commits import commits
-from db.models.repositories import repositories
-from db.database import database
-from schemas.commit import CommitCreate, CommitOut
 
 commit_router = APIRouter()
+logger = logging.getLogger(__name__)
 
-def get_db():
-    return database
-
-# Endpoint lấy danh sách commit của một repository
-@commit_router.get("/github/{owner}/{repo}/commits")
-async def get_commits(owner: str, repo: str, request: Request, branch: str = "main"):
-    # Lấy token từ header
-    token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
-
-    # Gọi GitHub API để lấy commit
-    async with httpx.AsyncClient() as client:
-        url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}"
-        headers = {"Authorization": token}
-
-        resp = await client.get(url, headers=headers)
-        # Xử lý trường hợp repository trống (409)
-        if resp.status_code == 409:
-            return []
-        # Xử lý lỗi khác
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-
-        return resp.json()
-
-# Lấy danh sách commit từ database
-@commit_router.get("/github/{owner}/{repo}/commits/db")
-async def get_commits_from_db(owner: str, repo: str, db: AsyncSession = Depends(get_db)):
-    repo_id = await get_repo_id_by_owner_and_name(owner, repo)
-    if not repo_id:
-        raise HTTPException(status_code=404, detail="Repository not found")
-
-    query = select(commits).where(commits.c.repo_id == repo_id)
-    result = await db.fetch_all(query)
-    return result
-
-# Endpoint lưu commit vào database
-@commit_router.post("/github/{owner}/{repo}/save-commits")
-async def save_repo_commits(owner: str, repo: str, request: Request, branch: str = None, limit: int = 50):
-    token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
-
-    # Nếu không truyền branch, lấy branch mặc định từ GitHub
-    if not branch:
-        async with httpx.AsyncClient() as client:
-            repo_url = f"https://api.github.com/repos/{owner}/{repo}"
-            headers = {"Authorization": token}
-            repo_resp = await client.get(repo_url, headers=headers)
-            if repo_resp.status_code != 200:
-                raise HTTPException(status_code=repo_resp.status_code, detail=repo_resp.text)
-            repo_data = repo_resp.json()
-            branch = repo_data.get("default_branch", "main")
-
-    # Lấy danh sách commit từ GitHub API (giới hạn số lượng)
-    async with httpx.AsyncClient() as client:
-        url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch}&per_page={limit}"
-        headers = {"Authorization": token}
-        resp = await client.get(url, headers=headers)
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-
-        commit_list = resp.json()
-
-    # Lấy repo_id từ cơ sở dữ liệu
-    repo_id = await get_repo_id_by_owner_and_name(owner, repo)
-    if not repo_id:
-        raise HTTPException(status_code=404, detail="Repository not found")
-
-    # Lưu từng commit vào cơ sở dữ liệu (song song để tăng tốc)
-    saved_commits = 0
-    async with httpx.AsyncClient() as client:
-        for commit in commit_list[:limit]:  # Giới hạn thêm một lần nữa
-            try:
-                # Lấy thông tin chi tiết của commit
-                commit_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit['sha']}"
-                commit_resp = await client.get(commit_url, headers={"Authorization": token})
-                if commit_resp.status_code != 200:
-                    continue  # Bỏ qua commit nếu không lấy được thông tin chi tiết
-
-                commit_details = commit_resp.json()
-                stats = commit_details.get("stats", {})
-                commit_data = {
-                    "sha": commit["sha"],
-                    "message": commit["commit"]["message"],
-                    "author_name": commit["commit"]["author"]["name"],
-                    "author_email": commit["commit"]["author"]["email"],
-                    "date": datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ"),
-                    "insertions": stats.get("additions", 0),
-                    "deletions": stats.get("deletions", 0),
-                    "files_changed": stats.get("total", 0),
-                    "repo_id": repo_id,
-                }
-                await save_commit(commit_data)
-                saved_commits += 1
-            except Exception as e:
-                print(f"Lỗi khi lưu commit {commit['sha']}: {e}")
-                continue
-
-    return {"message": f"Đã lưu {saved_commits}/{len(commit_list)} commits!"}
-
-# Endpoint lấy tất cả commit từ database
-@commit_router.get("/commits")
-async def get_all_commits(db = Depends(get_db)):
-    query = commits.select()  # Lấy tất cả commit
-    result = await db.fetch_all(query)
-    return result
-
-# Endpoint đồng bộ commit từ GitHub về database
-@commit_router.get("/sync-commits")
-async def sync_commits(
-    repo_id: int,
-    branch: str = "main",
-    since: str = None,
-    until: str = None,
-    db: AsyncSession = Depends(get_db)
-):
-    # 1. Lấy thông tin repository từ database
-    repo = await db.scalar(select(repositories).where(repositories.c.id == repo_id))
-    if not repo:
-        raise HTTPException(status_code=404, detail="Repository không tồn tại")
-
-    # 2. Gọi GitHub API lấy commit với các tham số lọc
-    commits_data = await fetch_commits(
-        token=repo.token,  # Access token
-        owner=repo.owner,  # Chủ repository
-        name=repo.name,  # Tên repository
-        branch=branch,  # Branch cần lấy
-        since=since,  # Lọc từ thời gian
-        until=until  # Lọc đến thời gian
-    )
-
-    # 3. Lưu commit mới vào database
-    new_commits = []
-    for item in commits_data:
-        sha = item["sha"]
-        # Kiểm tra commit đã tồn tại chưa
-        existing = await db.scalar(select(commits).where(commits.c.sha == sha))
-        if existing:
-            continue  # Bỏ qua nếu đã tồn tại
-
-        # Tạo commit mới
-        new_commit = CommitCreate(
-            sha=sha,
-            message=item["commit"]["message"],
-            author=item["commit"]["author"]["name"],
-            date=item["commit"]["author"]["date"],
-            repository_id=repo.id
-        )
-        commit_obj = commits.insert().values(**new_commit.dict())
-        await db.execute(commit_obj)
-        new_commits.append(new_commit)
-
-    await db.commit()
-
-    return {
-        "message": f"Đồng bộ thành công {len(new_commits)} commit.",
-        "data": [c.sha for c in new_commits]
+async def github_api_call(url: str, token: str, params: dict = None):
+    """Helper function for GitHub API calls with error handling"""
+    headers = {
+        "Authorization": token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
     }
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(url, headers=headers, params=params or {})
+        
+        if response.status_code == 429:
+            raise HTTPException(status_code=429, detail="GitHub API rate limit exceeded")
+        elif response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"GitHub API error: {response.text}"
+            )
+        
+        return response.json()
+
+# ==================== NEW BRANCH-SPECIFIC COMMIT ENDPOINTS ====================
+
+@commit_router.get("/commits/{owner}/{repo}/branches/{branch_name}/commits")
+async def get_branch_commits(
+    owner: str,
+    repo: str,
+    branch_name: str,
+    limit: int = Query(50, ge=1, le=500, description="Number of commits to return"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+    request: Request = None
+):
+    """
+    Lấy commits của một branch cụ thể với validation đầy đủ
+    """
+    try:
+        from services.commit_service import get_repo_id_by_owner_and_name, get_commits_by_branch_safe, get_commits_by_branch_fallback
+        
+        # Get repo_id
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Try safe method first (with branch_id validation)
+        commits_data = await get_commits_by_branch_safe(repo_id, branch_name, limit, offset)
+        
+        # Fallback to branch_name only if safe method returns empty
+        if not commits_data:
+            logger.warning(f"Safe method returned empty, trying fallback for {owner}/{repo}:{branch_name}")
+            commits_data = await get_commits_by_branch_fallback(repo_id, branch_name, limit, offset)
+        
+        # Convert to dict format for JSON response
+        commits_list = []
+        for commit in commits_data:
+            commit_dict = {
+                "id": commit.id,
+                "sha": commit.sha,
+                "message": commit.message,
+                "author_name": commit.author_name,
+                "author_email": commit.author_email,
+                "committer_name": commit.committer_name,
+                "committer_email": commit.committer_email,
+                "date": commit.date.isoformat() if commit.date else None,
+                "committer_date": commit.committer_date.isoformat() if commit.committer_date else None,
+                "insertions": commit.insertions,
+                "deletions": commit.deletions,
+                "files_changed": commit.files_changed,
+                "is_merge": commit.is_merge,
+                "merge_from_branch": commit.merge_from_branch,
+                "branch_name": commit.branch_name,
+                "author_role_at_commit": commit.author_role_at_commit
+            }
+            commits_list.append(commit_dict)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "branch": branch_name,
+            "commits": commits_list,
+            "count": len(commits_list),
+            "limit": limit,
+            "offset": offset,
+            "total_found": len(commits_list)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting commits for branch {branch_name}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@commit_router.get("/commits/{owner}/{repo}/branches")
+async def get_repository_branches_with_commits(
+    owner: str,
+    repo: str,
+    request: Request = None
+):
+    """
+    Lấy danh sách tất cả branches với thống kê commits
+    """
+    try:
+        from services.commit_service import get_repo_id_by_owner_and_name, get_all_branches_with_commit_stats
+        
+        # Get repo_id
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Get branches with commit stats
+        branches_data = await get_all_branches_with_commit_stats(repo_id)
+        
+        # Format response
+        branches_list = []
+        for branch in branches_data:
+            branch_dict = {
+                "id": branch.id,
+                "name": branch.name,
+                "is_default": branch.is_default,
+                "is_protected": branch.is_protected,
+                "stored_commit_count": branch.commits_count,
+                "actual_commit_count": branch.actual_commit_count,
+                "latest_commit_date": branch.latest_commit_date.isoformat() if branch.latest_commit_date else None,
+                "last_synced_commit_date": branch.last_commit_date.isoformat() if branch.last_commit_date else None
+            }
+            branches_list.append(branch_dict)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "branches": branches_list,
+            "total_branches": len(branches_list)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting branches for repo {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@commit_router.get("/commits/{owner}/{repo}/compare/{base_branch}...{head_branch}")
+async def compare_branch_commits(
+    owner: str,
+    repo: str,
+    base_branch: str,
+    head_branch: str,
+    limit: int = Query(100, ge=1, le=500, description="Number of commits to return"),
+    request: Request = None
+):
+    """
+    So sánh commits giữa 2 branches (commits in head_branch but not in base_branch)
+    """
+    try:
+        from services.commit_service import get_repo_id_by_owner_and_name, compare_commits_between_branches
+        
+        # Get repo_id
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Get diff commits
+        diff_commits = await compare_commits_between_branches(repo_id, base_branch, head_branch, limit)
+        
+        # Format response
+        commits_list = []
+        for commit in diff_commits:
+            commit_dict = {
+                "sha": commit.sha,
+                "message": commit.message,
+                "author_name": commit.author_name,
+                "author_email": commit.author_email,
+                "date": commit.date.isoformat() if commit.date else None,
+                "insertions": commit.insertions,
+                "deletions": commit.deletions,
+                "files_changed": commit.files_changed,
+                "is_merge": commit.is_merge
+            }
+            commits_list.append(commit_dict)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "comparison": f"{base_branch}...{head_branch}",
+            "commits_ahead": commits_list,
+            "commits_ahead_count": len(commits_list),
+            "base_branch": base_branch,
+            "head_branch": head_branch
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error comparing branches {base_branch}...{head_branch}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@commit_router.post("/commits/{owner}/{repo}/validate-commit-consistency")
+async def validate_commit_branch_consistency(
+    owner: str,
+    repo: str,
+    request: Request = None
+):
+    """
+    Kiểm tra và sửa inconsistency giữa branch_id và branch_name trong commits
+    """
+    try:
+        from services.commit_service import get_repo_id_by_owner_and_name, validate_and_fix_commit_branch_consistency
+        
+        # Get repo_id
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Validate and fix consistency
+        fixed_count = await validate_and_fix_commit_branch_consistency(repo_id)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "message": "Commit-branch consistency validation completed",
+            "inconsistencies_fixed": fixed_count,
+            "status": "success" if fixed_count >= 0 else "error"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error validating commit consistency for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+# Endpoint đồng bộ commit từ GitHub về database - Optimized version
+@commit_router.post("/github/{owner}/{repo}/sync-commits")
+async def sync_commits(
+    owner: str,
+    repo: str,
+    request: Request,
+    branch: str = Query("main", description="Branch name to sync commits from"),
+    since: Optional[str] = Query(None, description="Only commits after this date (ISO format)"),
+    until: Optional[str] = Query(None, description="Only commits before this date (ISO format)"),
+    per_page: int = Query(100, ge=1, le=100, description="Number of commits per page"),
+    max_pages: int = Query(10, ge=1, le=50, description="Maximum pages to fetch"),
+    include_stats: bool = Query(False, description="Include commit statistics (slower)")
+):
+    """
+    Đồng bộ commits từ GitHub với full model support
+    
+    Hỗ trợ tất cả các fields trong commit model:
+    - Basic info (sha, message, author, committer, dates)
+    - Statistics (insertions, deletions, files_changed)
+    - Relationships (repo_id, branch_id, parent_sha)
+    - Metadata (is_merge, merge_from_branch)
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
+    
+    try:
+        logger.info(f"Starting commit sync for {owner}/{repo}:{branch}")
+        
+        # 1. Validate repository exists
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found in database")
+        
+        # 2. Get branch info
+        branches = await get_branches_by_repo_id(repo_id)
+        branch_id = None
+        for b in branches:
+            if b['name'] == branch:
+                branch_id = b['id']
+                break
+        
+        if not branch_id:
+            logger.warning(f"Branch {branch} not found in database, using branch_name only")
+        
+        # 3. Fetch commits with enhanced data
+        all_commits = []
+        page = 1
+        
+        while page <= max_pages:
+            logger.info(f"Fetching commits page {page}/{max_pages}")
+            
+            params = {
+                "sha": branch,
+                "per_page": per_page,
+                "page": page
+            }
+            
+            if since:
+                params["since"] = since
+            if until:
+                params["until"] = until
+                
+            url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+            commits_data = await github_api_call(url, token, params)
+            
+            if not commits_data:
+                break
+            
+            # Optionally enhance commits with detailed stats
+            if include_stats:
+                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats...")
+                for commit in commits_data:
+                    sha = commit.get("sha")
+                    if sha:
+                        try:
+                            # Fetch detailed commit info including stats
+                            detail_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+                            detailed_commit = await github_api_call(detail_url, token)
+                            
+                            # Merge detailed info
+                            if detailed_commit:
+                                commit["detailed_stats"] = detailed_commit.get("stats", {})
+                                commit["files"] = detailed_commit.get("files", [])
+                                
+                        except Exception as e:
+                            logger.warning(f"Could not fetch details for commit {sha}: {e}")
+                        
+                        # Small delay to avoid rate limiting
+                        await asyncio.sleep(0.05)
+            
+            all_commits.extend(commits_data)
+            
+            if len(commits_data) < per_page:
+                break
+                
+            page += 1
+            await asyncio.sleep(0.1)
+        
+        logger.info(f"Fetched {len(all_commits)} commits from GitHub")
+        
+        # 4. Process and save commits with full model data
+        saved_count = await save_multiple_commits(
+            commits_data=all_commits,
+            repo_id=repo_id,
+            branch_name=branch,
+            branch_id=branch_id        )
+        
+        logger.info(f"Successfully saved {saved_count} new commits")
+        
+        return {
+            "message": f"Successfully synced {saved_count} commits",
+            "repository": f"{owner}/{repo}",
+            "branch": branch,
+            "total_fetched": len(all_commits),
+            "new_commits_saved": saved_count,
+            "pages_processed": min(page, max_pages),
+            "enhanced_with_stats": include_stats,
+            "branch_id": branch_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error syncing commits for {owner}/{repo}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Commit sync failed: {str(e)}")
+
+# Endpoint đồng bộ commits cho tất cả branches
+@commit_router.post("/github/{owner}/{repo}/sync-all-branches-commits")
+async def sync_all_branches_commits(
+    owner: str,
+    repo: str,
+    request: Request,
+    since: Optional[str] = Query(None, description="Only commits after this date"),
+    per_page: int = Query(50, ge=1, le=100),
+    max_pages_per_branch: int = Query(5, ge=1, le=20)
+):
+    """
+    Đồng bộ commits cho tất cả branches của repository
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
+    
+    try:
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found")
+        
+        # Get all branches
+        branches = await get_branches_by_repo_id(repo_id)
+        
+        if not branches:
+            raise HTTPException(status_code=404, detail="No branches found for repository")
+        
+        total_saved = 0
+        branch_results = []
+        
+        for branch in branches:
+            branch_name = branch['name']
+            logger.info(f"Processing commits for branch: {branch_name}")
+            
+            try:
+                # Fetch commits for this branch
+                params = {
+                    "sha": branch_name,
+                    "per_page": per_page
+                }
+                if since:
+                    params["since"] = since
+                
+                all_commits = []
+                page = 1
+                
+                while page <= max_pages_per_branch:
+                    params["page"] = page
+                    url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+                    commits_data = await github_api_call(url, token, params)
+                    
+                    if not commits_data:
+                        break
+                    
+                    all_commits.extend(commits_data)
+                    
+                    if len(commits_data) < per_page:
+                        break
+                    
+                    page += 1
+                    await asyncio.sleep(0.1)
+                
+                # Save commits for this branch
+                saved_count = await save_multiple_commits(
+                    commits_data=all_commits,
+                    repo_id=repo_id,
+                    branch_name=branch_name,
+                    branch_id=branch['id']
+                )
+                
+                total_saved += saved_count
+                branch_results.append({
+                    "branch": branch_name,
+                    "commits_fetched": len(all_commits),
+                    "commits_saved": saved_count
+                })
+                
+            except Exception as e:
+                logger.warning(f"Failed to sync commits for branch {branch_name}: {e}")
+                branch_results.append({
+                    "branch": branch_name,
+                    "error": str(e)
+                })
+        
+        return {
+            "message": f"Synced commits for {len(branches)} branches",
+            "repository": f"{owner}/{repo}",
+            "total_commits_saved": total_saved,
+            "branch_results": branch_results
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Multi-branch sync failed: {str(e)}")
+
+# REDUNDANT ENDPOINT REMOVED - Use /commits/{owner}/{repo}/branches/{branch_name}/commits instead
+
+# Endpoint lấy commit chi tiết
+@commit_router.get("/commits/{sha}")
+async def get_commit_details(sha: str):
+    """Get detailed information about a specific commit"""
+    try:
+        commit = await get_commit_by_sha(sha)
+        if not commit:
+            raise HTTPException(status_code=404, detail="Commit not found")
+        
+        return commit
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get commit: {str(e)}")
+
+# Endpoint thống kê commits
+@commit_router.get("/github/{owner}/{repo}/commit-stats")
+async def get_repository_commit_statistics(owner: str, repo: str):
+    """Get comprehensive commit statistics for a repository"""
+    try:
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found")
+        
+        stats = await get_commit_statistics(repo_id)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "statistics": stats
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get commit statistics: {str(e)}")
+
+# CONSOLIDATED ENDPOINT - This replaces the removed /github/{owner}/{repo}/commits
+@commit_router.get("/commits/{owner}/{repo}/commits")
+async def get_repository_commits_from_database(
+    owner: str,
+    repo: str,
+    branch: Optional[str] = Query(None, description="Filter commits by branch name (redirects to branch-specific endpoint)"),
+    limit: int = Query(50, ge=1, le=500, description="Number of commits to return"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+    since: Optional[str] = Query(None, description="Only commits after this date (ISO format)"),
+    until: Optional[str] = Query(None, description="Only commits before this date (ISO format)"),
+    request: Request = None
+):
+    """
+    Lấy commits của repository từ database với filtering nâng cao
+    Note: Nếu chỉ định branch, sẽ redirect đến endpoint branch-specific cho hiệu suất tốt hơn
+    """
+    try:
+        # If branch is specified, redirect to branch-specific endpoint
+        if branch:
+            return await get_branch_commits(owner, repo, branch, limit, offset, request)
+        
+        # Otherwise, get all commits (existing logic)
+        from services.commit_service import get_repo_id_by_owner_and_name
+        from db.models.commits import commits
+        from db.database import database
+        from sqlalchemy import select, and_
+        
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Build query with filters
+        query = select(commits).where(commits.c.repo_id == repo_id)
+        
+        # Add date filters if provided
+        if since:
+            try:
+                since_date = datetime.fromisoformat(since.replace('Z', '+00:00'))
+                query = query.where(commits.c.date >= since_date)
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid 'since' date format")
+        
+        if until:
+            try:
+                until_date = datetime.fromisoformat(until.replace('Z', '+00:00'))
+                query = query.where(commits.c.date <= until_date)
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid 'until' date format")
+        
+        # Apply pagination and ordering
+        query = query.order_by(commits.c.date.desc()).limit(limit).offset(offset)
+        
+        commits_data = await database.fetch_all(query)
+        
+        # Format response
+        commits_list = []
+        for commit in commits_data:
+            commit_dict = {
+                "id": commit.id,
+                "sha": commit.sha,
+                "message": commit.message,
+                "author_name": commit.author_name,
+                "author_email": commit.author_email,
+                "date": commit.date.isoformat() if commit.date else None,
+                "branch_name": commit.branch_name,
+                "insertions": commit.insertions,
+                "deletions": commit.deletions,
+                "files_changed": commit.files_changed,
+                "is_merge": commit.is_merge
+            }
+            commits_list.append(commit_dict)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "commits": commits_list,
+            "count": len(commits_list),
+            "limit": limit,
+            "offset": offset,
+            "filters": {
+                "since": since,
+                "until": until,
+                "branch": branch
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting commits for repo {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+# ==================== GITHUB DIRECT FETCH ENDPOINTS ====================
+
+@commit_router.get("/github/{owner}/{repo}/branches/{branch_name}/commits")
+async def get_branch_commits_from_github(
+    owner: str,
+    repo: str,
+    branch_name: str,
+    request: Request,
+    per_page: int = Query(30, ge=1, le=100, description="Number of commits per page"),
+    page: int = Query(1, ge=1, le=100, description="Page number"),
+    since: Optional[str] = Query(None, description="Only commits after this date (ISO format)"),
+    until: Optional[str] = Query(None, description="Only commits before this date (ISO format)")
+):
+    """
+    Fetch commits directly from GitHub for a specific branch (real-time data)
+    
+    This endpoint fetches commits directly from GitHub API without storing in database.
+    Use this when you need real-time, up-to-date commit data.
+    For faster access to stored data, use /commits/{owner}/{repo}/branches/{branch_name}/commits instead.
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
+    
+    try:
+        logger.info(f"Fetching commits from GitHub for {owner}/{repo}:{branch_name}")
+        
+        # Build parameters for GitHub API
+        params = {
+            "sha": branch_name,
+            "per_page": per_page,
+            "page": page
+        }
+        
+        if since:
+            params["since"] = since
+        if until:
+            params["until"] = until
+        
+        # Fetch commits from GitHub
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+        commits_data = await github_api_call(url, token, params)
+        
+        if not commits_data:
+            return {
+                "repository": f"{owner}/{repo}",
+                "branch": branch_name,
+                "commits": [],
+                "count": 0,
+                "page": page,
+                "per_page": per_page,
+                "source": "github_api",
+                "message": "No commits found"
+            }
+        
+        # Format commits to match our standard response format
+        formatted_commits = []
+        for commit in commits_data:
+            commit_info = commit.get("commit", {})
+            author_info = commit_info.get("author", {})
+            committer_info = commit_info.get("committer", {})
+            
+            formatted_commit = {
+                "sha": commit.get("sha"),
+                "message": commit_info.get("message"),
+                "author_name": author_info.get("name"),
+                "author_email": author_info.get("email"),
+                "author_date": author_info.get("date"),
+                "committer_name": committer_info.get("name"),
+                "committer_email": committer_info.get("email"),
+                "committer_date": committer_info.get("date"),
+                "url": commit.get("html_url"),
+                "api_url": commit.get("url"),
+                "comment_count": commit_info.get("comment_count", 0),
+                "verification": commit_info.get("verification", {}),
+                "author": commit.get("author"),  # GitHub user info
+                "committer": commit.get("committer"),  # GitHub user info
+                "parents": [{"sha": p.get("sha"), "url": p.get("url")} for p in commit.get("parents", [])]
+            }
+            formatted_commits.append(formatted_commit)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "branch": branch_name,
+            "commits": formatted_commits,
+            "count": len(formatted_commits),
+            "page": page,
+            "per_page": per_page,
+            "source": "github_api",
+            "filters": {
+                "since": since,
+                "until": until
+            },
+            "note": "This data is fetched directly from GitHub API. For stored data, use /commits/{owner}/{repo}/branches/{branch_name}/commits"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching commits from GitHub for {owner}/{repo}:{branch_name}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch commits from GitHub: {str(e)}")
+
+@commit_router.get("/github/{owner}/{repo}/commits")
+async def get_repository_commits_from_github(
+    owner: str,
+    repo: str,
+    request: Request,
+    sha: Optional[str] = Query(None, description="SHA or branch to start listing commits from"),
+    path: Optional[str] = Query(None, description="Only commits containing this file path will be returned"),
+    author: Optional[str] = Query(None, description="GitHub username or email address"),
+    committer: Optional[str] = Query(None, description="GitHub username or email address"),
+    since: Optional[str] = Query(None, description="Only commits after this date (ISO format)"),
+    until: Optional[str] = Query(None, description="Only commits before this date (ISO format)"),
+    per_page: int = Query(30, ge=1, le=100, description="Number of commits per page"),
+    page: int = Query(1, ge=1, le=100, description="Page number")
+):
+    """
+    Fetch commits directly from GitHub for a repository (real-time data)
+    
+    This endpoint provides comprehensive filtering options available in GitHub API.
+    For branch-specific queries, consider using /github/{owner}/{repo}/branches/{branch_name}/commits.
+    For stored data, use /commits/{owner}/{repo}/commits.
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
+    
+    try:
+        logger.info(f"Fetching commits from GitHub for {owner}/{repo}")
+        
+        # Build parameters for GitHub API with all available filters
+        params = {
+            "per_page": per_page,
+            "page": page
+        }
+        
+        # Add optional filters
+        if sha:
+            params["sha"] = sha
+        if path:
+            params["path"] = path
+        if author:
+            params["author"] = author
+        if committer:
+            params["committer"] = committer
+        if since:
+            params["since"] = since
+        if until:
+            params["until"] = until
+        
+        # Fetch commits from GitHub
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+        commits_data = await github_api_call(url, token, params)
+        
+        if not commits_data:
+            return {
+                "repository": f"{owner}/{repo}",
+                "commits": [],
+                "count": 0,
+                "page": page,
+                "per_page": per_page,
+                "source": "github_api",
+                "message": "No commits found"
+            }
+        
+        # Format commits (same as branch-specific endpoint)
+        formatted_commits = []
+        for commit in commits_data:
+            commit_info = commit.get("commit", {})
+            author_info = commit_info.get("author", {})
+            committer_info = commit_info.get("committer", {})
+            
+            formatted_commit = {
+                "sha": commit.get("sha"),
+                "message": commit_info.get("message"),
+                "author_name": author_info.get("name"),
+                "author_email": author_info.get("email"),
+                "author_date": author_info.get("date"),
+                "committer_name": committer_info.get("name"),
+                "committer_email": committer_info.get("email"),
+                "committer_date": committer_info.get("date"),
+                "url": commit.get("html_url"),
+                "api_url": commit.get("url"),
+                "comment_count": commit_info.get("comment_count", 0),
+                "verification": commit_info.get("verification", {}),
+                "author": commit.get("author"),
+                "committer": commit.get("committer"),
+                "parents": [{"sha": p.get("sha"), "url": p.get("url")} for p in commit.get("parents", [])]
+            }
+            formatted_commits.append(formatted_commit)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "commits": formatted_commits,
+            "count": len(formatted_commits),
+            "page": page,
+            "per_page": per_page,
+            "source": "github_api",
+            "filters": {
+                "sha": sha,
+                "path": path,
+                "author": author,
+                "committer": committer,
+                "since": since,
+                "until": until
+            },
+            "note": "This data is fetched directly from GitHub API. For stored data, use /commits/{owner}/{repo}/commits"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching commits from GitHub for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch commits from GitHub: {str(e)}")
+
+# ==================== END GITHUB DIRECT FETCH ENDPOINTS ====================

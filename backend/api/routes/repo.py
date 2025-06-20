@@ -1,14 +1,18 @@
 # backend/api/routes/repo.py
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Query
 import httpx
-from services.repo_service import get_repo_data, save_repository
+from typing import Optional, List
+from services.repo_service import (
+    save_repository, fetch_repo_from_github, fetch_repo_from_database,
+    get_user_repos_from_database, get_repositories_by_owner, get_repository_stats
+)
 
 repo_router = APIRouter()
 
-# Endpoint lấy thông tin repository cụ thể
+# Endpoint lấy thông tin repository cụ thể từ GitHub
 @repo_router.get("/github/{owner}/{repo}")
 async def fetch_repo(owner: str, repo: str):
-    return await get_repo_data(owner, repo)
+    return await fetch_repo_from_github(owner, repo)
 
 @repo_router.get("/github/repos")
 async def get_user_repos(request: Request):
@@ -31,6 +35,47 @@ async def get_user_repos(request: Request):
     
     # Trả về kết quả dạng JSON
     return resp.json()
+
+# Endpoint lấy thông tin repository từ database
+@repo_router.get("/repodb/{owner}/{repo}")
+async def get_repo_from_database(owner: str, repo: str):
+    """Fetch repository information from database"""
+    try:
+        repo_data = await fetch_repo_from_database(owner, repo)
+        if not repo_data:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found in database")
+        return repo_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching repository from database: {str(e)}")
+
+#Endpoint lấy danh sách repositories từ database
+@repo_router.get("/repodb/repos")
+async def get_repos_from_database(
+    user_id: Optional[int] = Query(None, description="Filter by user ID"),
+    owner: Optional[str] = Query(None, description="Filter by owner"),
+    limit: Optional[int] = Query(50, description="Limit number of results"),
+    offset: Optional[int] = Query(0, description="Offset for pagination")
+):
+    """Fetch repositories from database with optional filtering"""
+    try:
+        if owner:
+            # Lấy repositories theo owner
+            repos = await get_repositories_by_owner(owner, limit, offset)
+        elif user_id:
+            # Lấy repositories theo user_id
+            repos = await get_user_repos_from_database(user_id, limit, offset)
+        else:
+            # Lấy tất cả repositories
+            repos = await get_user_repos_from_database(None, limit, offset)
+        
+        return {
+            "repositories": repos,
+            "count": len(repos),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching repositories from database: {str(e)}")
 
 # Save repo vào database
 @repo_router.post("/github/{owner}/{repo}/save")

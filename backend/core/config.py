@@ -6,8 +6,10 @@ import os  # Làm việc với biến môi trường
 from fastapi.middleware.cors import CORSMiddleware  # Middleware CORS
 from starlette.middleware.sessions import SessionMiddleware  # Middleware quản lý session
 from fastapi import FastAPI  # Framework chính
-from api.routes.github import github_router  # Router cho GitHub API
+from api.routes.sync import sync_router  # Router cho GitHub Sync API
+from api.routes.repo import repo_router  # Router cho Repository API
 from api.routes.auth import auth_router  # Router cho xác thực
+from api.routes.commit import commit_router  # Router cho Commit API
 from dotenv import load_dotenv  # Đọc file .env
 
 # Nạp biến môi trường từ file .env
@@ -50,9 +52,14 @@ def setup_routers(app: FastAPI):
     Args:
         app (FastAPI): Instance của FastAPI app
     """
-    
     # Đăng ký auth router với prefix /auth
     app.include_router(auth_router, prefix="/auth")
     
-    # Đăng ký github router với prefix /api
-    app.include_router(github_router, prefix="/api")  # Gộp chung không bị đè lẫn nhau
+    # Đăng ký GitHub sync router với prefix /api
+    app.include_router(sync_router, prefix="/api")
+    
+    # Đăng ký repository router với prefix /api
+    app.include_router(repo_router, prefix="/api")
+    
+    # Đăng ký commit router với prefix /api/commits
+    app.include_router(commit_router, prefix="/api")
