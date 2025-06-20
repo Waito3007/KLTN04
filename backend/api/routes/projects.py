@@ -6,27 +6,28 @@ from datetime import datetime
 from pydantic import BaseModel
 
 # from core.security import get_current_user  # Temporarily disabled
+from core.security import get_current_user, CurrentUser
 from db.database import get_db, engine
 from db.models.project_tasks import project_tasks, TaskStatus, TaskPriority
 
 router = APIRouter()
 
-# Temporary mock user dependency
-async def get_current_user():
-    return {"username": "test_user", "id": 1}
+# Temporary mock user dependency - REMOVED, using real auth now
+# async def get_current_user():
+#     return {"username": "test_user", "id": 1}
 
 # Pydantic models cho Task
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
     assignee: str
-    priority: str = "medium"  # low, medium, high
-    status: str = "todo"  # todo, in_progress, done
+    priority: str = "MEDIUM"  # LOW, MEDIUM, HIGH, URGENT
+    status: str = "TODO"  # TODO, IN_PROGRESS, DONE, CANCELLED
     due_date: Optional[str] = None
 
 class TaskCreate(TaskBase):
-    repo_owner: str
-    repo_name: str
+    # repo_owner và repo_name sẽ được lấy từ URL path, không cần trong request body
+    pass
 
 class TaskUpdate(TaskBase):
     pass
@@ -45,7 +46,7 @@ class TaskResponse(TaskBase):
 async def get_project_tasks(
     owner: str,
     repo: str,
-    current_user=Depends(get_current_user),
+    current_user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Lấy danh sách tasks của repository"""
@@ -56,8 +57,7 @@ async def get_project_tasks(
                 and_(
                     project_tasks.c.repo_owner == owner,
                     project_tasks.c.repo_name == repo
-                )
-            ).order_by(project_tasks.c.created_at.desc())
+                )            ).order_by(project_tasks.c.created_at.desc())
             
             result = conn.execute(query)
             tasks = []
@@ -67,9 +67,9 @@ async def get_project_tasks(
                     "id": row.id,
                     "title": row.title,
                     "description": row.description,
-                    "assignee": row.assignee,
-                    "priority": row.priority.value if row.priority else "medium",
-                    "status": row.status.value if row.status else "todo",
+                    "assignee": row.assignee_github_username,  # Use correct field name
+                    "priority": row.priority if row.priority else "MEDIUM",  # Already string
+                    "status": row.status if row.status else "TODO",  # Already string
                     "due_date": row.due_date,
                     "repo_owner": row.repo_owner,
                     "repo_name": row.repo_name,
@@ -89,36 +89,55 @@ async def create_project_task(
     owner: str,
     repo: str,
     task: TaskCreate,
-    current_user=Depends(get_current_user),
+    current_user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Tạo task mới cho repository"""
     try:
         # Insert task into database
-        with engine.connect() as conn:
-            # Validate priority and status
+        with engine.connect() as conn:            # Validate priority and status
             priority_enum = TaskPriority.MEDIUM
-            if task.priority == "low":
-                priority_enum = TaskPriority.LOW
-            elif task.priority == "high":
+            if task.priority == "LOW":
+                priority_enum = TaskPriority.LOW            
+            elif task.priority == "HIGH":
                 priority_enum = TaskPriority.HIGH
-                
+            
             status_enum = TaskStatus.TODO
-            if task.status == "in_progress":
+            if task.status == "IN_PROGRESS":
                 status_enum = TaskStatus.IN_PROGRESS
-            elif task.status == "done":
+            elif task.status == "DONE":
                 status_enum = TaskStatus.DONE
+              # Handle due_date conversion
+            due_date_value = None
+            if task.due_date:
+                try:
+                    from datetime import datetime
+                    # Try to parse the date string
+                    if isinstance(task.due_date, str):
+                        due_date_value = datetime.strptime(task.due_date, '%Y-%m-%d').date()
+                    else:
+                        due_date_value = task.due_date
+                except (ValueError, TypeError) as e:
+                    print(f"Date parsing error: {e}")
+                    due_date_value = None
+            
+            # Resolve IDs
+            assignee_user_id = get_user_id_by_github_username(conn, task.assignee)
+            repository_id = get_repository_id(conn, owner, repo)
             
             insert_stmt = insert(project_tasks).values(
                 title=task.title,
                 description=task.description,
-                assignee=task.assignee,
-                priority=priority_enum,
-                status=status_enum,
-                due_date=task.due_date,
+                assignee_github_username=task.assignee,  # Use correct field name
+                assignee_user_id=assignee_user_id,  # Resolved user ID
+                priority=priority_enum.value,  # Convert enum to string
+                status=status_enum.value,  # Convert enum to string
+                due_date=str(due_date_value) if due_date_value else None,  # Store as string
+                repository_id=repository_id,  # Resolved repository ID
                 repo_owner=owner,
-                repo_name=repo,
-                created_by=current_user["username"]
+                repo_name=repo,                is_completed=False,  # Default to False for new tasks
+                created_by=current_user.github_username,
+                created_by_user_id=current_user.id  # Use user ID if available
             )
             
             result = conn.execute(insert_stmt)
@@ -133,9 +152,9 @@ async def create_project_task(
                 "id": created_task.id,
                 "title": created_task.title,
                 "description": created_task.description,
-                "assignee": created_task.assignee,
-                "priority": created_task.priority.value,
-                "status": created_task.status.value,
+                "assignee": created_task.assignee_github_username,  # Use correct field
+                "priority": created_task.priority,  # Should be string already
+                "status": created_task.status,  # Should be string already  
                 "due_date": created_task.due_date,
                 "repo_owner": created_task.repo_owner,
                 "repo_name": created_task.repo_name,
@@ -170,19 +189,19 @@ async def update_project_task(
             
             if not existing_task:
                 raise HTTPException(status_code=404, detail="Task not found")
-            
-            # Validate priority and status
+              # Validate priority and status
             priority_enum = TaskPriority.MEDIUM
-            if task_update.priority == "low":
+            if task_update.priority == "LOW":
                 priority_enum = TaskPriority.LOW
-            elif task_update.priority == "high":
+            elif task_update.priority == "HIGH":
                 priority_enum = TaskPriority.HIGH
                 
             status_enum = TaskStatus.TODO
-            if task_update.status == "in_progress":
+            if task_update.status == "IN_PROGRESS":
                 status_enum = TaskStatus.IN_PROGRESS
-            elif task_update.status == "done":
-                status_enum = TaskStatus.DONE
+            elif task_update.status == "DONE":
+                status_enum = TaskStatus.DONE            # Resolve assignee user ID if assignee changed
+            assignee_user_id = get_user_id_by_github_username(conn, task_update.assignee)
             
             # Update task
             update_stmt = update(project_tasks).where(
@@ -190,30 +209,31 @@ async def update_project_task(
             ).values(
                 title=task_update.title,
                 description=task_update.description,
-                assignee=task_update.assignee,
-                priority=priority_enum,
-                status=status_enum,
-                due_date=task_update.due_date
+                assignee_github_username=task_update.assignee,  # Use correct field name
+                assignee_user_id=assignee_user_id,  # Resolved user ID
+                priority=priority_enum.value,  # Convert enum to string
+                status=status_enum.value,  # Convert enum to string
+                due_date=task_update.due_date,
+                is_completed=(status_enum == TaskStatus.DONE)  # Set is_completed based on status
             )
             
             conn.execute(update_stmt)
             conn.commit()
-            
-            # Get updated task
+              # Get updated task
             updated_task = conn.execute(check_query).fetchone()
             
             return {
                 "id": updated_task.id,
                 "title": updated_task.title,
                 "description": updated_task.description,
-                "assignee": updated_task.assignee,
-                "priority": updated_task.priority.value,
-                "status": updated_task.status.value,
+                "assignee": updated_task.assignee_github_username,  # Use correct field
+                "priority": updated_task.priority,  # Already string
+                "status": updated_task.status,  # Already string
                 "due_date": updated_task.due_date,
                 "repo_owner": updated_task.repo_owner,
                 "repo_name": updated_task.repo_name,
                 "created_at": updated_task.created_at,
-                "updated_at": updated_task.updated_task
+                "updated_at": updated_task.updated_at
             }
     except HTTPException:
         raise
@@ -311,6 +331,36 @@ class BulkTaskUpdate(BaseModel):
     task_ids: List[int]
     updates: TaskUpdate
 
+# Helper functions for resolving IDs
+def get_user_id_by_github_username(conn, github_username: str) -> Optional[int]:
+    """Get user ID from github username"""
+    try:
+        from db.models.users import users
+        query = select(users.c.id).where(users.c.github_username == github_username)
+        result = conn.execute(query).fetchone()
+        print(f"Debug: Looking for user '{github_username}', found result: {result}")
+        return result[0] if result else None
+    except Exception as e:
+        print(f"Error getting user ID: {e}")
+        return None
+
+def get_repository_id(conn, owner: str, repo_name: str) -> Optional[int]:
+    """Get repository ID from owner and name"""
+    try:
+        from db.models.repositories import repositories
+        query = select(repositories.c.id).where(
+            and_(
+                repositories.c.owner == owner,
+                repositories.c.name == repo_name
+            )
+        )
+        result = conn.execute(query).fetchone()
+        print(f"Debug: Looking for repository '{owner}/{repo_name}', found result: {result}")
+        return result[0] if result else None
+    except Exception as e:
+        print(f"Error getting repository ID: {e}")
+        return None
+
 @router.get("/tasks", response_model=List[TaskResponse])
 async def get_all_tasks(
     limit: Optional[int] = Query(100, description="Limit number of results"),
@@ -330,23 +380,23 @@ async def get_all_tasks(
             # Apply filters
             conditions = []
             if status:
-                if status == "todo":
-                    conditions.append(project_tasks.c.status == TaskStatus.TODO)
-                elif status == "in_progress":
-                    conditions.append(project_tasks.c.status == TaskStatus.IN_PROGRESS)
-                elif status == "done":
-                    conditions.append(project_tasks.c.status == TaskStatus.DONE)
+                if status == "TODO":
+                    conditions.append(project_tasks.c.status == "TODO")
+                elif status == "IN_PROGRESS":
+                    conditions.append(project_tasks.c.status == "IN_PROGRESS")
+                elif status == "DONE":
+                    conditions.append(project_tasks.c.status == "DONE")
             
             if priority:
-                if priority == "low":
-                    conditions.append(project_tasks.c.priority == TaskPriority.LOW)
-                elif priority == "medium":
-                    conditions.append(project_tasks.c.priority == TaskPriority.MEDIUM)
-                elif priority == "high":
-                    conditions.append(project_tasks.c.priority == TaskPriority.HIGH)
+                if priority == "LOW":
+                    conditions.append(project_tasks.c.priority == "LOW")
+                elif priority == "MEDIUM":
+                    conditions.append(project_tasks.c.priority == "MEDIUM")
+                elif priority == "HIGH":
+                    conditions.append(project_tasks.c.priority == "HIGH")
             
             if assignee:
-                conditions.append(project_tasks.c.assignee == assignee)
+                conditions.append(project_tasks.c.assignee_github_username == assignee)
             
             if conditions:
                 query = query.where(and_(*conditions))
@@ -362,9 +412,9 @@ async def get_all_tasks(
                     "id": row.id,
                     "title": row.title,
                     "description": row.description,
-                    "assignee": row.assignee,
-                    "priority": row.priority.value if row.priority else "medium",
-                    "status": row.status.value if row.status else "todo",
+                    "assignee": row.assignee_github_username,  # Use correct field name
+                    "priority": row.priority if row.priority else "MEDIUM",  # Already string
+                    "status": row.status if row.status else "TODO",  # Already string
                     "due_date": row.due_date,
                     "repo_owner": row.repo_owner,
                     "repo_name": row.repo_name,

@@ -138,11 +138,16 @@ export const taskAPI = {
 };
 
 // ==================== COLLABORATOR API ====================
-export const collaboratorAPI = {
-  // Lấy từ backend API
+export const collaboratorAPI = {  
+  // Lấy từ backend API (NEW ENDPOINT)
   getFromBackend: async (owner, repoName) => {
-    const response = await apiClient.get(`/github/${owner}/${repoName}/collaborators`);
-    return response.data || [];
+    console.log(`🔍 getFromBackend called for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/repos/${owner}/${repoName}/collaborators`);
+    console.log('📊 Backend response:', response.data);
+    // API returns { repository, collaborators, count }
+    const collaborators = response.data?.collaborators || [];
+    console.log('📊 Extracted collaborators:', collaborators);
+    return collaborators;
   },
 
   // Lấy từ GitHub API (fallback)
@@ -167,12 +172,17 @@ export const collaboratorAPI = {
 
   // Intelligent fetch với 3-tier fallback
   getIntelligent: async (owner, repoName, ownerData) => {
+    console.log(`🧠 getIntelligent called for ${owner}/${repoName}`);
+    
     try {
       console.log('🔍 Trying backend API...');
       const data = await collaboratorAPI.getFromBackend(owner, repoName);
+      console.log('🔍 Backend returned:', data);
       if (data && data.length > 0) {
         console.log('✅ Loaded from backend API');
         return { data, source: 'database' };
+      } else {
+        console.log('⚠️ Backend returned empty data, trying GitHub...');
       }
     } catch (error) {
       console.log('❌ Backend API failed:', error.message);

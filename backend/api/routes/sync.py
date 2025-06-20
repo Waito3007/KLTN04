@@ -13,6 +13,9 @@ from services.github_service import fetch_commit_details, fetch_branch_stats
 sync_router = APIRouter()
 logger = logging.getLogger(__name__)
 
+# Constants
+GITHUB_API_BASE = "https://api.github.com"
+
 async def github_api_call(url: str, token: str, retries: int = 3) -> Dict[str, Any]:
     """
     Gọi GitHub API với error handling và retry logic
@@ -491,3 +494,129 @@ async def update_branch_info(owner: str, repo: str, branch_name: str, metadata: 
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi cập nhật branch {branch_name}: {str(e)}")
+
+# ==================== AUTO-SYNC ENDPOINTS FOR REPOSITORY SELECTION ====================
+
+@sync_router.post("/github/{owner}/{repo}/sync-branches")
+async def sync_repository_branches(owner: str, repo: str, request: Request):
+    """
+    Sync branches for specific repository when user selects it
+    Auto-creates repository if not exists
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    
+    try:
+        # Get repository ID, create if not exists
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            # Auto-create repository
+            repo_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", token)
+            repo_entry = {
+                "github_id": repo_data["id"],
+                "name": repo_data["name"],
+                "owner": repo_data["owner"]["login"],
+                "description": repo_data.get("description"),
+                "full_name": repo_data.get("full_name"),
+                "default_branch": repo_data.get("default_branch", "main"),
+                "stars": repo_data.get("stargazers_count", 0),
+                "forks": repo_data.get("forks_count", 0),
+                "language": repo_data.get("language"),
+                "is_private": repo_data.get("private", False),
+                "sync_status": "auto_created"
+            }
+            await save_repository(repo_entry)
+            repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+
+        # Sync branches
+        branches_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}/branches", token)
+        
+        # Enhanced branch data with commit info
+        enhanced_branches = []
+        default_branch = None
+        
+        # Get repository info for default branch
+        try:
+            repo_info = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", token)
+            default_branch = repo_info.get("default_branch", "main")
+        except:
+            default_branch = "main"
+        
+        for branch in branches_data:
+            try:
+                # Get additional commit info for each branch
+                commit_data = await github_api_call(
+                    f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits/{branch['commit']['sha']}", 
+                    token
+                )
+                
+                enhanced_branch = {
+                    "name": branch["name"],
+                    "sha": branch["commit"]["sha"],
+                    "is_protected": branch.get("protected", False),
+                    "is_default": branch["name"] == default_branch,
+                    "repo_id": repo_id,
+                    "creator_user_id": None,  # Could enhance later
+                    "last_committer_user_id": None,  # Could enhance later
+                    "commits_count": 1,  # Basic count, could enhance
+                    "contributors_count": 1,  # Basic count, could enhance
+                    "last_commit_date": commit_data["commit"]["committer"]["date"]
+                }
+                enhanced_branches.append(enhanced_branch)
+                
+            except Exception as e:
+                logger.warning(f"Error getting commit info for branch {branch['name']}: {e}")
+                # Fallback to basic branch info
+                enhanced_branches.append({
+                    "name": branch["name"],
+                    "sha": branch["commit"]["sha"],
+                    "is_protected": branch.get("protected", False),
+                    "is_default": branch["name"] == default_branch,
+                    "repo_id": repo_id,
+                    "commits_count": 1,
+                    "contributors_count": 1
+                })        # Save branches to database
+        saved_count = await save_multiple_branches(repo_id, enhanced_branches)
+        
+        return {
+            "status": "success",
+            "repository": f"{owner}/{repo}",
+            "branches": enhanced_branches,
+            "saved_count": saved_count,
+            "message": f"Successfully synced {saved_count} branches"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error syncing branches for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync branches: {str(e)}")
+
+# ==================== HELPER FUNCTIONS ====================
+
+async def save_multiple_branches(repo_id: int, branches_list: list):
+    """Save multiple branches efficiently"""
+    if not branches_list:
+        return 0
+    
+    try:
+        from db.models.branches import branches
+        from db.database import engine
+        from sqlalchemy import insert, delete
+        
+        with engine.connect() as conn:
+            # Clear existing branches for this repository
+            delete_query = delete(branches).where(branches.c.repo_id == repo_id)
+            conn.execute(delete_query)
+            
+            # Insert new branches
+            if branches_list:
+                insert_query = insert(branches)
+                conn.execute(insert_query, branches_list)
+            
+            conn.commit()
+        
+        return len(branches_list)
+        
+    except Exception as e:
+        logger.error(f"Error saving branches: {e}")
+        return 0

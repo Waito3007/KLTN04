@@ -6,12 +6,16 @@ import {
   Avatar, 
   Space,
   message,
-  Form
+  Form,
+  Select,
+  Tooltip,
+  Divider
 } from 'antd';
 import { 
   PlusOutlined, 
   UnorderedListOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 
@@ -60,21 +64,25 @@ const ProjectTaskManager = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [form] = Form.useForm();
   const [viewMode, setViewMode] = useState(true); // true = Kanban, false = List
-  
-  // Filter states
+    // Filter states
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
 
-  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
+  // Data source preference states
+  const [repoDataSource, setRepoDataSource] = useState('auto'); // 'auto', 'database', 'github'
+  const [taskDataSource, setTaskDataSource] = useState('auto'); // 'auto', 'database', 'fallback'
+  const [collaboratorDataSource, setCollaboratorDataSource] = useState('auto'); // 'auto', 'database', 'github'  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
   const {
     selectedRepo,
+    branches,
     repositories,
     tasks,
     collaborators,
     repositoriesLoading,
     tasksLoading,
+    branchesLoading,
     dataSourceStatus,
     handleRepoChange,
     getAssigneeInfo,
@@ -82,7 +90,11 @@ const ProjectTaskManager = () => {
     updateTask,
     updateTaskStatus,
     deleteTask
-  } = useProjectData();
+  } = useProjectData({
+    repoDataSource,
+    taskDataSource,
+    collaboratorDataSource
+  });
 
   // ==================== COMPUTED VALUES ====================
   const filteredTasks = filterTasks(tasks, {
@@ -133,42 +145,111 @@ const ProjectTaskManager = () => {
       console.error('Form submission error:', error);
       message.error('Lỗi khi lưu task!');
     }
-  };
-  // ==================== UI COMPONENTS ====================
-  const DataSourceIndicator = () => (
+  };  // ==================== UI COMPONENTS ====================
+  const DataSourceControl = () => (
     <div style={{ 
-      padding: '8px 12px', 
+      padding: '12px 16px', 
       background: '#f0f8ff', 
-      borderRadius: '6px', 
-      marginBottom: '12px',
-      fontSize: '12px',
-      color: '#666'
+      borderRadius: '8px', 
+      marginBottom: '16px',
+      border: '1px solid #d9d9d9'
     }}>
-      <Space size="large">
-        <span>
-          📊 Repositories: 
-          <Tag color={dataSourceStatus.repositories === 'database' ? 'green' : 'orange'} size="small">
-            {dataSourceStatus.repositories === 'database' ? '💾 Database' : '📡 GitHub API'}
-          </Tag>
-        </span>
+      <div style={{ marginBottom: '12px', fontWeight: 'bold', color: '#1890ff' }}>
+        🎛️ Chọn nguồn dữ liệu
+      </div>
+      
+      <Space size="large" wrap>
+        {/* Repository Data Source */}
+        <div style={{ minWidth: '200px' }}>
+          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>📊 Repositories:</div>
+          <Space>
+            <Select
+              size="small"
+              value={repoDataSource}
+              onChange={setRepoDataSource}
+              style={{ width: 120 }}
+              options={[
+                { value: 'auto', label: '🔄 Tự động' },
+                { value: 'database', label: '💾 Database' },
+                { value: 'github', label: '📡 GitHub API' }
+              ]}
+            />
+            <Tag color={dataSourceStatus.repositories === 'database' ? 'green' : 'orange'} size="small">
+              {dataSourceStatus.repositories === 'database' ? '💾 DB' : '📡 API'}
+            </Tag>
+          </Space>
+        </div>
+
         {selectedRepo && (
           <>
-            <span>
-              📝 Tasks: 
-              <Tag color={dataSourceStatus.tasks === 'database' ? 'green' : 'blue'} size="small">
-                {dataSourceStatus.tasks === 'database' ? '💾 Database' : '📡 Fallback'}
-              </Tag>
-            </span>
-            <span>
-              👥 Collaborators: 
-              <Tag color={dataSourceStatus.collaborators === 'database' ? 'green' : dataSourceStatus.collaborators === 'github' ? 'orange' : 'purple'} size="small">
-                {dataSourceStatus.collaborators === 'database' ? '💾 Database' : 
-                 dataSourceStatus.collaborators === 'github' ? '📡 GitHub API' : '🔄 Mixed'}
-              </Tag>
-            </span>
+            <Divider type="vertical" style={{ height: '40px' }} />
+            
+            {/* Tasks Data Source */}
+            <div style={{ minWidth: '180px' }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>📝 Tasks:</div>
+              <Space>
+                <Select
+                  size="small"
+                  value={taskDataSource}
+                  onChange={setTaskDataSource}
+                  style={{ width: 120 }}
+                  options={[
+                    { value: 'auto', label: '🔄 Tự động' },
+                    { value: 'database', label: '💾 Database' },
+                    { value: 'fallback', label: '🔄 Fallback' }
+                  ]}
+                />
+                <Tag color={dataSourceStatus.tasks === 'database' ? 'green' : 'blue'} size="small">
+                  {dataSourceStatus.tasks === 'database' ? '💾 DB' : '� FB'}
+                </Tag>
+              </Space>
+            </div>
+
+            <Divider type="vertical" style={{ height: '40px' }} />
+            
+            {/* Collaborators Data Source */}
+            <div style={{ minWidth: '200px' }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>👥 Collaborators:</div>
+              <Space>
+                <Select
+                  size="small"
+                  value={collaboratorDataSource}
+                  onChange={setCollaboratorDataSource}
+                  style={{ width: 120 }}
+                  options={[
+                    { value: 'auto', label: '🔄 Tự động' },
+                    { value: 'database', label: '💾 Database' },
+                    { value: 'github', label: '📡 GitHub API' }
+                  ]}
+                />
+                <Tag 
+                  color={
+                    dataSourceStatus.collaborators === 'database' ? 'green' : 
+                    dataSourceStatus.collaborators === 'github' ? 'orange' : 'purple'
+                  } 
+                  size="small"
+                >
+                  {dataSourceStatus.collaborators === 'database' ? '💾 DB' : 
+                   dataSourceStatus.collaborators === 'github' ? '📡 API' : '🔄 Mixed'}
+                </Tag>
+              </Space>
+            </div>
           </>
         )}
       </Space>
+      
+      <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
+        💡 Chọn "Tự động" để hệ thống tự chọn nguồn tốt nhất, hoặc chọn nguồn cụ thể
+        <Button 
+          size="small" 
+          type="link" 
+          icon={<ReloadOutlined />}
+          onClick={() => window.location.reload()}
+          style={{ marginLeft: '8px' }}
+        >
+          Tải lại
+        </Button>
+      </div>
     </div>
   );
 
@@ -205,14 +286,16 @@ const ProjectTaskManager = () => {
         )
       }
     >
-      <DataSourceIndicator />
+      <DataSourceControl />
       
-      <div style={{ marginBottom: 16 }}>
-        <RepoSelector 
+      <div style={{ marginBottom: 16 }}>        <RepoSelector 
           repositories={repositories}
           selectedRepo={selectedRepo}
           loading={repositoriesLoading}
           handleRepoChange={handleRepoChange}
+          branches={branches}
+          collaborators={collaborators}
+          branchesLoading={branchesLoading}
         />
       </div>
       

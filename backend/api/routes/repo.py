@@ -4,8 +4,10 @@ import httpx
 from typing import Optional, List
 from services.repo_service import (
     save_repository, fetch_repo_from_github, fetch_repo_from_database,
-    get_user_repos_from_database, get_repositories_by_owner, get_repository_stats
+    get_user_repos_from_database, get_repositories_by_owner, get_repository_stats,
+    get_repo_id_by_owner_and_name
 )
+from services.collaborator_service import get_collaborators_by_repo
 
 repo_router = APIRouter()
 
@@ -110,3 +112,22 @@ async def save_repo(owner: str, repo: str, request: Request):
         return {"message": f"Repository {owner}/{repo} saved successfully!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving repository: {str(e)}")
+
+# Endpoint lấy collaborators từ database
+@repo_router.get("/github/{owner}/{repo}/collaborators")
+async def get_repo_collaborators(owner: str, repo: str):
+    """Fetch collaborators for a repository from database"""
+    try:
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found in database")
+        
+        collaborators = await get_collaborators_by_repo(repo_id)
+        
+        return {
+            "repository": f"{owner}/{repo}",
+            "collaborators": collaborators,
+            "count": len(collaborators)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching collaborators: {str(e)}")

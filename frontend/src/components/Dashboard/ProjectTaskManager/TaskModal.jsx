@@ -11,7 +11,12 @@ const TaskModal = ({
   handleTaskSubmit,
   setIsModalVisible,
   collaborators
-}) => (
+}) => {
+  console.log('🎯 TaskModal rendered with collaborators:', collaborators);
+  console.log('🎯 TaskModal collaborators type:', typeof collaborators);
+  console.log('🎯 TaskModal collaborators isArray:', Array.isArray(collaborators));
+  
+  return (
   <Modal
     title={editingTask ? "Chỉnh sửa Task" : "Tạo Task Mới"}
     open={isModalVisible}
@@ -50,7 +55,7 @@ const TaskModal = ({
             option.children.props.children[1].toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
         >
-          {collaborators.map(collab => (
+          {Array.isArray(collaborators) && collaborators.map(collab => (
             <Option key={collab.login} value={collab.login}>
               <Space>
                 <Avatar src={collab.avatar_url} size="small" />
@@ -96,12 +101,12 @@ const TaskModal = ({
             Hủy
           </Button>
           <Button type="primary" htmlType="submit">
-            {editingTask ? 'Cập nhật' : 'Tạo mới'}
-          </Button>
+            {editingTask ? 'Cập nhật' : 'Tạo mới'}          </Button>
         </Space>
       </Form.Item>
     </Form>
   </Modal>
-);
+  );
+};
 
 export default TaskModal;
