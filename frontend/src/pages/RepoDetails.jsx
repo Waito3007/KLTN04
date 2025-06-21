@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { message, Button, Card, Typography, Alert, Progress } from "antd";
+import { message, Button, Card, Typography, Alert, Progress, Row, Col } from "antd";
 import { SyncOutlined, SaveOutlined, GithubOutlined } from "@ant-design/icons";
 import BranchSelector from "../components/Branchs/BranchSelector";
+import BranchCommitList from "../components/Branchs/BranchCommitList";
 import CommitList from "../components/commits/CommitList";
 import axios from "axios";
 
@@ -14,6 +15,15 @@ const RepoDetails = () => {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0); // For refreshing child components
+
+  // Handle branch change with optional refresh
+  const handleBranchChange = (newBranch, shouldRefresh = false) => {
+    setBranch(newBranch);
+    if (shouldRefresh) {
+      setRefreshKey(prev => prev + 1); // Trigger refresh
+    }
+  };
 
   // Sync repository trong background không block UI
   const syncRepositoryInBackground = useCallback(async () => {
@@ -117,7 +127,6 @@ const RepoDetails = () => {
       setLoading(false);
     }
   };
-
   const saveCommits = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -125,17 +134,26 @@ const RepoDetails = () => {
       return;
     }
 
+    if (!branch) {
+      message.error("Vui lòng chọn branch trước!");
+      return;
+    }
+
     try {
-      await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/save-commits`,
-        { branch },
+      const response = await axios.post(
+        `http://localhost:8000/api/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
+        {},
         {
           headers: {
             Authorization: `token ${token}`,
           },
         }
       );
-      message.success("Lưu commit thành công!");
+      
+      const { stats } = response.data;
+      message.success(
+        `Đồng bộ thành công! ${stats.new_commits_saved} commits mới được lưu cho branch "${branch}"`
+      );
     } catch (error) {
       console.error("Lỗi khi lưu commit:", error);
       message.error("Không thể lưu commit!");
@@ -191,15 +209,29 @@ const RepoDetails = () => {
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
-          />
-        )}
-
-        <BranchSelector owner={owner} repo={repo} onBranchChange={setBranch} />
+          />        )}        <BranchSelector owner={owner} repo={repo} onBranchChange={handleBranchChange} />
       </Card>
 
-      <div style={{ marginTop: 16 }}>
-        <CommitList owner={owner} repo={repo} branch={branch} />
-      </div>
+      <Row gutter={16} style={{ marginTop: 16 }}>
+        <Col xs={24} lg={12}>
+          <BranchCommitList 
+            key={`branch-commits-${refreshKey}`}
+            owner={owner} 
+            repo={repo} 
+            selectedBranch={branch} 
+          />
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card title="Commits từ GitHub API (Real-time)">
+            <CommitList 
+              key={`real-time-commits-${refreshKey}`}
+              owner={owner} 
+              repo={repo} 
+              branch={branch} 
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

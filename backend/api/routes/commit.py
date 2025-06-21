@@ -837,3 +837,172 @@ async def get_repository_commits_from_github(
         raise HTTPException(status_code=500, detail=f"Failed to fetch commits from GitHub: {str(e)}")
 
 # ==================== END GITHUB DIRECT FETCH ENDPOINTS ====================
+
+# ==================== BRANCH-SPECIFIC SYNC ENDPOINT ====================
+
+@commit_router.post("/github/{owner}/{repo}/branches/{branch_name}/sync-commits")
+async def sync_branch_commits_enhanced(
+    owner: str,
+    repo: str,
+    branch_name: str,
+    request: Request,
+    force_refresh: bool = Query(False, description="Force refresh all commits even if they exist"),
+    per_page: int = Query(100, ge=1, le=100, description="Number of commits per page"),
+    max_pages: int = Query(10, ge=1, le=50, description="Maximum pages to fetch"),
+    include_stats: bool = Query(True, description="Include detailed commit statistics")
+):
+    """
+    Đồng bộ commits cho một branch cụ thể với enhanced features
+    
+    Endpoint này được thiết kế đặc biệt cho BranchSelector component:
+    - Sync commits cho branch được chọn
+    - Hỗ trợ force refresh để cập nhật dữ liệu
+    - Bao gồm thống kê chi tiết cho commit analysis
+    - Tối ưu hóa cho UI responsiveness
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
+    
+    try:
+        logger.info(f"Starting enhanced commit sync for {owner}/{repo}:{branch_name}")
+        
+        # 1. Validate repository exists
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository not found in database")
+        
+        # 2. Get or create branch info
+        from services.branch_service import get_branches_by_repo_id, save_branch
+        branches = await get_branches_by_repo_id(repo_id)
+        branch_id = None
+        
+        for branch in branches:
+            if branch['name'] == branch_name:
+                branch_id = branch['id']
+                break
+        
+        # Create branch if not exists
+        if not branch_id:
+            logger.info(f"Branch {branch_name} not found, creating new branch record")
+            try:
+                # Fetch branch info from GitHub
+                branch_url = f"https://api.github.com/repos/{owner}/{repo}/branches/{branch_name}"
+                branch_data = await github_api_call(branch_url, token)
+                
+                new_branch = {
+                    "name": branch_name,
+                    "repo_id": repo_id,
+                    "sha": branch_data.get("commit", {}).get("sha"),
+                    "is_protected": branch_data.get("protected", False)
+                }
+                await save_branch(new_branch)
+                
+                # Re-fetch to get branch_id
+                branches = await get_branches_by_repo_id(repo_id)
+                for branch in branches:
+                    if branch['name'] == branch_name:
+                        branch_id = branch['id']
+                        break
+                        
+            except Exception as e:
+                logger.warning(f"Could not create branch record: {e}")
+        
+        # 3. Check existing commits if not force refresh
+        existing_count = 0
+        if not force_refresh:
+            from services.commit_service import get_commits_by_branch_safe
+            existing_commits = await get_commits_by_branch_safe(repo_id, branch_name, 1, 0)
+            existing_count = len(existing_commits) if existing_commits else 0
+        
+        # 4. Fetch commits from GitHub with enhanced data
+        all_commits = []
+        page = 1
+        
+        while page <= max_pages:
+            logger.info(f"Fetching commits page {page}/{max_pages} for branch {branch_name}")
+            
+            params = {
+                "sha": branch_name,
+                "per_page": per_page,
+                "page": page
+            }
+            
+            url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+            commits_data = await github_api_call(url, token, params)
+            
+            if not commits_data:
+                break
+            
+            # Enhance commits with detailed stats if requested
+            if include_stats:
+                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats...")
+                for commit in commits_data:
+                    sha = commit.get("sha")
+                    if sha:
+                        try:
+                            # Fetch detailed commit info including stats
+                            detail_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+                            detailed_commit = await github_api_call(detail_url, token)
+                            
+                            if detailed_commit:
+                                commit["stats"] = detailed_commit.get("stats", {})
+                                commit["files"] = detailed_commit.get("files", [])
+                                
+                        except Exception as e:
+                            logger.warning(f"Could not fetch details for commit {sha}: {e}")
+                        
+                        # Small delay to avoid rate limiting
+                        await asyncio.sleep(0.05)
+            
+            all_commits.extend(commits_data)
+            
+            if len(commits_data) < per_page:
+                break
+                
+            page += 1
+            await asyncio.sleep(0.1)
+        
+        logger.info(f"Fetched {len(all_commits)} commits from GitHub for branch {branch_name}")
+        
+        # 5. Process and save commits with full model data
+        saved_count = await save_multiple_commits(
+            commits_data=all_commits,
+            repo_id=repo_id,
+            branch_name=branch_name,
+            branch_id=branch_id
+        )
+        
+        logger.info(f"Successfully saved {saved_count} new commits for branch {branch_name}")
+        
+        # 6. Get final stats
+        total_commits_in_db = existing_count + saved_count
+        
+        return {
+            "success": True,
+            "message": f"Successfully synced commits for branch '{branch_name}'",
+            "repository": f"{owner}/{repo}",
+            "branch": branch_name,
+            "branch_id": branch_id,
+            "stats": {
+                "total_fetched_from_github": len(all_commits),
+                "new_commits_saved": saved_count,
+                "existing_commits_before_sync": existing_count,
+                "total_commits_in_database": total_commits_in_db,
+                "pages_processed": min(page, max_pages),
+                "enhanced_with_stats": include_stats,
+                "force_refresh_enabled": force_refresh
+            },
+            "next_actions": {
+                "view_commits": f"/api/commits/{owner}/{repo}/branches/{branch_name}/commits",
+                "analyze_commits": f"/api/ai/analyze-repo/{owner}/{repo}?branch={branch_name}"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error syncing commits for branch {branch_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Branch commit sync failed: {str(e)}")
+
+# ==================== END BRANCH-SPECIFIC SYNC ENDPOINT ====================
