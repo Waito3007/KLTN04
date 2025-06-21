@@ -4,7 +4,6 @@ from core.lifespan import lifespan
 from core.config import setup_middlewares
 from core.logger import setup_logger
 from services.ai_service import router as ai_router
-from api.routes.commit_routes import router as commit_router
 
 from api.routes.auth import auth_router
 from api.routes.github import github_router
@@ -23,7 +22,6 @@ app.include_router(github_router, prefix="/api")
 app.include_router(projects_router, prefix="/api")
 app.include_router(han_ai_router, prefix="/api")
 app.include_router(ai_router, prefix="/ai")  # giữ lại nếu cần legacy
-app.include_router(commit_router)
 
 @app.get("/")
 def root():

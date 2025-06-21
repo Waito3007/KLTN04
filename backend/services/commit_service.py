@@ -1,13 +1,13 @@
 from db.models.commits import commits
 from db.database import database
 from sqlalchemy import select, insert, update, and_
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
 
 def parse_github_datetime(date_str):
-    """Convert GitHub API datetime string to Python datetime object"""
+    """Convert GitHub API datetime string to Python datetime object (timezone-naive UTC)"""
     if not date_str:
         return None
     
@@ -16,10 +16,28 @@ def parse_github_datetime(date_str):
         if date_str.endswith('Z'):
             date_str = date_str[:-1] + '+00:00'  # Replace Z with +00:00 for proper parsing
         
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        # Parse as timezone-aware datetime first
+        dt_aware = datetime.fromisoformat(date_str)
+        
+        # Convert to UTC and make timezone-naive for database storage
+        dt_utc = dt_aware.astimezone(timezone.utc)
+        return dt_utc.replace(tzinfo=None)
+        
     except (ValueError, AttributeError) as e:
         logger.warning(f"Failed to parse datetime '{date_str}': {e}")
         return None
+
+def normalize_datetime(dt):
+    """Normalize datetime to timezone-naive UTC for consistent database storage"""
+    if dt is None:
+        return None
+    
+    if dt.tzinfo is not None:
+        # Convert timezone-aware to UTC and make timezone-naive
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+    else:
+        # Already timezone-naive, assume it's UTC
+        return dt
 
 async def save_commit(commit_data):
     """Save commit with full data model support including new fields"""
@@ -30,9 +48,7 @@ async def save_commit(commit_data):
 
         if existing_commit:
             logger.info(f"Commit {commit_data['sha']} already exists, skipping")
-            return existing_commit.id
-
-        # Prepare full commit entry with all model fields
+            return existing_commit.id        # Prepare full commit entry with all model fields
         commit_entry = {
             "sha": commit_data["sha"],
             "message": commit_data.get("message", ""),
@@ -45,8 +61,8 @@ async def save_commit(commit_data):
             "branch_name": commit_data.get("branch_name"),
             "author_role_at_commit": commit_data.get("author_role_at_commit"),
             "author_permissions_at_commit": commit_data.get("author_permissions_at_commit"),
-            "date": parse_github_datetime(commit_data.get("date")),
-            "committer_date": parse_github_datetime(commit_data.get("committer_date")),
+            "date": normalize_datetime(parse_github_datetime(commit_data.get("date"))),
+            "committer_date": normalize_datetime(parse_github_datetime(commit_data.get("committer_date"))),
             "insertions": commit_data.get("insertions"),
             "deletions": commit_data.get("deletions"),
             "files_changed": commit_data.get("files_changed"),
@@ -106,8 +122,7 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
         author_info = commit_info.get("author", {})
         committer_info = commit_info.get("committer", {})
         stats = commit_data.get("stats", {})
-        
-        # Check if this is a merge commit
+          # Check if this is a merge commit
         parents = commit_data.get("parents", [])
         is_merge = len(parents) > 1
         parent_sha = parents[0].get("sha") if parents else None
@@ -122,8 +137,8 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
             "repo_id": repo_id,
             "branch_id": branch_id,
             "branch_name": branch_name,
-            "date": parse_github_datetime(author_info.get("date")),
-            "committer_date": parse_github_datetime(committer_info.get("date")),
+            "date": normalize_datetime(parse_github_datetime(author_info.get("date"))),
+            "committer_date": normalize_datetime(parse_github_datetime(committer_info.get("date"))),
             "insertions": stats.get("additions"),
             "deletions": stats.get("deletions"),
             "files_changed": len(commit_data.get("files", [])) if commit_data.get("files") else None,

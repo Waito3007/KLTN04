@@ -106,7 +106,6 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [syncLoading, setSyncLoading] = useState(false);
   const [commitStats, setCommitStats] = useState(null);
-  const [isInitialized, setIsInitialized] = useState(false); // Prevent multiple initializations
 
   // Define fetchCommitStats first using useCallback
   const fetchCommitStats = useCallback(async (branchName) => {
@@ -144,14 +143,13 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
               Authorization: `token ${token}`,
             },
           }
-        );        setBranches(response.data);
-        if (response.data.length > 0 && !isInitialized) {
-          const defaultBranch = response.data[0].name;
-          console.log('BranchSelector: Initializing with default branch:', defaultBranch);
-          setSelectedBranch(defaultBranch);
-          onBranchChange(defaultBranch);
-          fetchCommitStats(defaultBranch);
-          setIsInitialized(true);
+        );
+        setBranches(response.data);
+        if (response.data.length > 0) {
+          setSelectedBranch(response.data[0].name);
+          onBranchChange(response.data[0].name);
+          // Fetch commit stats for default branch
+          fetchCommitStats(response.data[0].name);
         }
       } catch (err) {
         console.error(err);
@@ -159,16 +157,12 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
       } finally {
         setLoading(false);
       }
-    };    fetchBranches();
-  }, [owner, repo, onBranchChange, fetchCommitStats, isInitialized]);  const handleBranchChange = (value) => {
-    console.log('BranchSelector: Changing branch from', selectedBranch, 'to', value);
-    console.log('Available branches:', branches);
-    
-    if (value === selectedBranch) {
-      console.log('BranchSelector: Same branch selected, skipping');
-      return;
-    }
-    
+    };
+
+    fetchBranches();
+  }, [owner, repo, onBranchChange, fetchCommitStats]);
+
+  const handleBranchChange = (value) => {
     setSelectedBranch(value);
     onBranchChange(value);
     fetchCommitStats(value);
@@ -265,18 +259,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     }
   };
 
-  if (loading) {
-    console.log('BranchSelector: Loading...');
-    return <Spin size="small" />;
-  }
-
-  if (!branches || branches.length === 0) {
-    console.log('BranchSelector: No branches available');
-  } else {
-    console.log('BranchSelector: Available branches:', branches.map(b => b.name));
-  }
-
-  console.log('BranchSelector: Current selected branch:', selectedBranch);
+  if (loading) return <Spin size="small" />;
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -286,11 +269,12 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
             <BranchesOutlined />
             <Text strong>Branch:</Text>
           </BranchTag>
-            <StyledSelect
+          
+          <StyledSelect
             value={selectedBranch}
             onChange={handleBranchChange}
             suffixIcon={<GithubOutlined style={{ color: '#1890ff' }} />}
-            popupMatchSelectWidth={false}
+            dropdownMatchSelectWidth={false}
           >
             {branches.map((branch) => (
               <Option key={branch.name} value={branch.name}>
