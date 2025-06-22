@@ -10,7 +10,7 @@ from api.routes.github import github_router
 from api.routes.projects import router as projects_router
 from api.routes.ai import ai_router as han_ai_router
 from api.routes.sync import sync_router
-from api.routes.contributors import contributors_router
+from api.routes.contributors import router as contributors_router
 
 setup_logger()  # Bật logger trước khi chạy app
 
@@ -24,7 +24,7 @@ app.include_router(github_router, prefix="/api")
 app.include_router(projects_router, prefix="/api")
 app.include_router(han_ai_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
-app.include_router(contributors_router, prefix="/api")
+app.include_router(contributors_router, prefix="/api/contributors")
 app.include_router(ai_router, prefix="/ai")  # giữ lại nếu cần legacy
 
 @app.get("/")

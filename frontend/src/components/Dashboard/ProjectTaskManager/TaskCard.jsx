@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Space, Button, Tooltip, Tag, Avatar, Select } from 'antd';
 import { EditOutlined, DeleteOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
+import { getAvatarUrl } from '../../../utils/taskUtils.jsx';
 import styled from 'styled-components';
 
 const { Option } = Select;
@@ -63,21 +64,25 @@ const TaskCard = ({
         {task.description}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Space>
-          <Avatar 
-            src={assigneeInfo.avatar_url} 
+        <Space>          <Avatar 
+            src={getAvatarUrl(assigneeInfo.avatar_url, assigneeInfo.login || assigneeInfo.github_username)} 
             icon={<UserOutlined />}
             size="small"
-          />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 12, fontWeight: 500 }}>{assigneeInfo.login}</span>
-            {assigneeInfo.type && (
+          /><div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 12, fontWeight: 500 }}>
+              {assigneeInfo.display_name || assigneeInfo.login || assigneeInfo.github_username}
+            </span>
+            {(assigneeInfo.type || assigneeInfo.is_owner || assigneeInfo.role) && (
               <Tag 
                 size="small" 
-                color={assigneeInfo.type === 'Owner' ? 'gold' : 'blue'}
+                color={
+                  assigneeInfo.is_owner ? 'gold' : 
+                  assigneeInfo.type === 'Owner' ? 'gold' : 
+                  'blue'
+                }
                 style={{ fontSize: '9px', marginTop: 2 }}
               >
-                {assigneeInfo.type}
+                {assigneeInfo.is_owner ? 'Owner' : assigneeInfo.type || assigneeInfo.role}
               </Tag>
             )}
           </div>

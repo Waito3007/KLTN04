@@ -47,9 +47,7 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
       message.error(error.message);
     } finally {
       setLoading(false);
-    }  }, [dataSourcePreference]);
-
-  useEffect(() => {
+    }  }, [dataSourcePreference]);  useEffect(() => {
     fetchRepositories();
   }, [fetchRepositories]);
 
@@ -174,9 +172,7 @@ export const useTasks = (selectedRepo, dataSourcePreference = 'auto') => {
       setTasks(prev => prev.filter(task => task.id !== taskId));
       message.success('Xóa task thành công (local)!');
     }
-  }, [selectedRepo, fetchTasks]);
-
-  useEffect(() => {
+  }, [selectedRepo, fetchTasks]);  useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
@@ -193,106 +189,129 @@ export const useTasks = (selectedRepo, dataSourcePreference = 'auto') => {
 };
 
 // ==================== COLLABORATORS HOOK ====================
-export const useCollaborators = (selectedRepo, dataSourcePreference = 'auto') => {
+export const useCollaborators = (selectedRepo) => {
   const [collaborators, setCollaborators] = useState([]);
   const [dataSource, setDataSource] = useState('mixed');
-
-  const fetchCollaborators = useCallback(async () => {
+  const [syncStatus, setSyncStatus] = useState(null);  const fetchCollaborators = useCallback(async () => {
     if (!selectedRepo) {
+      console.log('🚫 No selected repo, clearing collaborators');
       setCollaborators([]);
+      setSyncStatus(null);
       return;
     }
 
-    console.log(`🔄 fetchCollaborators called for ${selectedRepo.owner.login}/${selectedRepo.name}`, {
-      dataSourcePreference,
-      selectedRepo: selectedRepo.owner.login + '/' + selectedRepo.name
-    });
+    const repoKey = `${selectedRepo.owner.login}/${selectedRepo.name}`;
+    console.log(`🔄 Fetching collaborators for ${repoKey}`);
 
     try {
-      let result;
+      // 📊 Chỉ lấy từ database (đơn giản)
+      const result = await collaboratorAPI.getCollaborators(
+        selectedRepo.owner.login, 
+        selectedRepo.name
+      );
       
-      // Handle forced data source preference
-      if (dataSourcePreference === 'database') {
-        console.log('📊 Using database preference');
-        const data = await collaboratorAPI.getFromBackend(selectedRepo.owner.login, selectedRepo.name);
-        console.log('📊 Database result:', data);
-        result = { data, source: 'database' };
-      } else if (dataSourcePreference === 'github') {
-        console.log('📡 Using GitHub preference');
-        const contributors = await collaboratorAPI.getFromGitHub(selectedRepo.owner.login, selectedRepo.name);
-        const ownerEntry = {
-          login: selectedRepo.owner.login,
-          avatar_url: selectedRepo.owner.avatar_url,
-          type: 'Owner',
-          contributions: 0
-        };
-        const uniqueCollaborators = [
-          ownerEntry,
-          ...contributors.filter(c => c.login !== selectedRepo.owner.login)
-        ];
-        result = { data: uniqueCollaborators, source: 'github' };
-      } else {
-        console.log('🔄 Using auto/intelligent mode');
-        // Auto mode - intelligent fallback
-        result = await collaboratorAPI.getIntelligent(
-          selectedRepo.owner.login,
-          selectedRepo.name,
-          selectedRepo.owner
-        );
-        console.log('🔄 Intelligent result:', result);
-      }
+      console.log(`📊 Result for ${repoKey}:`, result);
       
-      console.log(`🎯 Setting collaborators:`, result.data);
-      setCollaborators(result.data);
-      setDataSource(result.source);
+      setCollaborators(result.collaborators);
+      setDataSource('database');
+      setSyncStatus({
+        hasSyncedData: result.hasSyncedData,
+        message: result.message
+      });
       
-      console.log(`✅ Loaded ${result.data.length} collaborators from ${result.source}`);
+      console.log(`✅ Loaded ${result.collaborators.length} collaborators for ${repoKey}`);
     } catch (error) {
-      console.error('❌ Error fetching collaborators:', error);
+      console.error(`❌ Error fetching collaborators for ${repoKey}:`, error);
       setCollaborators([]);
+      setSyncStatus({
+        hasSyncedData: false,
+        message: 'Không thể tải collaborators. Vui lòng thử lại.'
+      });
     }
-  }, [selectedRepo, dataSourcePreference]);
-
-  useEffect(() => {
+  }, [selectedRepo]);  useEffect(() => {
     fetchCollaborators();
-  }, [fetchCollaborators]);
-
-  // Utility function để get assignee info
+  }, [fetchCollaborators]);  // Utility function để get assignee info với fallback đến current user
   const getAssigneeInfo = useCallback((assigneeLogin) => {
-    return collaborators.find(c => c.login === assigneeLogin) || 
-           { login: assigneeLogin, avatar_url: null };
+    // Tìm trong collaborators trước
+    const found = collaborators.find(c => 
+      c.login === assigneeLogin || 
+      c.github_username === assigneeLogin
+    );
+    
+    if (found) {
+      return found;
+    }
+    
+    // Fallback đến current user nếu assignee là chính mình
+    try {
+      const currentUserProfile = JSON.parse(localStorage.getItem('github_profile') || '{}');
+      if (currentUserProfile.login === assigneeLogin) {
+        return {
+          login: currentUserProfile.login,
+          github_username: currentUserProfile.login,
+          avatar_url: currentUserProfile.avatar_url,
+          display_name: currentUserProfile.name || currentUserProfile.login
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to parse github_profile from localStorage:', error);
+    }
+    
+    // Default fallback
+    return { 
+      login: assigneeLogin, 
+      github_username: assigneeLogin,
+      avatar_url: null, 
+      display_name: assigneeLogin 
+    };
   }, [collaborators]);
+  // Function to manually clear collaborators data
+  const clearCollaborators = useCallback(() => {
+    console.log('🧹 Manually clearing collaborators data');
+    setCollaborators([]);
+    setSyncStatus(null);
+    setDataSource('mixed');
+  }, []);  // 🔄 Sync collaborators từ GitHub 
+  const syncCollaborators = useCallback(async () => {
+    if (!selectedRepo) return;
+
+    const repoKey = `${selectedRepo.owner.login}/${selectedRepo.name}`;
+    console.log(`🔄 Syncing collaborators for ${repoKey}`);
+
+    try {
+      await collaboratorAPI.sync(selectedRepo.owner.login, selectedRepo.name);
+      console.log(`✅ Sync completed for ${repoKey}`);
+      
+      // Refresh data sau khi sync
+      await fetchCollaborators();
+    } catch (error) {
+      console.error(`❌ Sync failed for ${repoKey}:`, error);
+      throw error;
+    }
+  }, [selectedRepo, fetchCollaborators]);
 
   return {
     collaborators,
     dataSource,
+    syncStatus,
     getAssigneeInfo,
+    clearCollaborators,
+    syncCollaborators,
     refetch: fetchCollaborators
   };
 };
 
 // ==================== COMPOSITE HOOK FOR ALL PROJECT DATA ====================
-export const useProjectData = (preferences = {}) => {
-  const {
-    repoDataSource = 'auto',
-    taskDataSource = 'auto', 
-    collaboratorDataSource = 'auto'
-  } = preferences;
-  
+export const useProjectData = (dataSourcePreference = 'database') => {
+  // Individual hooks
+  const repositories = useRepositories(dataSourcePreference);
   const [selectedRepo, setSelectedRepo] = useState(null);
+  const tasks = useTasks(selectedRepo, 'database');
+  const collaborators = useCollaborators(selectedRepo);
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
-  
-  const repositories = useRepositories(repoDataSource);
-  const tasks = useTasks(selectedRepo, taskDataSource);
-  const collaborators = useCollaborators(selectedRepo, collaboratorDataSource);
 
-  // Computed data source status
-  const dataSourceStatus = {
-    repositories: repositories.dataSource,
-    tasks: tasks.dataSource,
-    collaborators: collaborators.dataSource
-  };  // New function: Auto-sync repository data
+  // New function: Auto-sync repository data
   const syncRepositoryData = useCallback(async (repo) => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
@@ -314,24 +333,18 @@ export const useProjectData = (preferences = {}) => {
         const branchData = await branchResponse.json();
         setBranches(branchData.branches || []);
         message.success(`✅ Đã sync ${branchData.branches?.length || 0} branches`);
-      }
-
-      // 2. Sync collaborators to database  
+      }      // 2. Sync collaborators to database  
       console.log(`👥 Syncing collaborators for ${repo.owner.login}/${repo.name}`);
-      const collabResponse = await fetch(`http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-collaborators`, {
-        method: 'POST', 
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
       
-      if (collabResponse.ok) {
-        const collabData = await collabResponse.json();
-        message.success(`✅ Đã sync ${collabData.saved_collaborators_count || 0} collaborators`);
+      try {
+        const collabResult = await collaboratorAPI.sync(repo.owner.login, repo.name);
+        message.success(`✅ Đã sync ${collabResult.saved_collaborators_count || 0} collaborators`);
         
         // Refresh collaborators data
         await collaborators.refetch();
+      } catch (collabError) {
+        console.error('Failed to sync collaborators:', collabError);
+        message.warning('⚠️ Không thể sync collaborators từ GitHub');
       }
 
     } catch (error) {
@@ -352,8 +365,7 @@ export const useProjectData = (preferences = {}) => {
       
       // Trigger background sync for branches & collaborators
       await syncRepositoryData(repo);
-    }
-  }, [repositories.repositories, syncRepositoryData]);
+    }  }, [repositories.repositories, syncRepositoryData]);
 
   return {
     // States
@@ -364,14 +376,10 @@ export const useProjectData = (preferences = {}) => {
     repositories: repositories.repositories,
     tasks: tasks.tasks,
     collaborators: collaborators.collaborators,
-    
-    // Loading states
+      // Loading states
     repositoriesLoading: repositories.loading,
     tasksLoading: tasks.loading,
     branchesLoading,
-    
-    // Data sources
-    dataSourceStatus,
     
     // Actions
     handleRepoChange,
@@ -382,11 +390,12 @@ export const useProjectData = (preferences = {}) => {
     updateTask: tasks.updateTask,
     updateTaskStatus: tasks.updateTaskStatus,
     deleteTask: tasks.deleteTask,
-    
-    // Refresh functions
+
+    // Manual refresh functions (no auto-sync)
     refetchRepositories: repositories.refetch,
     refetchTasks: tasks.refetch,
     refetchCollaborators: collaborators.refetch,
-    syncRepositoryData
+    syncRepositoryData,
+    syncCollaborators: collaborators.syncCollaborators
   };
 };

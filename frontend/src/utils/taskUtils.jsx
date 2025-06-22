@@ -6,30 +6,41 @@ import {
   CheckCircleOutlined 
 } from '@ant-design/icons';
 
+// ==================== AVATAR UTILITIES ====================
+export const getDefaultAvatarUrl = (username) => {
+  // Generate default avatar using GitHub's default avatar pattern or a placeholder service
+  return `https://github.com/identicons/${username}.png`;
+};
+
+export const getAvatarUrl = (avatarUrl, username) => {
+  // Return provided avatar or fallback to default
+  return avatarUrl || getDefaultAvatarUrl(username);
+};
+
 // ==================== TASK STATUS UTILITIES ====================
 export const getStatusIcon = (status) => {
   const statusMap = {
-    'todo': React.createElement(ClockCircleOutlined, { style: { color: '#faad14' } }),
-    'in_progress': React.createElement(ExclamationCircleOutlined, { style: { color: '#1890ff' } }),
-    'done': React.createElement(CheckCircleOutlined, { style: { color: '#52c41a' } }),
+    'TODO': React.createElement(ClockCircleOutlined, { style: { color: '#faad14' } }),
+    'IN_PROGRESS': React.createElement(ExclamationCircleOutlined, { style: { color: '#1890ff' } }),
+    'DONE': React.createElement(CheckCircleOutlined, { style: { color: '#52c41a' } }),
   };
   return statusMap[status] || React.createElement(ClockCircleOutlined);
 };
 
 export const getStatusText = (status) => {
   const statusMap = {
-    'todo': 'Chờ thực hiện',
-    'in_progress': 'Đang thực hiện',
-    'done': 'Hoàn thành'
+    'TODO': 'Chờ thực hiện',
+    'IN_PROGRESS': 'Đang thực hiện',
+    'DONE': 'Hoàn thành'
   };
   return statusMap[status] || 'Không xác định';
 };
 
 export const getStatusColor = (status) => {
   const colorMap = {
-    'todo': '#faad14',
-    'in_progress': '#1890ff', 
-    'done': '#52c41a'
+    'TODO': '#faad14',
+    'IN_PROGRESS': '#1890ff', 
+    'DONE': '#52c41a'
   };
   return colorMap[status] || '#d9d9d9';
 };
@@ -90,9 +101,9 @@ export const filterTasks = (tasks, filters) => {
 // ==================== TASK STATISTICS ====================
 export const calculateTaskStats = (tasks) => {
   const total = tasks.length;
-  const completed = tasks.filter(t => t.status === 'done').length;
-  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
-  const todo = tasks.filter(t => t.status === 'todo').length;
+  const completed = tasks.filter(t => t.status === 'DONE').length;
+  const inProgress = tasks.filter(t => t.status === 'IN_PROGRESS').length;
+  const todo = tasks.filter(t => t.status === 'TODO').length;
   const highPriority = tasks.filter(t => t.priority === 'high').length;
   
   return {
@@ -108,9 +119,9 @@ export const calculateTaskStats = (tasks) => {
 // ==================== TASK GROUPING ====================
 export const groupTasksByStatus = (tasks) => {
   return {
-    todo: tasks.filter(t => t.status === 'todo'),
-    in_progress: tasks.filter(t => t.status === 'in_progress'),
-    done: tasks.filter(t => t.status === 'done')
+    todo: tasks.filter(t => t.status === 'TODO'),
+    inProgress: tasks.filter(t => t.status === 'IN_PROGRESS'),
+    done: tasks.filter(t => t.status === 'DONE')
   };
 };
 
@@ -191,7 +202,7 @@ export const formatTaskForAPI = (formValues) => {
   return {
     ...formValues,
     due_date: formValues.dueDate ? formValues.dueDate.format('YYYY-MM-DD') : null,
-    status: formValues.status || 'todo'
+    status: formValues.status || 'TODO'
   };
 };
 
@@ -209,11 +220,11 @@ export const formatTaskForForm = (task) => {
 // ==================== TASK OPERATIONS ====================
 export const getNextStatus = (currentStatus) => {
   const statusFlow = {
-    'todo': 'in_progress',
-    'in_progress': 'done',
-    'done': 'todo' // Reset cycle
+    'TODO': 'IN_PROGRESS',
+    'IN_PROGRESS': 'DONE',
+    'DONE': 'TODO' // Reset cycle
   };
-  return statusFlow[currentStatus] || 'todo';
+  return statusFlow[currentStatus] || 'TODO';
 };
 
 export const canEditTask = (task, currentUser) => {
@@ -237,6 +248,8 @@ export const getTaskDeadlineStatus = (dueDate) => {
 };
 
 export default {
+  getDefaultAvatarUrl,
+  getAvatarUrl,
   getStatusIcon,
   getStatusText,
   getStatusColor,

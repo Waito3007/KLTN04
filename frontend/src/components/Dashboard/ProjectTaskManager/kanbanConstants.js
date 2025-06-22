@@ -3,7 +3,7 @@ import { ClockCircleOutlined, ExclamationCircleOutlined, CheckCircleOutlined } f
 
 export const COLUMN_CONFIG = [
   {
-    id: 'todo',
+    id: 'TODO',
     title: 'To Do',
     icon: ClockCircleOutlined,
     color: '#faad14',
@@ -12,7 +12,7 @@ export const COLUMN_CONFIG = [
     cssClass: 'todo'
   },
   {
-    id: 'in_progress',
+    id: 'IN_PROGRESS',
     title: 'In Progress',
     icon: ExclamationCircleOutlined,
     color: '#1890ff',
@@ -21,7 +21,7 @@ export const COLUMN_CONFIG = [
     cssClass: 'inProgress'
   },
   {
-    id: 'done',
+    id: 'DONE',
     title: 'Done',
     icon: CheckCircleOutlined,
     color: '#52c41a',

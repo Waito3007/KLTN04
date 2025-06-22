@@ -5,7 +5,8 @@ import { TASK_CARD_CONFIG } from './kanbanConstants';
  * Lọc tasks theo status
  */
 export const getTasksByStatus = (tasks, status) => {
-  return tasks.filter(task => task.status === status);
+  const filtered = tasks.filter(task => task.status === status);
+  return filtered;
 };
 
 /**

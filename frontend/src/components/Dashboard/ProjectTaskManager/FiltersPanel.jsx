@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, Select, Button, Space, Badge, Input, Avatar } from 'antd';
-import { ReloadOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
+import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
+import { getAvatarUrl } from '../../../utils/taskUtils.jsx';
 
 const { Option } = Select;
 const { Search } = Input;
@@ -15,9 +16,8 @@ const FiltersPanel = ({
   assigneeFilter,
   setAssigneeFilter,
   collaborators,
-  fetchTasks,
-  tasksLoading,
-  filteredTasks
+  filteredTasks,
+  resetFilters
 }) => {
   console.log('🔍 FiltersPanel rendered with collaborators:', collaborators);
   console.log('🔍 FiltersPanel collaborators type:', typeof collaborators);
@@ -68,25 +68,22 @@ const FiltersPanel = ({
           style={{ width: '100%' }}        >
           <Option value="all">Tất cả</Option>
           {Array.isArray(collaborators) && collaborators.map(collab => (
-            <Option key={collab.login} value={collab.login}>
-              <Space>
-                <Avatar src={collab.avatar_url} size="small" />
+            <Option key={collab.login} value={collab.login}>              <Space>
+                <Avatar src={getAvatarUrl(collab.avatar_url, collab.login)} size="small" />
                 {collab.login}
               </Space>
             </Option>
           ))}
         </Select>
-      </Col>
-      <Col span={6}>
+      </Col>      <Col span={6}>
         <Space>
           <Button
-            icon={<ReloadOutlined />}
-            onClick={fetchTasks}
-            disabled={tasksLoading}
+            onClick={resetFilters}
+            size="small"
           >
-            Làm mới
+            Reset Filters
           </Button>
-          <Badge count={filteredTasks.length} showZero>
+          <Badge count={filteredTasks?.length || 0} showZero>
             <Button icon={<FilterOutlined />}>
               Kết quả lọc
             </Button>

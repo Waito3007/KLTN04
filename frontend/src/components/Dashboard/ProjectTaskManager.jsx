@@ -1,32 +1,20 @@
 import React, { useState } from 'react';
 import { 
-  Card, 
-  Button, 
-  Tag, 
-  Avatar, 
-  Space,
-  message,
-  Form,
-  Select,
-  Tooltip,
-  Divider
+  Card, Button, Space, Form, message, Switch,
+  Typography, Divider
 } from 'antd';
 import { 
-  PlusOutlined, 
-  UnorderedListOutlined,
-  AppstoreOutlined,
-  ReloadOutlined
+  AppstoreOutlined, UnorderedListOutlined, PlusOutlined,
+  ReloadOutlined 
 } from '@ant-design/icons';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
 
-// Custom hooks và services
 import { useProjectData } from '../../hooks/useProjectData';
-import { 
-  filterTasks, 
-  calculateTaskStats, 
-  formatTaskForAPI,
-  getStatusIcon,
-  getPriorityColor
+import {
+  filterTasks,
+  calculateTaskStats,
+  formatTaskForAPI
 } from '../../utils/taskUtils.jsx';
 import RepoSelector from './ProjectTaskManager/RepoSelector';
 import StatisticsPanel from './ProjectTaskManager/StatisticsPanel';
@@ -34,6 +22,8 @@ import FiltersPanel from './ProjectTaskManager/FiltersPanel';
 import TaskList from './ProjectTaskManager/TaskList';
 import TaskModal from './ProjectTaskManager/TaskModal';
 import KanbanBoard from './ProjectTaskManager/KanbanBoard';
+
+const { Title } = Typography;
 
 const TaskCard = styled(Card)`
   margin-bottom: 12px;
@@ -64,16 +54,13 @@ const ProjectTaskManager = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [form] = Form.useForm();
   const [viewMode, setViewMode] = useState(true); // true = Kanban, false = List
-    // Filter states
+  
+  // Filter states
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
-
-  // Data source preference states
-  const [repoDataSource, setRepoDataSource] = useState('auto'); // 'auto', 'database', 'github'
-  const [taskDataSource, setTaskDataSource] = useState('auto'); // 'auto', 'database', 'fallback'
-  const [collaboratorDataSource, setCollaboratorDataSource] = useState('auto'); // 'auto', 'database', 'github'  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
+  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
   const {
     selectedRepo,
     branches,
@@ -83,18 +70,14 @@ const ProjectTaskManager = () => {
     repositoriesLoading,
     tasksLoading,
     branchesLoading,
-    dataSourceStatus,
     handleRepoChange,
     getAssigneeInfo,
     createTask,
     updateTask,
     updateTaskStatus,
-    deleteTask
-  } = useProjectData({
-    repoDataSource,
-    taskDataSource,
-    collaboratorDataSource
-  });
+    deleteTask,
+    syncCollaborators
+  } = useProjectData();
 
   // ==================== COMPUTED VALUES ====================
   const filteredTasks = filterTasks(tasks, {
@@ -117,7 +100,7 @@ const ProjectTaskManager = () => {
         description: task.description,
         assignee: task.assignee,
         priority: task.priority,
-        dueDate: task.due_date ? new Date(task.due_date) : null
+        dueDate: task.due_date ? dayjs(task.due_date) : null
       });
     } else {
       form.resetFields();
@@ -128,227 +111,160 @@ const ProjectTaskManager = () => {
     try {
       const taskData = {
         ...formatTaskForAPI(values),
-        status: editingTask ? editingTask.status : 'todo',
+        status: editingTask ? editingTask.status : 'TODO',
         repo_owner: selectedRepo.owner.login,
         repo_name: selectedRepo.name
       };
 
+      console.log('🎯 Creating task with data:', taskData);
+
       if (editingTask) {
         await updateTask(editingTask.id, taskData);
+        message.success('✅ Cập nhật task thành công!');
       } else {
         await createTask(taskData);
+        message.success('✅ Tạo task thành công!');
       }
 
       setIsModalVisible(false);
       form.resetFields();
     } catch (error) {
       console.error('Form submission error:', error);
-      message.error('Lỗi khi lưu task!');
+      message.error('❌ Lỗi khi lưu task!');
     }
-  };  // ==================== UI COMPONENTS ====================
-  const DataSourceControl = () => (
-    <div style={{ 
-      padding: '12px 16px', 
-      background: '#f0f8ff', 
-      borderRadius: '8px', 
-      marginBottom: '16px',
-      border: '1px solid #d9d9d9'
-    }}>
-      <div style={{ marginBottom: '12px', fontWeight: 'bold', color: '#1890ff' }}>
-        🎛️ Chọn nguồn dữ liệu
-      </div>
-      
-      <Space size="large" wrap>
-        {/* Repository Data Source */}
-        <div style={{ minWidth: '200px' }}>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>📊 Repositories:</div>
-          <Space>
-            <Select
-              size="small"
-              value={repoDataSource}
-              onChange={setRepoDataSource}
-              style={{ width: 120 }}
-              options={[
-                { value: 'auto', label: '🔄 Tự động' },
-                { value: 'database', label: '💾 Database' },
-                { value: 'github', label: '📡 GitHub API' }
-              ]}
-            />
-            <Tag color={dataSourceStatus.repositories === 'database' ? 'green' : 'orange'} size="small">
-              {dataSourceStatus.repositories === 'database' ? '💾 DB' : '📡 API'}
-            </Tag>
-          </Space>
-        </div>
+  };
 
-        {selectedRepo && (
-          <>
-            <Divider type="vertical" style={{ height: '40px' }} />
-            
-            {/* Tasks Data Source */}
-            <div style={{ minWidth: '180px' }}>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>📝 Tasks:</div>
-              <Space>
-                <Select
-                  size="small"
-                  value={taskDataSource}
-                  onChange={setTaskDataSource}
-                  style={{ width: 120 }}
-                  options={[
-                    { value: 'auto', label: '🔄 Tự động' },
-                    { value: 'database', label: '💾 Database' },
-                    { value: 'fallback', label: '🔄 Fallback' }
-                  ]}
-                />
-                <Tag color={dataSourceStatus.tasks === 'database' ? 'green' : 'blue'} size="small">
-                  {dataSourceStatus.tasks === 'database' ? '💾 DB' : '� FB'}
-                </Tag>
-              </Space>
-            </div>
+  const resetFilters = () => {
+    setSearchText('');
+    setStatusFilter('all');
+    setPriorityFilter('all');
+    setAssigneeFilter('all');
+  };
 
-            <Divider type="vertical" style={{ height: '40px' }} />
-            
-            {/* Collaborators Data Source */}
-            <div style={{ minWidth: '200px' }}>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>👥 Collaborators:</div>
-              <Space>
-                <Select
-                  size="small"
-                  value={collaboratorDataSource}
-                  onChange={setCollaboratorDataSource}
-                  style={{ width: 120 }}
-                  options={[
-                    { value: 'auto', label: '🔄 Tự động' },
-                    { value: 'database', label: '💾 Database' },
-                    { value: 'github', label: '📡 GitHub API' }
-                  ]}
-                />
-                <Tag 
-                  color={
-                    dataSourceStatus.collaborators === 'database' ? 'green' : 
-                    dataSourceStatus.collaborators === 'github' ? 'orange' : 'purple'
-                  } 
-                  size="small"
-                >
-                  {dataSourceStatus.collaborators === 'database' ? '💾 DB' : 
-                   dataSourceStatus.collaborators === 'github' ? '📡 API' : '🔄 Mixed'}
-                </Tag>
-              </Space>
-            </div>
-          </>
-        )}
-      </Space>
-      
-      <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
-        💡 Chọn "Tự động" để hệ thống tự chọn nguồn tốt nhất, hoặc chọn nguồn cụ thể
-        <Button 
-          size="small" 
-          type="link" 
-          icon={<ReloadOutlined />}
-          onClick={() => window.location.reload()}
-          style={{ marginLeft: '8px' }}
-        >
-          Tải lại
-        </Button>
-      </div>
-    </div>
-  );
-
+  // ==================== RENDER ====================
   return (
     <Card 
-      title="🎯 Quản lý Task Dự án" 
-      variant="outlined"
-      extra={selectedRepo && (
-          <Space>
-            <Space.Compact>
-              <Button 
-                type={viewMode ? "primary" : "default"}
-                icon={<AppstoreOutlined />}
-                onClick={() => setViewMode(true)}
-              >
-                Kanban
-              </Button>
-              <Button 
-                type={!viewMode ? "primary" : "default"}
-                icon={<UnorderedListOutlined />}
-                onClick={() => setViewMode(false)}
-              >
-                List
-              </Button>
-            </Space.Compact>
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              onClick={() => showTaskModal()}
-            >
-              Thêm Task
-            </Button>
-          </Space>
-        )
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Title level={3} style={{ margin: 0, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            🎯 Quản lý Task Dự án
+          </Title>
+        </div>
       }
+      style={{ minHeight: '80vh' }}
+      extra={selectedRepo && (
+        <Space>
+          <Space.Compact>
+            <Button 
+              type={viewMode ? "primary" : "default"}
+              icon={<AppstoreOutlined />}
+              onClick={() => setViewMode(true)}
+              style={{ borderRadius: '6px 0 0 6px' }}
+            >
+              Kanban
+            </Button>
+            <Button 
+              type={!viewMode ? "primary" : "default"}
+              icon={<UnorderedListOutlined />}
+              onClick={() => setViewMode(false)}
+              style={{ borderRadius: '0 6px 6px 0' }}
+            >
+              List
+            </Button>
+          </Space.Compact>
+          
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => showTaskModal()}
+            disabled={!selectedRepo}
+            style={{ 
+              borderRadius: 6,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none'
+            }}
+          >
+            Tạo Task
+          </Button>
+        </Space>
+      )}
     >
-      <DataSourceControl />
-      
-      <div style={{ marginBottom: 16 }}>        <RepoSelector 
-          repositories={repositories}
-          selectedRepo={selectedRepo}
-          loading={repositoriesLoading}
-          handleRepoChange={handleRepoChange}
-          branches={branches}
-          collaborators={collaborators}
-          branchesLoading={branchesLoading}
-        />
-      </div>
-      
+      {/* Repository Selector - Clean & Simple */}      <RepoSelector 
+        repositories={repositories}
+        selectedRepo={selectedRepo}
+        loading={repositoriesLoading}
+        handleRepoChange={handleRepoChange}
+        branches={branches}
+        collaborators={collaborators}
+        branchesLoading={branchesLoading}
+        onSyncCollaborators={syncCollaborators}
+      />
+
+      {/* Statistics Panel */}
       {selectedRepo && (
-        <>
-          <div style={{ marginBottom: 16, padding: 12, background: '#f5f5f5', borderRadius: 8 }}>
-            <Space>
-              <Avatar src={selectedRepo.owner.avatar_url} />
-              <div>
-                <strong>{selectedRepo.owner.login}/{selectedRepo.name}</strong>
-                <div style={{ fontSize: 12, color: '#666' }}>
-                  {selectedRepo.description || 'Không có mô tả'}
-                </div>
-              </div>
-            </Space>
-          </div>
-          
-          <StatisticsPanel stats={taskStats} />
-          
-          <Card size="small" style={{ marginBottom: 16 }}>
-            <FiltersPanel
-              searchText={searchText}
-              setSearchText={setSearchText}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              priorityFilter={priorityFilter}
-              setPriorityFilter={setPriorityFilter}
-              assigneeFilter={assigneeFilter}
-              setAssigneeFilter={setAssigneeFilter}
-              collaborators={collaborators}
-              fetchTasks={() => {/* Refresh handled by hook */}}
-              tasksLoading={tasksLoading}
-              filteredTasks={filteredTasks}
-            />
-          </Card>
-          
-          {/* Task View - Kanban or List */}
+        <>          <StatisticsPanel 
+            stats={taskStats}
+            selectedRepo={selectedRepo}
+            collaborators={collaborators}
+          />
+
+          <Divider />
+
+          {/* Filters Panel */}          <FiltersPanel 
+            searchText={searchText}
+            setSearchText={setSearchText}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            priorityFilter={priorityFilter}
+            setPriorityFilter={setPriorityFilter}
+            assigneeFilter={assigneeFilter}
+            setAssigneeFilter={setAssigneeFilter}            collaborators={collaborators}
+            filteredTasks={filteredTasks}
+            tasksLoading={tasksLoading}
+            resetFilters={resetFilters}
+          />
+
+          <Divider />          {/* Tasks Display */}
           {viewMode ? (
-            <KanbanBoard
+            <KanbanBoard 
               tasks={filteredTasks}
               getAssigneeInfo={getAssigneeInfo}
-              getPriorityColor={getPriorityColor}
+              getPriorityColor={(priority) => {
+                switch (priority) {
+                  case 'urgent': return '#ff4d4f';
+                  case 'high': return '#ff7a45';
+                  case 'medium': return '#faad14';
+                  case 'low': return '#52c41a';
+                  default: return '#1890ff';
+                }
+              }}
               showTaskModal={showTaskModal}
               deleteTask={deleteTask}
               updateTaskStatus={updateTaskStatus}
             />
           ) : (
-            <TaskList
+            <TaskList 
               filteredTasks={filteredTasks}
               tasksLoading={tasksLoading}
               getAssigneeInfo={getAssigneeInfo}
-              getStatusIcon={getStatusIcon}
-              getPriorityColor={getPriorityColor}
+              getStatusIcon={(status) => {
+                switch (status) {
+                  case 'todo': return '📋';
+                  case 'in_progress': return '⚡';
+                  case 'done': return '✅';
+                  default: return '📋';
+                }
+              }}
+              getPriorityColor={(priority) => {
+                switch (priority) {
+                  case 'urgent': return '#ff4d4f';
+                  case 'high': return '#ff7a45';
+                  case 'medium': return '#faad14';
+                  case 'low': return '#52c41a';
+                  default: return '#1890ff';
+                }
+              }}
               updateTaskStatus={updateTaskStatus}
               showTaskModal={showTaskModal}
               deleteTask={deleteTask}
@@ -356,8 +272,9 @@ const ProjectTaskManager = () => {
           )}
         </>
       )}
-      
-      <TaskModal
+
+      {/* Task Modal */}
+      <TaskModal 
         isModalVisible={isModalVisible}
         editingTask={editingTask}
         form={form}

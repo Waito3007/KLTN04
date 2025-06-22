@@ -11,6 +11,12 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
+// Create a separate client for long-running operations like sync
+const apiClientLongTimeout = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000, // 30 seconds for sync operations
+});
+
 // Request interceptor để tự động thêm token
 apiClient.interceptors.request.use(
   (config) => {
@@ -25,6 +31,31 @@ apiClient.interceptors.request.use(
 
 // Response interceptor để xử lý lỗi chung
 apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      message.error('Phiên đăng nhập đã hết hạn');
+      // Có thể redirect đến login page
+    } else if (error.response?.status === 429) {
+      message.warning('Quá nhiều requests, vui lòng thử lại sau');
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Add interceptors for long timeout client
+apiClientLongTimeout.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `token ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiClientLongTimeout.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
@@ -138,91 +169,29 @@ export const taskAPI = {
 };
 
 // ==================== COLLABORATOR API ====================
-export const collaboratorAPI = {  
-  // Lấy từ backend API (NEW ENDPOINT)
-  getFromBackend: async (owner, repoName) => {
-    console.log(`🔍 getFromBackend called for ${owner}/${repoName}`);
-    const response = await apiClient.get(`/repos/${owner}/${repoName}/collaborators`);
-    console.log('📊 Backend response:', response.data);
-    // API returns { repository, collaborators, count }
-    const collaborators = response.data?.collaborators || [];
-    console.log('📊 Extracted collaborators:', collaborators);
-    return collaborators;
-  },
-
-  // Lấy từ GitHub API (fallback)
-  getFromGitHub: async (owner, repoName) => {
-    const response = await axios.get(
-      `https://api.github.com/repos/${owner}/${repoName}/contributors`,
-      {
-        headers: { 
-          Authorization: `token ${localStorage.getItem('access_token')}`,
-          Accept: 'application/vnd.github.v3+json'
-        },
-      }
-    );
+export const collaboratorAPI = {
+  // 📊 Lấy collaborators từ database
+  getCollaborators: async (owner, repoName) => {
+    console.log(`🔍 Getting collaborators from database for ${owner}/${repoName}`);
+    const timestamp = Date.now();
+    const response = await apiClient.get(`/contributors/${owner}/${repoName}?t=${timestamp}`);
     
-    return response.data.slice(0, 10).map(contributor => ({
-      login: contributor.login,
-      avatar_url: contributor.avatar_url,
-      type: 'Contributor',
-      contributions: contributor.contributions
-    }));
-  },
-
-  // Intelligent fetch với 3-tier fallback
-  getIntelligent: async (owner, repoName, ownerData) => {
-    console.log(`🧠 getIntelligent called for ${owner}/${repoName}`);
+    const result = response.data;
+    console.log('📊 Database response:', result);
     
-    try {
-      console.log('🔍 Trying backend API...');
-      const data = await collaboratorAPI.getFromBackend(owner, repoName);
-      console.log('🔍 Backend returned:', data);
-      if (data && data.length > 0) {
-        console.log('✅ Loaded from backend API');
-        return { data, source: 'database' };
-      } else {
-        console.log('⚠️ Backend returned empty data, trying GitHub...');
-      }
-    } catch (error) {
-      console.log('❌ Backend API failed:', error.message);
-    }
-
-    try {
-      console.log('🔍 Trying GitHub API...');
-      const contributors = await collaboratorAPI.getFromGitHub(owner, repoName);
-      
-      // Thêm owner vào đầu danh sách
-      const ownerEntry = {
-        login: owner,
-        avatar_url: ownerData?.avatar_url,
-        type: 'Owner',
-        contributions: 0
-      };
-      
-      const uniqueCollaborators = [
-        ownerEntry,
-        ...contributors.filter(c => c.login !== owner)
-      ];
-      
-      console.log('⚠️ Loaded from GitHub API');
-      return { data: uniqueCollaborators, source: 'github' };
-    } catch (error) {
-      console.log('❌ GitHub API failed:', error.message);
-    }
-
-    // Last fallback: owner only
-    console.log('⚠️ Using owner-only fallback');
     return {
-      data: [{
-        login: owner,
-        avatar_url: ownerData?.avatar_url,
-        type: 'Owner',
-        contributions: 0
-      }],
-      source: 'fallback'
+      collaborators: result?.collaborators || [],
+      hasSyncedData: result?.has_synced_data || false,
+      message: result?.message || '',
+      repository: result?.repository
     };
-  }
+  },
+  // � Sync collaborators từ GitHub vào database
+  sync: async (owner, repoName) => {
+    console.log(`🔄 Syncing collaborators for ${owner}/${repoName}`);
+    const response = await apiClientLongTimeout.post(`/contributors/${owner}/${repoName}/sync`);
+    console.log('✅ Sync response:', response.data);
+    return response.data;  }
 };
 
 export default apiClient;

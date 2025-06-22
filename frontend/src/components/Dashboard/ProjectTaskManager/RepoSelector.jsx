@@ -1,5 +1,5 @@
-import React from 'react';
-import { Select, Avatar, Space, Tag, Spin, Badge } from 'antd';
+import React, { useState } from 'react';
+import { Select, Avatar, Space, Tag, Button, Card } from 'antd';
 import { BranchesOutlined, TeamOutlined, SyncOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -11,11 +11,26 @@ const RepoSelector = ({
   handleRepoChange,
   branches = [],
   collaborators = [],
-  branchesLoading = false
+  branchesLoading = false,
+  onSyncCollaborators = null     
 }) => {
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleRepoSelect = async (repoId) => {
     await handleRepoChange(repoId);
+  };
+
+  const handleSyncClick = async () => {
+    if (!onSyncCollaborators || !selectedRepo || isSyncing) return;
+    
+    setIsSyncing(true);
+    try {
+      await onSyncCollaborators();
+    } catch (error) {
+      console.error('Sync failed:', error);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (
@@ -33,45 +48,81 @@ const RepoSelector = ({
           <Option key={repo.id} value={repo.id}>
             <Space>
               <Avatar src={repo.owner.avatar_url} size="small" />
-              {repo.owner.login}/{repo.name}
-              <Tag color={repo.private ? 'red' : 'green'}>
-                {repo.private ? 'Private' : 'Public'}
-              </Tag>
+              <span style={{ fontWeight: 500 }}>
+                {repo.owner.login}/{repo.name}
+              </span>
             </Space>
           </Option>
         ))}
       </Select>
 
-      {/* Repository sync status and stats */}
       {selectedRepo && (
-        <div style={{ marginTop: 12, padding: '8px 12px', background: '#f5f5f5', borderRadius: 6 }}>
-          <Space>
-            {branchesLoading ? (
-              <>
-                <Spin size="small" />
-                <span style={{ color: '#1890ff' }}>
-                  <SyncOutlined spin /> Đang đồng bộ...
+        <Card 
+          size="small" 
+          style={{ 
+            marginTop: 16, 
+            borderRadius: 8,
+            background: 'linear-gradient(135deg, #f6f8fa 0%, #e1e7ed 100%)'
+          }}
+        >
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Space>
+              <Avatar src={selectedRepo.owner.avatar_url} size="small" />
+              <span style={{ fontWeight: 600, color: '#1890ff' }}>
+                {selectedRepo.owner.login}/{selectedRepo.name}
+              </span>
+              {selectedRepo.private && (
+                <Tag color="orange" size="small">Private</Tag>
+              )}
+            </Space>
+
+            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+              <Space>
+                <BranchesOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
+                <span style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
+                  {branchesLoading ? 'Loading...' : `${branches.length} branches`}
                 </span>
-              </>
-            ) : (
-              <>
-                <Badge count={branches.length} showZero color="#52c41a">
-                  <BranchesOutlined style={{ color: '#52c41a' }} />
-                </Badge>
-                <span style={{ fontSize: '12px', color: '#666' }}>
-                  {branches.length} branches
-                </span>
-                
-                <Badge count={collaborators.length} showZero color="#1890ff">
-                  <TeamOutlined style={{ color: '#1890ff' }} />
-                </Badge>
-                <span style={{ fontSize: '12px', color: '#666' }}>
+              </Space>
+
+              <Space>
+                <TeamOutlined style={{ color: '#1890ff', fontSize: '14px' }} />
+                <span style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
                   {collaborators.length} collaborators
                 </span>
-              </>
-            )}
+              </Space>
+            </Space>
+
+            {/* Only GitHub sync button - data loads automatically from DB */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center',
+              marginTop: '8px'
+            }}>
+              <Button
+                size="small"
+                icon={<SyncOutlined spin={isSyncing} />}
+                onClick={handleSyncClick}
+                disabled={!selectedRepo || isSyncing}
+                type="primary"
+                style={{ 
+                  background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
+                  border: 'none'
+                }}
+              >
+                {isSyncing ? 'Đang sync GitHub...' : 'Sync collaborators từ GitHub'}
+              </Button>
+            </div>
+
+            <div style={{ 
+              fontSize: '11px', 
+              color: '#999', 
+              textAlign: 'center',
+              marginTop: '4px'
+            }}>
+              💡 Dữ liệu tự động tải từ database, chỉ sync GitHub khi cần
+            </div>
           </Space>
-        </div>
+        </Card>
       )}
     </div>
   );

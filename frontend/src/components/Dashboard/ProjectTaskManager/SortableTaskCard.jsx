@@ -5,6 +5,7 @@ import { EditOutlined, DeleteOutlined, UserOutlined, CalendarOutlined } from '@a
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { formatDate, formatFullDate } from './kanbanUtils';
+import { getAvatarUrl } from '../../../utils/taskUtils.jsx';
 import { TASK_CARD_CONFIG } from './kanbanConstants';
 import styles from './KanbanBoard.module.css';
 
@@ -99,11 +100,10 @@ const SortableTaskCard = ({
         </Space>
       </div>
 
-      <div className={styles.taskFooter}>
-        <Space>
+      <div className={styles.taskFooter}>        <Space>
           <Avatar 
             size={TASK_CARD_CONFIG.AVATAR_SIZE} 
-            src={assigneeInfo.avatar_url} 
+            src={getAvatarUrl(assigneeInfo.avatar_url, assigneeInfo.login)} 
             icon={<UserOutlined />}
           />
           <Text style={{ fontSize: 12, color: '#666' }}>

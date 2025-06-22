@@ -18,13 +18,16 @@ import styles from './KanbanBoard.module.css';
 const { Title } = Typography;
 
 const KanbanBoard = ({ 
-  tasks, 
+  tasks = [], 
   getAssigneeInfo, 
   getPriorityColor, 
   showTaskModal, 
   deleteTask, 
   updateTaskStatus 
 }) => {
+  // Safe array check
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+
   // Use custom hook for drag & drop logic
   const {
     sensors,
@@ -33,12 +36,10 @@ const KanbanBoard = ({
     handleDragEnd,
     dropAnimation
   } = useKanbanDragDrop({ 
-    tasks, 
+    tasks: safeTasks, 
     updateTaskStatus, 
     columns: COLUMN_CONFIG 
-  });
-
-  return (
+  });  return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
@@ -47,7 +48,7 @@ const KanbanBoard = ({
     >
       <div className={styles.kanbanContainer}>
         {COLUMN_CONFIG.map(column => {
-          const columnTasks = getTasksByStatus(tasks, column.id);
+          const columnTasks = getTasksByStatus(safeTasks, column.id);
           const IconComponent = column.icon;
           
           return (
