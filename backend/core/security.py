@@ -224,7 +224,7 @@ async def get_current_user_from_header(
     
     return user
 
-# Alternative dependency that requires valid token or no token at all
+# thêm một hàm để lấy người dùng hiện tại với tùy chọn trả về None nếu không có token
 async def get_current_user_strict_optional(
     request: Request
 ) -> Optional[CurrentUser]:
