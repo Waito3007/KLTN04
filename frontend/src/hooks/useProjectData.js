@@ -3,21 +3,36 @@ import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
 import { repositoryAPI, taskAPI, collaboratorAPI, branchAPI } from '../services/api';
 
+// ==================== AUTHENTICATION HELPER ====================
+const redirectToLogin = () => {
+  window.location.href = '/login';
+};
+
+const checkAuthentication = () => {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    message.error('🔒 Vui lòng đăng nhập để tiếp tục');
+    redirectToLogin();
+    return false;
+  }
+  return true;
+};
+
 // ==================== REPOSITORY HOOK ====================
 export const useRepositories = (dataSourcePreference = 'auto') => {
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState('database');  const fetchRepositories = useCallback(async () => {
-    const token = localStorage.getItem('access_token');
-    console.log('fetchRepositories: token exists?', !!token); // Debug
-    console.log('fetchRepositories: token preview:', token ? `${token.substring(0, 10)}...` : 'No token'); // Debug
+    console.log('fetchRepositories: checking authentication...'); // Debug
     
-    // Require authentication for repository access
-    if (!token) {
-      message.warning('⚠️ Vui lòng đăng nhập để xem repositories');
+    // Check authentication before making API calls
+    if (!checkAuthentication()) {
       setRepositories([]);
       return;
     }
+    
+    const token = localStorage.getItem('access_token');
+    console.log('fetchRepositories: token preview:', token ? `${token.substring(0, 10)}...` : 'No token'); // Debug
 
     setLoading(true);
     try {
@@ -56,11 +71,15 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
         message: error.message,
         code: error.code
       });
-      setRepositories([]);
-        if (error.response?.status === 401) {
-        message.error('🔒 Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-        // Optional: Clear token and redirect to login
+      setRepositories([]);      if (error.response?.status === 401) {
+        message.error('🔒 Phiên đăng nhập đã hết hạn. Đang chuyển hướng đến trang đăng nhập...');
         localStorage.removeItem('access_token');
+        setTimeout(() => redirectToLogin(), 1500);
+      } else if (error.response?.status === 404 && error.config?.url?.includes('/repositories')) {
+        // 404 on repositories endpoint usually means auth issue
+        message.error('🔒 Không có quyền truy cập. Vui lòng đăng nhập lại.');
+        localStorage.removeItem('access_token');
+        setTimeout(() => redirectToLogin(), 1500);
       } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
         message.error('❌ Không thể kết nối tới server. Vui lòng kiểm tra server có đang chạy?');
       } else if (error.code === 'ECONNABORTED') {
@@ -347,10 +366,15 @@ export const useProjectData = (options = {}) => {
 
   // New function: Auto-sync repository data  // Note: Removed syncRepositoryData function - no longer needed for auto-sync
   // Use individual sync functions (syncBranches, syncCollaborators) instead
-
   // Load branches from database
   const loadBranches = useCallback(async (repo) => {
     if (!repo) {
+      setBranches([]);
+      return;
+    }
+
+    // Check authentication before loading branches
+    if (!checkAuthentication()) {
       setBranches([]);
       return;
     }
@@ -364,7 +388,14 @@ export const useProjectData = (options = {}) => {
     } catch (error) {
       console.error('Failed to load branches:', error);
       setBranches([]);
-      // Don't show error message for initial load - it's expected to be empty sometimes
+      
+      // Handle authentication errors for branches
+      if (error.response?.status === 401 || error.response?.status === 404) {
+        message.error('🔒 Không thể tải branches. Vui lòng đăng nhập lại.');
+        localStorage.removeItem('access_token');
+        setTimeout(() => redirectToLogin(), 1500);
+      }
+      // Don't show error message for other cases - it's expected to be empty sometimes
     } finally {
       setBranchesLoading(false);
     }
