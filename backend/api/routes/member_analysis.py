@@ -37,7 +37,6 @@ async def get_member_commits_analysis(
     """Lấy commits của member với AI analysis và branch filter"""
     try:
         service = MemberAnalysisService(db)
-        
         if use_ai:
             # Use AI-powered analysis
             analysis = await service.get_member_commits_with_ai_analysis(
@@ -48,7 +47,17 @@ async def get_member_commits_analysis(
             analysis = service.get_member_commits_with_analysis(
                 repo_id, member_login, limit, branch_name
             )
-        
+
+        # Đảm bảo trả về đúng định dạng frontend mong muốn
+        # Nếu analysis là dict và có statistics thì trả về trực tiếp
+        if isinstance(analysis, dict) and "statistics" in analysis:
+            return {
+                "success": True,
+                "statistics": analysis["statistics"],
+                "commits": analysis.get("commits", []),
+                "branch_filter": branch_name
+            }
+        # Nếu analysis là list hoặc không có statistics, trả về như cũ
         return {
             "success": True,
             "data": analysis,
@@ -142,22 +151,26 @@ async def get_developer_insights(
 
 @router.get("/{repo_id}/ai/model-status")
 async def get_ai_model_status(repo_id: int):
-    """Kiểm tra trạng thái AI model"""
+    """Kiểm tra trạng thái AI model (HAN Commit Analyzer)"""
     try:
-        from services.han_ai_service import HANAIService
-        ai_service = HANAIService()
-        
+        # Kiểm tra model HAN đã tồn tại chưa
+        import os
+        from pathlib import Path
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        han_model_path = Path(current_dir).parent.parent / "ai" / "models" / "han_github_model" / "best_model.pth"
+        model_loaded = han_model_path.exists()
         return {
             "success": True,
             "repository_id": repo_id,
-            "model_loaded": ai_service.is_model_loaded,
+            "model_loaded": model_loaded,
             "model_info": {
-                "type": "HAN (Hierarchical Attention Network)",
+                "type": "Hierarchical Attention Network (HAN)",
                 "purpose": "Commit message analysis and classification",
                 "features": [
                     "Semantic understanding",
-                    "Multi-level attention",
-                    "Context-aware classification"
+                    "Commit type classification",
+                    "Technology area detection",
+                    "Multi-task classification"
                 ]
             }
         }
