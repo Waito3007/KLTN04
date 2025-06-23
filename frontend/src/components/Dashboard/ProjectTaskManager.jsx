@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import { 
   AppstoreOutlined, UnorderedListOutlined, PlusOutlined,
-  ReloadOutlined 
+  ReloadOutlined, TeamOutlined 
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
@@ -22,6 +22,7 @@ import FiltersPanel from './ProjectTaskManager/FiltersPanel';
 import TaskList from './ProjectTaskManager/TaskList';
 import TaskModal from './ProjectTaskManager/TaskModal';
 import KanbanBoard from './ProjectTaskManager/KanbanBoard';
+import RepositoryMembers from './RepositoryMembers';
 
 const { Title } = Typography;
 
@@ -54,6 +55,7 @@ const ProjectTaskManager = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [form] = Form.useForm();
   const [viewMode, setViewMode] = useState(true); // true = Kanban, false = List
+  const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' or 'members'
   
   // Filter states
   const [searchText, setSearchText] = useState('');
@@ -152,41 +154,64 @@ const ProjectTaskManager = () => {
           </Title>
         </div>
       }
-      style={{ minHeight: '80vh' }}
-      extra={selectedRepo && (
+      style={{ minHeight: '80vh' }}      extra={selectedRepo && (
         <Space>
+          {/* Tab Switcher */}
           <Space.Compact>
             <Button 
-              type={viewMode ? "primary" : "default"}
-              icon={<AppstoreOutlined />}
-              onClick={() => setViewMode(true)}
+              type={activeTab === 'tasks' ? "primary" : "default"}
+              onClick={() => setActiveTab('tasks')}
               style={{ borderRadius: '6px 0 0 6px' }}
             >
-              Kanban
+              📋 Tasks
             </Button>
             <Button 
-              type={!viewMode ? "primary" : "default"}
-              icon={<UnorderedListOutlined />}
-              onClick={() => setViewMode(false)}
+              type={activeTab === 'members' ? "primary" : "default"}
+              icon={<TeamOutlined />}
+              onClick={() => setActiveTab('members')}
               style={{ borderRadius: '0 6px 6px 0' }}
             >
-              List
+              👥 Members
             </Button>
           </Space.Compact>
+
+          {/* Task View Mode (only show when on tasks tab) */}
+          {activeTab === 'tasks' && (
+            <Space.Compact>
+              <Button 
+                type={viewMode ? "primary" : "default"}
+                icon={<AppstoreOutlined />}
+                onClick={() => setViewMode(true)}
+                style={{ borderRadius: '6px 0 0 6px' }}
+              >
+                Kanban
+              </Button>
+              <Button 
+                type={!viewMode ? "primary" : "default"}
+                icon={<UnorderedListOutlined />}
+                onClick={() => setViewMode(false)}
+                style={{ borderRadius: '0 6px 6px 0' }}
+              >
+                List
+              </Button>
+            </Space.Compact>
+          )}
           
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            onClick={() => showTaskModal()}
-            disabled={!selectedRepo}
-            style={{ 
-              borderRadius: 6,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: 'none'
-            }}
-          >
-            Tạo Task
-          </Button>
+          {activeTab === 'tasks' && (
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />}
+              onClick={() => showTaskModal()}
+              disabled={!selectedRepo}
+              style={{ 
+                borderRadius: 6,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none'
+              }}
+            >
+              Tạo Task
+            </Button>
+          )}
         </Space>
       )}
     >
@@ -199,76 +224,88 @@ const ProjectTaskManager = () => {
         collaborators={collaborators}
         branchesLoading={branchesLoading}
         onSyncCollaborators={syncCollaborators}
-      />
-
-      {/* Statistics Panel */}
+      />      {/* Tab Content - Conditional Rendering */}
       {selectedRepo && (
-        <>          <StatisticsPanel 
-            stats={taskStats}
-            selectedRepo={selectedRepo}
-            collaborators={collaborators}
-          />
+        <>
+          {activeTab === 'tasks' && (
+            <>
+              {/* Statistics Panel */}
+              <StatisticsPanel 
+                stats={taskStats}
+                selectedRepo={selectedRepo}
+                collaborators={collaborators}
+              />
 
-          <Divider />
+              <Divider />
 
-          {/* Filters Panel */}          <FiltersPanel 
-            searchText={searchText}
-            setSearchText={setSearchText}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            priorityFilter={priorityFilter}
-            setPriorityFilter={setPriorityFilter}
-            assigneeFilter={assigneeFilter}
-            setAssigneeFilter={setAssigneeFilter}            collaborators={collaborators}
-            filteredTasks={filteredTasks}
-            tasksLoading={tasksLoading}
-            resetFilters={resetFilters}
-          />
+              {/* Filters Panel */}
+              <FiltersPanel 
+                searchText={searchText}
+                setSearchText={setSearchText}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                priorityFilter={priorityFilter}
+                setPriorityFilter={setPriorityFilter}
+                assigneeFilter={assigneeFilter}
+                setAssigneeFilter={setAssigneeFilter}
+                collaborators={collaborators}
+                filteredTasks={filteredTasks}
+                tasksLoading={tasksLoading}
+                resetFilters={resetFilters}
+              />
 
-          <Divider />          {/* Tasks Display */}
-          {viewMode ? (
-            <KanbanBoard 
-              tasks={filteredTasks}
-              getAssigneeInfo={getAssigneeInfo}
-              getPriorityColor={(priority) => {
-                switch (priority) {
-                  case 'urgent': return '#ff4d4f';
-                  case 'high': return '#ff7a45';
-                  case 'medium': return '#faad14';
-                  case 'low': return '#52c41a';
-                  default: return '#1890ff';
-                }
-              }}
-              showTaskModal={showTaskModal}
-              deleteTask={deleteTask}
-              updateTaskStatus={updateTaskStatus}
-            />
-          ) : (
-            <TaskList 
-              filteredTasks={filteredTasks}
-              tasksLoading={tasksLoading}
-              getAssigneeInfo={getAssigneeInfo}
-              getStatusIcon={(status) => {
-                switch (status) {
-                  case 'todo': return '📋';
-                  case 'in_progress': return '⚡';
-                  case 'done': return '✅';
-                  default: return '📋';
-                }
-              }}
-              getPriorityColor={(priority) => {
-                switch (priority) {
-                  case 'urgent': return '#ff4d4f';
-                  case 'high': return '#ff7a45';
-                  case 'medium': return '#faad14';
-                  case 'low': return '#52c41a';
-                  default: return '#1890ff';
-                }
-              }}
-              updateTaskStatus={updateTaskStatus}
-              showTaskModal={showTaskModal}
-              deleteTask={deleteTask}
-            />
+              <Divider />
+
+              {/* Tasks Display */}
+              {viewMode ? (
+                <KanbanBoard 
+                  tasks={filteredTasks}
+                  getAssigneeInfo={getAssigneeInfo}
+                  getPriorityColor={(priority) => {
+                    switch (priority) {
+                      case 'urgent': return '#ff4d4f';
+                      case 'high': return '#ff7a45';
+                      case 'medium': return '#faad14';
+                      case 'low': return '#52c41a';
+                      default: return '#1890ff';
+                    }
+                  }}
+                  showTaskModal={showTaskModal}
+                  deleteTask={deleteTask}
+                  updateTaskStatus={updateTaskStatus}
+                />
+              ) : (
+                <TaskList 
+                  filteredTasks={filteredTasks}
+                  tasksLoading={tasksLoading}
+                  getAssigneeInfo={getAssigneeInfo}
+                  getStatusIcon={(status) => {
+                    switch (status) {
+                      case 'todo': return '📋';
+                      case 'in_progress': return '⚡';
+                      case 'done': return '✅';
+                      default: return '📋';
+                    }
+                  }}
+                  getPriorityColor={(priority) => {
+                    switch (priority) {
+                      case 'urgent': return '#ff4d4f';
+                      case 'high': return '#ff7a45';
+                      case 'medium': return '#faad14';
+                      case 'low': return '#52c41a';
+                      default: return '#1890ff';
+                    }
+                  }}
+                  updateTaskStatus={updateTaskStatus}
+                  showTaskModal={showTaskModal}
+                  deleteTask={deleteTask}
+                />
+              )}
+            </>
+          )}
+
+          {activeTab === 'members' && (
+            <RepositoryMembers selectedRepo={selectedRepo} />
           )}
         </>
       )}

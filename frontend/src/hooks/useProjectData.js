@@ -8,13 +8,15 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState('database');
-
   const fetchRepositories = useCallback(async () => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      message.error('Vui lòng đăng nhập để tiếp tục');
-      return;
-    }
+    console.log('fetchRepositories: token exists?', !!token); // Debug
+    
+    // Allow repositories to load without auth for public endpoints
+    // if (!token) {
+    //   message.error('Vui lòng đăng nhập để tiếp tục');
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -22,7 +24,9 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
       
       // Handle forced data source preference
       if (dataSourcePreference === 'database') {
+        console.log('Fetching from database...'); // Debug
         const data = await repositoryAPI.getFromDatabase();
+        console.log('Database result:', data); // Debug
         result = { data, source: 'database' };
       } else if (dataSourcePreference === 'github') {
         const data = await repositoryAPI.getFromGitHub();
@@ -35,6 +39,8 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
       setRepositories(result.data);
       setDataSource(result.source);
       
+      console.log('Repositories loaded:', result.data.length, 'repos'); // Debug
+      
       // User feedback
       if (result.source === 'github') {
         message.info('📡 Repositories loaded from GitHub API');
@@ -44,10 +50,10 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
     } catch (error) {
       console.error('Error fetching repositories:', error);
       setRepositories([]);
-      message.error(error.message);
+      message.error(error.message || 'Failed to load repositories');
     } finally {
       setLoading(false);
-    }  }, [dataSourcePreference]);  useEffect(() => {
+    }  }, [dataSourcePreference]);useEffect(() => {
     fetchRepositories();
   }, [fetchRepositories]);
 

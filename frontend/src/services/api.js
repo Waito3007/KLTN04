@@ -17,6 +17,12 @@ const apiClientLongTimeout = axios.create({
   timeout: 30000, // 30 seconds for sync operations
 });
 
+// Create a separate API client without auth for public endpoints
+const publicApiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
+
 // Request interceptor để tự động thêm token
 apiClient.interceptors.request.use(
   (config) => {
@@ -69,11 +75,10 @@ apiClientLongTimeout.interceptors.response.use(
 );
 
 // ==================== REPOSITORY API ====================
-export const repositoryAPI = {
-  // Lấy repos từ database
+export const repositoryAPI = {  // Lấy repos từ database
   getFromDatabase: async () => {
-    const response = await apiClient.get('/repodb/repos');
-    return response.data.repositories || response.data || [];
+    const response = await publicApiClient.get('/repositories');
+    return response.data || [];
   },
 
   // Lấy repos từ GitHub API (fallback)
