@@ -1,0 +1,11 @@
+{
+  "status": "SUCCESS",
+  "total_samples": 17356,
+  "output_file": "training_data\\large_dataset_100k_multimodal_training.json",
+  "created_at": "2025-06-10T08:24:34.282136",
+  "next_steps": [
+    "Run multimodal fusion training script",
+    "Use the generated training data",
+    "Monitor training progress and accuracy"
+  ]
+}

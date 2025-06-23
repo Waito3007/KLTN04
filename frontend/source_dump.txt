@@ -1,0 +1,3772 @@
+# ==================================================
+# Path: C:\SAN\KLTN\KLTN04\frontend
+# Detected tech: javascript, python, react, typescript
+# ==================================================
+
+## DIRECTORY STRUCTURE
+```
+frontend/
+├── node_modules/
+├── public/
+│   └── vite.svg
+├── src/
+│   ├── api/
+│   │   └── github.js
+│   ├── assets/
+│   │   └── react.svg
+│   ├── components/
+│   │   ├── Branchs/
+│   │   │   └── BranchSelector.jsx
+│   │   ├── Dashboard/
+│   │   │   ├── ProjectTaskManager/
+│   │   │   │   ├── FiltersPanel.jsx
+│   │   │   │   ├── README.md
+│   │   │   │   ├── RepoSelector.jsx
+│   │   │   │   ├── StatisticsPanel.jsx
+│   │   │   │   ├── TaskCard.jsx
+│   │   │   │   ├── TaskList.jsx
+│   │   │   │   ├── TaskModal.jsx
+│   │   │   │   └── index.js
+│   │   │   ├── AIInsightWidget.jsx
+│   │   │   ├── FiltersPanel.jsx
+│   │   │   ├── OverviewCard.jsx
+│   │   │   ├── ProjectTaskManager.jsx
+│   │   │   ├── RepoListFilter.jsx
+│   │   │   ├── RepoSelector.jsx
+│   │   │   ├── StatisticsPanel.jsx
+│   │   │   ├── TaskBoard.jsx
+│   │   │   ├── TaskCard.jsx
+│   │   │   ├── TaskList.jsx
+│   │   │   └── TaskModal.jsx
+│   │   ├── commits/
+│   │   │   ├── AnalyzeGitHubCommits.jsx
+│   │   │   ├── CommitAnalysisBadge.jsx
+│   │   │   ├── CommitAnalysisModal.jsx
+│   │   │   ├── CommitList.jsx
+│   │   │   └── CommitTable.jsx
+│   │   ├── common/
+│   │   │   └── SyncProgressNotification.jsx
+│   │   ├── repo/
+│   │   │   └── RepoList.jsx
+│   │   ├── AliasTest.jsx
+│   │   └── SimpleAliasTest.jsx
+│   ├── contexts/
+│   │   └── SyncContext.jsx
+│   ├── features/
+│   │   └── github/
+│   ├── pages/
+│   │   ├── AuthSuccess.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Login.jsx
+│   │   ├── RepoDetails.jsx
+│   │   └── TestPage.jsx
+│   ├── utils/
+│   │   └── types.js
+│   ├── App.css
+│   ├── App.jsx
+│   ├── config.js
+│   ├── index.css
+│   └── main.jsx
+├── .gitignore
+├── README.md
+├── eslint.config.js
+├── index.html
+├── jsconfig.json
+├── package-lock.json
+├── package.json
+└── vite.config.js
+```
+
+## FILE CONTENTS
+
+### eslint.config.js
+```js
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+
+```
+
+### vite.config.js
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+      '@dashboard': fileURLToPath(new URL('./src/components/Dashboard', import.meta.url)),
+      '@taskmanager': fileURLToPath(new URL('./src/components/Dashboard/ProjectTaskManager', import.meta.url)),
+    }
+  }
+})
+
+```
+
+### src\App.jsx
+```jsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import AuthSuccess from "./pages/AuthSuccess";
+import Dashboard from "./pages/Dashboard"; 
+import RepoDetails from "./pages/RepoDetails";
+import CommitTable from './components/commits/CommitTable';
+import TestPage from './pages/TestPage';
+
+function App() {
+  return (
+    <Router>      <Routes>
+        {/* ✅ Test route */}
+        <Route path="/test" element={<TestPage />} />
+        
+        {/* ✅ Trang mặc định là Login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Các route chính */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth-success" element={<AuthSuccess />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
+        <Route path="/commits" element={<CommitTable />} />
+
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+```
+
+### src\config.js
+```js
+
+```
+
+### src\main.jsx
+```jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css';
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+```
+
+### src\api\github.js
+```js
+
+```
+
+### src\components\AliasTest.jsx
+```jsx
+// Test component để kiểm tra alias
+import React from 'react';
+// Test named imports from index
+import { 
+  RepoSelector, 
+  StatisticsPanel, 
+  FiltersPanel 
+} from '@taskmanager/index';
+
+const AliasTest = () => {
+  console.log('✅ Alias @taskmanager hoạt động!');
+  console.log('Components imported:', { RepoSelector, StatisticsPanel, FiltersPanel });
+  
+  return (
+    <div style={{ padding: '20px', border: '2px solid green', borderRadius: '8px' }}>
+      <h3>✅ Alias Test thành công!</h3>
+      <p>Đã import thành công từ @taskmanager:</p>
+      <ul>
+        <li>RepoSelector: {RepoSelector ? '✅' : '❌'}</li>
+        <li>StatisticsPanel: {StatisticsPanel ? '✅' : '❌'}</li>
+        <li>FiltersPanel: {FiltersPanel ? '✅' : '❌'}</li>
+      </ul>
+    </div>
+  );
+};
+
+export default AliasTest;
+
+```
+
+### src\components\SimpleAliasTest.jsx
+```jsx
+// Simple test for alias
+import React from 'react';
+
+// Test individual imports
+import RepoSelector from '@taskmanager/RepoSelector';
+import StatisticsPanel from '@taskmanager/StatisticsPanel';
+
+const SimpleAliasTest = () => {
+  console.log('Testing individual imports:', { RepoSelector, StatisticsPanel });
+  
+  return (
+    <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px' }}>
+      <h4>Simple Alias Test</h4>
+      <p>RepoSelector: {RepoSelector ? '✅ Loaded' : '❌ Failed'}</p>
+      <p>StatisticsPanel: {StatisticsPanel ? '✅ Loaded' : '❌ Failed'}</p>
+    </div>
+  );
+};
+
+export default SimpleAliasTest;
+
+```
+
+### src\components\Branchs\BranchSelector.jsx
+```jsx
+import { useEffect, useState } from "react";
+import { Select, Spin, message, Tag, Typography, Divider } from "antd";
+import { GithubOutlined, BranchesOutlined } from '@ant-design/icons';
+import axios from "axios";
+import styled from "styled-components";
+
+const { Option } = Select;
+const { Text } = Typography;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const StyledSelect = styled(Select)`
+  min-width: 240px;
+  
+  .ant-select-selector {
+    border-radius: 6px !important;
+    border: 1px solid #d9d9d9 !important;
+    transition: all 0.3s !important;
+    
+    &:hover {
+      border-color: #1890ff !important;
+    }
+  }
+  
+  .ant-select-selection-item {
+    font-weight: 500;
+  }
+`;
+
+const BranchTag = styled(Tag)`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #f0f5ff;
+  color: #1890ff;
+  border: 1px solid #d6e4ff;
+`;
+
+const BranchSelector = ({ owner, repo, onBranchChange }) => {
+  const [branches, setBranches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    const fetchBranches = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/github/${owner}/${repo}/branches`,
+          {
+            headers: {
+              Authorization: `token ${token}`,
+            },
+          }
+        );
+        setBranches(response.data);
+        if (response.data.length > 0) {
+          setSelectedBranch(response.data[0].name);
+          onBranchChange(response.data[0].name);
+        }
+      } catch (err) {
+        console.error(err);
+        message.error("Không lấy được danh sách branch");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBranches();
+  }, [owner, repo]);
+
+  const handleChange = (value) => {
+    setSelectedBranch(value);
+    onBranchChange(value);
+  };
+
+  if (loading) return <Spin size="small" />;
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      {/* <Divider orientation="left" style={{ fontSize: 32, color: '#666' }}>
+        Chọn branch
+      </Divider> */}
+      
+      <SelectContainer>
+        <BranchTag>
+          <BranchesOutlined />
+          <Text strong>Branch:</Text>
+        </BranchTag>
+        
+        <StyledSelect
+          value={selectedBranch}
+          onChange={handleChange}
+          suffixIcon={<GithubOutlined style={{ color: '#1890ff' }} />}
+          dropdownMatchSelectWidth={false}
+        >
+          {branches.map((branch) => (
+            <Option key={branch.name} value={branch.name}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <BranchesOutlined style={{ color: '#52c41a' }} />
+                <Text strong>{branch.name}</Text>
+              </div>
+            </Option>
+          ))}
+        </StyledSelect>
+      </SelectContainer>
+    </div>
+  );
+};
+
+export default BranchSelector;
+```
+
+### src\components\commits\AnalyzeGitHubCommits.jsx
+```jsx
+import { useState } from 'react';
+import { Button, Badge, Popover, List, Typography, Divider, Spin, Tag, Alert, Tooltip } from 'antd';
+import { ExclamationCircleFilled, CheckCircleFilled, InfoCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
+
+const { Text, Title } = Typography;
+
+const AnalyzeGitHubCommits = ({ repo }) => {
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [popoverVisible, setPopoverVisible] = useState(false);
+
+  const analyzeCommits = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("access_token");
+      
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await axios.get(
+        `http://localhost:8000/api/commits/analyze-github/${repo.owner.login}/${repo.name}`,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json"
+          },
+          params: { 
+            per_page: 10,
+            // Add cache busting to avoid stale data
+            timestamp: Date.now()
+          },
+          timeout: 10000 // 10 second timeout
+        }
+      );
+      
+      if (!response.data) {
+        throw new Error('Invalid response data');
+      }
+
+      setAnalysis(response.data);
+    } catch (err) {
+      let errorMessage = 'Failed to analyze commits';
+      
+      if (err.response) {
+        if (err.response.status === 401) {
+          errorMessage = 'Please login to analyze commits';
+        } else if (err.response.status === 403) {
+          errorMessage = 'Access to this repository is denied';
+        } else if (err.response.data?.detail) {
+          errorMessage = err.response.data.detail;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePopoverOpen = (visible) => {
+    setPopoverVisible(visible);
+    if (visible && !analysis && !error) {
+      analyzeCommits();
+    }
+  };
+
+  const getStatusColor = () => {
+    if (error) return 'warning';
+    if (!analysis) return 'default';
+    return analysis.critical > 0 ? 'error' : 'success';
+  };
+
+  const getStatusText = () => {
+    if (error) return 'Error';
+    if (!analysis) return 'Analyze Commits';
+    return analysis.critical > 0 
+      ? `${analysis.critical} Critical` 
+      : 'No Issues';
+  };
+
+  const getStatusIcon = () => {
+    if (error) return <InfoCircleOutlined />;
+    if (!analysis) return null;
+    return analysis.critical > 0 
+      ? <ExclamationCircleFilled /> 
+      : <CheckCircleFilled />;
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return <Spin size="small" tip="Analyzing commits..." />;
+    }
+
+    if (error) {
+      return (
+        <Alert
+          message="Analysis Failed"
+          description={error}
+          type="error"
+          showIcon
+        />
+      );
+    }
+
+    if (!analysis) {
+      return <Text type="secondary">Click to analyze commits</Text>;
+    }
+
+    return (
+      <>
+        <div style={{ marginBottom: 16 }}>
+          <Title level={5} style={{ marginBottom: 4 }}>
+            Commit Analysis Summary
+          </Title>
+          <Text>
+            <Tag color={analysis.critical > 0 ? 'error' : 'success'}>
+              {analysis.critical > 0 ? 'Needs Review' : 'All Clear'}
+            </Tag>
+            {analysis.critical} of {analysis.total} commits are critical
+          </Text>
+        </div>
+
+        <Divider style={{ margin: '12px 0' }} />
+
+        <List
+          size="small"
+          dataSource={analysis.details.slice(0, 5)}
+          renderItem={item => (
+            <List.Item>
+              <div style={{ width: '100%' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Tag color={item.is_critical ? 'error' : 'success'}>
+                    {item.is_critical ? 'CRITICAL' : 'Normal'}
+                  </Tag>
+                  <Tooltip title="Commit ID">
+                    <Text code style={{ fontSize: 12 }}>
+                      {item.id.substring(0, 7)}
+                    </Text>
+                  </Tooltip>
+                </div>
+                <Text
+                  ellipsis={{ tooltip: item.message_preview }}
+                  style={{ 
+                    color: item.is_critical ? '#f5222d' : 'inherit',
+                    marginTop: 4,
+                    display: 'block'
+                  }}
+                >
+                  {item.message_preview}
+                </Text>
+              </div>
+            </List.Item>
+          )}
+        />
+
+        {analysis.total > 5 && (
+          <Text type="secondary" style={{ display: 'block', marginTop: 8 }}>
+            Showing 5 of {analysis.total} commits
+          </Text>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <Popover 
+      content={renderContent()}
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>Commit Analysis</span>
+          {analysis && (
+            <Badge 
+              count={`${analysis.critical_percentage}%`} 
+              style={{ 
+                backgroundColor: analysis.critical > 0 ? '#f5222d' : '#52c41a'
+              }} 
+            />
+          )}
+        </div>
+      }
+      trigger="click"
+      open={popoverVisible}
+      onOpenChange={handlePopoverOpen}
+      overlayStyle={{ width: 350 }}
+      placement="bottomRight"
+    >
+      <Badge 
+        count={analysis?.critical || 0} 
+        color={getStatusColor()}
+        offset={[-10, 10]}
+      >
+        <Button 
+          type={error ? 'default' : analysis ? (analysis.critical ? 'danger' : 'success') : 'default'}
+          icon={getStatusIcon()}
+          loading={loading}
+          onClick={(e) => e.stopPropagation()}
+          style={{ 
+            marginLeft: 'auto',
+            fontWeight: 500,
+            borderRadius: 20,
+            padding: '0 16px',
+            border: error ? '1px solid #faad14' : undefined
+          }}
+        >
+          {getStatusText()}
+        </Button>
+      </Badge>
+    </Popover>
+  );
+};
+
+export default AnalyzeGitHubCommits;
+```
+
+### src\components\commits\CommitAnalysisBadge.jsx
+```jsx
+// components/CommitAnalysisBadge.jsx
+import { Tag, Tooltip, Popover, List, Typography, Divider, Badge, Spin } from 'antd';
+import { ExclamationCircleFilled, CheckCircleFilled } from '@ant-design/icons';
+import { useState } from 'react';
+import axios from 'axios';
+
+const { Text } = Typography;
+
+const CommitAnalysisBadge = ({ repo }) => {
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchCommitAnalysis = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get(
+        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/commits`,
+        {
+          headers: { Authorization: `token ${token}` },
+          params: { per_page: 5 } // Get last 5 commits for analysis
+        }
+      );
+      
+      // Analyze the commits
+      const analysisRes = await axios.post(
+        'http://localhost:8000/api/commits/analyze-json',
+        {
+          commits: response.data.map(commit => ({
+            id: commit.sha,
+            message: commit.commit.message
+          }))
+        },
+        {
+          headers: { Authorization: `token ${token}` }
+        }
+      );
+      
+      setAnalysis(analysisRes.data);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to analyze commits');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = () => {
+    if (!analysis) return 'default';
+    return analysis.critical > 0 ? 'error' : 'success';
+  };
+
+  const getStatusText = () => {
+    if (!analysis) return 'Analyze Commits';
+    return analysis.critical > 0 
+      ? `${analysis.critical} Critical Commits` 
+      : 'No Critical Commits';
+  };
+
+  const getStatusIcon = () => {
+    if (!analysis) return null;
+    return analysis.critical > 0 
+      ? <ExclamationCircleFilled /> 
+      : <CheckCircleFilled />;
+  };
+
+  const content = (
+    <div style={{ maxWidth: 300 }}>
+      {loading && <Spin size="small" />}
+      {error && <Text type="danger">{error}</Text>}
+      {analysis && (
+        <>
+          <Text strong>Recent Commits Analysis</Text>
+          <Divider style={{ margin: '8px 0' }} />
+          <List
+            size="small"
+            dataSource={analysis.details.slice(0, 5)}
+            renderItem={item => (
+              <List.Item>
+                <div style={{ width: '100%' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    marginBottom: 4
+                  }}>
+                    <Text 
+                      ellipsis 
+                      style={{ 
+                        maxWidth: 180,
+                        color: item.is_critical ? '#f5222d' : 'inherit'
+                      }}
+                    >
+                      {item.message_preview}
+                    </Text>
+                    <Tag color={item.is_critical ? 'error' : 'success'}>
+                      {item.is_critical ? 'Critical' : 'Normal'}
+                    </Tag>
+                  </div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {item.id.substring(0, 7)}
+                  </Text>
+                </div>
+              </List.Item>
+            )}
+          />
+          <Divider style={{ margin: '8px 0' }} />
+          <Text type="secondary">
+            {analysis.critical} of {analysis.total} recent commits are critical
+          </Text>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <Popover 
+      content={content}
+      title="Commit Analysis"
+      trigger="click"
+      onVisibleChange={visible => visible && !analysis && fetchCommitAnalysis()}
+    >
+      <Badge 
+        count={analysis?.critical || 0} 
+        style={{ backgroundColor: getStatusColor() }}
+      >
+        <Tag 
+          icon={getStatusIcon()}
+          color={getStatusColor()}
+          style={{ cursor: 'pointer' }}
+        >
+          {getStatusText()}
+        </Tag>
+      </Badge>
+    </Popover>
+  );
+};
+
+export default CommitAnalysisBadge;
+```
+
+### src\components\commits\CommitAnalysisModal.jsx
+```jsx
+// components/CommitAnalysisModal.jsx
+import { Modal, List, Typography, Tag, Divider, Spin, Tabs, Progress, Alert } from 'antd';
+import { 
+  ExclamationCircleOutlined, 
+  CheckCircleOutlined,
+  BarChartOutlined,
+  FileTextOutlined 
+} from '@ant-design/icons';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
+
+const { Title, Text } = Typography;
+const { TabPane } = Tabs;
+
+const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchFullAnalysis = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get(
+        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/commits`,
+        {
+          headers: { Authorization: `token ${token}` },
+          params: { per_page: 100 } // Get more commits for detailed analysis
+        }
+      );
+      
+      const analysisRes = await axios.post(
+        'http://localhost:8000/api/commits/analyze-json',
+        {
+          commits: response.data.map(commit => ({
+            id: commit.sha,
+            message: commit.commit.message
+          }))
+        },
+        {
+          headers: { Authorization: `token ${token}` }
+        }
+      );
+      
+      setAnalysis(analysisRes.data);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to analyze commits');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+      fetchFullAnalysis();
+    }
+  }, [visible]);
+
+  const criticalPercentage = analysis 
+    ? Math.round((analysis.critical / analysis.total) * 100) 
+    : 0;
+
+  return (
+    <Modal
+      title={<><BarChartOutlined /> Commit Analysis for {repo.name}</>}
+      visible={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={800}
+    >
+      {loading && <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />}
+      
+      {error && (
+        <Alert 
+          message="Error" 
+          description={error} 
+          type="error" 
+          showIcon 
+          style={{ marginBottom: 20 }}
+        />
+      )}
+      
+      {analysis && (
+        <Tabs defaultActiveKey="1">
+          <TabPane tab={<><FileTextOutlined /> Commits</>} key="1">
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                <Progress
+                  type="circle"
+                  percent={criticalPercentage}
+                  width={80}
+                  format={percent => (
+                    <Text strong style={{ fontSize: 24, color: percent > 0 ? '#f5222d' : '#52c41a' }}>
+                      {percent}%
+                    </Text>
+                  )}
+                  status={criticalPercentage > 0 ? 'exception' : 'success'}
+                />
+                <div style={{ marginLeft: 20 }}>
+                  <Title level={4} style={{ marginBottom: 0 }}>
+                    {analysis.critical} of {analysis.total} commits are critical
+                  </Title>
+                  <Text type="secondary">
+                    {criticalPercentage > 0 
+                      ? 'This repository contains potentially critical changes'
+                      : 'No critical commits detected'}
+                  </Text>
+                </div>
+              </div>
+              
+              <List
+                size="large"
+                dataSource={analysis.details}
+                renderItem={item => (
+                  <List.Item>
+                    <div style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Tag color={item.is_critical ? 'error' : 'success'}>
+                          {item.is_critical ? 'CRITICAL' : 'Normal'}
+                        </Tag>
+                        <Text type="secondary" copyable>
+                          {item.id.substring(0, 7)}
+                        </Text>
+                      </div>
+                      <Divider style={{ margin: '8px 0' }} />
+                      <Text style={{ color: item.is_critical ? '#f5222d' : 'inherit' }}>
+                        {item.message_preview}
+                      </Text>
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </div>
+          </TabPane>
+          
+          <TabPane tab={<><ExclamationCircleOutlined /> Critical Commits</>} key="2">
+            {analysis.critical > 0 ? (
+              <List
+                dataSource={analysis.details.filter(c => c.is_critical)}
+                renderItem={item => (
+                  <List.Item>
+                    <Alert
+                      message="Critical Commit"
+                      description={
+                        <>
+                          <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                            {item.message_preview}
+                          </Text>
+                          <Text type="secondary">Commit ID: {item.id.substring(0, 7)}</Text>
+                        </>
+                      }
+                      type="error"
+                      showIcon
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a', marginBottom: 20 }} />
+                <Title level={4} style={{ color: '#52c41a' }}>
+                  No Critical Commits Found
+                </Title>
+                <Text type="secondary">
+                  All analyzed commits appear to be normal changes
+                </Text>
+              </div>
+            )}
+          </TabPane>
+        </Tabs>
+      )}
+    </Modal>
+  );
+};
+
+export default CommitAnalysisModal;
+```
+
+### src\components\commits\CommitList.jsx
+```jsx
+import { useEffect, useState } from "react";
+import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination } from "antd";
+import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
+import axios from "axios";
+import styled from "styled-components";
+
+const { Title, Text } = Typography;
+
+const CommitCard = styled(Card)`
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+`;
+
+const CommitHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+`;
+
+const CommitMessage = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  
+  &:hover {
+    white-space: normal;
+    overflow: visible;
+  }
+`;
+
+const CommitMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  color: #666;
+  font-size: 13px;
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+const CommitList = ({ owner, repo, branch }) => {
+  const [commits, setCommits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  useEffect(() => {
+    if (!branch) return;
+
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    const fetchCommits = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/github/${owner}/${repo}/commits?branch=${branch}`,
+          {
+            headers: {
+              Authorization: `token ${token}`,
+            },
+          }
+        );
+        setCommits(response.data);
+      } catch (err) {
+        console.error(err);
+        message.error("Lỗi khi lấy danh sách commit");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+    fetchCommits();
+  }, [owner, repo, branch]);
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString('vi-VN', options);
+  };
+
+  // Tính toán dữ liệu hiển thị theo trang hiện tại
+  const paginatedCommits = commits.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  if (loading) return <Spin tip="Đang tải commit..." size="large" />;
+
+  return (
+    <div style={{ padding: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+        <Title level={4} style={{ margin: 0 }}>
+          <BranchesOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
+          Commit trên branch: <Tag color="blue">{branch}</Tag>
+          <Tag style={{ marginLeft: '8px' }}>{commits.length} commits</Tag>
+        </Title>
+      </div>
+      
+      <List
+        itemLayout="vertical"
+        dataSource={paginatedCommits}
+        renderItem={(item) => (
+          <List.Item>
+            <CommitCard>
+              <CommitHeader>
+                <Tooltip title={item.sha} placement="topLeft">
+                  <Tag icon={<GithubOutlined />} color="default">
+                    {item.sha.substring(0, 7)}
+                  </Tag>
+                </Tooltip>
+              </CommitHeader>
+              
+              <CommitMessage>
+                <Tooltip title={item.commit.message} placement="topLeft">
+                  {item.commit.message.split('\n')[0]}
+                </Tooltip>
+              </CommitMessage>
+              
+              <CommitMeta>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar 
+                    src={item.author?.avatar_url} 
+                    size="small" 
+                    icon={<UserOutlined />}
+                    style={{ marginRight: '8px' }}
+                  />
+                  <Text>{item.commit.author.name}</Text>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <ClockCircleOutlined style={{ marginRight: '4px' }} />
+                  <Text>{formatDate(item.commit.author.date)}</Text>
+                </div>
+              </CommitMeta>
+            </CommitCard>
+          </List.Item>
+        )}
+      />
+
+      <PaginationContainer>
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={commits.length}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+          showQuickJumper
+          style={{ marginTop: '20px' }}
+        />
+      </PaginationContainer>
+    </div>
+  );
+};
+
+export default CommitList;
+```
+
+### src\components\commits\CommitTable.jsx
+```jsx
+//frontend\src\components\commits\CommitTable.jsxCommitTable.jsx
+
+import { useEffect, useState } from 'react';
+import { Table } from 'antd';
+import axios from 'axios';
+
+const CommitTable = () => {
+  const [commits, setCommits] = useState([]);
+
+  useEffect(() => {
+    const fetchCommits = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/commits');
+        setCommits(response.data);
+      } catch (error) {
+        console.error('Failed to fetch commits:', error);
+      }
+    };
+    fetchCommits();
+  }, []);
+
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+    },
+    {
+      title: 'Repo ID',
+      dataIndex: 'repo_id',
+    },
+    {
+      title: 'User ID',
+      dataIndex: 'user_id',
+    },
+    {
+      title: 'Message',
+      dataIndex: 'message',
+    },
+    {
+      title: 'Hash',
+      dataIndex: 'commit_hash',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'commit_date',
+    },
+  ];
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Lịch sử Commit</h2>
+      <Table columns={columns} dataSource={commits} rowKey="id" />
+    </div>
+  );
+};
+
+export default CommitTable;
+```
+
+### src\components\common\SyncProgressNotification.jsx
+```jsx
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { Progress, Card, Typography, Button, Space } from 'antd';
+import { CloseOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+
+const { Text } = Typography;
+
+const ProgressContainer = styled(Card)`
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  opacity: ${props => props.visible ? 1 : 0};
+  transform: ${props => props.visible ? 'translateX(0)' : 'translateX(100%)'};
+  transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+  pointer-events: ${props => props.visible ? 'auto' : 'none'};
+
+  .ant-card-body {
+    padding: 16px;
+  }
+
+  /* Force immediate display */
+  &.instant-show {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    transition: none !important;
+  }
+`;
+
+const ProgressHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+const ProgressTitle = styled(Text)`
+  font-weight: 600;
+  color: #1e293b;
+`;
+
+const RepoProgress = styled.div`
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid ${props => 
+    props.status === 'completed' ? '#10b981' : 
+    props.status === 'error' ? '#ef4444' : '#3b82f6'
+  };
+`;
+
+const SyncProgressNotification = ({ 
+  visible, 
+  onClose, 
+  totalRepos = 0, 
+  completedRepos = 0, 
+  currentRepo = '', 
+  repoProgresses = [], 
+  overallProgress = 0 
+}) => {
+  const [autoClose, setAutoClose] = useState(false);
+  const [showInstantly, setShowInstantly] = useState(false);
+  const [forceInstantShow, setForceInstantShow] = useState(false);
+  // Show immediately when visible becomes true - using useLayoutEffect for immediate DOM update
+  useLayoutEffect(() => {
+    if (visible) {
+      setShowInstantly(true);
+      setForceInstantShow(true);
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (visible) {
+      // Reset force instant after a tiny delay to allow normal transitions
+      const timer = setTimeout(() => setForceInstantShow(false), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setForceInstantShow(false);
+      // Delay hiding for animation
+      const timer = setTimeout(() => setShowInstantly(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (completedRepos === totalRepos && totalRepos > 0) {
+      setAutoClose(true);
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000); // Tự động đóng sau 3 giây
+      return () => clearTimeout(timer);
+    }
+  }, [completedRepos, totalRepos, onClose]);
+  
+  // Render even if not visible for smooth transitions
+  if (!showInstantly && !visible) return null;
+
+  const isCompleted = completedRepos === totalRepos && totalRepos > 0;
+  const hasErrors = repoProgresses.some(repo => repo.status === 'error');
+  return (
+    <ProgressContainer 
+      visible={visible} 
+      className={forceInstantShow ? 'instant-show' : (visible ? 'show' : '')}
+    >
+      <ProgressHeader>
+        <ProgressTitle>
+          {isCompleted ? '✅ Đồng bộ hoàn thành' : '🔄 Đang đồng bộ repository'}
+        </ProgressTitle>
+        <Button 
+          type="text" 
+          size="small" 
+          icon={<CloseOutlined />} 
+          onClick={onClose}
+        />
+      </ProgressHeader>
+
+      {/* Overall Progress */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <Text type="secondary">Tổng tiến trình</Text>
+          <Text strong>{Math.round(overallProgress)}%</Text>
+        </div>
+        <Progress 
+          percent={overallProgress} 
+          strokeColor={isCompleted ? '#10b981' : '#3b82f6'}
+          showInfo={false}
+          size="small"
+        />
+        <Text type="secondary" style={{ fontSize: '12px' }}>
+          {completedRepos}/{totalRepos} repository
+        </Text>
+      </div>
+
+      {/* Current Repository */}
+      {currentRepo && !isCompleted && (
+        <div style={{ marginBottom: 12 }}>
+          <Text type="secondary" style={{ fontSize: '12px' }}>Đang xử lý:</Text>
+          <div style={{ 
+            background: '#e0f2fe', 
+            padding: '4px 8px', 
+            borderRadius: '4px',
+            marginTop: '4px'
+          }}>
+            <Text style={{ fontSize: '12px', color: '#0369a1' }}>{currentRepo}</Text>
+          </div>
+        </div>
+      )}
+
+      {/* Repository List (hiển thị khi có nhiều repo) */}
+      {repoProgresses.length > 0 && (
+        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+          {repoProgresses.slice(-5).map((repo, index) => (
+            <RepoProgress key={index} status={repo.status}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontSize: '11px', fontWeight: 500 }}>
+                  {repo.name}
+                </Text>
+                <Space size={4}>
+                  {repo.status === 'completed' && <CheckCircleOutlined style={{ color: '#10b981' }} />}
+                  {repo.status === 'error' && <ExclamationCircleOutlined style={{ color: '#ef4444' }} />}
+                  <Text style={{ fontSize: '10px' }}>
+                    {repo.status === 'completed' ? '✓' : 
+                     repo.status === 'error' ? '✗' : '...'}
+                  </Text>
+                </Space>
+              </div>
+              {repo.progress !== undefined && repo.status === 'syncing' && (
+                <Progress 
+                  percent={repo.progress} 
+                  size="small" 
+                  showInfo={false}
+                  strokeColor="#3b82f6"
+                  style={{ marginTop: 4 }}
+                />
+              )}
+            </RepoProgress>
+          ))}
+        </div>
+      )}
+
+      {/* Summary */}
+      {isCompleted && (
+        <div style={{ 
+          background: hasErrors ? '#fef3c7' : '#d1fae5', 
+          padding: '8px', 
+          borderRadius: '6px',
+          marginTop: '12px'
+        }}>
+          <Text style={{ 
+            fontSize: '12px', 
+            color: hasErrors ? '#92400e' : '#047857'
+          }}>
+            {hasErrors 
+              ? `Hoàn thành với ${repoProgresses.filter(r => r.status === 'error').length} lỗi`
+              : 'Tất cả repository đã được đồng bộ thành công!'
+            }
+          </Text>
+          {autoClose && (
+            <div style={{ marginTop: 4 }}>
+              <Text style={{ fontSize: '10px', color: '#6b7280' }}>
+                Tự động đóng sau 3 giây...
+              </Text>
+            </div>
+          )}
+        </div>
+      )}
+    </ProgressContainer>
+  );
+};
+
+export default SyncProgressNotification;
+
+```
+
+### src\components\Dashboard\AIInsightWidget.jsx
+```jsx
+import React from 'react';
+import { Card, Space, Typography, Button, Tag } from 'antd';
+import { BulbOutlined, WarningOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+
+const { Title, Text } = Typography;
+
+// Styled components
+const InsightContainer = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+`;
+
+const InsightCard = styled(Card)`
+  border-radius: 8px;
+  border: 1px solid ${(props) => props.borderColor || '#f0f0f0'};
+  background: #fff;
+  transition: all 0.3s ease;
+  padding: 12px;
+
+  &:hover {
+    border-color: ${(props) => props.borderColor || '#d9d9d9'};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 576px) {
+    padding: 8px;
+  }
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: ${(props) => props.bgColor || '#f0f0f0'};
+`;
+
+const ActionWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  @media (max-width: 576px) {
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+`;
+
+const AIInsightWidget = () => {
+  const insights = [
+    {
+      id: 1,
+      type: 'suggestion',
+      title: 'Phân công đề xuất',
+      description: 'Thêm 2 developer vào repo "frontend" để đảm bảo deadline 25/04/2025.',
+    },
+    {
+      id: 2,
+      type: 'warning',
+      title: 'Dự đoán tiến độ',
+      description: 'Repo "backend" có nguy cơ trễ hạn 3 ngày. Xem xét tăng tài nguyên.',
+    },
+  ];
+
+  const getInsightStyle = (type) => {
+    switch (type) {
+      case 'suggestion':
+        return {
+          icon: <BulbOutlined style={{ fontSize: 20, color: '#1890ff' }} />,
+          tag: <Tag color="blue">Đề xuất</Tag>,
+          borderColor: '#e6f7ff',
+          iconBg: '#e6f7ff',
+        };
+      case 'warning':
+        return {
+          icon: <WarningOutlined style={{ fontSize: 20, color: '#fa8c16' }} />,
+          tag: <Tag color="orange">Cảnh báo</Tag>,
+          borderColor: '#fff7e6',
+          iconBg: '#fff7e6',
+        };
+      default:
+        return {
+          icon: null,
+          tag: null,
+          borderColor: '#f0f0f0',
+          iconBg: '#f0f0f0',
+        };
+    }
+  };
+
+  return (
+    <InsightContainer
+      title={<Title level={4} style={{ margin: 0 }}>Gợi ý AI</Title>}
+      bordered={false}
+    >
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        {insights.map((item) => {
+          const { icon, tag, borderColor, iconBg } = getInsightStyle(item.type);
+          return (
+            <InsightCard key={item.id} borderColor={borderColor}>
+              <Space direction="horizontal" size="middle" style={{ width: '100%', alignItems: 'center' }}>
+                <IconWrapper bgColor={iconBg}>{icon}</IconWrapper>
+                <Space direction="vertical" size={4} style={{ flex: 1 }}>
+                  <Space>
+                    <Title level={5} style={{ margin: 0 }}>{item.title}</Title>
+                    {tag}
+                  </Space>
+                  <Text type="secondary">{item.description}</Text>
+                </Space>
+                <ActionWrapper>
+                  <Button type="primary" size="small">Thực hiện</Button>
+                  <Button size="small">Bỏ qua</Button>
+                </ActionWrapper>
+              </Space>
+            </InsightCard>
+          );
+        })}
+      </Space>
+    </InsightContainer>
+  );
+};
+
+export default AIInsightWidget;
+```
+
+### src\components\Dashboard\FiltersPanel.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\OverviewCard.jsx
+```jsx
+import React from 'react';
+import { Card, Row, Col, Statistic } from 'antd';
+import { ProjectOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
+
+const OverviewCard = ({ projects = 10, completedTasks = 50, overdueTasks = 5 }) => {
+  return (
+    <Card title="Tổng quan dự án" bordered={false}>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Statistic
+            title="Số dự án"
+            value={projects}
+            prefix={<ProjectOutlined />}
+            valueStyle={{ color: '#1890ff' }}
+          />
+        </Col>
+        <Col span={8}>
+          <Statistic
+            title="Công việc hoàn thành"
+            value={completedTasks}
+            prefix={<CheckCircleOutlined />}
+            valueStyle={{ color: '#52c41a' }}
+          />
+        </Col>
+        <Col span={8}>
+          <Statistic
+            title="Công việc trễ hạn"
+            value={overdueTasks}
+            prefix={<WarningOutlined />}
+            valueStyle={{ color: '#ff4d4f' }}
+          />
+        </Col>
+      </Row>
+    </Card>
+  );
+};
+
+export default OverviewCard;
+```
+
+### src\components\Dashboard\ProjectTaskManager.jsx
+```jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  Card, 
+  Select, 
+  List, 
+  Button, 
+  Modal, 
+  Input, 
+  DatePicker, 
+  Tag, 
+  Avatar, 
+  Space,
+  Tooltip,
+  message,
+  Empty,
+  Spin,
+  Row,
+  Col,
+  Statistic,
+  Progress,
+  Badge,
+  Dropdown,
+  Menu,
+  Form
+} from 'antd';
+import { 
+  PlusOutlined, 
+  UserOutlined, 
+  CalendarOutlined, 
+  EditOutlined,
+  DeleteOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  BarChartOutlined,
+  ReloadOutlined
+} from '@ant-design/icons';
+import styled from 'styled-components';
+import axios from 'axios';
+import RepoSelector from './ProjectTaskManager/RepoSelector';
+import StatisticsPanel from './ProjectTaskManager/StatisticsPanel';
+import FiltersPanel from './ProjectTaskManager/FiltersPanel';
+import TaskList from './ProjectTaskManager/TaskList';
+import TaskModal from './ProjectTaskManager/TaskModal';
+
+const TaskCard = styled(Card)`
+  margin-bottom: 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+`;
+
+const TaskHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+const TaskActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const ProjectTaskManager = () => {
+  const [repositories, setRepositories] = useState([]);
+  const [selectedRepo, setSelectedRepo] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [collaborators, setCollaborators] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [form] = Form.useForm();
+  
+  // Filter states
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
+
+  const fetchRepositories = useCallback(async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:8000/api/github/repos', {
+        headers: { Authorization: `token ${token}` },
+      });
+      setRepositories(response.data || []);
+    } catch (error) {
+      console.error('Lỗi khi tải repositories:', error);
+      message.error('Không thể tải danh sách repository!');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchTasks = useCallback(async () => {
+    if (!selectedRepo) return;
+
+    try {
+      setTasksLoading(true);
+      const response = await axios.get(
+        `http://localhost:8000/api/projects/${selectedRepo.owner.login}/${selectedRepo.name}/tasks`,
+        {
+          headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+        }
+      );
+      setTasks(response.data || []);    } catch {
+      console.log('API chưa có dữ liệu, sử dụng dữ liệu mẫu cho tasks');
+      // Dữ liệu mẫu khi API chưa có - sử dụng owner thật của repo
+      const ownerLogin = selectedRepo.owner.login;
+      setTasks([
+        {
+          id: 1,
+          title: 'Fix authentication bug',
+          description: 'Sửa lỗi đăng nhập không thành công trong hệ thống',
+          assignee: ownerLogin,
+          status: 'todo',
+          priority: 'high',
+          due_date: '2025-06-20',
+          created_at: '2025-06-10'
+        },
+        {
+          id: 2,
+          title: 'Update documentation',
+          description: 'Cập nhật tài liệu hướng dẫn API và README',
+          assignee: ownerLogin,
+          status: 'in_progress',
+          priority: 'medium',
+          due_date: '2025-06-25',
+          created_at: '2025-06-11'
+        },
+        {
+          id: 3,
+          title: 'Optimize database queries',
+          description: 'Tối ưu hóa các truy vấn database để cải thiện performance',
+          assignee: ownerLogin,
+          status: 'todo',
+          priority: 'low',
+          due_date: '2025-06-30',
+          created_at: '2025-06-12'
+        }
+      ]);
+    } finally {
+      setTasksLoading(false);
+    }
+  }, [selectedRepo]);
+  const fetchCollaborators = useCallback(async () => {
+    if (!selectedRepo) return;
+
+    try {
+      // Thử lấy contributors từ GitHub API (ít bị hạn chế hơn collaborators)
+      const token = localStorage.getItem('access_token');
+      const response = await axios.get(
+        `https://api.github.com/repos/${selectedRepo.owner.login}/${selectedRepo.name}/contributors`,
+        {
+          headers: { 
+            Authorization: `token ${token}`,
+            Accept: 'application/vnd.github.v3+json'
+          },
+        }
+      );
+      
+      // Thêm owner vào đầu danh sách
+      const ownerData = {
+        login: selectedRepo.owner.login,
+        avatar_url: selectedRepo.owner.avatar_url,
+        type: 'Owner',
+        contributions: 0
+      };
+      
+      // Lọc và format contributors
+      const contributors = response.data.slice(0, 10).map(contributor => ({
+        login: contributor.login,
+        avatar_url: contributor.avatar_url,
+        type: contributor.login === selectedRepo.owner.login ? 'Owner' : 'Contributor',
+        contributions: contributor.contributions
+      }));
+      
+      // Đảm bảo owner luôn ở đầu danh sách
+      const uniqueCollaborators = [
+        ownerData,
+        ...contributors.filter(c => c.login !== selectedRepo.owner.login)
+      ];
+      
+      setCollaborators(uniqueCollaborators);
+      console.log(`✅ Loaded ${uniqueCollaborators.length} contributors for ${selectedRepo.name}`);
+      
+    } catch (error) {
+      console.log('Không thể lấy contributors từ GitHub API, sử dụng fallback:', error.message);
+      
+      // Fallback: hiển thị owner và một số thành viên từ backend nếu có
+      try {
+        const backupResponse = await axios.get(
+          `http://localhost:8000/api/github/${selectedRepo.owner.login}/${selectedRepo.name}/collaborators`,
+          {
+            headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+          }
+        );
+        setCollaborators(backupResponse.data || []);
+      } catch {
+        // Last fallback: chỉ hiển thị owner
+        setCollaborators([
+          {
+            login: selectedRepo.owner.login,
+            avatar_url: selectedRepo.owner.avatar_url,
+            type: 'Owner',
+            contributions: 0
+          }
+        ]);
+      }
+    }
+  }, [selectedRepo]);
+
+  // Load repositories khi component mount
+  useEffect(() => {
+    fetchRepositories();
+  }, [fetchRepositories]);
+
+  // Load tasks và collaborators khi chọn repo
+  useEffect(() => {
+    if (selectedRepo) {
+      fetchTasks();
+      fetchCollaborators();
+    }
+  }, [selectedRepo, fetchTasks, fetchCollaborators]);
+
+  const handleRepoChange = (repoId) => {
+    const repo = repositories.find(r => r.id === repoId);
+    setSelectedRepo(repo);
+    setTasks([]);
+  };
+
+  const showTaskModal = (task = null) => {
+    setEditingTask(task);
+    setIsModalVisible(true);
+    
+    if (task) {
+      form.setFieldsValue({
+        title: task.title,
+        description: task.description,
+        assignee: task.assignee,
+        priority: task.priority,
+        dueDate: task.due_date ? new Date(task.due_date) : null
+      });
+    } else {
+      form.resetFields();
+    }
+  };
+
+  const handleTaskSubmit = async (values) => {
+    try {
+      const taskData = {
+        ...values,
+        due_date: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
+        status: editingTask ? editingTask.status : 'todo',
+        repo_owner: selectedRepo.owner.login,
+        repo_name: selectedRepo.name
+      };
+
+      if (editingTask) {
+        // Update task via API
+        try {
+          await axios.put(
+            `http://localhost:8000/api/projects/${selectedRepo.owner.login}/${selectedRepo.name}/tasks/${editingTask.id}`,
+            taskData,
+            {
+              headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+            }
+          );
+          // Refresh tasks from server
+          await fetchTasks();
+          message.success('Cập nhật task thành công!');
+        } catch (apiError) {
+          console.log('API call failed, using local update:', apiError);
+          // Fallback to local update
+          const updatedTasks = tasks.map(task => 
+            task.id === editingTask.id ? { ...task, ...taskData } : task
+          );
+          setTasks(updatedTasks);
+          message.success('Cập nhật task thành công (local)!');
+        }
+      } else {
+        // Create new task via API
+        try {
+          await axios.post(
+            `http://localhost:8000/api/projects/${selectedRepo.owner.login}/${selectedRepo.name}/tasks`,
+            taskData,
+            {
+              headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+            }
+          );
+          // Refresh tasks from server
+          await fetchTasks();
+          message.success('Tạo task mới thành công!');
+        } catch (apiError) {
+          console.log('API call failed, using local creation:', apiError);
+          // Fallback to local creation
+          const newTask = {
+            id: Date.now(),
+            ...taskData,
+            created_at: new Date().toISOString().split('T')[0]
+          };
+          setTasks([...tasks, newTask]);
+          message.success('Tạo task mới thành công (local)!');
+        }
+      }
+
+      setIsModalVisible(false);
+      form.resetFields();
+    } catch (formError) {
+      console.error('Form submission error:', formError);
+      message.error('Lỗi khi lưu task!');
+    }
+  };
+
+  const updateTaskStatus = async (taskId, newStatus) => {
+    try {
+      const taskToUpdate = tasks.find(t => t.id === taskId);
+      if (!taskToUpdate) return;
+
+      const updatedTaskData = { ...taskToUpdate, status: newStatus };
+      
+      try {
+        await axios.put(
+          `http://localhost:8000/api/projects/${selectedRepo.owner.login}/${selectedRepo.name}/tasks/${taskId}`,
+          updatedTaskData,
+          {
+            headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+          }
+        );
+        // Refresh tasks from server
+        await fetchTasks();
+        message.success('Cập nhật trạng thái thành công!');
+      } catch (apiError) {
+        console.log('API call failed, using local update:', apiError);
+        // Fallback to local update
+        const updatedTasks = tasks.map(task => 
+          task.id === taskId ? { ...task, status: newStatus } : task
+        );
+        setTasks(updatedTasks);
+        message.success('Cập nhật trạng thái thành công (local)!');
+      }
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      message.error('Lỗi khi cập nhật trạng thái!');
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      try {
+        await axios.delete(
+          `http://localhost:8000/api/projects/${selectedRepo.owner.login}/${selectedRepo.name}/tasks/${taskId}`,
+          {
+            headers: { Authorization: `token ${localStorage.getItem('access_token')}` },
+          }
+        );
+        // Refresh tasks from server
+        await fetchTasks();
+        message.success('Xóa task thành công!');
+      } catch (apiError) {
+        console.log('API call failed, using local delete:', apiError);
+        // Fallback to local delete
+        const updatedTasks = tasks.filter(task => task.id !== taskId);
+        setTasks(updatedTasks);
+        message.success('Xóa task thành công (local)!');
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      message.error('Lỗi khi xóa task!');
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'todo': return <ClockCircleOutlined style={{ color: '#faad14' }} />;
+      case 'in_progress': return <ExclamationCircleOutlined style={{ color: '#1890ff' }} />;
+      case 'done': return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
+      default: return <ClockCircleOutlined />;
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return '#f5222d';
+      case 'medium': return '#fa8c16';
+      case 'low': return '#52c41a';
+      default: return '#d9d9d9';
+    }
+  };
+
+  const getAssigneeInfo = (assigneeLogin) => {
+    return collaborators.find(c => c.login === assigneeLogin) || 
+           { login: assigneeLogin, avatar_url: null };
+  };
+
+  // Filter and search functions
+  const applyFilters = useCallback(() => {
+    let filtered = [...tasks];
+    
+    // Search filter
+    if (searchText) {
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.assignee.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+    
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(task => task.status === statusFilter);
+    }
+    
+    // Priority filter
+    if (priorityFilter !== 'all') {
+      filtered = filtered.filter(task => task.priority === priorityFilter);
+    }
+    
+    // Assignee filter
+    if (assigneeFilter !== 'all') {
+      filtered = filtered.filter(task => task.assignee === assigneeFilter);
+    }
+    
+    setFilteredTasks(filtered);
+  }, [tasks, searchText, statusFilter, priorityFilter, assigneeFilter]);
+
+  // Statistics calculation
+  const getTaskStats = useCallback(() => {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.status === 'done').length;
+    const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+    const todo = tasks.filter(t => t.status === 'todo').length;
+    const highPriority = tasks.filter(t => t.priority === 'high').length;
+    
+    return {
+      total,
+      completed,
+      inProgress,
+      todo,
+      highPriority,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
+    };
+  }, [tasks]);
+
+  // Apply filters whenever dependencies change
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  return (
+    <Card 
+      title="🎯 Quản lý Task Dự án" 
+      bordered={false}
+      extra={
+        selectedRepo && (
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => showTaskModal()}
+          >
+            Thêm Task
+          </Button>
+        )
+      }
+    >
+      <div style={{ marginBottom: 16 }}>
+        <RepoSelector 
+          repositories={repositories}
+          selectedRepo={selectedRepo}
+          loading={loading}
+          handleRepoChange={handleRepoChange}
+        />
+      </div>
+      {selectedRepo && (
+        <>
+          <div style={{ marginBottom: 16, padding: 12, background: '#f5f5f5', borderRadius: 8 }}>
+            <Space>
+              <Avatar src={selectedRepo.owner.avatar_url} />
+              <div>
+                <strong>{selectedRepo.owner.login}/{selectedRepo.name}</strong>
+                <div style={{ fontSize: 12, color: '#666' }}>
+                  {selectedRepo.description || 'Không có mô tả'}
+                </div>
+              </div>
+            </Space>
+          </div>
+          <StatisticsPanel stats={getTaskStats()} />
+          <Card size="small" style={{ marginBottom: 16 }}>
+            <FiltersPanel
+              searchText={searchText}
+              setSearchText={setSearchText}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              priorityFilter={priorityFilter}
+              setPriorityFilter={setPriorityFilter}
+              assigneeFilter={assigneeFilter}
+              setAssigneeFilter={setAssigneeFilter}
+              collaborators={collaborators}
+              fetchTasks={fetchTasks}
+              tasksLoading={tasksLoading}
+              filteredTasks={filteredTasks}
+            />
+          </Card>
+          <TaskList
+            filteredTasks={filteredTasks}
+            tasksLoading={tasksLoading}
+            getAssigneeInfo={getAssigneeInfo}
+            getStatusIcon={getStatusIcon}
+            getPriorityColor={getPriorityColor}
+            updateTaskStatus={updateTaskStatus}
+            showTaskModal={showTaskModal}
+            deleteTask={deleteTask}
+          />
+        </>
+      )}
+      <TaskModal
+        isModalVisible={isModalVisible}
+        editingTask={editingTask}
+        form={form}
+        handleTaskSubmit={handleTaskSubmit}
+        setIsModalVisible={setIsModalVisible}
+        collaborators={collaborators}
+      />
+    </Card>
+  );
+};
+
+export default ProjectTaskManager;
+```
+
+### src\components\Dashboard\RepoListFilter.jsx
+```jsx
+import React, { useState } from 'react';
+import { Card, Row, Col, Input, Select, Button } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
+
+const RepoListFilter = ({ onFilterChange }) => {
+  const [searchText, setSearchText] = useState('');
+  const [status, setStatus] = useState('all');
+  const [assignee, setAssignee] = useState('all');
+
+  const handleApplyFilter = () => {
+    onFilterChange({ searchText, status, assignee });
+  };
+
+  return (
+    <Card title="Bộ lọc Repository" bordered={false}>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Input
+            placeholder="Tìm kiếm repo"
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </Col>
+        <Col span={6}>
+          <Select
+            style={{ width: '100%' }}
+            value={status}
+            onChange={(value) => setStatus(value)}
+            placeholder="Trạng thái"
+          >
+            <Option value="all">Tất cả</Option>
+            <Option value="active">Đang hoạt động</Option>
+            <Option value="archived">Đã lưu trữ</Option>
+          </Select>
+        </Col>
+        <Col span={6}>
+          <Select
+            style={{ width: '100%' }}
+            value={assignee}
+            onChange={(value) => setAssignee(value)}
+            placeholder="Người phụ trách"
+          >
+            <Option value="all">Tất cả</Option>
+            <Option value="user1">User 1</Option>
+            <Option value="user2">User 2</Option>
+          </Select>
+        </Col>
+        <Col span={4}>
+          <Button type="primary" onClick={handleApplyFilter}>
+            Áp dụng
+          </Button>
+        </Col>
+      </Row>
+    </Card>
+  );
+};
+
+export default RepoListFilter;
+```
+
+### src\components\Dashboard\RepoSelector.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\StatisticsPanel.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\TaskBoard.jsx
+```jsx
+import React, { useState } from 'react';
+import { Card, Row, Col } from 'antd';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Task } from '../../utils/types';
+
+const SortableTask = ({ task }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    marginBottom: 8,
+  };
+
+  return (
+    <Card ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <p>{task.title}</p>
+      <p>Người phụ trách: {task.assignee}</p>
+    </Card>
+  );
+};
+
+const TaskBoard = ({ initialTasks = [] }) => {
+  const [tasks, setTasks] = useState(initialTasks);
+
+  const onDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setTasks((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const columns = {
+    todo: { title: 'Chờ xử lý', tasks: tasks.filter((task) => task.status === 'todo') },
+    inProgress: { title: 'Đang thực hiện', tasks: tasks.filter((task) => task.status === 'inProgress') },
+    done: { title: 'Hoàn thành', tasks: tasks.filter((task) => task.status === 'done') },
+  };
+
+  return (
+    <Card title="Bảng công việc" bordered={false}>
+      <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <Row gutter={16}>
+          {Object.keys(columns).map((columnId) => (
+            <Col span={8} key={columnId}>
+              <Card title={columns[columnId].title} bordered={false}>
+                <SortableContext items={columns[columnId].tasks.map((task) => task.id)}>
+                  {columns[columnId].tasks.map((task) => (
+                    <SortableTask key={task.id} task={task} />
+                  ))}
+                </SortableContext>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </DndContext>
+    </Card>
+  );
+};
+
+export default TaskBoard;
+```
+
+### src\components\Dashboard\TaskCard.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\TaskList.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\TaskModal.jsx
+```jsx
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\FiltersPanel.jsx
+```jsx
+import React from 'react';
+import { Row, Col, Select, Button, Space, Badge, Input, Avatar } from 'antd';
+import { ReloadOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
+const { Search } = Input;
+
+const FiltersPanel = ({
+  searchText,
+  setSearchText,
+  statusFilter,
+  setStatusFilter,
+  priorityFilter,
+  setPriorityFilter,
+  assigneeFilter,
+  setAssigneeFilter,
+  collaborators,
+  fetchTasks,
+  tasksLoading,
+  filteredTasks
+}) => (
+  <Row gutter={16} align="middle">
+    <Col span={6}>
+      <Search
+        placeholder="Tìm kiếm tasks..."
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        prefix={<SearchOutlined />}
+        allowClear
+      />
+    </Col>
+    <Col span={4}>
+      <Select 
+        placeholder="Trạng thái"
+        value={statusFilter}
+        onChange={setStatusFilter}
+        style={{ width: '100%' }}
+      >
+        <Option value="all">Tất cả</Option>
+        <Option value="todo">Chưa bắt đầu</Option>
+        <Option value="in_progress">Đang làm</Option>
+        <Option value="done">Hoàn thành</Option>
+      </Select>
+    </Col>
+    <Col span={4}>
+      <Select 
+        placeholder="Độ ưu tiên"
+        value={priorityFilter}
+        onChange={setPriorityFilter}
+        style={{ width: '100%' }}
+      >
+        <Option value="all">Tất cả</Option>
+        <Option value="high">Cao</Option>
+        <Option value="medium">Trung bình</Option>
+        <Option value="low">Thấp</Option>
+      </Select>
+    </Col>
+    <Col span={4}>
+      <Select 
+        placeholder="Người thực hiện"
+        value={assigneeFilter}
+        onChange={setAssigneeFilter}
+        style={{ width: '100%' }}
+      >
+        <Option value="all">Tất cả</Option>
+        {collaborators.map(collab => (
+          <Option key={collab.login} value={collab.login}>
+            <Space>
+              <Avatar src={collab.avatar_url} size="small" />
+              {collab.login}
+            </Space>
+          </Option>
+        ))}
+      </Select>
+    </Col>
+    <Col span={6}>
+      <Space>
+        <Button 
+          icon={<ReloadOutlined />}
+          onClick={fetchTasks}
+          disabled={tasksLoading}
+        >
+          Làm mới
+        </Button>
+        <Badge count={filteredTasks.length} showZero>
+          <Button icon={<FilterOutlined />}>
+            Kết quả lọc
+          </Button>
+        </Badge>
+      </Space>
+    </Col>
+  </Row>
+);
+
+export default FiltersPanel;
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\index.js
+```js
+// Export all ProjectTaskManager components
+export { default as RepoSelector } from './RepoSelector';
+export { default as StatisticsPanel } from './StatisticsPanel';
+export { default as FiltersPanel } from './FiltersPanel';
+export { default as TaskList } from './TaskList';
+export { default as TaskModal } from './TaskModal';
+export { default as TaskCard } from './TaskCard';
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\RepoSelector.jsx
+```jsx
+import React from 'react';
+import { Select, Avatar, Space, Tag } from 'antd';
+
+const { Option } = Select;
+
+const RepoSelector = ({ repositories, selectedRepo, loading, handleRepoChange }) => (
+  <Select
+    style={{ width: '100%' }}
+    placeholder="Chọn repository để quản lý tasks"
+    loading={loading}
+    value={selectedRepo?.id}
+    onChange={handleRepoChange}
+    showSearch
+    optionFilterProp="children"
+  >
+    {repositories.map(repo => (
+      <Option key={repo.id} value={repo.id}>
+        <Space>
+          <Avatar src={repo.owner.avatar_url} size="small" />
+          {repo.owner.login}/{repo.name}
+          <Tag color={repo.private ? 'red' : 'green'}>
+            {repo.private ? 'Private' : 'Public'}
+          </Tag>
+        </Space>
+      </Option>
+    ))}
+  </Select>
+);
+
+export default RepoSelector;
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\StatisticsPanel.jsx
+```jsx
+import React from 'react';
+import { Card, Row, Col, Statistic, Progress } from 'antd';
+import { BarChartOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+
+const StatisticsPanel = ({ stats }) => (
+  <div style={{ marginBottom: 16 }}>
+    <Row gutter={16}>
+      <Col span={6}>
+        <Card size="small">
+          <Statistic 
+            title="Tổng tasks" 
+            value={stats.total}
+            prefix={<BarChartOutlined />}
+          />
+        </Card>
+      </Col>
+      <Col span={6}>
+        <Card size="small">
+          <Statistic 
+            title="Hoàn thành" 
+            value={stats.completed}
+            valueStyle={{ color: '#52c41a' }}
+            prefix={<CheckCircleOutlined />}
+          />
+        </Card>
+      </Col>
+      <Col span={6}>
+        <Card size="small">
+          <Statistic 
+            title="Đang làm" 
+            value={stats.inProgress}
+            valueStyle={{ color: '#1890ff' }}
+            prefix={<ExclamationCircleOutlined />}
+          />
+        </Card>
+      </Col>
+      <Col span={6}>
+        <Card size="small">
+          <Statistic 
+            title="Tỷ lệ hoàn thành" 
+            value={stats.completionRate}
+            suffix="%"
+            valueStyle={{ color: stats.completionRate > 70 ? '#52c41a' : '#fa8c16' }}
+          />
+          <Progress 
+            percent={stats.completionRate} 
+            showInfo={false}
+            size="small"
+            strokeColor={stats.completionRate > 70 ? '#52c41a' : '#fa8c16'}
+          />
+        </Card>
+      </Col>
+    </Row>
+  </div>
+);
+
+export default StatisticsPanel;
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\TaskCard.jsx
+```jsx
+import React from 'react';
+import { Card, Space, Button, Tooltip, Tag, Avatar, Select } from 'antd';
+import { EditOutlined, DeleteOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+
+const { Option } = Select;
+
+const TaskHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+const TaskActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const PriorityTag = styled(Tag)`
+  font-weight: 500;
+`;
+
+const TaskCard = ({
+  task,
+  getAssigneeInfo,
+  getStatusIcon,
+  getPriorityColor,
+  updateTaskStatus,
+  showTaskModal,
+  deleteTask
+}) => {
+  const assigneeInfo = getAssigneeInfo(task.assignee);
+  return (
+    <Card size="small">
+      <TaskHeader>
+        <Space>
+          {getStatusIcon(task.status)}
+          <strong>{task.title}</strong>
+          <PriorityTag color={getPriorityColor(task.priority)}>
+            {task.priority?.toUpperCase()}
+          </PriorityTag>
+        </Space>
+        <TaskActions>
+          <Tooltip title="Chỉnh sửa">
+            <Button 
+              size="small" 
+              icon={<EditOutlined />}
+              onClick={() => showTaskModal(task)}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button 
+              size="small" 
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => deleteTask(task.id)}
+            />
+          </Tooltip>
+        </TaskActions>
+      </TaskHeader>
+      <div style={{ marginBottom: 8 }}>
+        {task.description}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Space>
+          <Avatar 
+            src={assigneeInfo.avatar_url} 
+            icon={<UserOutlined />}
+            size="small"
+          />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 12, fontWeight: 500 }}>{assigneeInfo.login}</span>
+            {assigneeInfo.type && (
+              <Tag 
+                size="small" 
+                color={assigneeInfo.type === 'Owner' ? 'gold' : 'blue'}
+                style={{ fontSize: '9px', marginTop: 2 }}
+              >
+                {assigneeInfo.type}
+              </Tag>
+            )}
+          </div>
+        </Space>
+        <Space>
+          {task.due_date && (
+            <Space style={{ fontSize: 12, color: '#666' }}>
+              <CalendarOutlined />
+              {task.due_date}
+            </Space>
+          )}
+          <Select 
+            size="small"
+            value={task.status}
+            onChange={(newStatus) => updateTaskStatus(task.id, newStatus)}
+            style={{ width: 100 }}
+          >
+            <Option value="todo">To Do</Option>
+            <Option value="in_progress">Đang làm</Option>
+            <Option value="done">Hoàn thành</Option>
+          </Select>
+        </Space>
+      </div>
+    </Card>
+  );
+};
+
+export default TaskCard;
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\TaskList.jsx
+```jsx
+import React from 'react';
+import { List, Empty, Spin } from 'antd';
+import TaskCard from './TaskCard';
+
+const TaskList = ({ filteredTasks, tasksLoading, getAssigneeInfo, getStatusIcon, getPriorityColor, updateTaskStatus, showTaskModal, deleteTask }) => (
+  <Spin spinning={tasksLoading}>
+    {filteredTasks.length === 0 ? (
+      <Empty 
+        description="Chưa có task nào cho repository này"
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
+    ) : (
+      <List
+        dataSource={filteredTasks}
+        renderItem={task => (
+          <TaskCard
+            task={task}
+            getAssigneeInfo={getAssigneeInfo}
+            getStatusIcon={getStatusIcon}
+            getPriorityColor={getPriorityColor}
+            updateTaskStatus={updateTaskStatus}
+            showTaskModal={showTaskModal}
+            deleteTask={deleteTask}
+          />
+        )}
+      />
+    )}
+  </Spin>
+);
+
+export default TaskList;
+
+```
+
+### src\components\Dashboard\ProjectTaskManager\TaskModal.jsx
+```jsx
+import React from 'react';
+import { Modal, Form, Input, Select, DatePicker, Button, Space, Avatar, Tag } from 'antd';
+
+const { Option } = Select;
+const { TextArea } = Input;
+
+const TaskModal = ({
+  isModalVisible,
+  editingTask,
+  form,
+  handleTaskSubmit,
+  setIsModalVisible,
+  collaborators
+}) => (
+  <Modal
+    title={editingTask ? "Chỉnh sửa Task" : "Tạo Task Mới"}
+    open={isModalVisible}
+    onCancel={() => setIsModalVisible(false)}
+    footer={null}
+  >
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleTaskSubmit}
+    >
+      <Form.Item
+        name="title"
+        label="Tiêu đề"
+        rules={[{ required: true, message: 'Vui lòng nhập tiêu đề!' }]}
+      >
+        <Input placeholder="Nhập tiêu đề task" />
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label="Mô tả"
+        rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
+      >
+        <TextArea rows={3} placeholder="Mô tả chi tiết task" />
+      </Form.Item>
+      <Form.Item
+        name="assignee"
+        label="Giao cho"
+        rules={[{ required: true, message: 'Vui lòng chọn người thực hiện!' }]}
+      >
+        <Select 
+          placeholder="Chọn thành viên"
+          showSearch
+          optionFilterProp="children"
+          filterOption={(input, option) =>
+            option.children.props.children[1].toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {collaborators.map(collab => (
+            <Option key={collab.login} value={collab.login}>
+              <Space>
+                <Avatar src={collab.avatar_url} size="small" />
+                <span>{collab.login}</span>
+                {collab.type === 'Owner' && <Tag color="gold">Owner</Tag>}
+                {collab.type === 'Contributor' && <Tag color="blue">Contributor</Tag>}
+                {collab.contributions > 0 && (
+                  <Tag color="green" style={{ fontSize: '10px' }}>
+                    {collab.contributions} commits
+                  </Tag>
+                )}
+              </Space>
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Form.Item
+        name="priority"
+        label="Độ ưu tiên"
+        rules={[{ required: true, message: 'Vui lòng chọn độ ưu tiên!' }]}
+      >
+        <Select placeholder="Chọn độ ưu tiên">
+          <Option value="low">
+            <Tag color="#52c41a">Thấp</Tag>
+          </Option>
+          <Option value="medium">
+            <Tag color="#fa8c16">Trung bình</Tag>
+          </Option>
+          <Option value="high">
+            <Tag color="#f5222d">Cao</Tag>
+          </Option>
+        </Select>
+      </Form.Item>
+      <Form.Item
+        name="dueDate"
+        label="Hạn hoàn thành"
+      >
+        <DatePicker style={{ width: '100%' }} />
+      </Form.Item>
+      <Form.Item>
+        <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+          <Button onClick={() => setIsModalVisible(false)}>
+            Hủy
+          </Button>
+          <Button type="primary" htmlType="submit">
+            {editingTask ? 'Cập nhật' : 'Tạo mới'}
+          </Button>
+        </Space>
+      </Form.Item>
+    </Form>
+  </Modal>
+);
+
+export default TaskModal;
+
+```
+
+### src\components\repo\RepoList.jsx
+```jsx
+import { useEffect, useState } from "react";
+import { Avatar, Typography, Spin, message, Card, Tag, Pagination } from "antd";
+import { useNavigate } from "react-router-dom";
+import { GithubOutlined, StarFilled, EyeFilled, ForkOutlined, CalendarOutlined } from "@ant-design/icons";
+import styled from "styled-components";
+import axios from "axios";
+
+const { Title, Text } = Typography;
+
+const RepoContainer = styled.div`
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+`;
+
+const RepoCard = styled(Card)`
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: none;
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+  }
+`;
+
+const RepoHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+`;
+
+const RepoTitle = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const RepoName = styled(Text)`
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #24292e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const RepoDescription = styled(Text)`
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #586069;
+  margin: 8px 0;
+`;
+
+const RepoMeta = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  align-items: center;
+`;
+
+const MetaItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #586069;
+`;
+
+const StyledPagination = styled(Pagination)`
+  margin-top: 32px;
+  text-align: center;
+  
+  .ant-pagination-item-active {
+    border-color: #1890ff;
+    background: #1890ff;
+    
+    a {
+      color: white;
+    }
+  }
+`;
+
+const HighlightTag = styled(Tag)`
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 0 10px;
+`;
+
+const RepoList = () => {
+  const [repos, setRepos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalRepos, setTotalRepos] = useState(0);
+  const navigate = useNavigate();
+  const pageSize = 8;
+
+  useEffect(() => {
+    const fetchRepos = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) return message.error("Vui lòng đăng nhập lại!");
+
+      try {
+        setLoading(true);
+        const response = await axios.get("http://localhost:8000/api/github/repos", {
+          headers: { Authorization: `token ${token}` },
+          params: { sort: 'updated', direction: 'desc' } // Sắp xếp theo mới nhất
+        });
+        
+        // Sắp xếp lại để đảm bảo mới nhất lên đầu
+        const sortedRepos = response.data.sort((a, b) => 
+          new Date(b.updated_at) - new Date(a.updated_at)
+        );
+        
+        setRepos(sortedRepos);
+        setTotalRepos(sortedRepos.length);
+      } catch (error) {
+        message.error("Không thể tải danh sách repository!");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepos();
+  }, []);
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  const paginatedRepos = repos.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '100px' }}>
+        <Spin tip="Đang tải dữ liệu..." size="large" />
+      </div>
+    );
+  }
+
+  return (
+    <RepoContainer>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <Title level={2} style={{ margin: 0, color: '#24292e' }}>
+          <GithubOutlined style={{ marginRight: '12px', color: '#1890ff' }} />
+          GitHub Repositories
+        </Title>
+        <Text strong style={{ fontSize: '16px' }}>
+          Tổng cộng: {totalRepos} repositories
+        </Text>
+      </div>
+
+      {paginatedRepos.map((repo) => (
+        <RepoCard 
+          key={repo.id} 
+          onClick={() => navigate(`/repo/${repo.owner.login}/${repo.name}`)}
+        >
+          <RepoHeader>
+            <Avatar 
+              src={repo.owner.avatar_url} 
+              size={48}
+              style={{ marginRight: '16px', flexShrink: 0 }}
+            />
+            <RepoTitle>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <RepoName>{repo.name}</RepoName>
+                {repo.private ? (
+                  <HighlightTag color="error" style={{ marginLeft: '12px' }}>
+                    Private
+                  </HighlightTag>
+                ) : (
+                  <HighlightTag color="success" style={{ marginLeft: '12px' }}>
+                    Public
+                  </HighlightTag>
+                )}
+              </div>
+              
+              <RepoDescription type="secondary">
+                {repo.description || "Không có mô tả"}
+              </RepoDescription>
+            </RepoTitle>
+          </RepoHeader>
+
+          <RepoMeta>
+            <MetaItem>
+              <StarFilled style={{ color: '#ffc53d' }} />
+              <Text strong>{repo.stargazers_count}</Text>
+              <Text>stars</Text>
+            </MetaItem>
+            
+            <MetaItem>
+              <EyeFilled style={{ color: '#1890ff' }} />
+              <Text strong>{repo.watchers_count}</Text>
+              <Text>watchers</Text>
+            </MetaItem>
+            
+            <MetaItem>
+              <ForkOutlined style={{ color: '#73d13d' }} />
+              <Text strong>{repo.forks_count}</Text>
+              <Text>forks</Text>
+            </MetaItem>
+            
+            {repo.language && (
+              <MetaItem>
+                <div style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  backgroundColor: '#1890ff',
+                  marginRight: 6
+                }} />
+                <Text>{repo.language}</Text>
+              </MetaItem>
+            )}
+            
+            <MetaItem style={{ marginLeft: 'auto' }}>
+              <CalendarOutlined />
+              <Text>Cập nhật: {formatDate(repo.updated_at)}</Text>
+            </MetaItem>
+          </RepoMeta>
+        </RepoCard>
+      ))}
+
+      <StyledPagination
+        current={currentPage}
+        pageSize={pageSize}
+        total={totalRepos}
+        onChange={(page) => setCurrentPage(page)}
+        showSizeChanger={false}
+        showQuickJumper
+      />
+    </RepoContainer>
+  );
+};
+
+export default RepoList;
+```
+
+### src\contexts\SyncContext.jsx
+```jsx
+
+```
+
+### src\pages\AuthSuccess.jsx
+```jsx
+// src/pages/AuthSuccess.jsx
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { message } from "antd";
+
+const AuthSuccess = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const username = params.get("username");
+    const email = params.get("email");
+
+    if (token) {
+      const profile = {
+        token,
+        username,
+        email,
+        avatar_url: params.get("avatar_url"),
+      };      localStorage.setItem("github_profile", JSON.stringify(profile));
+      localStorage.setItem("access_token", token);
+
+      // Chuyển hướng ngay lập tức, để Dashboard xử lý đồng bộ
+      message.success("Đăng nhập thành công!");
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  }, [location, navigate]);
+
+  return (
+    <div className="h-screen flex items-center justify-center">
+      <p className="text-xl">Đang đồng bộ dữ liệu...</p>
+    </div>
+  );
+};
+
+export default AuthSuccess;
+```
+
+### src\pages\Dashboard.jsx
+```jsx
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message, Spin } from 'antd';
+import { LogoutOutlined, GithubOutlined, NotificationOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+import RepoList from '../components/repo/RepoList';
+import OverviewCard from '../components/Dashboard/OverviewCard';
+import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
+import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
+import RepoListFilter from '../components/Dashboard/RepoListFilter';
+import TaskBoard from '../components/Dashboard/TaskBoard';
+import SyncProgressNotification from '../components/common/SyncProgressNotification';
+import axios from 'axios';
+
+const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
+
+// Styled components với theme hiện đại
+const DashboardContainer = styled.div`
+  padding: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  background: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    gap: 16px;
+  }
+`;
+
+const HeaderCard = styled(Card)`
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  
+  .ant-card-body {
+    padding: 24px;
+  }
+`;
+
+const DashboardCard = styled(Card)`
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  &:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .ant-card-head {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 16px 24px;
+  }
+
+  .ant-card-body {
+    padding: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-card-body {
+      padding: 16px;
+    }
+  }
+`;
+
+const PrimaryButton = styled(Button)`
+  border-radius: 8px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const UserInfoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const UserAvatar = styled(Avatar)`
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 2px solid #ffffff;
+`;
+
+const WidgetsRow = styled.div`
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ContentSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;
+
+const SectionTitle = styled(Title)`
+  margin-bottom: 0 !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const NotificationBadge = styled(Badge)`
+  .ant-badge-count {
+    background: #3b82f6;
+    box-shadow: 0 0 0 1px #fff;
+  }
+`;
+
+const Dashboard = () => {
+  const [user, setUser] = useState(null);
+  const [loading] = useState(false);
+  const navigate = useNavigate();
+  const screens = useBreakpoint();
+  // Progress notification states
+  const [syncProgress, setSyncProgress] = useState({
+    visible: false,
+    totalRepos: 0,
+    completedRepos: 0,
+    currentRepo: '',
+    repoProgresses: [],
+    overallProgress: 0
+  });
+
+  const [isSyncing, setIsSyncing] = useState(false);  const syncAllRepositories = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      message.error('Vui lòng đăng nhập lại!');
+      return;
+    }
+
+    // Hiển thị progress ngay lập tức TRƯỚC khi set loading
+    setSyncProgress({
+      visible: true,
+      totalRepos: 0,
+      completedRepos: 0,
+      currentRepo: 'Đang lấy danh sách repository...',
+      repoProgresses: [],
+      overallProgress: 0
+    });
+
+    setIsSyncing(true);
+
+    try {
+      // Thêm timeout nhỏ để đảm bảo UI render progress trước
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      const response = await axios.get('http://localhost:8000/api/github/repos', {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      });
+
+      const repositories = response.data;
+      
+      // Cập nhật với danh sách repository thực tế
+      setSyncProgress(prev => ({
+        ...prev,
+        totalRepos: repositories.length,
+        currentRepo: 'Chuẩn bị đồng bộ...',
+        repoProgresses: repositories.map(repo => ({
+          name: `${repo.owner.login}/${repo.name}`,
+          status: 'pending',
+          progress: 0
+        }))
+      }));
+
+      let completedCount = 0;
+      
+      // Đồng bộ từng repository một cách tuần tự để tracking dễ hơn
+      for (const repo of repositories) {
+        const repoName = `${repo.owner.login}/${repo.name}`;
+        
+        // Cập nhật repository hiện tại
+        setSyncProgress(prev => ({
+          ...prev,
+          currentRepo: repoName,
+          repoProgresses: prev.repoProgresses.map(r => 
+            r.name === repoName ? { ...r, status: 'syncing', progress: 0 } : r
+          )
+        }));
+
+        try {
+          // Đồng bộ repository
+          await axios.post(
+            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-all`,
+            {},
+            {
+              headers: {
+                Authorization: `token ${token}`,
+              },
+            }
+          );
+
+          completedCount++;
+          
+          // Cập nhật trạng thái hoàn thành
+          setSyncProgress(prev => ({
+            ...prev,
+            completedRepos: completedCount,
+            overallProgress: (completedCount / repositories.length) * 100,
+            repoProgresses: prev.repoProgresses.map(r => 
+              r.name === repoName ? { ...r, status: 'completed', progress: 100 } : r
+            )
+          }));
+
+        } catch (error) {
+          console.error(`Lỗi đồng bộ ${repoName}:`, error);
+          
+          // Cập nhật trạng thái lỗi
+          setSyncProgress(prev => ({
+            ...prev,
+            repoProgresses: prev.repoProgresses.map(r => 
+              r.name === repoName ? { ...r, status: 'error', progress: 0 } : r
+            )
+          }));
+          
+          completedCount++; // Vẫn tính là completed để tiếp tục
+        }
+      }
+
+      message.success('Đồng bộ tất cả repository hoàn thành!');
+
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách repository:', error);
+      message.error('Không thể lấy danh sách repository!');
+      setSyncProgress(prev => ({ ...prev, visible: false }));
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+  useEffect(() => {
+    const storedProfile = localStorage.getItem('github_profile');
+    if (!storedProfile) {
+      navigate('/login');
+    } else {
+      setUser(JSON.parse(storedProfile));
+      
+      // Đồng bộ cơ bản nhanh để hiển thị danh sách repo ngay lập tức
+      syncBasicRepositories();
+    }
+  }, [navigate]);
+
+  // Đồng bộ cơ bản (nhanh) - chỉ thông tin repo và branches
+  const syncBasicRepositories = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/github/repos', {
+        headers: { Authorization: `token ${token}` },
+      });
+
+      const repositories = response.data;
+      message.info(`Đồng bộ cơ bản ${repositories.length} repository...`);
+      
+      // Đồng bộ cơ bản song song (nhanh hơn)
+      Promise.all(
+        repositories.slice(0, 10).map(repo => // Chỉ đồng bộ 10 repo đầu tiên
+          axios.post(
+            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-basic`,
+            {},
+            { headers: { Authorization: `token ${token}` } }
+          ).catch(() => null)
+        )
+      ).then(() => {
+        message.success('Đồng bộ cơ bản hoàn thành!');
+      });
+
+    } catch (error) {
+      console.error('Lỗi đồng bộ cơ bản:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('github_profile');
+    localStorage.removeItem('access_token');
+    navigate('/login');
+  };
+
+  const handleFilterChange = (filters) => {
+    console.log('Applied filters:', filters);
+  };
+
+  const handleStatusChange = (taskId, newStatus) => {
+    console.log(`Updated task ${taskId} status to ${newStatus}`);
+  };
+
+  if (loading) {
+    return <Spin tip="Đang đồng bộ dữ liệu..." size="large" />;
+  }
+
+  return (
+    <DashboardContainer>
+      {/* Header Section */}
+      <HeaderCard bordered={false}>
+        <Space 
+          direction={screens.md ? 'horizontal' : 'vertical'} 
+          align={screens.md ? 'center' : 'start'}
+          style={{ width: '100%', justifyContent: 'space-between' }}
+        >
+          <UserInfoContainer>
+            <UserAvatar src={user?.avatar_url} size={screens.md ? 72 : 56} />
+            <div>
+              <Title level={4} style={{ margin: 0, color: '#1e293b' }}>
+                Welcome back, {user?.username || 'User'}!
+              </Title>
+              <Text type="secondary" style={{ color: '#64748b' }}>
+                {user?.email || 'No email provided'}
+              </Text>
+            </div>
+          </UserInfoContainer>            <Space size={screens.md ? 16 : 8}>
+            <Button 
+              type="default" 
+              onClick={syncAllRepositories}
+              loading={isSyncing}
+              disabled={isSyncing}
+              style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }}
+            >
+              {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ đầy đủ'}
+            </Button>
+            
+            {/* Test button for instant progress */}
+            <Button 
+              onClick={() => {
+                setSyncProgress({
+                  visible: true,
+                  totalRepos: 5,
+                  completedRepos: 0,
+                  currentRepo: 'Test repository...',
+                  repoProgresses: [],
+                  overallProgress: 0
+                });
+              }}
+              style={{ background: '#10b981', borderColor: '#10b981', color: 'white' }}
+            >
+              Test Progress
+            </Button>
+            
+            <NotificationBadge count={3} size="small">
+              <Button 
+                icon={<NotificationOutlined />} 
+                shape="circle" 
+                style={{ border: 'none' }}
+              />
+            </NotificationBadge>
+            <PrimaryButton 
+              type="primary" 
+              danger 
+              onClick={handleLogout}
+              icon={<LogoutOutlined />}
+            >
+              {screens.md ? 'Log Out' : ''}
+            </PrimaryButton>
+          </Space>
+        </Space>
+      </HeaderCard>
+
+      {/* Overview Metrics */}
+      <DashboardCard bodyStyle={{ padding: '16px' }}>
+        <OverviewCard />
+      </DashboardCard>      {/* AI Insights and Project Management */}
+      <WidgetsRow>
+        <DashboardCard 
+          title={
+            <SectionTitle level={5}>
+              <GithubOutlined />
+              Repository Analysis
+            </SectionTitle>
+          }
+        >
+          <AIInsightWidget />
+        </DashboardCard>
+        
+        <DashboardCard>
+          <ProjectTaskManager />
+        </DashboardCard>
+      </WidgetsRow>
+
+      {/* Filters Section */}
+      <DashboardCard 
+        title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
+      >
+        <RepoListFilter onFilterChange={handleFilterChange} />
+      </DashboardCard>
+
+      {/* Main Content Sections */}
+      <ContentSection>
+        <DashboardCard 
+          title={
+            <SectionTitle level={5}>
+              My Repositories
+              <Text type="secondary" style={{ fontSize: 14, marginLeft: 8 }}>
+                (24 repositories)
+              </Text>
+            </SectionTitle>
+          }
+        >
+          <RepoList />
+        </DashboardCard>        <DashboardCard 
+          title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
+        >
+          <TaskBoard onStatusChange={handleStatusChange} />
+        </DashboardCard>
+      </ContentSection>
+
+      {/* Progress Notification */}
+      <SyncProgressNotification
+        visible={syncProgress.visible}
+        onClose={() => setSyncProgress(prev => ({ ...prev, visible: false }))}
+        totalRepos={syncProgress.totalRepos}
+        completedRepos={syncProgress.completedRepos}
+        currentRepo={syncProgress.currentRepo}
+        repoProgresses={syncProgress.repoProgresses}
+        overallProgress={syncProgress.overallProgress}
+      />
+    </DashboardContainer>
+  );
+};
+
+export default Dashboard;
+```
+
+### src\pages\Login.jsx
+```jsx
+// src/pages/Login.jsx
+import React from "react";
+import { Button, Card, Typography } from "antd";
+import { GithubOutlined } from "@ant-design/icons";
+
+const { Title } = Typography;
+
+const Login = () => {
+  const handleGitHubLogin = () => {
+    window.location.href = "http://localhost:8000/api/login"; // backend redirect to GitHub OAuth
+  };
+
+  return (
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-white">
+      <Card
+        className="shadow-xl rounded-2xl w-full max-w-md"
+        style={{ textAlign: "center", padding: "3rem 2rem" }}
+      >
+        <Title level={2} style={{ marginBottom: "2rem" }}>
+          Đăng nhập vào <span style={{ color: "#1890ff" }}>TaskFlowAI</span>
+        </Title>
+        <Button
+          type="primary"
+          icon={<GithubOutlined />}
+          size="large"
+          onClick={handleGitHubLogin}
+          style={{
+            backgroundColor: "#000",
+            borderColor: "#000",
+            width: "100%",
+          }}
+        >
+          Đăng nhập với GitHub
+        </Button>
+      </Card>
+    </div>
+  );
+};
+
+export default Login;
+```
+
+### src\pages\RepoDetails.jsx
+```jsx
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { message, Button, Card, Typography, Alert, Progress } from "antd";
+import { SyncOutlined, SaveOutlined, GithubOutlined } from "@ant-design/icons";
+import BranchSelector from "../components/Branchs/BranchSelector";
+import CommitList from "../components/commits/CommitList";
+import axios from "axios";
+
+const { Title, Text } = Typography;
+
+const RepoDetails = () => {
+  const { owner, repo } = useParams();
+  const [branch, setBranch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
+
+  // Sync repository trong background không block UI
+  const syncRepositoryInBackground = useCallback(async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token || syncing) return;
+
+    try {
+      setSyncing(true);
+      setSyncProgress(0);
+      
+      // Hiển thị thông báo bắt đầu sync
+      message.info(`Đang đồng bộ repository ${repo} trong background...`, 2);
+      
+      // Sync cơ bản trước (nhanh)
+      setSyncProgress(30);
+      await axios.post(
+        `http://localhost:8000/api/github/${owner}/${repo}/sync-basic`,
+        {},
+        {
+          headers: { Authorization: `token ${token}` },
+        }
+      );
+      
+      // Sync đầy đủ
+      setSyncProgress(70);
+      await axios.post(
+        `http://localhost:8000/api/github/${owner}/${repo}/sync-all`,
+        {},
+        {
+          headers: { Authorization: `token ${token}` },
+        }
+      );
+      
+      setSyncProgress(100);
+      message.success(`Đồng bộ repository ${repo} thành công!`);
+      
+    } catch (error) {
+      console.error("Lỗi khi đồng bộ repository:", error);
+      message.error("Đồng bộ repository thất bại!");
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setSyncProgress(0), 2000);
+    }
+  }, [owner, repo, syncing]);
+
+  // Kiểm tra và sync repository trong background
+  const checkAndSyncRepository = useCallback(async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+      // Kiểm tra xem repo đã có dữ liệu chưa
+      const checkResponse = await axios.get(
+        `http://localhost:8000/api/github/${owner}/${repo}/branches`,
+        {
+          headers: { Authorization: `token ${token}` },
+        }
+      );
+
+      // Nếu có dữ liệu rồi thì không cần sync
+      if (checkResponse.data && checkResponse.data.length > 0) {
+        console.log('Repository đã có dữ liệu, không cần sync');
+        return;
+      }
+    } catch {
+      console.log('Repository chưa có dữ liệu, bắt đầu sync...');
+    }
+
+    // Sync repository trong background
+    syncRepositoryInBackground();
+  }, [owner, repo, syncRepositoryInBackground]);
+
+  // Load trang ngay lập tức với dữ liệu có sẵn
+  useEffect(() => {
+    // Sync trong background nếu cần
+    checkAndSyncRepository();
+  }, [owner, repo, checkAndSyncRepository]);
+
+  // Sync thủ công
+  const manualSync = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      message.error("Vui lòng đăng nhập lại!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.post(
+        `http://localhost:8000/api/github/${owner}/${repo}/sync-all`,
+        {},
+        {
+          headers: { Authorization: `token ${token}` },
+        }
+      );
+      message.success("Đồng bộ dữ liệu thành công!");
+    } catch (error) {
+      console.error("Lỗi khi đồng bộ dữ liệu:", error);
+      message.error("Không thể đồng bộ dữ liệu!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveCommits = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      message.error("Vui lòng đăng nhập lại!");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `http://localhost:8000/api/github/${owner}/${repo}/save-commits`,
+        { branch },
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }
+      );
+      message.success("Lưu commit thành công!");
+    } catch (error) {
+      console.error("Lỗi khi lưu commit:", error);
+      message.error("Không thể lưu commit!");
+    }
+  };
+
+  // Hiển thị trang ngay lập tức, không đợi sync
+  return (
+    <div style={{ padding: 24 }}>
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <Title level={2} style={{ margin: 0 }}>
+            <GithubOutlined /> {owner}/{repo}
+          </Title>
+          
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {syncing && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Progress 
+                  type="circle" 
+                  size={24} 
+                  percent={syncProgress}
+                  showInfo={false}
+                />
+                <Text type="secondary">Đang đồng bộ...</Text>
+              </div>
+            )}
+            
+            <Button 
+              icon={<SyncOutlined />} 
+              onClick={manualSync}
+              loading={loading}
+              disabled={loading || syncing}
+            >
+              Đồng bộ thủ công
+            </Button>
+            
+            <Button 
+              type="primary" 
+              icon={<SaveOutlined />} 
+              onClick={saveCommits}
+              disabled={!branch}
+            >
+              Lưu Commit
+            </Button>
+          </div>
+        </div>
+
+        {syncing && (
+          <Alert
+            message="Đang đồng bộ dữ liệu trong background"
+            description="Bạn có thể tiếp tục sử dụng trang này, việc đồng bộ sẽ hoàn thành trong giây lát."
+            type="info"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
+        <BranchSelector owner={owner} repo={repo} onBranchChange={setBranch} />
+      </Card>
+
+      <div style={{ marginTop: 16 }}>
+        <CommitList owner={owner} repo={repo} branch={branch} />
+      </div>
+    </div>
+  );
+};
+
+export default RepoDetails;
+
+```
+
+### src\pages\TestPage.jsx
+```jsx
+import React from 'react';
+
+const TestPage = () => {
+  return (
+    <div style={{ padding: '20px', background: 'lightblue', minHeight: '100vh' }}>
+      <h1>🚀 Test Page - App đang hoạt động!</h1>
+      <p>Thời gian: {new Date().toLocaleString()}</p>
+      <div>
+        <button style={{ padding: '10px', background: 'green', color: 'white', border: 'none', borderRadius: '5px' }}>
+          Click me!
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default TestPage;
+
+```
+
+### src\utils\types.js
+```js
+export const Task = {
+  id: '',
+  title: '',
+  assignee: '',
+  status: '', // 'todo', 'inProgress', 'done'
+};
+```
