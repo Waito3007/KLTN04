@@ -4,7 +4,7 @@ Security module for authentication and authorization
 Handles GitHub OAuth tokens and user session management
 """
 
-from fastapi import Depends, HTTPException, status, Header
+from fastapi import Depends, HTTPException, status, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security.base import SecurityBase
@@ -220,6 +220,46 @@ async def get_current_user_from_header(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
+        )
+    
+    return user
+
+# Alternative dependency that requires valid token or no token at all
+async def get_current_user_strict_optional(
+    request: Request
+) -> Optional[CurrentUser]:
+    """
+    FastAPI dependency to get current user with strict validation
+    - If no Authorization header: returns None (allowed)
+    - If Authorization header exists but invalid: raises 401 error
+    - If Authorization header exists and valid: returns CurrentUser
+    """
+    authorization = request.headers.get("Authorization")
+    if not authorization:
+        return None  # No token provided - this is OK
+    
+    try:
+        scheme, credentials = authorization.split(' ', 1)
+        if scheme.lower() not in ["bearer", "token"]:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication scheme. Use 'Bearer' or 'token'",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Token provided - must be valid
+    user = await get_current_user_from_token(credentials)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     
     return user
