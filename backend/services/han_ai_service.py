@@ -115,6 +115,9 @@ class HANAIService:
             'statistics': stats
         }
     
+    # Alias for backward compatibility
+    analyze_commits = analyze_commits_batch
+    
     async def analyze_developer_patterns(self, developer_commits: Dict[str, List[str]]) -> Dict[str, Any]:
         """
         Analyze commit patterns for each developer

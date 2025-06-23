@@ -5,12 +5,12 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import re
 import asyncio
-from services.han_ai_service import HANAIService
+from services.han_real_ai_service import HANRealAIService
 
 class MemberAnalysisService:
     def __init__(self, db: Session):        
         self.db = db
-        self.ai_service = HANAIService()
+        self.ai_service = HANRealAIService()
     
     def get_repository_members(self, repository_id: int) -> List[Dict[str, Any]]:
         """Lấy danh sách members của repository từ collaborators table và commit authors"""
@@ -460,7 +460,18 @@ class MemberAnalysisService:
         
         # Get AI analysis
         try:
-            ai_analysis = await self.ai_service.analyze_commits(commit_messages)
+            # Sửa: Gọi đúng hàm analyze_commits_batch thay vì analyze_commits
+            ai_analysis_result = await self.ai_service.analyze_commits_batch(commit_messages)
+            ai_analysis = {}
+            # Chuẩn hóa kết quả: lấy từng commit analysis từ 'results' nếu có
+            if ai_analysis_result and 'results' in ai_analysis_result:
+                for idx, res in enumerate(ai_analysis_result['results']):
+                    if res.get('success') and 'analysis' in res:
+                        ai_analysis[idx] = res['analysis']
+                    else:
+                        ai_analysis[idx] = {}
+            else:
+                ai_analysis = {}
         except Exception as e:
             print(f"AI analysis failed, falling back to pattern analysis: {e}")
             # Fallback to pattern-based analysis
@@ -475,7 +486,14 @@ class MemberAnalysisService:
         
         for i, commit in enumerate(commits_data):
             ai_result = ai_analysis.get(i, {}) if ai_analysis else {}
-            
+            # Map lại các trường từ AI cho đúng chuẩn frontend
+            commit_type = ai_result.get("type", "other")
+            tech_area = ai_result.get("tech_area", "general")
+            # Nếu AI trả về label thô, ánh xạ lại
+            if 'label' in ai_result and not ai_result.get('type'):
+                commit_type = ai_result['label']
+            if 'label' in ai_result and not ai_result.get('tech_area'):
+                tech_area = ai_result['label']
             commit_info = {
                 "id": commit[0],
                 "sha": commit[1][:8] if commit[1] else "N/A",
@@ -489,9 +507,9 @@ class MemberAnalysisService:
                     "files_changed": commit[9] or 0
                 },
                 "analysis": {
-                    "type": ai_result.get("type", "other"),
-                    "type_icon": self._get_type_icon(ai_result.get("type", "other")),
-                    "tech_area": ai_result.get("tech_area", "general"),
+                    "type": commit_type,
+                    "type_icon": self._get_type_icon(commit_type),
+                    "tech_area": tech_area,
                     "impact": ai_result.get("impact", "medium"),
                     "urgency": ai_result.get("urgency", "normal"),
                     "ai_powered": True
@@ -499,8 +517,8 @@ class MemberAnalysisService:
             }
             
             commits_with_analysis.append(commit_info)
-            commit_type_stats[ai_result.get("type", "other")] += 1
-            tech_stats[ai_result.get("tech_area", "general")] += 1
+            commit_type_stats[commit_type] += 1
+            tech_stats[tech_area] += 1
             total_additions += commit[7] or 0
             total_deletions += commit[8] or 0
         
@@ -608,4 +626,3 @@ class MemberAnalysisService:
                     author_names.append(author_name)
         
         return author_names
-    

@@ -1,4 +1,5 @@
 # backend/main.py
+
 from fastapi import FastAPI
 from core.lifespan import lifespan
 from core.config import setup_middlewares
@@ -30,6 +31,25 @@ app.include_router(repositories_router)  # Already has /api prefix
 @app.get("/")
 def root():
     return {"message": "TaskFlowAI backend is running "}
+
+# --- HAN model patch for torch.load (SimpleTokenizer) ---
+import os
+import types
+import sys
+try:
+    from ai.testmodelAi.han_model_real_test_fixed import SimpleTokenizer
+    import torch
+    # Patch đúng module path cho pickle
+    sys.modules['SimpleTokenizer'] = SimpleTokenizer
+    sys.modules['ai.testmodelAi.han_model_real_test_fixed.SimpleTokenizer'] = SimpleTokenizer
+    # Nếu cần, đăng ký vào torch.serialization
+    if hasattr(torch.serialization, 'add_safe_class'):
+        torch.serialization.add_safe_class(SimpleTokenizer)
+    if hasattr(torch.serialization, 'add_safe_globals'):
+        torch.serialization.add_safe_globals({'SimpleTokenizer': SimpleTokenizer})
+except Exception as e:
+    print(f"[WARN] Could not patch SimpleTokenizer for torch.load: {e}")
+# --- END PATCH ---
 
 if __name__ == "__main__":
     import uvicorn
