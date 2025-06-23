@@ -2,8 +2,8 @@
 import axios from 'axios';
 import { message } from 'antd';
 
-// Centralized API configuration
-const API_BASE_URL = 'http://localhost:8000/api';
+// Centralized API configuration - get from environment variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 // Axios instance với common config
 const apiClient = axios.create({

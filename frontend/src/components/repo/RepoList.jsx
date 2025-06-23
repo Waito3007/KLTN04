@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { GithubOutlined, StarFilled, EyeFilled, ForkOutlined, CalendarOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import axios from "axios";
+import { buildApiUrl } from '../../config/api';
 
 const { Title, Text } = Typography;
 
@@ -107,8 +108,7 @@ const RepoList = () => {
       if (!token) return message.error("Vui lòng đăng nhập lại!");
 
       try {
-        setLoading(true);
-        const response = await axios.get("http://localhost:8000/api/github/repos", {
+        setLoading(true);        const response = await axios.get(buildApiUrl("/github/repos"), {
           headers: { Authorization: `token ${token}` },
           params: { sort: 'updated', direction: 'desc' } // Sắp xếp theo mới nhất
         });

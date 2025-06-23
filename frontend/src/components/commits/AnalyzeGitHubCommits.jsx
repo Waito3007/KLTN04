@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Badge, Popover, List, Typography, Divider, Spin, Tag, Alert, Tooltip } from 'antd';
 import { ExclamationCircleFilled, CheckCircleFilled, InfoCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { buildApiUrl } from '../../config/api';
 
 const { Text, Title } = Typography;
 
@@ -19,10 +20,8 @@ const AnalyzeGitHubCommits = ({ repo }) => {
       
       if (!token) {
         throw new Error('Authentication required');
-      }
-
-      const response = await axios.get(
-        `http://localhost:8000/api/commits/analyze-github/${repo.owner.login}/${repo.name}`,
+      }      const response = await axios.get(
+        buildApiUrl(`/commits/analyze-github/${repo.owner.login}/${repo.name}`),
         {
           headers: { 
             Authorization: `Bearer ${token}`,

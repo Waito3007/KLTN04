@@ -3,6 +3,7 @@ import { Tag, Tooltip, Popover, List, Typography, Divider, Badge, Spin } from 'a
 import { ExclamationCircleFilled, CheckCircleFilled } from '@ant-design/icons';
 import { useState } from 'react';
 import axios from 'axios';
+import { buildApiUrl } from '../../config/api';
 
 const { Text } = Typography;
 
@@ -15,9 +16,8 @@ const CommitAnalysisBadge = ({ repo }) => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/commits`,
+      const token = localStorage.getItem("access_token");      const response = await axios.get(
+        buildApiUrl(`/github/repos/${repo.owner.login}/${repo.name}/commits`),
         {
           headers: { Authorization: `token ${token}` },
           params: { per_page: 5 } // Get last 5 commits for analysis
@@ -26,7 +26,7 @@ const CommitAnalysisBadge = ({ repo }) => {
       
       // Analyze the commits
       const analysisRes = await axios.post(
-        'http://localhost:8000/api/commits/analyze-json',
+        buildApiUrl('/commits/analyze-json'),
         {
           commits: response.data.map(commit => ({
             id: commit.sha,
