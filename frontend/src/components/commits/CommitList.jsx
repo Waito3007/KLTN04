@@ -3,6 +3,7 @@ import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination
 import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
 import axios from "axios";
 import styled from "styled-components";
+import { buildApiUrl } from '../../config/api';
 
 const { Title, Text } = Typography;
 
@@ -62,9 +63,8 @@ const CommitList = ({ owner, repo, branch }) => {
 
     const token = localStorage.getItem("access_token");
     if (!token) return;    const fetchCommits = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`,
+      try {        const response = await axios.get(
+          buildApiUrl(`/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`),
           {
             headers: {
               Authorization: `token ${token}`,

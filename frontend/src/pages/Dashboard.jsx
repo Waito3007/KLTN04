@@ -8,6 +8,7 @@ import OverviewCard from '../components/Dashboard/OverviewCard';
 import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
 import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
 import RepoListFilter from '../components/Dashboard/RepoListFilter';
+import { buildApiUrl } from '../config/api';
 import TaskBoard from '../components/Dashboard/TaskBoard';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
@@ -190,9 +191,8 @@ const Dashboard = () => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
-    try {
-      // Gọi API lấy repos từ database (không phải GitHub API)
-      const response = await axios.get('http://localhost:8000/api/repositories', {
+    try {      // Gọi API lấy repos từ database (không phải GitHub API)
+      const response = await axios.get(buildApiUrl('/repositories'), {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -232,8 +232,7 @@ const Dashboard = () => {
     try {
       // Thêm timeout nhỏ để đảm bảo UI render progress trước
       await new Promise(resolve => setTimeout(resolve, 50));
-      
-      const response = await axios.get('http://localhost:8000/api/github/repos', {
+        const response = await axios.get(buildApiUrl('/github/repos'), {
         headers: {
           Authorization: `token ${token}`,
         },
@@ -268,10 +267,9 @@ const Dashboard = () => {
           )
         }));
 
-        try {
-          // Đồng bộ repository
+        try {          // Đồng bộ repository
           await axios.post(
-            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-all`,
+            buildApiUrl(`/github/${repo.owner.login}/${repo.name}/sync-all`),
             {},
             {
               headers: {

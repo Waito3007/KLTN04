@@ -6,6 +6,7 @@ import BranchSelector from "../components/Branchs/BranchSelector";
 import BranchCommitList from "../components/Branchs/BranchCommitList";
 import CommitList from "../components/commits/CommitList";
 import axios from "axios";
+import { buildApiUrl } from "../config/api";
 
 const { Title, Text } = Typography;
 
@@ -38,19 +39,17 @@ const RepoDetails = () => {
       message.info(`Đang đồng bộ repository ${repo} trong background...`, 2);
       
       // Sync cơ bản trước (nhanh)
-      setSyncProgress(30);
-      await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/sync-basic`,
+      setSyncProgress(30);      await axios.post(
+        buildApiUrl(`/github/${owner}/${repo}/sync-basic`),
         {},
         {
           headers: { Authorization: `token ${token}` },
         }
       );
-      
-      // Sync đầy đủ
+        // Sync đầy đủ
       setSyncProgress(70);
       await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/sync-all`,
+        buildApiUrl(`/github/${owner}/${repo}/sync-all`),
         {},
         {
           headers: { Authorization: `token ${token}` },
@@ -74,10 +73,9 @@ const RepoDetails = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    try {
-      // Kiểm tra xem repo đã có dữ liệu chưa
+    try {      // Kiểm tra xem repo đã có dữ liệu chưa
       const checkResponse = await axios.get(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches`,
+        buildApiUrl(`/github/${owner}/${repo}/branches`),
         {
           headers: { Authorization: `token ${token}` },
         }
@@ -110,10 +108,9 @@ const RepoDetails = () => {
       return;
     }
 
-    try {
-      setLoading(true);
+    try {      setLoading(true);
       await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/sync-all`,
+        buildApiUrl(`/github/${owner}/${repo}/sync-all`),
         {},
         {
           headers: { Authorization: `token ${token}` },
@@ -139,9 +136,8 @@ const RepoDetails = () => {
       return;
     }
 
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
+    try {      const response = await axios.post(
+        buildApiUrl(`/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`),
         {},
         {
           headers: {

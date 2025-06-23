@@ -2,6 +2,7 @@
 import React from "react";
 import { Button, Card, Typography } from "antd";
 import { GithubOutlined } from "@ant-design/icons";
+import { buildApiUrl } from "../config/api";
 
 const { Title } = Typography;
 
@@ -10,7 +11,7 @@ const Login = () => {
   
   const handleGitHubLogin = () => {
     console.log("GitHub login button clicked");
-    window.location.href = "http://localhost:8000/api/login"; // backend redirect to GitHub OAuth
+    window.location.href = buildApiUrl("/login"); // backend redirect to GitHub OAuth
   };
 
   console.log("Login component rendered successfully");

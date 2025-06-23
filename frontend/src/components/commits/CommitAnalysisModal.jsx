@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { buildApiUrl } from '../../config/api';
 
 const { Title, Text } = Typography;
 
@@ -20,9 +21,8 @@ const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/commits`,
+      const token = localStorage.getItem("access_token");      const response = await axios.get(
+        buildApiUrl(`/github/repos/${repo.owner.login}/${repo.name}/commits`),
         {
           headers: { Authorization: `token ${token}` },
           params: { per_page: 100 } // Get more commits for detailed analysis
@@ -30,7 +30,7 @@ const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
       );
       
       const analysisRes = await axios.post(
-        'http://localhost:8000/api/commits/analyze-json',
+        buildApiUrl('/commits/analyze-json'),
         {
           commits: response.data.map(commit => ({
             id: commit.sha,

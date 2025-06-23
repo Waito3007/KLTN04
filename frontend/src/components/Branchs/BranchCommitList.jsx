@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import styled from 'styled-components';
+import { buildApiUrl } from '../../config/api';
 
 const { Text, Paragraph } = Typography;
 
@@ -96,9 +97,8 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
 
     setLoading(true);
     try {
-      const offset = (pagination.current - 1) * pagination.pageSize;
-      const response = await axios.get(
-        `http://localhost:8000/api/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=${pagination.pageSize}&offset=${offset}`,
+      const offset = (pagination.current - 1) * pagination.pageSize;      const response = await axios.get(
+        buildApiUrl(`/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=${pagination.pageSize}&offset=${offset}`),
         {
           headers: {
             Authorization: `token ${token}`,

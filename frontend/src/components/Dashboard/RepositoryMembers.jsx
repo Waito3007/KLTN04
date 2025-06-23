@@ -8,6 +8,7 @@ import {
   BugOutlined, ToolOutlined, FileTextOutlined, BranchesOutlined 
 } from '@ant-design/icons';
 import { Pie, Bar } from 'react-chartjs-2';
+import { buildApiUrl } from '../../config/api';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -47,7 +48,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
     if (!selectedRepo?.id) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/ai/model-status`);
+      const response = await fetch(buildApiUrl(`/repositories/${selectedRepo.id}/ai/model-status`));
       
       if (response.ok) {
         const data = await response.json();
@@ -66,7 +67,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
     
     setBranchesLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/branches`);
+      const response = await fetch(buildApiUrl(`/repositories/${selectedRepo.id}/branches`));
       
       if (response.ok) {
         const data = await response.json();
@@ -94,7 +95,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
     console.log('loadRepositoryMembers called with repo:', selectedRepo); // Debug log
     setLoading(true);
     try {
-      const url = `http://localhost:8000/api/repositories/${selectedRepo.id}/members`;
+      const url = buildApiUrl(`/repositories/${selectedRepo.id}/members`);
       console.log('Fetching members from URL:', url); // Debug log
       
       // Test without token first
@@ -157,9 +158,8 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
     
     try {
       const aiParam = useAI ? '?use_ai=true' : '?use_ai=false';
-      const branchParam = selectedBranch ? `&branch_name=${encodeURIComponent(selectedBranch)}` : '';
-      const response = await fetch(
-        `http://localhost:8000/api/repositories/${selectedRepo.id}/members/${member.login}/commits${aiParam}${branchParam}`
+      const branchParam = selectedBranch ? `&branch_name=${encodeURIComponent(selectedBranch)}` : '';      const response = await fetch(
+        buildApiUrl(`/repositories/${selectedRepo.id}/members/${member.login}/commits${aiParam}${branchParam}`)
       );
       
       if (response.ok) {

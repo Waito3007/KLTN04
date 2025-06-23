@@ -3,6 +3,7 @@ import { Select, Spin, message, Tag, Typography, Button, Space, Tooltip } from "
 import { GithubOutlined, BranchesOutlined, SyncOutlined, DatabaseOutlined } from '@ant-design/icons';
 import axios from "axios";
 import styled from "styled-components";
+import { buildApiUrl } from '../../config/api';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -112,9 +113,8 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/api/commits/${owner}/${repo}/branches/${branchName}/commits?limit=1`,
+    try {      const response = await axios.get(
+        buildApiUrl(`/commits/${owner}/${repo}/branches/${branchName}/commits?limit=1`),
         {
           headers: {
             Authorization: `token ${token}`,
@@ -135,9 +135,8 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     if (!token) return;
 
     const fetchBranches = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/github/${owner}/${repo}/branches`,
+      try {        const response = await axios.get(
+          buildApiUrl(`/github/${owner}/${repo}/branches`),
           {
             headers: {
               Authorization: `token ${token}`,
@@ -181,9 +180,8 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     }
 
     setSyncLoading(true);
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches/${selectedBranch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
+    try {      const response = await axios.post(
+        buildApiUrl(`/github/${owner}/${repo}/branches/${selectedBranch}/sync-commits?include_stats=true&per_page=100&max_pages=5`),
         {},
         {
           headers: {
@@ -230,9 +228,8 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
       return;
     }
 
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/api/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=10`,
+    try {      const response = await axios.get(
+        buildApiUrl(`/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=10`),
         {
           headers: {
             Authorization: `token ${token}`,

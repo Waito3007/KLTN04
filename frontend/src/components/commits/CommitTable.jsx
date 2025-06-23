@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Table } from 'antd';
 import axios from 'axios';
+import { buildApiUrl } from '../../config/api';
 
 const CommitTable = () => {
   const [commits, setCommits] = useState([]);
@@ -10,7 +11,7 @@ const CommitTable = () => {
   useEffect(() => {
     const fetchCommits = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/commits');
+        const response = await axios.get(buildApiUrl('/commits'));
         setCommits(response.data);
       } catch (error) {
         console.error('Failed to fetch commits:', error);
