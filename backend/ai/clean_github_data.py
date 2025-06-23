@@ -204,21 +204,23 @@ def clean_github_data(csv_file: Path, sample_size: int = 20000) -> pd.DataFrame:
             print(f"  {col}:")
             for val, count in value_counts.head(5).items():
                 print(f"    {val}: {count} ({count/len(df)*100:.1f}%)")
-        
-        # BƯỚC 4: Tạo metadata synthetic
+          # BƯỚC 4: Tạo metadata synthetic
         print(f"\n⚙️ BƯỚC 4: TẠO METADATA SYNTHETIC")
         generator = GitHubDataGenerator()
+        
         def create_synthetic_metadata():
             """Tạo metadata synthetic cho mỗi commit"""
             sample = generator.generate_single_commit()
+            metadata = sample['metadata']
+            
             return {
-                'author': sample['author'],
-                'repository': sample['repository'], 
-                'timestamp': sample['timestamp'],
-                'files_changed': sample['files_changed'],
-                'additions': sample['additions'],
-                'deletions': sample['deletions'],
-                'file_types': sample['file_types']
+                'author': metadata['author_info']['name'],
+                'repository': f"repo_{random.randint(1, 100)}", 
+                'timestamp': metadata['temporal']['timestamp'],
+                'files_changed': len(metadata['files']),
+                'additions': metadata['change_stats']['additions'],
+                'deletions': metadata['change_stats']['deletions'],
+                'file_types': list(metadata['file_types'].keys())
             }
         
         # Apply synthetic metadata
@@ -408,23 +410,45 @@ def save_training_data(samples: List[Dict], output_dir: Path) -> str:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = output_dir / f"cleaned_github_commits_{timestamp}.json"
     
+    # Convert non-serializable objects to strings
+    def make_json_serializable(obj):
+        """Convert objects to JSON serializable format"""
+        if hasattr(obj, 'isoformat'):  # datetime objects
+            return obj.isoformat()
+        elif hasattr(obj, 'tolist'):  # numpy arrays
+            return obj.tolist()
+        elif isinstance(obj, (pd.Timestamp, pd.Timedelta)):  # pandas objects
+            return str(obj)
+        elif isinstance(obj, dict):
+            return {k: make_json_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [make_json_serializable(item) for item in obj]
+        else:
+            return obj
+    
+    # Clean samples for JSON serialization
+    clean_samples = []
+    for sample in samples:
+        clean_sample = make_json_serializable(sample)
+        clean_samples.append(clean_sample)
+    
     # Tạo metadata
     training_data = {
         'metadata': {
-            'total_samples': len(samples),
+            'total_samples': len(clean_samples),
             'created_at': datetime.now().isoformat(),
             'source': 'kaggle_github_commits_cleaned',
             'version': '1.0',
             'description': 'Cleaned GitHub commit data for Multi-Modal Fusion Network'
         },
-        'samples': samples
+        'samples': clean_samples
     }
     
     # Save to JSON
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(training_data, f, ensure_ascii=False, indent=2)
     
-    print(f"💾 Đã lưu {len(samples)} samples vào: {output_file}")
+    print(f"💾 Đã lưu {len(clean_samples)} samples vào: {output_file}")
     print(f"📊 File size: {output_file.stat().st_size / (1024*1024):.1f} MB")
     
     return str(output_file)

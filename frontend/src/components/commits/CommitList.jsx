@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination } from "antd";
+import { useEffect, useState, useCallback } from "react";
+import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination, Select } from "antd";
 import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
 import axios from "axios";
 import styled from "styled-components";
@@ -47,52 +47,87 @@ const CommitMeta = styled.div`
 
 const PaginationContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 20px;
+  padding: 0 16px;
+`;
+
+const PageSizeSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const CommitList = ({ owner, repo, branch }) => {
-  const [commits, setCommits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
-
-  useEffect(() => {
-    if (!branch) return;
-
+  const [pageSize, setPageSize] = useState(30);
+  const [totalCommits, setTotalCommits] = useState(0);
+  const [allCommits, setAllCommits] = useState([]); // Lưu tất cả commits để phân trang client-side// Function để fetch commits từ API - lấy nhiều commits để phân trang client-side
+  const fetchCommits = useCallback(async (requestedPageSize = pageSize) => {
     const token = localStorage.getItem("access_token");
-    if (!token) return;    const fetchCommits = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`,
-          {
-            headers: {
-              Authorization: `token ${token}`,
-            },
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      // Lấy số lượng commits lớn hơn để có đủ dữ liệu phân trang
+      const fetchSize = Math.max(requestedPageSize, 100); // Ít nhất 100 commits
+      
+      const response = await axios.get(
+        `http://localhost:8000/api/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+          params: {
+            per_page: fetchSize,
+            page: 1 // Luôn lấy từ trang 1
           }
-        );
-        
-        // Backend trả về object với commits array trong property "commits"
-        const commitsData = response.data.commits || response.data;
-        setCommits(Array.isArray(commitsData) ? commitsData : []);
-      } catch (err) {
-        console.error(err);
-        message.error("Lỗi khi lấy danh sách commit");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    setLoading(true);
-    fetchCommits();
-  }, [owner, repo, branch]);
-
-  const formatDate = (dateString) => {
+        }
+      );
+      
+      const commitsData = response.data.commits || response.data;
+      const newCommits = Array.isArray(commitsData) ? commitsData : [];
+      
+      setAllCommits(newCommits);
+      setTotalCommits(newCommits.length);
+        console.log(`Fetched ${newCommits.length} commits from GitHub API`);
+      
+    } catch (err) {
+      console.error(err);
+      message.error("Lỗi khi lấy danh sách commit");
+      setAllCommits([]);
+      setTotalCommits(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [owner, repo, branch, pageSize]);useEffect(() => {
+    if (!branch) return;
+    
+    setCurrentPage(1);
+    fetchCommits(pageSize);
+  }, [owner, repo, branch, pageSize, fetchCommits]);const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
   };
-  // Tính toán dữ liệu hiển thị theo trang hiện tại
-  const paginatedCommits = Array.isArray(commits) ? commits.slice(
+  // Xử lý thay đổi trang - chỉ thay đổi currentPage (client-side pagination)
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Xử lý thay đổi số lượng commits trên trang
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+    // Nếu cần thêm dữ liệu, fetch lại
+    if (newPageSize > allCommits.length) {
+      fetchCommits(newPageSize);
+    }
+  };
+
+  // Tính toán dữ liệu hiển thị theo trang hiện tại (client-side pagination)
+  const paginatedCommits = Array.isArray(allCommits) ? allCommits.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   ) : [];
@@ -109,16 +144,30 @@ const CommitList = ({ owner, repo, branch }) => {
   }
 
   return (
-    <div style={{ padding: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <Title level={4} style={{ margin: 0 }}>
+    <div style={{ padding: '16px' }}>      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>        <Title level={4} style={{ margin: 0, flex: 1 }}>
           <BranchesOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
           Commit trên branch: <Tag color="blue">{branch}</Tag>
-          <Tag style={{ marginLeft: '8px' }}>{commits.length} commits</Tag>
+          <Tag style={{ marginLeft: '8px' }}>{totalCommits} commits</Tag>
         </Title>
+        
+        <PageSizeSelector>
+          <Text>Hiển thị:</Text>
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            style={{ width: 80 }}
+            options={[
+              { value: 10, label: '10' },
+              { value: 20, label: '20' },
+              { value: 30, label: '30' },
+              { value: 50, label: '50' },
+              { value: 100, label: '100' }
+            ]}
+          />
+          <Text>commits</Text>
+        </PageSizeSelector>
       </div>
-      
-      <List
+        <List
         itemLayout="vertical"
         dataSource={paginatedCommits}
         renderItem={(item) => (
@@ -157,14 +206,23 @@ const CommitList = ({ owner, repo, branch }) => {
           </List.Item>
         )}
       />      <PaginationContainer>
+        <div>
+          <Text type="secondary">
+            Hiển thị {paginatedCommits.length} trong tổng số {totalCommits} commits
+            (Trang {currentPage} / {Math.ceil(totalCommits / pageSize)})
+          </Text>
+        </div>
+        
         <Pagination
           current={currentPage}
           pageSize={pageSize}
-          total={Array.isArray(commits) ? commits.length : 0}
-          onChange={(page) => setCurrentPage(page)}
+          total={totalCommits}
+          onChange={handlePageChange}
           showSizeChanger={false}
           showQuickJumper
-          style={{ marginTop: '20px' }}
+          showTotal={(total, range) => 
+            `${range[0]}-${range[1]} của ${total} commits`
+          }
         />
       </PaginationContainer>
     </div>
