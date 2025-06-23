@@ -1,0 +1,181 @@
+
+Epoch 1/20
+Epoch Time: 566.2s
+Train Loss: 0.5543
+  commit_type Train Loss: 0.5142
+  purpose Train Loss: 0.4645
+  sentiment Train Loss: 0.5331
+  tech_tag Train Loss: 0.7054
+Val Metrics: {'commit_type': {'loss': 0.12185943914006887, 'accuracy': 0.972032820986941}, 'purpose': {'loss': 0.09159302558557464, 'accuracy': 0.9785045648907893}, 'sentiment': {'loss': 0.31261631747453417, 'accuracy': 0.9115913555992141}, 'tech_tag': {'loss': 0.29504010863464697, 'accuracy': 0.9411764705882353}}
+Avg Val Accuracy: 0.9508
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 2/20
+Epoch Time: 538.0s
+Train Loss: 0.1409
+  commit_type Train Loss: 0.0742
+  purpose Train Loss: 0.0588
+  sentiment Train Loss: 0.2462
+  tech_tag Train Loss: 0.1845
+Val Metrics: {'commit_type': {'loss': 0.04661369646944078, 'accuracy': 0.9902923841442275}, 'purpose': {'loss': 0.033602464351952556, 'accuracy': 0.9927192881081706}, 'sentiment': {'loss': 0.18370752159602308, 'accuracy': 0.9521553218536923}, 'tech_tag': {'loss': 0.14385977373853656, 'accuracy': 0.9729573558303478}}
+Avg Val Accuracy: 0.9770
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 3/20
+Epoch Time: 534.6s
+Train Loss: 0.0757
+  commit_type Train Loss: 0.0298
+  purpose Train Loss: 0.0262
+  sentiment Train Loss: 0.1645
+  tech_tag Train Loss: 0.0825
+Val Metrics: {'commit_type': {'loss': 0.039832568245663266, 'accuracy': 0.9901768172888016}, 'purpose': {'loss': 0.02841194287319221, 'accuracy': 0.9941060903732809}, 'sentiment': {'loss': 0.16644098459334006, 'accuracy': 0.9616318039986131}, 'tech_tag': {'loss': 0.07820627996242671, 'accuracy': 0.986363111059748}}
+Avg Val Accuracy: 0.9831
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 4/20
+Epoch Time: 518.1s
+Train Loss: 0.0573
+  commit_type Train Loss: 0.0214
+  purpose Train Loss: 0.0204
+  sentiment Train Loss: 0.1379
+  tech_tag Train Loss: 0.0492
+Val Metrics: {'commit_type': {'loss': 0.02860730989493354, 'accuracy': 0.9934126892407258}, 'purpose': {'loss': 0.02092167994242017, 'accuracy': 0.9954928926383914}, 'sentiment': {'loss': 0.15211476628733903, 'accuracy': 0.9678724141916099}, 'tech_tag': {'loss': 0.04907111658257642, 'accuracy': 0.9913324858430602}}
+Avg Val Accuracy: 0.9870
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 5/20
+Epoch Time: 788.8s
+Train Loss: 0.0443
+  commit_type Train Loss: 0.0147
+  purpose Train Loss: 0.0126
+  sentiment Train Loss: 0.1192
+  tech_tag Train Loss: 0.0307
+Val Metrics: {'commit_type': {'loss': 0.025750717695036084, 'accuracy': 0.9951461920721137}, 'purpose': {'loss': 0.021128501786331248, 'accuracy': 0.9952617589275395}, 'sentiment': {'loss': 0.14277082165648192, 'accuracy': 0.9693747833121461}, 'tech_tag': {'loss': 0.05820561412440929, 'accuracy': 0.988905581879117}}
+Avg Val Accuracy: 0.9872
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 6/20
+Epoch Time: 807.1s
+Train Loss: 0.0449
+  commit_type Train Loss: 0.0156
+  purpose Train Loss: 0.0141
+  sentiment Train Loss: 0.1176
+  tech_tag Train Loss: 0.0324
+Val Metrics: {'commit_type': {'loss': 0.029039813020049442, 'accuracy': 0.9931815555298741}, 'purpose': {'loss': 0.026186747494554474, 'accuracy': 0.9929504218190223}, 'sentiment': {'loss': 0.15018391478686452, 'accuracy': 0.9689125158904426}, 'tech_tag': {'loss': 0.04629924310768316, 'accuracy': 0.9916791864093378}}
+Avg Val Accuracy: 0.9867
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 7/20
+Epoch Time: 788.5s
+Train Loss: 0.0429
+  commit_type Train Loss: 0.0146
+  purpose Train Loss: 0.0167
+  sentiment Train Loss: 0.1081
+  tech_tag Train Loss: 0.0322
+Val Metrics: {'commit_type': {'loss': 0.023556844697430957, 'accuracy': 0.9945683577949844}, 'purpose': {'loss': 0.019415576612054692, 'accuracy': 0.9952617589275395}, 'sentiment': {'loss': 0.12772726931444256, 'accuracy': 0.9722639546977927}, 'tech_tag': {'loss': 0.04934511971958514, 'accuracy': 0.9901768172888016}}
+Avg Val Accuracy: 0.9881
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 8/20
+Epoch Time: 754.9s
+Train Loss: 0.0335
+  commit_type Train Loss: 0.0090
+  purpose Train Loss: 0.0090
+  sentiment Train Loss: 0.0913
+  tech_tag Train Loss: 0.0246
+Val Metrics: {'commit_type': {'loss': 0.01730092421363439, 'accuracy': 0.9960707269155207}, 'purpose': {'loss': 0.019648284746275533, 'accuracy': 0.9951461920721137}, 'sentiment': {'loss': 0.16665805645357487, 'accuracy': 0.9685658153241651}, 'tech_tag': {'loss': 0.05227648605205607, 'accuracy': 0.9927192881081706}}
+Avg Val Accuracy: 0.9881
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 9/20
+Epoch Time: 761.2s
+Train Loss: 0.0369
+  commit_type Train Loss: 0.0127
+  purpose Train Loss: 0.0109
+  sentiment Train Loss: 0.0990
+  tech_tag Train Loss: 0.0250
+Val Metrics: {'commit_type': {'loss': 0.014268253359310834, 'accuracy': 0.997457529180631}, 'purpose': {'loss': 0.01201046121571471, 'accuracy': 0.9967641280480758}, 'sentiment': {'loss': 0.14383938905505492, 'accuracy': 0.9698370507338495}, 'tech_tag': {'loss': 0.05831458321271522, 'accuracy': 0.9907546515659309}}
+Avg Val Accuracy: 0.9887
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 10/20
+Epoch Time: 225.8s
+Train Loss: 0.0461
+  commit_type Train Loss: 0.0203
+  purpose Train Loss: 0.0223
+  sentiment Train Loss: 0.1040
+  tech_tag Train Loss: 0.0376
+Val Metrics: {'commit_type': {'loss': 0.0228439574493476, 'accuracy': 0.9945683577949844}, 'purpose': {'loss': 0.01888223871886135, 'accuracy': 0.9959551600600948}, 'sentiment': {'loss': 0.162771919898163, 'accuracy': 0.9647521090951116}, 'tech_tag': {'loss': 0.07000912064471092, 'accuracy': 0.9877499133248584}}
+Avg Val Accuracy: 0.9858
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 11/20
+Epoch Time: 220.6s
+Train Loss: 0.0487
+  commit_type Train Loss: 0.0262
+  purpose Train Loss: 0.0227
+  sentiment Train Loss: 0.1054
+  tech_tag Train Loss: 0.0406
+Val Metrics: {'commit_type': {'loss': 0.03502773343944343, 'accuracy': 0.9913324858430602}, 'purpose': {'loss': 0.030721014263274296, 'accuracy': 0.9911013521322085}, 'sentiment': {'loss': 0.15395684533484444, 'accuracy': 0.9656766439385185}, 'tech_tag': {'loss': 0.08088452462662708, 'accuracy': 0.9845140413729342}}
+Avg Val Accuracy: 0.9832
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 12/20
+Epoch Time: 309.3s
+Train Loss: 0.0427
+  commit_type Train Loss: 0.0223
+  purpose Train Loss: 0.0206
+  sentiment Train Loss: 0.0919
+  tech_tag Train Loss: 0.0361
+Val Metrics: {'commit_type': {'loss': 0.024995492773221124, 'accuracy': 0.9952617589275395}, 'purpose': {'loss': 0.02778914117227965, 'accuracy': 0.9943372240841327}, 'sentiment': {'loss': 0.15569162659189834, 'accuracy': 0.9706460187218305}, 'tech_tag': {'loss': 0.04919478995520121, 'accuracy': 0.9912169189876343}}
+Avg Val Accuracy: 0.9879
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 13/20
+Epoch Time: 176.1s
+Train Loss: 0.0403
+  commit_type Train Loss: 0.0234
+  purpose Train Loss: 0.0164
+  sentiment Train Loss: 0.0873
+  tech_tag Train Loss: 0.0342
+Val Metrics: {'commit_type': {'loss': 0.01980630600736835, 'accuracy': 0.9964174274817982}, 'purpose': {'loss': 0.0168547739458803, 'accuracy': 0.9961862937709465}, 'sentiment': {'loss': 0.16919428437470968, 'accuracy': 0.9705304518664047}, 'tech_tag': {'loss': 0.07460579600822165, 'accuracy': 0.9874032127585808}}
+Avg Val Accuracy: 0.9876
+GPU Memory: 60.9 MB
+--------------------------------------------------
+
+Epoch 14/20
+Epoch Time: 174.8s
+Train Loss: 0.0283
+  commit_type Train Loss: 0.0081
+  purpose Train Loss: 0.0070
+  sentiment Train Loss: 0.0633
+  tech_tag Train Loss: 0.0348
+Val Metrics: {'commit_type': {'loss': 0.016428944253170492, 'accuracy': 0.9963018606263724}, 'purpose': {'loss': 0.011542335759297598, 'accuracy': 0.9972263954697793}, 'sentiment': {'loss': 0.18018185949460525, 'accuracy': 0.973M?˚o9Î]ÃHÒ≤πtq¯eö`/B›UCirÃ<ısûﬁÜﬁı–¸Åj∂`–ZO!∏¡Oi≈◊ ¯ÑWÈ! §îVñÎÒÍŒoï =≠ôèê∆ÖOC}˙1ﬂí°˛•(ç‹ßT1Yàp+Î4<Oˆ¸ Î.Ë.®Á~3V(2Ì˚ø3\§ﬂQûòÁOQÏ%n/âôÍ√tÔŒ≥Y(RYhkÇ‘êNòR}Ña0çπ˜=åè©‡_˝˚åñõÖ
+ŸwWL$oπ—Cû'OÑ¢D˘{F&Ì[MÓÌæáµS”’Ì„˘/$!∞z∞SxX¨ê¥Ò[ñ¸r•€≈⁄˚/Q!ea%R‚Ìp…A˝j¬VrÏ^fc+Ë’¿∆Õ
+˙k∏=êKﬁ÷Ìª£¿˛÷·˛hmﬁ#ÅÀ8œx`´˘
+ˆ•`#âCnÖ(π;”3ÁÚ!ß‚â?WÅbM<-¬4V•vè‰AF£HOaí÷ÿ˝Jr‚l+t∏ﬁˇûu;RfØôVÓVøX+?&Û®·èÓ9LCg= :é§…læ$æXÉ<öæGfÙâ%2êÒ∆æáñ{Í*<k/ñÎì±Öz+D!c˝ª◊YÎxì›Ë˘3Q—óÒwãÒŸ{_¬í∏ÔÖºñÁÁ7¥—ï2Ù'ÀÀˆ)ƒùµ@8~iR¯	Ò`Ω‰ÿùeÌUn`zºîÃÅË”nO∑Hb>¶µ˜2≈ßcQ-X™”Tÿ3E–∆
+˜∆¸Ï‰åuŸfAa ˆﬁ$
+∞‡!øPëÿ¢cıªÆ˜‹˜˚|îÜÙ
+P¨øΩmÎˇlÃ‹‰ë7ò©ám]¨ D¢UwÓ·	`Ö¢B÷∫èˇHBà∂+!ñe-•€gw¡±·j∂x;n‚éœ‹Pào‚Eñô”ú&WÉT]£°ﬂ®Ë˜\~≥˚‚4!‰¬∫HL†ÇÚ∑p£‹öB0è£a`bDÚÜ•˜¡SîÚÚı¡“çPÈœû‹±l6°ÒÁﬂ|Ÿg?·≈Wf“+´± É6<ßˇk:ã¨ﬂ«Ω$fYÓ¿ã⁄†g?r6·.ñ2Lo .RB!5\|&;1"+ˇGÔM≠≠±m.î_†ÊZËxÔËπ˛OØM˝!8ô2`÷◊èU≤”ªS∏Ã g
+∫œØ¢/?_±	é˜û¸é/ËP-JƒPØŸÓ(◊0fW–óç£≥‰ps ÿúb3Qp∞ÊËŸ£Åp¿;a‚äeh¯≥±Èt≠ß$ |à’µ˙∞‰2Á∆_—–wñ‹ÛFÆl{Î®(ÂÇ%ÏhÙ∫bôzÎ§c≤ rUªÜÕzÔ =ò˙~ó'XlT-}≤qÙ!Ÿﬁ*º`)Ã5√Öj¬4≥·¢≈@Ç√˙$Î˝Œ«_Ø>≥Ru°ëRT∑¶4ê5óÜ§òÓè°ËŸd;u‹∞X˚	ÿÎ#ê°“uA±ÛJCGndR≠vàtq¥\YÚ∑-D'Ñ¯9oH«:}Ï¥çYi~—D¢â‡ç{?◊HM=ñ…≥ïÄ7Um˛‘¢4—é;ºQî>≈c&∂L[A‹1∫A~ùﬂZ2¬SS´<¥&?†s„pÒ¬-Ù&;ƒí!’21¥çºïª#ûç´M7'úXÄ·iöéﬁ)rsòqAEﬁ1é“óQﬁÂ∏ı0F1„6`úÚÖX[âc¸áA®‹˝Û|˛˛#Y*∂ﬁÖÿ 3eÖ›ÑO’íLüÈSú-Øª{ÊNO¥∞'∞ÀÄ˝‚› …c£!TnØÎ≥J9∆ÿê+ƒ´‰f¨∫±üıˇ>iëˇMò‹vö*ö\À4c
+«‡
+Õ¬xR÷èˇW ãH ΩJ∂Béàiö(j©µxÀ«ÁÎ“≥ î"+2øˆKSÇI„p
+z◊ùæœgp¨¬îÆŸ=é©Õ_QUfèøR£øÿÖÜënúÉ.Êû`fgﬂ˙°7Î€ò˜:z∑ëm~≠áÌøw¯≥aL©H˛À1€∑‘πê$µ+—å°/ªI‰q:a!ì #éKLﬂ˘l9§—áV“¡QZ∆Ó±jË£Mâ}‚ºî®˜7[èÊBr}¶Zu\†Ÿ„,[6ÜÚÇ©ªIP.:,Ùñôk?/◊…ªìﬁ‹T8≈;–ÇEV…‡õ]="Ω]⁄9ü†P»Q\è£bËﬂ€fÜgºµ˜¡˛œ]z›+ﬂ:îŸsrDjÊÒ¶ÚL…_RLàÁ∏√õ®‡\öo-ˆG»O6»≈k˛íQñDŸn1ˆ/≤Em…Áî{Ω≈!üDÑ◊≈dSè˜qHK≈  xıÜÁ∑L‡_PˆnÎ£∞g>áìßFam<ç©˜2¿º^áîc?∞∆[ÿõ—hní(e {ñÖDå ∂ƒè5<[˙‹‡T˝Òq˘7°itB⁄≈gZõÌ˝§¯ù»ºôqì1–Â%Úï«‘ü˜:fÃˆbÌKñ»–`ëv.≠YÖ\æ⁄,}ÑCÑ§§?<∞◊â;∑g„ÀdiŸn8WCØÙnIhm·à—.uKui…ØÜÆ⁄˝©<¬±©.C∞å{ãÒºÅGkÅ≤Ë©.$¥◊u¯$’$!ã9ã3ÓMY uvBÒºåîÕt}Å\#0o<P—ZπÏ`Æ˝¡¶3ÛfÊiô8PΩûπmˇ€;˚7-µÇã≠≥#4ˇºÊ—M<Ô'_ç"Èh©€c¥Ç∆fı.ûz≈ÿ µ´mŸÂt	’ù:˚^òÛ_ËISB–Ü/›^£h©∆;~Êå4«KŒi6v!πÓbâπû-Õ±>›Jã5_å.7™Q˚¯()Ω∏0*oìwúÒDLvkt/—C/d=≤	*SD$®öÇ¿p°’z·∞'v¥<6ñˆx_ 2ÙYhg~ﬁŒ˙,£J»›8ÛJ‡\9ûge”e√ík£ìÃ(y2⁄	»0’dÌq¿∞Û«âçn÷Œ«É°⁄w[9 ü”K†âÌ¬ñ]ﬂ°´V@‰zcÑ£-(å’Ú[ xM$XÆ]k˚øT^k0»Î‘æ√®WZ‚27>Ÿ—;QìÑ°ˇomµ˘P5X©õÂõÁÃUe˘ZXò´ê‰D (Áöë¶é¶åìb ±ƒWdC—’ØIÒ∂“∆›ˆ	⁄ä›¡Ë˛Ÿ3G±DÎ•¬r…,
+y”{ﬁ˙≥“º©ŒU2⁄‚iÄÃ”ÃÂòÖáítamS?#î¢µí&Øõ/	IòÖñKΩ]'ı˚£ˆG˙œ≥=zgÊî⁄ùÊéÃºäÃzPƒzéU÷ZjÙkelè!ºÑ≤⁄TB¯ò \ïGtÊ¶ˆK≠‰±Ò7Q‡UÆ√¯6F-G(∏ˇ?–Œ• 5‘äí™e
+
+FÖØÈ˚	Ëﬁ
+‹π7h∫Ö)–Å9	çäò{ò∞ƒâUã!Ë|ü)®ôsûP¬1lGÀFŒ!ÃàuÀ,†qD 3qZÃJæ+ßÖñu¸st⁄}w+ç†°-í\B¶–tìî%—ŒSå¢»ﬁs_Ñ¯ÏçT±«lm]?1≤*üÛ–Ênöcåz˚ÆÎF˛3¡!9ö’¸Lt-äá◊}c+Y˘	`mÔbéØM>í8ìRwﬁDÄ7î%Õsîkê=ºﬁï∞cÖyÍè≤ÖóùΩ6GK÷ótßØ<Gß'©Ê◊Ú:Ù^◊ïj£x⁄;›m]˙ 9‘|-gŸ—ÚØ@Ââ8&ù)‡n¿¡»u6ﬂ_§x˜£ƒˇA˝t8Ü_·˝#fNªÀ–Ô%?Å’µÀIÿ)≠™≤⁄Jè|;xâ= b>ÛÜ4¢mÀU¢-∫t mÆ[ûB[∞õÍÛÕgz€‰	jü˙k√∏ô;r}ñ )ÜóùÂ˙·m˘ÿªñ≤?˜Ä˝—[°äuíL“`ü@VÙt∂—ê<7HV≈ﬂ=Û?ë±y≤Z}£&0gL}=/u‚ö3’hìMÖÿ¯íûÛïÉ$gâ∆|zûƒB‚C®#•ã•	Â|8ÛÇ$T—98˙xLcc„öBÒDa§◊g•‘-‰pÑlj¢ÿ¯xåïú›K…IÜHCwî"ˇílÄ9≠∂\FLO>Qáv|’È:∫0}<e£‡T‹öíìæ%~D–∏…’≥jö’„à÷Ã‡–Y€]ï0•y]¨rP¶ò4C!|é!V®;:#ÔKP•jè§¬uT£∞„≈LOg?˜˛èVj<ñèƒ“]7≈√Ùß!o¯Ewµ–π4Ì©‹ñ» }ÿü"ñbé»∞ß‘ã.Fó53]q„wÁÏÑ]Ä‹á≈å\ö„9ò„ò@w¶Q≈∑/Ì_Ñà? ±Ó„ÈzÁ}Â4<fº(Bƒ2ÚA±5π?àRïúh◊)âV{Íâ 6w6ú§¯v=“k‰äQU=º|iYUÕukﬂºüÛ=≥ﬂrÊµO¥æ:ä?.¶(˘x>:ajXµ-|…dènUbªyö1áûqÚÖt6rÙÙ¨˘˜¬DÜöR˜˜”¯⁄‚ùlkäbèVC◊l¢h^Dr0éä`Õx«(Ï¯Cõp«Ó˚œG5J±_Ö¶51¸Ÿﬁt≥{rR=∏¿ÎÏÑO@–xB¨¸©∞Avπ¡Xø⁄Ã<û<›^DŸ√
+™Gu	üy˘JäÖúW˝$ãØ‡+‘”IŸŒB»g©∫Êû◊˝Ó[0‘*¥µA≠Øl{ZvåtZ∞tƒXüR?y¥⁄2≈ôV∞∂Ã±∏—î¯-&πŸ~uÅ ç¯$¡±Œü8£}hOÅUÜÁp@5…0C¯¶ürBÙ£≠ÜVxá‹∑)$}r–g:†2ÑπÙ4……â∑ósÈŒånnö‹‰∏!Ñ˝ÿÈ]Â:_¸$˜Bﬁ '}ODÌöo†¯Ùn‹ç{CªÁ&∞pö=¥§~˘≠Û^kKAÄ∏˙y˙9RÀã D´¥°mË√‘ØI˜0ãøNM«)≈n·ßæ!
+ê }` >±øËBññññññññññññññ

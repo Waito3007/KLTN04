@@ -143,11 +143,13 @@ const RepoList = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '100px' }}>
-        <Spin tip="Đang tải dữ liệu..." size="large" />
+        <Spin size="large" />
+        <div style={{ marginLeft: 16 }}>
+          <Text>Đang tải dữ liệu...</Text>
+        </div>
       </div>
     );
   }

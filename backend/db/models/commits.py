@@ -1,19 +1,31 @@
-# backend\db\models\commits.py
-from sqlalchemy import Table, Column, Integer, String, Text, TIMESTAMP, ForeignKey, func
-from db.metadata import metadata  # Import metadata từ metadata.py
+from sqlalchemy import Table, Column, Integer, String, Boolean, Text, DateTime, func, ForeignKey
+from db.metadata import metadata
 
 commits = Table(
-    "commits",
+    'commits',
     metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("sha", String(40), nullable=False, unique=True),  # SHA của commit
-    Column("message", Text, nullable=False),  # Nội dung commit
-    Column("author_name", String(255), nullable=False),  # Tên tác giả
-    Column("author_email", String(255), nullable=False),  # Email tác giả
-    Column("date", TIMESTAMP, nullable=False),  # Ngày commit
-    Column("insertions", Integer, default=0),  # Số dòng thêm
-    Column("deletions", Integer, default=0),  # Số dòng xóa
-    Column("files_changed", Integer, default=0),  # Số file thay đổi
-    Column("repo_id", Integer, ForeignKey("repositories.id"), nullable=False),  # Liên kết với bảng repositories
-    Column("created_at", TIMESTAMP, server_default=func.now()),  # Thời gian tạo
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('sha', String(40), nullable=False),
+    Column('message', Text, nullable=False),
+    Column('author_user_id', Integer, ForeignKey('users.id'), nullable=True),
+    Column('author_name', String(255), nullable=False),
+    Column('author_email', String(255), nullable=False),
+    Column('committer_user_id', Integer, ForeignKey('users.id'), nullable=True),
+    Column('committer_name', String(255), nullable=True),
+    Column('committer_email', String(255), nullable=True),
+    Column('repo_id', Integer, ForeignKey('repositories.id'), nullable=False),
+    Column('branch_id', Integer, ForeignKey('branches.id'), nullable=True),
+    Column('branch_name', String(255), nullable=True),
+    Column('author_role_at_commit', String(20), nullable=True),
+    Column('author_permissions_at_commit', String(100), nullable=True),
+    Column('date', DateTime, nullable=False),
+    Column('committer_date', DateTime, nullable=True),
+    Column('insertions', Integer, nullable=True),
+    Column('deletions', Integer, nullable=True),
+    Column('files_changed', Integer, nullable=True),
+    Column('parent_sha', String(40), nullable=True),
+    Column('is_merge', Boolean, nullable=True),
+    Column('merge_from_branch', String(255), nullable=True),
+    Column('created_at', DateTime, nullable=True, server_default=func.now()),
+    Column('last_synced', DateTime, nullable=True, server_default=func.now()),
 )

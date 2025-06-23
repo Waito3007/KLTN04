@@ -18,7 +18,9 @@ const InsightContainer = styled(Card)`
   }
 `;
 
-const InsightCard = styled(Card)`
+const InsightCard = styled(Card).withConfig({
+  shouldForwardProp: (prop) => !['borderColor'].includes(prop),
+})`
   border-radius: 8px;
   border: 1px solid ${(props) => props.borderColor || '#f0f0f0'};
   background: #fff;
@@ -35,7 +37,9 @@ const InsightCard = styled(Card)`
   }
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['bgColor'].includes(prop),
+})`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,11 +101,10 @@ const AIInsightWidget = () => {
         };
     }
   };
-
   return (
     <InsightContainer
       title={<Title level={4} style={{ margin: 0 }}>Gợi ý AI</Title>}
-      bordered={false}
+      variant="outlined"
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {insights.map((item) => {

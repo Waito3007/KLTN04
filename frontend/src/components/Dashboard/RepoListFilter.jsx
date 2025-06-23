@@ -14,7 +14,7 @@ const RepoListFilter = ({ onFilterChange }) => {
   };
 
   return (
-    <Card title="Bộ lọc Repository" bordered={false}>
+    <Card title="Bộ lọc Repository" variant="borderless">
       <Row gutter={16}>
         <Col span={8}>
           <Input

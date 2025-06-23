@@ -1,14 +1,27 @@
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, func
-from db.metadata import metadata  # Import metadata từ metadata.py
+from sqlalchemy import Table, Column, Integer, String, Boolean, Text, DateTime, func
+from db.metadata import metadata
 
 users = Table(
-    "users",
+    'users',
     metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("github_id", Integer, unique=True, nullable=True),  # ID GitHub
-    Column("github_username", String(255), nullable=False, unique=True),  # Tên GitHub
-    Column("email", String(255), nullable=False, unique=True),  # Email
-    Column("avatar_url", String(255), nullable=True),  # URL ảnh đại diện
-    Column("created_at", TIMESTAMP, server_default=func.now()),  # Thời gian tạo
-    Column("updated_at", TIMESTAMP, server_default=func.now(), onupdate=func.now()),  # Thời gian cập nhật
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('github_id', Integer, nullable=True),
+    Column('github_username', String(255), nullable=False),
+    Column('email', String(255), nullable=True),
+    Column('display_name', String(255), nullable=True),
+    Column('full_name', String(255), nullable=True),
+    Column('avatar_url', String(500), nullable=True),
+    Column('bio', Text, nullable=True),
+    Column('location', String(255), nullable=True),
+    Column('company', String(255), nullable=True),
+    Column('blog', String(500), nullable=True),
+    Column('twitter_username', String(255), nullable=True),
+    Column('github_profile_url', String(500), nullable=True),
+    Column('repos_url', String(500), nullable=True),
+    Column('is_active', Boolean, nullable=True),
+    Column('is_verified', Boolean, nullable=True),
+    Column('github_created_at', DateTime, nullable=True),
+    Column('last_synced', DateTime, nullable=True),
+    Column('created_at', DateTime, nullable=True, server_default=func.now()),
+    Column('updated_at', DateTime, nullable=True, server_default=func.now()),
 )

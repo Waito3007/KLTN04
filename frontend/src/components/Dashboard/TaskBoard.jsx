@@ -43,12 +43,11 @@ const TaskBoard = ({ initialTasks = [] }) => {
   };
 
   return (
-    <Card title="Bảng công việc" bordered={false}>
+    <Card title="Bảng công việc" variant="borderless">
       <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <Row gutter={16}>
-          {Object.keys(columns).map((columnId) => (
-            <Col span={8} key={columnId}>
-              <Card title={columns[columnId].title} bordered={false}>
+          {Object.keys(columns).map((columnId) => (            <Col span={8} key={columnId}>
+              <Card title={columns[columnId].title} variant="outlined">
                 <SortableContext items={columns[columnId].tasks.map((task) => task.id)}>
                   {columns[columnId].tasks.map((task) => (
                     <SortableTask key={task.id} task={task} />

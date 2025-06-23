@@ -61,19 +61,20 @@ const CommitList = ({ owner, repo, branch }) => {
     if (!branch) return;
 
     const token = localStorage.getItem("access_token");
-    if (!token) return;
-
-    const fetchCommits = async () => {
+    if (!token) return;    const fetchCommits = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/github/${owner}/${repo}/commits?branch=${branch}`,
+          `http://localhost:8000/api/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`,
           {
             headers: {
               Authorization: `token ${token}`,
             },
           }
         );
-        setCommits(response.data);
+        
+        // Backend trả về object với commits array trong property "commits"
+        const commitsData = response.data.commits || response.data;
+        setCommits(Array.isArray(commitsData) ? commitsData : []);
       } catch (err) {
         console.error(err);
         message.error("Lỗi khi lấy danh sách commit");
@@ -90,14 +91,22 @@ const CommitList = ({ owner, repo, branch }) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
   };
-
   // Tính toán dữ liệu hiển thị theo trang hiện tại
-  const paginatedCommits = commits.slice(
+  const paginatedCommits = Array.isArray(commits) ? commits.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
-  );
+  ) : [];
 
-  if (loading) return <Spin tip="Đang tải commit..." size="large" />;
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: 16 }}>
+          <Text>Đang tải commit...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '16px' }}>
@@ -122,10 +131,9 @@ const CommitList = ({ owner, repo, branch }) => {
                   </Tag>
                 </Tooltip>
               </CommitHeader>
-              
-              <CommitMessage>
-                <Tooltip title={item.commit.message} placement="topLeft">
-                  {item.commit.message.split('\n')[0]}
+                <CommitMessage>
+                <Tooltip title={item.message || item.commit?.message} placement="topLeft">
+                  {(item.message || item.commit?.message || '').split('\n')[0]}
                 </Tooltip>
               </CommitMessage>
               
@@ -137,24 +145,22 @@ const CommitList = ({ owner, repo, branch }) => {
                     icon={<UserOutlined />}
                     style={{ marginRight: '8px' }}
                   />
-                  <Text>{item.commit.author.name}</Text>
+                  <Text>{item.author_name || item.commit?.author?.name || 'Unknown'}</Text>
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <ClockCircleOutlined style={{ marginRight: '4px' }} />
-                  <Text>{formatDate(item.commit.author.date)}</Text>
+                  <Text>{formatDate(item.author_date || item.commit?.author?.date)}</Text>
                 </div>
               </CommitMeta>
             </CommitCard>
           </List.Item>
         )}
-      />
-
-      <PaginationContainer>
+      />      <PaginationContainer>
         <Pagination
           current={currentPage}
           pageSize={pageSize}
-          total={commits.length}
+          total={Array.isArray(commits) ? commits.length : 0}
           onChange={(page) => setCurrentPage(page)}
           showSizeChanger={false}
           showQuickJumper
