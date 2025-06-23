@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, Avatar, List, Tag, Progress, Row, Col, Button, 
-  Typography, Divider, Spin, Empty, message, Space, Switch, Select 
+  Typography, Divider, Spin, Empty, message, Space, Switch, Select, Pagination 
 } from 'antd';
 import { 
   UserOutlined, RobotOutlined, CodeOutlined, 
@@ -22,7 +22,8 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 const { Title, Text } = Typography;
 
-const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] = useState([]);
+const RepositoryMembers = ({ selectedRepo }) => {  
+  const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberCommits, setMemberCommits] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,8 +32,14 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
   const [useAI, setUseAI] = useState(true); // Toggle for AI analysis
   const [aiModelStatus, setAiModelStatus] = useState(null);
   const [branches, setBranches] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState(null); // NEW: Branch selector
+  const [selectedBranch, setSelectedBranch] = useState(undefined); // Sửa: undefined thay vì null
   const [branchesLoading, setBranchesLoading] = useState(false);
+  // State for commit filter and pagination
+  const [commitTypeFilter, setCommitTypeFilter] = useState('all');
+  const [techAreaFilter, setTechAreaFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
   // Debug: Log component render and props
   console.log('RepositoryMembers RENDER:', { 
     selectedRepo, 
@@ -63,17 +70,14 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
 
   const loadRepositoryBranches = useCallback(async () => {
     if (!selectedRepo?.id) return;
-    
     setBranchesLoading(true);
     try {
       const response = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/branches`);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Branches API Response:', data);
-        setBranches(data.branches || []);        // Auto-select: Start with "All Branches" by default
-        if (!selectedBranch) {
-          setSelectedBranch(null); // null = "All Branches"
+        setBranches(data.branches || []);
+        if (typeof selectedBranch === 'undefined') {
+          setSelectedBranch(undefined); // Sửa: undefined thay vì null
         }
       } else {
         console.error('Branches API Error:', response.status);
@@ -165,7 +169,18 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
       if (response.ok) {
         const data = await response.json();
         console.log('Commit Analysis Response:', data); // Debug log
-        setMemberCommits(data.data);
+        // Sửa: Tự động lấy đúng trường dữ liệu phân tích
+        if (data.statistics && data.commits) {
+          setMemberCommits({
+            statistics: data.statistics,
+            commits: data.commits,
+            summary: data.summary || {},
+          });
+        } else if (data.data) {
+          setMemberCommits(data.data);
+        } else {
+          setMemberCommits(null);
+        }
       } else {
         console.error('Commit Analysis Error:', response.status, response.statusText);
         message.error(`Không thể phân tích commits: ${response.status}`);
@@ -207,7 +222,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
   };
 
   // Chart data for commit types
-  const chartData = memberCommits ? {
+  const chartData = memberCommits && memberCommits.statistics && memberCommits.statistics.commit_types ? {
     labels: Object.keys(memberCommits.statistics.commit_types),
     datasets: [{
       data: Object.values(memberCommits.statistics.commit_types),
@@ -217,6 +232,18 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
       ]
     }]
   } : null;
+
+  // Filtered and paginated commits
+  const filteredCommits = memberCommits && memberCommits.commits ? memberCommits.commits.filter(commit => {
+    const typeMatch = commitTypeFilter === 'all' || commit.analysis?.type === commitTypeFilter;
+    const techMatch = techAreaFilter === 'all' || commit.analysis?.tech_area === techAreaFilter;
+    return typeMatch && techMatch;
+  }) : [];
+  const paginatedCommits = filteredCommits.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // Unique commit types and tech areas for filter dropdowns
+  const commitTypes = memberCommits && memberCommits.statistics ? Object.keys(memberCommits.statistics.commit_types) : [];
+  const techAreas = memberCommits && memberCommits.statistics ? Object.keys(memberCommits.statistics.tech_analysis) : [];
 
   if (!selectedRepo) {
     return (
@@ -244,13 +271,13 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
             <Text strong style={{ fontSize: '14px' }}>Nhánh:</Text>
             <Select
               value={selectedBranch}
-              onChange={setSelectedBranch}
+              onChange={val => setSelectedBranch(val)}
               placeholder="Chọn nhánh"
               style={{ minWidth: 150 }}
               loading={branchesLoading}
               allowClear
             >
-              <Select.Option key="all" value={null}>
+              <Select.Option key="all" value={undefined}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Tag color="purple" size="small">Tất cả</Tag>
                   Tất cả nhánh
@@ -320,7 +347,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
           <Col xs={24} sm={8}>
             <Card size="small" style={{ textAlign: 'center' }}>
               <Title level={3} style={{ color: '#fa8c16', margin: 0 }}>
-                {members.reduce((sum, member) => sum + member.total_commits, 0)}
+                {members.reduce((sum, member) => sum + (member.total_commits || 0), 0)}
               </Title>
               <Text type="secondary">Tổng commits</Text>
             </Card>
@@ -433,7 +460,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
               <Empty description="Chọn thành viên để xem phân tích commits" />
             </Card>          ) : (
             <Spin spinning={analysisLoading}>
-              {memberCommits && memberCommits.summary.total_commits === 0 ? (
+              {memberCommits && memberCommits.summary && memberCommits.summary.total_commits === 0 ? (
                 <Card>
                   <Empty 
                     description={
@@ -454,7 +481,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
                     }
                   />
                 </Card>
-              ) : memberCommits && (
+              ) : memberCommits && memberCommits.summary && memberCommits.statistics && memberCommits.commits ? (
                 <>{/* Statistics Overview */}
                   <Card 
                     title={                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -480,7 +507,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
                             </Tag>
                           )}
                           <Text type="secondary" style={{ fontSize: '12px' }}>
-                            {new Date(memberCommits.summary.analysis_date).toLocaleString()}
+                            {memberCommits.summary.analysis_date ? new Date(memberCommits.summary.analysis_date).toLocaleString() : ''}
                           </Text>
                         </div>
                       </div>
@@ -498,7 +525,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
                       <Col span={8}>
                         <div style={{ textAlign: 'center' }}>
                           <Title level={2} style={{ color: '#52c41a', margin: 0 }}>
-                            +{memberCommits.statistics.productivity.total_additions}
+                            +{memberCommits.statistics.productivity?.total_additions || 0}
                           </Title>
                           <Text>Dòng code thêm</Text>
                         </div>
@@ -506,7 +533,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
                       <Col span={8}>
                         <div style={{ textAlign: 'center' }}>
                           <Title level={2} style={{ color: '#f5222d', margin: 0 }}>
-                            -{memberCommits.statistics.productivity.total_deletions}
+                            -{memberCommits.statistics.productivity?.total_deletions || 0}
                           </Title>
                           <Text>Dòng code xóa</Text>
                         </div>
@@ -526,104 +553,165 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
                                 maintainAspectRatio: false,
                                 plugins: {
                                   legend: {
-                                    position: 'bottom'
+                                    position: 'bottom',
+                                    labels: {
+                                      color: '#333',
+                                      font: {
+                                        size: 14,
+                                        weight: 'bold',
+                                      }
+                                    }
                                   }
                                 }
-                              }} 
+                              }}
                             />
                           </div>
                         )}
                       </Card>
                     </Col>
 
-                    {/* Tech Areas */}
+                    {/* Tech Areas Chart */}
                     <Col xs={24} lg={12}>
-                      <Card title="🛠️ Lĩnh vực công nghệ" size="small">
-                        <div style={{ height: '300px' }}>
-                          {Object.entries(memberCommits.statistics.tech_analysis).map(([tech, count]) => (
-                            <div key={tech} style={{ marginBottom: '12px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span>{tech}</span>
-                                <span>{count}</span>
-                              </div>
-                              <Progress 
-                                percent={(count / memberCommits.summary.total_commits) * 100} 
-                                size="small"
-                                showInfo={false}
-                              />
-                            </div>
-                          ))}
-                        </div>
+                      <Card title="🌐 Lĩnh vực công nghệ" size="small">
+                        {memberCommits.statistics.tech_analysis && (
+                          <div style={{ height: '300px', display: 'flex', justifyContent: 'center' }}>
+                            <Bar
+                              data={{
+                                labels: Object.keys(memberCommits.statistics.tech_analysis),
+                                datasets: [{
+                                  label: 'Số lượng',
+                                  data: Object.values(memberCommits.statistics.tech_analysis),
+                                  backgroundColor: '#1890ff',
+                                  borderColor: '#0056b3',
+                                  borderWidth: 2,
+                                }]
+                              }}
+                              options={{ 
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                plugins: {
+                                  legend: {
+                                    position: 'top',
+                                    labels: {
+                                      color: '#333',
+                                      font: {
+                                        size: 14,
+                                        weight: 'bold',
+                                      }
+                                    }
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
                       </Card>
                     </Col>
-                  </Row>                  {/* Recent Commits */}
+                  </Row>
+
+                  {/* Recent Commits Card - START */}
                   <Card title="📝 Commits gần đây" style={{ marginTop: '20px' }}>
-                    <List
-                      dataSource={memberCommits.commits.slice(0, 10)}
-                      renderItem={commit => (
-                        <List.Item>
-                          <List.Item.Meta
-                            title={
-                              <div>
-                                <span style={{ marginRight: '8px' }}>
-                                  {commit.message.length > 80 ? 
-                                    commit.message.substring(0, 80) + '...' : 
-                                    commit.message
-                                  }
-                                </span>
-                                <Tag 
-                                  color={getCommitTypeColor(commit.analysis.type)}
-                                  icon={getCommitTypeIcon(commit.analysis.type)}
-                                >
-                                  {commit.analysis.type_icon} {commit.analysis.type}
-                                </Tag>
-                                <Tag color="blue">{commit.analysis.tech_area}</Tag>
-                                {commit.analysis.ai_powered && (
-                                  <>                                    {commit.analysis.impact && (
-                                      <Tag color={commit.analysis.impact === 'high' ? 'red' : 
-                                                 commit.analysis.impact === 'medium' ? 'orange' : 'green'}>
-                                        Tác động: {commit.analysis.impact === 'high' ? 'Cao' : 
-                                                  commit.analysis.impact === 'medium' ? 'Trung bình' : 'Thấp'}
-                                      </Tag>
-                                    )}
-                                    {commit.analysis.urgency && (
-                                      <Tag color={commit.analysis.urgency === 'urgent' ? 'red' : 
-                                                 commit.analysis.urgency === 'high' ? 'orange' : 'default'}>
-                                        {commit.analysis.urgency === 'urgent' ? 'Khẩn cấp' : 
-                                         commit.analysis.urgency === 'high' ? 'Cao' : commit.analysis.urgency}
-                                      </Tag>
-                                    )}
-                                    <Tag color="green" style={{ fontSize: '10px' }}>
-                                      🤖 AI
-                                    </Tag>
-                                  </>
-                                )}
-                              </div>
-                            }
-                            description={
-                              <div>
-                                <Text code>{commit.sha}</Text> •                                <Text type="secondary">
-                                  {commit.date ? 
-                                    new Date(commit.date).toLocaleDateString('vi-VN') : 
-                                    'Ngày không xác định'
-                                  }
-                                </Text> • 
-                                <Text style={{ color: '#52c41a' }}>+{commit.stats?.insertions || 0}</Text> 
-                                <Text style={{ color: '#f5222d' }}> -{commit.stats?.deletions || 0}</Text>
-                                {commit.stats?.files_changed && (
-                                  <Text type="secondary"> • {commit.stats.files_changed} files</Text>
-                                )}
-                              </div>
-                            }
-                          />
-                        </List.Item>
-                      )}
-                    />                  </Card>
+  <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+    <Select
+      value={commitTypeFilter}
+      onChange={val => { setCommitTypeFilter(val); setCurrentPage(1); }}
+      style={{ minWidth: 120 }}
+    >
+      <Select.Option value="all">Tất cả loại</Select.Option>
+      {commitTypes.map(type => (
+        <Select.Option key={type} value={type}>{type}</Select.Option>
+      ))}
+    </Select>
+    <Select
+      value={techAreaFilter}
+      onChange={val => { setTechAreaFilter(val); setCurrentPage(1); }}
+      style={{ minWidth: 120 }}
+    >
+      <Select.Option value="all">Tất cả lĩnh vực</Select.Option>
+      {techAreas.map(area => (
+        <Select.Option key={area} value={area}>{area}</Select.Option>
+      ))}
+    </Select>
+  </div>
+  <List
+    dataSource={paginatedCommits}
+    renderItem={commit => (
+      <List.Item>
+        <List.Item.Meta
+          title={
+            <div>
+              <span style={{ marginRight: '8px' }}>
+                {commit.message && commit.message.length > 80 ? 
+                  commit.message.substring(0, 80) + '...' : 
+                  commit.message || ''
+                }
+              </span>
+              <Tag 
+                color={getCommitTypeColor(commit.analysis?.type)}
+                icon={getCommitTypeIcon(commit.analysis?.type)}
+              >
+                {commit.analysis?.type_icon || ''} {commit.analysis?.type || ''}
+              </Tag>
+              <Tag color="blue">{commit.analysis?.tech_area || ''}</Tag>
+              {commit.analysis?.ai_powered && (
+                <>
+                  {commit.analysis.impact && (
+                    <Tag color={commit.analysis.impact === 'high' ? 'red' : 
+                               commit.analysis.impact === 'medium' ? 'orange' : 'green'}>
+                      Tác động: {commit.analysis.impact === 'high' ? 'Cao' : 
+                                commit.analysis.impact === 'medium' ? 'Trung bình' : 'Thấp'}
+                    </Tag>
+                  )}
+                  {commit.analysis.urgency && (
+                    <Tag color={commit.analysis.urgency === 'urgent' ? 'red' : 
+                               commit.analysis.urgency === 'high' ? 'orange' : 'default'}>
+                      {commit.analysis.urgency === 'urgent' ? 'Khẩn cấp' : 
+                       commit.analysis.urgency === 'high' ? 'Cao' : commit.analysis.urgency}
+                    </Tag>
+                  )}
+                  <Tag color="green" style={{ fontSize: '10px' }}>
+                    🤖 AI
+                  </Tag>
                 </>
               )}
+            </div>
+          }
+          description={
+            <div>
+              <Text code>{commit.sha || ''}</Text> •
+              <Text type="secondary">
+                {commit.date ? 
+                  new Date(commit.date).toLocaleDateString('vi-VN') : 
+                  'Ngày không xác định'
+                }
+              </Text> • 
+              <Text style={{ color: '#52c41a' }}>+{commit.stats?.insertions || 0}</Text> 
+              <Text style={{ color: '#f5222d' }}> -{commit.stats?.deletions || 0}</Text>
+              {commit.stats?.files_changed && (
+                <Text type="secondary"> • {commit.stats.files_changed} files</Text>
+              )}
+            </div>
+          }
+        />
+      </List.Item>
+    )}
+  />
+  <Pagination
+    current={currentPage}
+    pageSize={pageSize}
+    total={filteredCommits.length}
+    onChange={setCurrentPage}
+    style={{ marginTop: 16, textAlign: 'center' }}
+    showSizeChanger={false}
+  />
+</Card>
+{/* Recent Commits Card - END */}
+                </>
+              ) : null}
             </Spin>
           )}
-        </Col></Row>
+        </Col>
+      </Row>
     </div>
   );
 };
