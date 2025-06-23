@@ -150,7 +150,7 @@ const RepoSelector = ({
               textAlign: 'center',
               marginTop: '8px'
             }}>
-              💡 Dữ liệu tự động tải từ database, ấn sync để cập nhật từ GitHub
+              
             </div>
           </Space>
         </Card>
