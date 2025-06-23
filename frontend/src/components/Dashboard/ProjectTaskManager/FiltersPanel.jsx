@@ -18,11 +18,7 @@ const FiltersPanel = ({
   collaborators,
   filteredTasks,
   resetFilters
-}) => {
-  console.log('🔍 FiltersPanel rendered with collaborators:', collaborators);
-  console.log('🔍 FiltersPanel collaborators type:', typeof collaborators);
-  console.log('🔍 FiltersPanel collaborators isArray:', Array.isArray(collaborators));
-  
+}) => { 
   return (
     <Row gutter={16} align="middle">
       <Col span={6}>

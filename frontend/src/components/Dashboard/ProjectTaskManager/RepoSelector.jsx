@@ -12,24 +12,38 @@ const RepoSelector = ({
   branches = [],
   collaborators = [],
   branchesLoading = false,
-  onSyncCollaborators = null     
+  onSyncCollaborators = null,
+  onSyncBranches = null     
 }) => {
-  const [isSyncing, setIsSyncing] = useState(false);
-
+  const [isSyncingCollaborators, setIsSyncingCollaborators] = useState(false);
+  const [isSyncingBranches, setIsSyncingBranches] = useState(false);
   const handleRepoSelect = async (repoId) => {
     await handleRepoChange(repoId);
   };
 
-  const handleSyncClick = async () => {
-    if (!onSyncCollaborators || !selectedRepo || isSyncing) return;
+  const handleSyncCollaborators = async () => {
+    if (!onSyncCollaborators || !selectedRepo || isSyncingCollaborators) return;
     
-    setIsSyncing(true);
+    setIsSyncingCollaborators(true);
     try {
       await onSyncCollaborators();
     } catch (error) {
-      console.error('Sync failed:', error);
+      console.error('Sync collaborators failed:', error);
     } finally {
-      setIsSyncing(false);
+      setIsSyncingCollaborators(false);
+    }
+  };
+
+  const handleSyncBranches = async () => {
+    if (!onSyncBranches || !selectedRepo || isSyncingBranches) return;
+    
+    setIsSyncingBranches(true);
+    try {
+      await onSyncBranches();
+    } catch (error) {
+      console.error('Sync branches failed:', error);
+    } finally {
+      setIsSyncingBranches(false);
     }
   };
 
@@ -43,13 +57,18 @@ const RepoSelector = ({
         onChange={handleRepoSelect}
         showSearch
         optionFilterProp="children"
-      >
-        {repositories.map(repo => (
+      >        {repositories.map(repo => (
           <Option key={repo.id} value={repo.id}>
             <Space>
-              <Avatar src={repo.owner.avatar_url} size="small" />
+              <Avatar 
+                src={repo.owner?.avatar_url} 
+                size="small"
+                style={{ backgroundColor: '#1890ff' }}
+              >
+                {!repo.owner?.avatar_url && repo.owner?.login?.charAt(0)?.toUpperCase()}
+              </Avatar>
               <span style={{ fontWeight: 500 }}>
-                {repo.owner.login}/{repo.name}
+                {repo.owner?.login}/{repo.name}
               </span>
             </Space>
           </Option>
@@ -65,23 +84,42 @@ const RepoSelector = ({
             background: 'linear-gradient(135deg, #f6f8fa 0%, #e1e7ed 100%)'
           }}
         >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Space>
-              <Avatar src={selectedRepo.owner.avatar_url} size="small" />
+          <Space direction="vertical" style={{ width: '100%' }}>            <Space>
+              <Avatar 
+                src={selectedRepo.owner?.avatar_url} 
+                size="small"
+                style={{ backgroundColor: '#1890ff' }}
+              >
+                {!selectedRepo.owner?.avatar_url && selectedRepo.owner?.login?.charAt(0)?.toUpperCase()}
+              </Avatar>
               <span style={{ fontWeight: 600, color: '#1890ff' }}>
-                {selectedRepo.owner.login}/{selectedRepo.name}
+                {selectedRepo.owner?.login}/{selectedRepo.name}
               </span>
               {selectedRepo.private && (
                 <Tag color="orange" size="small">Private</Tag>
               )}
-            </Space>
-
-            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+            </Space>            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
               <Space>
                 <BranchesOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
                 <span style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
                   {branchesLoading ? 'Loading...' : `${branches.length} branches`}
                 </span>
+                {onSyncBranches && (
+                  <Button
+                    size="small"
+                    type="text"
+                    icon={<SyncOutlined spin={isSyncingBranches} />}
+                    onClick={handleSyncBranches}
+                    disabled={!selectedRepo || isSyncingBranches}
+                    style={{ 
+                      fontSize: '12px',
+                      height: '20px',
+                      padding: '0 4px',
+                      color: '#52c41a'
+                    }}
+                    title="Sync branches từ GitHub"
+                  />
+                )}
               </Space>
 
               <Space>
@@ -89,37 +127,30 @@ const RepoSelector = ({
                 <span style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
                   {collaborators.length} collaborators
                 </span>
+                {onSyncCollaborators && (
+                  <Button
+                    size="small"
+                    type="text"
+                    icon={<SyncOutlined spin={isSyncingCollaborators} />}
+                    onClick={handleSyncCollaborators}
+                    disabled={!selectedRepo || isSyncingCollaborators}
+                    style={{ 
+                      fontSize: '12px',
+                      height: '20px',
+                      padding: '0 4px',
+                      color: '#1890ff'
+                    }}
+                    title="Sync collaborators từ GitHub"
+                  />
+                )}
               </Space>
-            </Space>
-
-            {/* Only GitHub sync button - data loads automatically from DB */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center',
-              marginTop: '8px'
-            }}>
-              <Button
-                size="small"
-                icon={<SyncOutlined spin={isSyncing} />}
-                onClick={handleSyncClick}
-                disabled={!selectedRepo || isSyncing}
-                type="primary"
-                style={{ 
-                  background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
-                  border: 'none'
-                }}
-              >
-                {isSyncing ? 'Đang sync GitHub...' : 'Sync collaborators từ GitHub'}
-              </Button>
-            </div>
-
-            <div style={{ 
+            </Space>            <div style={{ 
               fontSize: '11px', 
               color: '#999', 
               textAlign: 'center',
-              marginTop: '4px'
+              marginTop: '8px'
             }}>
-              💡 Dữ liệu tự động tải từ database, chỉ sync GitHub khi cần
+              💡 Dữ liệu tự động tải từ database, ấn sync để cập nhật từ GitHub
             </div>
           </Space>
         </Card>

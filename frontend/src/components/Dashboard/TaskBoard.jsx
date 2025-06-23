@@ -43,7 +43,7 @@ const TaskBoard = ({ initialTasks = [] }) => {
   };
 
   return (
-    <Card title="Bảng công việc" bordered={false}>
+    <Card title="Bảng công việc" variant="borderless">
       <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <Row gutter={16}>
           {Object.keys(columns).map((columnId) => (            <Col span={8} key={columnId}>

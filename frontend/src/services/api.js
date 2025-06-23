@@ -17,28 +17,46 @@ const apiClientLongTimeout = axios.create({
   timeout: 30000, // 30 seconds for sync operations
 });
 
-// Create a separate API client without auth for public endpoints
-const publicApiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
+// Create a separate API client without auth for public endpoints (currently unused)
+// const publicApiClient = axios.create({
+//   baseURL: API_BASE_URL,
+//   timeout: 10000,
+// });
 
 // Request interceptor để tự động thêm token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
+    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`🔑 Token exists: ${!!token}`);
     if (token) {
       config.headers.Authorization = `token ${token}`;
+      console.log(`🔑 Authorization header set: token ${token.substring(0, 10)}...`);
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('❌ Request interceptor error:', error);
+    return Promise.reject(error);
+  }
 );
 
 // Response interceptor để xử lý lỗi chung
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`✅ API Response: ${response.status} for ${response.config.url}`);
+    return response;
+  },
   (error) => {
+    console.error(`❌ API Error:`, {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
+    
     if (error.response?.status === 401) {
       message.error('Phiên đăng nhập đã hết hạn');
       // Có thể redirect đến login page
@@ -75,9 +93,14 @@ apiClientLongTimeout.interceptors.response.use(
 );
 
 // ==================== REPOSITORY API ====================
-export const repositoryAPI = {  // Lấy repos từ database
+export const repositoryAPI = {  // Lấy repos từ database (requires authentication to filter by user)
   getFromDatabase: async () => {
-    const response = await publicApiClient.get('/repositories');
+    console.log('🔍 repositoryAPI.getFromDatabase: Making request to /repositories');
+    const response = await apiClient.get('/repositories');
+    console.log('✅ repositoryAPI.getFromDatabase: Response received', {
+      status: response.status,
+      dataLength: response.data?.length
+    });
     return response.data || [];
   },
 
@@ -197,6 +220,25 @@ export const collaboratorAPI = {
     const response = await apiClientLongTimeout.post(`/contributors/${owner}/${repoName}/sync`);
     console.log('✅ Sync response:', response.data);
     return response.data;  }
+};
+
+// ==================== BRANCH API ====================
+export const branchAPI = {  // 🌿 Lấy branches từ database
+  getBranches: async (owner, repoName) => {
+    console.log(`🔍 Getting branches from database for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/${owner}/${repoName}/branches`);
+    
+    console.log('🌿 Branch database response:', response.data);
+    return response.data?.branches || [];
+  },
+
+  // 🔄 Sync branches từ GitHub vào database
+  sync: async (owner, repoName) => {
+    console.log(`🔄 Syncing branches for ${owner}/${repoName}`);
+    const response = await apiClientLongTimeout.post(`/github/${owner}/${repoName}/sync-branches`);
+    console.log('✅ Branch sync response:', response.data);
+    return response.data;
+  }
 };
 
 export default apiClient;

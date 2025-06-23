@@ -181,7 +181,36 @@ const Dashboard = () => {
     overallProgress: 0
   });
 
-  const [isSyncing, setIsSyncing] = useState(false);  const syncAllRepositories = async () => {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [repositories, setRepositories] = useState([]);
+  const [repoLoading, setRepoLoading] = useState(true);
+
+  // Pre-fetch repositories từ database ngầm trong nền
+  const preloadRepositoriesFromDB = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      // Gọi API lấy repos từ database (không phải GitHub API)
+      const response = await axios.get('http://localhost:8000/api/repositories', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      setRepositories(response.data);
+      console.log(`Pre-loaded ${response.data.length} repositories from database`);
+    } catch (error) {
+      console.error('Lỗi khi pre-load repositories:', error);
+    } finally {
+      setRepoLoading(false);
+    }
+  };
+
+  // Pre-load repositories ngay khi vào Dashboard
+  useEffect(() => {
+    preloadRepositoriesFromDB();
+  }, []);
+
+  const syncAllRepositories = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) {
       message.error('Vui lòng đăng nhập lại!');
@@ -287,49 +316,16 @@ const Dashboard = () => {
     } finally {
       setIsSyncing(false);
     }
-  };
-  useEffect(() => {
+  };  useEffect(() => {
     const storedProfile = localStorage.getItem('github_profile');
     if (!storedProfile) {
       navigate('/login');
     } else {
       setUser(JSON.parse(storedProfile));
       
-      // Đồng bộ cơ bản nhanh để hiển thị danh sách repo ngay lập tức
-      syncBasicRepositories();
-    }
-  }, [navigate]);
-
-  // Đồng bộ cơ bản (nhanh) - chỉ thông tin repo và branches
-  const syncBasicRepositories = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    try {
-      const response = await axios.get('http://localhost:8000/api/github/repos', {
-        headers: { Authorization: `token ${token}` },
-      });
-
-      const repositories = response.data;
-      message.info(`Đồng bộ cơ bản ${repositories.length} repository...`);
-      
-      // Đồng bộ cơ bản song song (nhanh hơn)
-      Promise.all(
-        repositories.slice(0, 10).map(repo => // Chỉ đồng bộ 10 repo đầu tiên
-          axios.post(
-            `http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-basic`,
-            {},
-            { headers: { Authorization: `token ${token}` } }
-          ).catch(() => null)
-        )
-      ).then(() => {
-        message.success('Đồng bộ cơ bản hoàn thành!');
-      });
-
-    } catch (error) {
-      console.error('Lỗi đồng bộ cơ bản:', error);
-    }
-  };
+      // Removed automatic sync - now only manual sync is allowed
+      // Users must manually sync repositories using the sync buttons
+    }  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('github_profile');
@@ -352,7 +348,7 @@ const Dashboard = () => {
   return (
     <DashboardContainer>
       {/* Header Section */}
-      <HeaderCard bordered={false}>
+      <HeaderCard variant="borderless">
         <Space 
           direction={screens.md ? 'horizontal' : 'vertical'} 
           align={screens.md ? 'center' : 'start'}
@@ -460,10 +456,12 @@ const Dashboard = () => {
         </Sidebar>
 
         {/* Main Content bên phải */}
-        <MainContent>
-          {/* Project Task Manager - Full Width */}
+        <MainContent>          {/* Project Task Manager - Full Width */}
           <DashboardCard>
-            <ProjectTaskManager />
+            <ProjectTaskManager 
+              repositories={repositories}
+              repoLoading={repoLoading}
+            />
           </DashboardCard>
 
           {/* Repository Analysis */}

@@ -49,7 +49,7 @@ const TaskActions = styled.div`
   gap: 8px;
 `;
 
-const ProjectTaskManager = () => {
+const ProjectTaskManager = ({ repositories, repoLoading }) => {
   // ==================== LOCAL STATE (UI ONLY) ====================
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -61,25 +61,22 @@ const ProjectTaskManager = () => {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
-  const [assigneeFilter, setAssigneeFilter] = useState('all');
-  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
+  const [assigneeFilter, setAssigneeFilter] = useState('all');  // ==================== CUSTOM HOOK (DATA MANAGEMENT) ====================
   const {
     selectedRepo,
     branches,
-    repositories,
     tasks,
     collaborators,
-    repositoriesLoading,
     tasksLoading,
     branchesLoading,
     handleRepoChange,
     getAssigneeInfo,
     createTask,
     updateTask,
-    updateTaskStatus,
-    deleteTask,
+    updateTaskStatus,    deleteTask,
+    syncBranches,
     syncCollaborators
-  } = useProjectData();
+  } = useProjectData({ preloadedRepositories: repositories });
 
   // ==================== COMPUTED VALUES ====================
   const filteredTasks = filterTasks(tasks, {
@@ -117,9 +114,6 @@ const ProjectTaskManager = () => {
         repo_owner: selectedRepo.owner.login,
         repo_name: selectedRepo.name
       };
-
-      console.log('🎯 Creating task with data:', taskData);
-
       if (editingTask) {
         await updateTask(editingTask.id, taskData);
         message.success('✅ Cập nhật task thành công!');
@@ -149,7 +143,7 @@ const ProjectTaskManager = () => {
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Title level={3} style={{ margin: 0, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-                                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             🎯 Quản lý Task Dự án
           </Title>
         </div>
@@ -218,13 +212,14 @@ const ProjectTaskManager = () => {
       {/* Repository Selector - Clean & Simple */}      <RepoSelector 
         repositories={repositories}
         selectedRepo={selectedRepo}
-        loading={repositoriesLoading}
+        loading={repoLoading}
         handleRepoChange={handleRepoChange}
         branches={branches}
         collaborators={collaborators}
         branchesLoading={branchesLoading}
+        onSyncBranches={syncBranches}
         onSyncCollaborators={syncCollaborators}
-      />      {/* Tab Content - Conditional Rendering */}
+      />{/* Tab Content - Conditional Rendering */}
       {selectedRepo && (
         <>
           {activeTab === 'tasks' && (
@@ -235,9 +230,7 @@ const ProjectTaskManager = () => {
                 selectedRepo={selectedRepo}
                 collaborators={collaborators}
               />
-
               <Divider />
-
               {/* Filters Panel */}
               <FiltersPanel 
                 searchText={searchText}
@@ -253,9 +246,7 @@ const ProjectTaskManager = () => {
                 tasksLoading={tasksLoading}
                 resetFilters={resetFilters}
               />
-
               <Divider />
-
               {/* Tasks Display */}
               {viewMode ? (
                 <KanbanBoard 
@@ -303,13 +294,11 @@ const ProjectTaskManager = () => {
               )}
             </>
           )}
-
           {activeTab === 'members' && (
             <RepositoryMembers selectedRepo={selectedRepo} />
           )}
         </>
       )}
-
       {/* Task Modal */}
       <TaskModal 
         isModalVisible={isModalVisible}
@@ -322,5 +311,4 @@ const ProjectTaskManager = () => {
     </Card>
   );
 };
-
 export default ProjectTaskManager;

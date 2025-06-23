@@ -1,22 +1,23 @@
 // frontend/src/hooks/useProjectData.js
 import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
-import { repositoryAPI, taskAPI, collaboratorAPI } from '../services/api';
+import { repositoryAPI, taskAPI, collaboratorAPI, branchAPI } from '../services/api';
 
 // ==================== REPOSITORY HOOK ====================
 export const useRepositories = (dataSourcePreference = 'auto') => {
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState('database');
-  const fetchRepositories = useCallback(async () => {
+  const [dataSource, setDataSource] = useState('database');  const fetchRepositories = useCallback(async () => {
     const token = localStorage.getItem('access_token');
     console.log('fetchRepositories: token exists?', !!token); // Debug
+    console.log('fetchRepositories: token preview:', token ? `${token.substring(0, 10)}...` : 'No token'); // Debug
     
-    // Allow repositories to load without auth for public endpoints
-    // if (!token) {
-    //   message.error('Vui lòng đăng nhập để tiếp tục');
-    //   return;
-    // }
+    // Require authentication for repository access
+    if (!token) {
+      message.warning('⚠️ Vui lòng đăng nhập để xem repositories');
+      setRepositories([]);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -46,14 +47,30 @@ export const useRepositories = (dataSourcePreference = 'auto') => {
         message.info('📡 Repositories loaded from GitHub API');
       } else {
         message.success('💾 Repositories loaded from local database');
-      }
-    } catch (error) {
+      }    } catch (error) {
       console.error('Error fetching repositories:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        code: error.code
+      });
       setRepositories([]);
-      message.error(error.message || 'Failed to load repositories');
+        if (error.response?.status === 401) {
+        message.error('🔒 Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        // Optional: Clear token and redirect to login
+        localStorage.removeItem('access_token');
+      } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        message.error('❌ Không thể kết nối tới server. Vui lòng kiểm tra server có đang chạy?');
+      } else if (error.code === 'ECONNABORTED') {
+        message.error('⏱️ Kết nối bị timeout. Vui lòng kiểm tra kết nối mạng và thử lại.');
+      } else {
+        message.error(error.message || 'Failed to load repositories');
+      }
     } finally {
       setLoading(false);
-    }  }, [dataSourcePreference]);useEffect(() => {
+    }}, [dataSourcePreference]);useEffect(() => {
     fetchRepositories();
   }, [fetchRepositories]);
 
@@ -308,70 +325,93 @@ export const useCollaborators = (selectedRepo) => {
 };
 
 // ==================== COMPOSITE HOOK FOR ALL PROJECT DATA ====================
-export const useProjectData = (dataSourcePreference = 'database') => {
-  // Individual hooks
-  const repositories = useRepositories(dataSourcePreference);
+export const useProjectData = (options = {}) => {
+  const { dataSourcePreference = 'database', preloadedRepositories } = options;
+  
+  // Individual hooks - chỉ use repositories nếu không có preloaded
+  const repositoriesHook = useRepositories(dataSourcePreference);
+  
+  // Sử dụng preloaded repositories nếu có, fallback đến hook
+  const repositories = {
+    repositories: preloadedRepositories || repositoriesHook.repositories,
+    loading: preloadedRepositories ? false : repositoriesHook.loading,
+    dataSource: repositoriesHook.dataSource,
+    refetch: repositoriesHook.refetch
+  };
+  
   const [selectedRepo, setSelectedRepo] = useState(null);
   const tasks = useTasks(selectedRepo, 'database');
   const collaborators = useCollaborators(selectedRepo);
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
 
-  // New function: Auto-sync repository data
-  const syncRepositoryData = useCallback(async (repo) => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
+  // New function: Auto-sync repository data  // Note: Removed syncRepositoryData function - no longer needed for auto-sync
+  // Use individual sync functions (syncBranches, syncCollaborators) instead
 
+  // Load branches from database
+  const loadBranches = useCallback(async (repo) => {
+    if (!repo) {
+      setBranches([]);
+      return;
+    }
+
+    setBranchesLoading(true);
     try {
-      setBranchesLoading(true);
-      
-      // 1. Sync branches to database
-      console.log(`📂 Syncing branches for ${repo.owner.login}/${repo.name}`);
-      const branchResponse = await fetch(`http://localhost:8000/api/github/${repo.owner.login}/${repo.name}/sync-branches`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (branchResponse.ok) {
-        const branchData = await branchResponse.json();
-        setBranches(branchData.branches || []);
-        message.success(`✅ Đã sync ${branchData.branches?.length || 0} branches`);
-      }      // 2. Sync collaborators to database  
-      console.log(`👥 Syncing collaborators for ${repo.owner.login}/${repo.name}`);
-      
-      try {
-        const collabResult = await collaboratorAPI.sync(repo.owner.login, repo.name);
-        message.success(`✅ Đã sync ${collabResult.saved_collaborators_count || 0} collaborators`);
-        
-        // Refresh collaborators data
-        await collaborators.refetch();
-      } catch (collabError) {
-        console.error('Failed to sync collaborators:', collabError);
-        message.warning('⚠️ Không thể sync collaborators từ GitHub');
-      }
-
+      console.log(`🌿 Loading branches from database for ${repo.owner.login}/${repo.name}`);
+      const branchesData = await branchAPI.getBranches(repo.owner.login, repo.name);
+      setBranches(branchesData);
+      console.log(`✅ Loaded ${branchesData.length} branches from database`);
     } catch (error) {
-      console.error('Sync error:', error);
-      message.warning('⚠️ Một số dữ liệu không sync được, sẽ dùng cache');
+      console.error('Failed to load branches:', error);
+      setBranches([]);
+      // Don't show error message for initial load - it's expected to be empty sometimes
     } finally {
       setBranchesLoading(false);
     }
-  }, [collaborators]);
-
-  // Enhanced handleRepoChange with auto-sync
+  }, []);
+  // Handle repository selection - ONLY load from database, NO auto-sync
   const handleRepoChange = useCallback(async (repoId) => {
     const repo = repositories.repositories.find(r => r.id === repoId);
     setSelectedRepo(repo);
     
     if (repo) {
-      console.log(`🔄 Repository selected: ${repo.owner.login}/${repo.name}`);
+      console.log(`� Repository selected: ${repo.owner.login}/${repo.name} - Loading from database only`);
       
-      // Trigger background sync for branches & collaborators
-      await syncRepositoryData(repo);
-    }  }, [repositories.repositories, syncRepositoryData]);
+      // ONLY load branches from database (no auto-sync)
+      await loadBranches(repo);
+    } else {
+      // Clear branches when no repo selected
+      setBranches([]);
+    }
+  }, [repositories.repositories, loadBranches]);
+  // Sync branches only
+  const syncBranches = useCallback(async () => {
+    if (!selectedRepo) return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      message.error('Vui lòng đăng nhập để sync branches');
+      return;
+    }
+
+    setBranchesLoading(true);
+    try {
+      console.log(`📂 Syncing branches for ${selectedRepo.owner.login}/${selectedRepo.name}`);
+      
+      const branchData = await branchAPI.sync(selectedRepo.owner.login, selectedRepo.name);
+      setBranches(branchData.branches || []);
+      message.success(`✅ Đã sync ${branchData.branches?.length || 0} branches từ GitHub`);
+      
+    } catch (error) {
+      console.error('Failed to sync branches:', error);
+      if (error.response?.status === 401) {
+        message.error('🔒 Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      } else {
+        message.error('❌ Không thể sync branches từ GitHub');
+      }
+    } finally {
+      setBranchesLoading(false);
+    }  }, [selectedRepo]);
 
   return {
     // States
@@ -395,13 +435,13 @@ export const useProjectData = (dataSourcePreference = 'database') => {
     createTask: tasks.createTask,
     updateTask: tasks.updateTask,
     updateTaskStatus: tasks.updateTaskStatus,
-    deleteTask: tasks.deleteTask,
-
-    // Manual refresh functions (no auto-sync)
+    deleteTask: tasks.deleteTask,    // Manual refresh functions (no auto-sync)
     refetchRepositories: repositories.refetch,
     refetchTasks: tasks.refetch,
     refetchCollaborators: collaborators.refetch,
-    syncRepositoryData,
+
+    // Manual sync functions (user-initiated only)
+    syncBranches,
     syncCollaborators: collaborators.syncCollaborators
   };
 };
