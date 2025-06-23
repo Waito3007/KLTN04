@@ -1,8 +1,8 @@
-# backend/main.py
 from fastapi import FastAPI
 from core.lifespan import lifespan
 from core.config import setup_middlewares
 from core.logger import setup_logger
+import os
 
 from api.routes.auth import auth_router
 from api.routes.github import github_router
@@ -18,19 +18,30 @@ app = FastAPI(lifespan=lifespan)
 
 setup_middlewares(app)
 
-# Include routers trực tiếp
+# Include routers
 app.include_router(auth_router, prefix="/api")
 app.include_router(github_router, prefix="/api")
 app.include_router(projects_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
 app.include_router(contributors_router, prefix="/api/contributors")
-app.include_router(member_analysis_router)  # Already has /api prefix
-app.include_router(repositories_router)  # Already has /api prefix
+app.include_router(member_analysis_router)
+app.include_router(repositories_router)
 
 @app.get("/")
 def root():
-    return {"message": "TaskFlowAI backend is running "}
+    return {"message": "TaskFlowAI backend is running"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.getenv("PORT", 10000)) 
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",  # Lắng nghe trên tất cả interfaces
+        port=port,
+        reload=False,  # Tắt reload trên production
+        workers=1  
+    )
