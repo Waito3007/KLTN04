@@ -236,7 +236,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
         gap: '16px'
       }}>
         <Title level={3} style={{ margin: 0 }}>
-          👥 Thành viên - {selectedRepo.name}
+          {selectedRepo.name}
         </Title>        
         <Space wrap>{/* Branch Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -272,17 +272,16 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
           
           {/* AI Toggle Switch */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Text>Phân tích mẫu</Text>
+            <Text>Loại phân tích</Text>
             <Switch 
               checked={useAI}
               onChange={setUseAI}
-              checkedChildren="🤖 AI"
-              unCheckedChildren="📝 Cơ bản"
+              checkedChildren="AI"
+              unCheckedChildren="Cơ bản"
               style={{
                 backgroundColor: useAI ? '#52c41a' : '#d9d9d9'
               }}
             />
-            <Text>Mô hình HAN AI</Text>
           </div>
           
           <Button 
@@ -294,7 +293,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
               border: 'none'
             }}
           >
-            🤖 AI Features
+            Xem tính năng AI
           </Button>        </Space>
       </div>
 
@@ -306,7 +305,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
               <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
                 {members.length}
               </Title>
-              <Text type="secondary">Thành viên tham gia</Text>
+              <Text type="secondary">Số tài khoản thực hiện</Text>
             </Card>
           </Col>
           <Col xs={24} sm={8}>
@@ -335,7 +334,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
               <span>🤖 AI Model Status</span>
               {aiModelStatus && (
                 <Tag color={aiModelStatus.model_loaded ? 'green' : 'red'}>
-                  {aiModelStatus.model_loaded ? '✅ Model Loaded' : '❌ Model Not Available'}
+                  {aiModelStatus.model_loaded ? 'HAN Model' : '❌ Model Not Available'}
                 </Tag>
               )}
             </div>
@@ -386,7 +385,7 @@ const RepositoryMembers = ({ selectedRepo }) => {  const [members, setMembers] =
       <Row gutter={[24, 24]}>
         {/* Members List */}
         <Col xs={24} md={8}>
-          <Card title="👥 Danh sách thành viên" loading={loading}>
+          <Card title="Danh sách tài khoản trên dự án" loading={loading}>
             {members.length === 0 ? (
               <Empty description="Không có thành viên nào" />
             ) : (
