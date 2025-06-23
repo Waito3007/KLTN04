@@ -23,14 +23,16 @@ def setup_middlewares(app: FastAPI):
     Args:
         app (FastAPI): Instance của FastAPI app
     """
-    
-    # Thêm middleware CORS (Cross-Origin Resource Sharing)
+      # Thêm middleware CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,
         # Danh sách domain được phép truy cập
         allow_origins=[
             "http://localhost:5173",  # Frontend dev (Vite thường chạy ở port 5173)
-            "http://localhost:3000"   # Frontend dev (React có thể chạy ở port 3000)
+            "http://localhost:3000",  # Frontend dev (React có thể chạy ở port 3000)
+            "http://127.0.0.1:5173",  # Alternative localhost
+            "http://127.0.0.1:3000",  # Alternative localhost
+            "*"  # Allow all origins for development (remove in production)
         ],
         allow_credentials=True,  # Cho phép gửi credential (cookies, auth headers)
         allow_methods=["*"],  # Cho phép tất cả HTTP methods
