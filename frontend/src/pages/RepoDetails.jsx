@@ -127,38 +127,38 @@ const RepoDetails = () => {
       setLoading(false);
     }
   };
-  const saveCommits = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      message.error("Vui lòng đăng nhập lại!");
-      return;
-    }
+  // const saveCommits = async () => {
+  //   const token = localStorage.getItem("access_token");
+  //   if (!token) {
+  //     message.error("Vui lòng đăng nhập lại!");
+  //     return;
+  //   }
 
-    if (!branch) {
-      message.error("Vui lòng chọn branch trước!");
-      return;
-    }
+  //   if (!branch) {
+  //     message.error("Vui lòng chọn branch trước!");
+  //     return;
+  //   }
 
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
-        {},
-        {
-          headers: {
-            Authorization: `token ${token}`,
-          },
-        }
-      );
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:8000/api/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
+  //       {},
+  //       {
+  //         headers: {
+  //           Authorization: `token ${token}`,
+  //         },
+  //       }
+  //     );
       
-      const { stats } = response.data;
-      message.success(
-        `Đồng bộ thành công! ${stats.new_commits_saved} commits mới được lưu cho branch "${branch}"`
-      );
-    } catch (error) {
-      console.error("Lỗi khi lưu commit:", error);
-      message.error("Không thể lưu commit!");
-    }
-  };
+  //     const { stats } = response.data;
+  //     message.success(
+  //       `Đồng bộ thành công! ${stats.new_commits_saved} commits mới được lưu cho branch "${branch}"`
+  //     );
+  //   } catch (error) {
+  //     console.error("Lỗi khi lưu commit:", error);
+  //     message.error("Không thể lưu commit!");
+  //   }
+  // };
 
   // Hiển thị trang ngay lập tức, không đợi sync
   return (
@@ -191,14 +191,14 @@ const RepoDetails = () => {
               Đồng bộ thủ công
             </Button>
             
-            <Button 
+            {/* <Button 
               type="primary" 
               icon={<SaveOutlined />} 
               onClick={saveCommits}
               disabled={!branch}
             >
               Lưu Commit
-            </Button>
+            </Button> */}
           </div>
         </div>
 
