@@ -1,0 +1,40 @@
+# GitHub Repository List
+# Format: owner/repo
+# Lines starting with # are ignored
+
+# Popular Frameworks
+facebook/react
+angular/angular
+vuejs/vue
+laravel/laravel
+django/django
+rails/rails
+spring-projects/spring-framework
+tensorflow/tensorflow
+pytorch/pytorch
+scikit-learn/scikit-learn
+
+# IDEs and Dev Tools
+microsoft/vscode
+JetBrains/intellij-community
+atom/atom
+neovim/neovim
+
+# Programming Languages
+golang/go
+rust-lang/rust
+nodejs/node
+python/cpython
+ruby/ruby
+php/php-src
+dotnet/runtime
+
+# Other Major Projects
+kubernetes/kubernetes
+docker/docker-ce
+apache/spark
+elastic/elasticsearch
+pandas-dev/pandas
+flutter/flutter
+
+# Add your repositories below

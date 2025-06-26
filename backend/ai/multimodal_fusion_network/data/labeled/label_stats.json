@@ -1,0 +1,44 @@
+{
+  "total_commits": 4816,
+  "label_counts": {
+    "task_type": {
+      "bug_fix": 1453,
+      "development": 2398,
+      "devops": 762,
+      "refactoring": 494,
+      "security": 206,
+      "testing": 729,
+      "documentation": 650
+    },
+    "complexity": {
+      "low": 3769,
+      "medium": 1004,
+      "high": 43
+    },
+    "technical_area": {
+      "database": 451,
+      "frontend": 3815,
+      "mobile": 267,
+      "infrastructure": 367,
+      "backend": 338
+    },
+    "required_skills": {
+      "angular": 2240,
+      "testing": 681,
+      "database": 129,
+      "python": 2089,
+      "javascript": 353,
+      "java": 4,
+      "react": 130,
+      "dotnet": 215,
+      "devops": 55,
+      "vue": 1
+    },
+    "priority": {
+      "critical": 4472,
+      "low": 290,
+      "medium": 23,
+      "high": 31
+    }
+  }
+}

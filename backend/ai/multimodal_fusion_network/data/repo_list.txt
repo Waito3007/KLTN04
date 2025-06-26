@@ -1,0 +1,40 @@
+# Danh sách các repository để thu thập commit
+# Mỗi dòng một repository (dạng owner/repo)
+# Dòng bắt đầu bằng # sẽ bị bỏ qua
+
+# Frameworks và libraries phổ biến
+facebook/react
+angular/angular
+vuejs/vue
+laravel/laravel
+django/django
+rails/rails
+spring-projects/spring-framework
+tensorflow/tensorflow
+pytorch/pytorch
+scikit-learn/scikit-learn
+
+# Các IDE và công cụ phát triển
+microsoft/vscode
+JetBrains/intellij-community
+atom/atom
+neovim/neovim
+
+# Ngôn ngữ lập trình
+golang/go
+rust-lang/rust
+nodejs/node
+python/cpython
+ruby/ruby
+php/php-src
+dotnet/runtime
+
+# Các dự án lớn khác
+kubernetes/kubernetes
+docker/docker-ce
+apache/spark
+elastic/elasticsearch
+pandas-dev/pandas
+flutter/flutter
+
+# Thêm các repository của bạn vào đây

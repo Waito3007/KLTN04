@@ -1,0 +1,44 @@
+# Danh sách repositories để thu thập dữ liệu
+# Mỗi dòng là một repository theo format: owner/repo
+# Dòng bắt đầu bằng # sẽ bị bỏ qua
+
+torvalds/linux
+chromium/chromium
+microsoft/vscode
+facebook/react
+tensorflow/tensorflow
+angular/angular
+kubernetes/kubernetes
+django/django
+laravel/laravel
+ruby/ruby
+rails/rails
+vuejs/vue
+pytorch/pytorch
+flutter/flutter
+opencv/opencv
+pandas-dev/pandas
+golang/go
+docker/docker
+nodejs/node
+rust-lang/rust
+microsoft/TypeScript
+apple/swift
+facebook/react-native
+vercel/next.js
+puppeteer/puppeteer
+expressjs/express
+spring-projects/spring-boot
+elastic/elasticsearch
+bitcoin/bitcoin
+ethereum/go-ethereum
+godotengine/godot
+python/cpython
+scikit-learn/scikit-learn
+tensorflow/models
+facebook/create-react-app
+openai/openai-python
+microsoft/PowerToys
+huggingface/transformers
+hashicorp/terraform
+denoland/deno

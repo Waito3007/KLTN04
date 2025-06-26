@@ -1,0 +1,8 @@
+{
+  "total_raw": 4816,
+  "total_clean": 4806,
+  "removed": 10,
+  "train": 3364,
+  "val": 720,
+  "test": 722
+}
