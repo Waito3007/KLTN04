@@ -3,4 +3,3 @@
 # Dòng bắt đầu bằng # sẽ bị bỏ qua
 
 # Thêm token của bạn vào đây:
-gg khong hieu kieu gi
