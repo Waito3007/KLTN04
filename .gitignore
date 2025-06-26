@@ -22,6 +22,7 @@ __pycache__/
 
 # Large training data files (>50MB)
 backend/ai/training_data/kaggle_github_commit_messages_dataset_*.json
+backend/ai/multimodal_fusion_network/data/parallel_commits/temp_commits
 backend/ai/training_data/*_large.json
 backend/ai/training_data/*.csv
 backend/ai/training_data/improved_100k_multimodal_training.json
