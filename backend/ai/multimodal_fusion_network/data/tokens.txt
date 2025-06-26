@@ -1,6 +1,0 @@
-# Danh sách GitHub token
-# Mỗi dòng là một token
-# Dòng bắt đầu bằng # sẽ bị bỏ qua
-
-# Thêm token của bạn vào đây:
-gg ko hieu kieu gi
