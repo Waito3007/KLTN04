@@ -84,3 +84,4 @@ backend/ai/kaggle_data/oneline.csv
 backend/ai/training_data/improved_100k_multimodal_training.json
 backend/ai/deployment_packages/multimodal_fusion_*/
 backend/ai/trained_models/multimodal_fusion/best_multimodal_fusion_model.pth
+backend/ai/multimodal_fusion_network/data/tokens.txt
