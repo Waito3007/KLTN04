@@ -10,7 +10,8 @@ from typing import Dict, List, Optional, Union, Any, Tuple
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-from data_collection.github_collector import GitHubCommitCollector
+
+from data_collection.github_collector import GitHubDataCollector
 from data_processing.commit_processor import CommitDataProcessor
 from data_processing.text_processor import TextProcessor
 from data_processing.metadata_processor import MetadataProcessor
@@ -242,6 +243,17 @@ class CommitAnalysisPipeline:
         early_stopping_patience: int = 5,
         text_encoder_method: str = 'transformer'
     ) -> Tuple[EnhancedMultimodalFusionModel, str]:
+        if self.text_processor is None:
+            # Sửa đường dẫn để load đúng file processor đã fit
+            processor_path = os.path.join('data', 'processed', 'text_processor.json')
+            self.text_processor = TextProcessor.load(processor_path)
+            if self.text_processor is None or not self.text_processor.is_fitted:
+                raise RuntimeError("TextProcessor chưa được khởi tạo hoặc chưa fit. Hãy fit và load TextProcessor trước khi train.")
+        if self.metadata_processor is None:
+            meta_processor_path = os.path.join('data', 'processed', 'metadata_processor.json')
+            self.metadata_processor = MetadataProcessor.load(meta_processor_path)
+            if self.metadata_processor is None or not hasattr(self.metadata_processor, 'output_dim'):
+                raise RuntimeError("MetadataProcessor chưa được khởi tạo hoặc chưa fit. Hãy fit và load MetadataProcessor trước khi train.")
         """
         Huấn luyện mô hình fusion đa phương thức.
         

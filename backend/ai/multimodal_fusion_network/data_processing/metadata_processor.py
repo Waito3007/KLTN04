@@ -197,6 +197,9 @@ class MetadataProcessor:
             processor.scaler.var_ = np.array(data['scaler_var'])
             processor.scaler.scale_ = np.array(data['scaler_scale'])
         
+        # Bổ sung gán output_dim để pipeline không lỗi
+        processor.output_dim = len(processor.feature_names)
+        
         logger.info(f"Đã tải metadata processor từ {filepath}")
         return processor
 

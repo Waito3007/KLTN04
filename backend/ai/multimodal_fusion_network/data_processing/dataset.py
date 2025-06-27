@@ -84,14 +84,19 @@ class CommitDataset(Dataset):
         # Xử lý labels
         labels = sample.get('labels', {})
         labels_dict = {}
-        
         for task_name in self.task_names:
             if task_name in labels:
-                labels_dict[task_name] = torch.tensor(labels[task_name], dtype=torch.long)
+                try:
+                    labels_dict[task_name] = torch.tensor(labels[task_name], dtype=torch.float)
+                except Exception as e:
+                    print(f"Lỗi nhãn ở index {idx}, task {task_name}, value: {labels[task_name]}")
+                    raise
             else:
-                # Nếu không có nhãn, sử dụng giá trị mặc định là 0
-                labels_dict[task_name] = torch.tensor(0, dtype=torch.long)
-        
+                # Nếu không có nhãn, trả về vector 0 đúng chiều dài
+                # Số chiều lấy từ metadata_processor hoặc label_maps nếu có
+                # Tạm thời lấy chiều dài từ sample đầu tiên
+                zero_len = len(self.data['data'][0]['labels'][task_name]) if self.data['data'] and task_name in self.data['data'][0]['labels'] else 1
+                labels_dict[task_name] = torch.zeros(zero_len, dtype=torch.float)
         return {
             'text': text_tensor,
             'metadata': metadata_tensor,

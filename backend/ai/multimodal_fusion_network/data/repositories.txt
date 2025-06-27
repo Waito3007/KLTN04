@@ -2,43 +2,44 @@
 # Mỗi dòng là một repository theo format: owner/repo
 # Dòng bắt đầu bằng # sẽ bị bỏ qua
 
-torvalds/linux
-chromium/chromium
-microsoft/vscode
+# --- Dưới đây là các dự án công nghệ phần mềm, web, framework, platform nổi bật ---
+# Frontend frameworks
 facebook/react
-tensorflow/tensorflow
+vuejs/vue
 angular/angular
-kubernetes/kubernetes
+vercel/next.js
+facebook/create-react-app
+puppeteer/puppeteer
+flutter/flutter
+
+# Backend frameworks & platforms
+expressjs/express
 django/django
 laravel/laravel
-ruby/ruby
+spring-projects/spring-boot
 rails/rails
-vuejs/vue
-pytorch/pytorch
-flutter/flutter
-opencv/opencv
-pandas-dev/pandas
-golang/go
-docker/docker
+ruby/ruby
 nodejs/node
+golang/go
+python/cpython
 rust-lang/rust
+
+# Fullstack, devtools, cloud, infra
+microsoft/vscode
+chromium/chromium
 microsoft/TypeScript
 apple/swift
-facebook/react-native
-vercel/next.js
-puppeteer/puppeteer
-expressjs/express
-spring-projects/spring-boot
+kubernetes/kubernetes
+docker/docker
 elastic/elasticsearch
-bitcoin/bitcoin
-ethereum/go-ethereum
-godotengine/godot
-python/cpython
-scikit-learn/scikit-learn
-tensorflow/models
-facebook/create-react-app
-openai/openai-python
-microsoft/PowerToys
-huggingface/transformers
 hashicorp/terraform
 denoland/deno
+
+# Data, AI, ML platform
+pandas-dev/pandas
+scikit-learn/scikit-learn
+tensorflow/tensorflow
+tensorflow/models
+pytorch/pytorch
+huggingface/transformers
+openai/openai-python

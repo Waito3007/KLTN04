@@ -36,15 +36,22 @@ except LookupError:
 USE_SPACY = False
 nlp = None
 
-# Thử tải spaCy (tùy chọn)
+# Chỉ thử import spaCy khi thực sự cần
 try:
-    import spacy
-    nlp = spacy.load("en_core_web_sm")
-    USE_SPACY = True
-    logger.info("spaCy loaded successfully")
-except (ImportError, OSError) as e:
-    logger.warning(f"spaCy not available: {str(e)}. Using NLTK only.")
-    # Không cần cài đặt spaCy, chúng ta sẽ sử dụng NLTK
+    import importlib
+    spacy_spec = importlib.util.find_spec("spacy")
+    if spacy_spec is not None:
+        spacy = importlib.import_module("spacy")
+        try:
+            nlp = spacy.load("en_core_web_sm")
+            USE_SPACY = True
+            logger.info("spaCy loaded successfully")
+        except Exception as e:
+            logger.warning(f"spaCy found but cannot load model: {str(e)}. Using NLTK only.")
+    else:
+        logger.warning("spaCy not installed. Using NLTK only.")
+except Exception as e:
+    logger.warning(f"spaCy import failed: {str(e)}. Using NLTK only.")
 
 # Các từ khóa cho phân loại
 KEYWORDS = {

@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "text": "DOC update KNNImputer `metric` parameter by describing the expected interface when passing a callable (#29776)\n\nCo-authored-by: Guillaume Lemaitre <guillaume@probabl.ai>",
+      "metadata": {
+        "commit_id": "b3c213b4f6a1ee9c91e0b5fb421865c9415faf7f",
+        "author": "Cailean Carter",
+        "author_email": "cailean.carter@quadram.ac.uk",
+        "timestamp": "2024-09-05T17:34:45Z",
+        "files_changed": 1,
+        "additions": 3,
+        "deletions": 3,
+        "total_changes": 6,
+        "is_merge": false,
+        "modified_files": [
+          "sklearn/impute/_knn.py"
+        ],
+        "file_types": {
+          ".py": 1
+        },
+        "modified_directories": {
+          "sklearn/impute": 1
+        },
+        "repository": "scikit-learn/scikit-learn"
+      },
+      "labels": {
+        "task_type": [
+          "documentation",
+          "security"
+        ],
+        "complexity": "medium",
+        "technical_area": [
+          "frontend"
+        ],
+        "required_skills": [
+          "angular"
+        ],
+        "priority": "critical"
+      },
+      "features": {
+        "text_length": 169,
+        "word_count": 19,
+        "files_changed": 1,
+        "additions": 3,
+        "deletions": 3,
+        "total_changes": 6,
+        "is_merge": false,
+        "modified_files_count": 1,
+        "commit_count_by_author": 50679,
+        "risk_level": "low"
+      }
+    }
+  ]
+}

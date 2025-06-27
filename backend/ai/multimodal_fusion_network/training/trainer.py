@@ -16,6 +16,7 @@ from tqdm import tqdm
 import numpy as np
 
 from models.multimodal_fusion_model import EnhancedMultimodalFusionModel
+from dataloader_multimodal import MultimodalCommitDataset
 
 # Thiết lập logging
 logging.basicConfig(
@@ -74,10 +75,16 @@ class CommitModelTrainer:
         # Thiết lập các loss function cho các task
         self.loss_functions = {}
         for task_name, task_config in model.config['task_heads'].items():
-            if task_config.get('type', 'classification') == 'regression':
+            if task_config.get('type', 'regression') == 'regression':
                 self.loss_functions[task_name] = nn.MSELoss()
             else:
-                self.loss_functions[task_name] = nn.CrossEntropyLoss()
+                # Nếu là multi-label (multi-hot vector), dùng BCEWithLogitsLoss
+                # Giả sử mọi classification đều là multi-label nếu output là vector
+                # Nếu task_config có 'num_classes' và >1, dùng BCEWithLogitsLoss
+                if 'num_classes' in task_config and task_config['num_classes'] > 2:
+                    self.loss_functions[task_name] = nn.BCEWithLogitsLoss()
+                else:
+                    self.loss_functions[task_name] = nn.CrossEntropyLoss()
         
         # Thiết lập optimizer
         self.optimizer = optim.AdamW(
@@ -123,10 +130,16 @@ class CommitModelTrainer:
             outputs = self.model(text, metadata)
             
             # Tính loss cho từng task và tổng hợp
-            batch_loss = 0
+            batch_loss = None
             for task_name in self.task_names:
                 task_loss = self.loss_functions[task_name](outputs[task_name], labels[task_name])
-                batch_loss += self.task_weights.get(task_name, 1.0) * task_loss
+                weighted_loss = self.task_weights.get(task_name, 1.0) * task_loss
+                if batch_loss is None:
+                    batch_loss = weighted_loss
+                else:
+                    batch_loss = batch_loss + weighted_loss
+            if batch_loss is None:
+                continue  # Không có task nào, bỏ qua batch này
             
             # Backward và optimize
             batch_loss.backward()
@@ -487,3 +500,9 @@ if __name__ == "__main__":
     #     early_stopping_patience=5,
     #     log_interval=1
     # )
+
+    # Kiểm tra dữ liệu đầu vào
+    train_ds = MultimodalCommitDataset('data/processed/train.json')
+    train_loader = DataLoader(train_ds, batch_size=32, shuffle=True)
+    for batch in train_loader:
+        print(batch['text'], batch['labels'], batch['meta'])
