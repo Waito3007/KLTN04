@@ -289,15 +289,26 @@ class CommitAnalysisPipeline:
             sample = train_data['data'][0]
             task_heads = {}
             
+            logger.info(f"Phân tích labels từ sample: {sample['labels']}")
+            
             for task_name, value in sample['labels'].items():
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                if isinstance(value, list):
+                    # Multi-label classification: value là list multi-hot
+                    num_classes = len(value)
+                    task_heads[task_name] = {'num_classes': num_classes, 'type': 'multilabel'}
+                    logger.info(f"Task '{task_name}': multi-label với {num_classes} classes")
+                elif isinstance(value, (int, float)) and not isinstance(value, bool):
                     if value % 1 == 0:  # Nếu là số nguyên
-                        # Đếm số lớp
+                        # Single-label classification: đếm số lớp
                         all_values = [item['labels'].get(task_name, 0) for item in train_data['data']]
                         num_classes = len(set(all_values))
-                        task_heads[task_name] = {'num_classes': num_classes}
+                        task_heads[task_name] = {'num_classes': num_classes, 'type': 'classification'}
+                        logger.info(f"Task '{task_name}': single-label với {num_classes} classes")
                     else:  # Nếu là số thực
                         task_heads[task_name] = {'type': 'regression'}
+                        logger.info(f"Task '{task_name}': regression")
+            
+            logger.info(f"Đã tạo task_heads: {task_heads}")
             
             model_config = create_model_config(
                 vocab_size=self.text_processor.vocab_size,
@@ -314,17 +325,8 @@ class CommitAnalysisPipeline:
         
         # Lưu cấu hình mô hình
         with open(os.path.join(checkpoint_dir, 'model_config.json'), 'w', encoding='utf-8') as f:
-            # Chuyển đổi các đối tượng không serializable sang string
-            config_serializable = {}
-            for k, v in model_config.items():
-                if isinstance(v, dict):
-                    config_serializable[k] = {}
-                    for k2, v2 in v.items():
-                        config_serializable[k][k2] = str(v2) if not isinstance(v2, (dict, list, int, float, str, bool, type(None))) else v2
-                else:
-                    config_serializable[k] = str(v) if not isinstance(v, (dict, list, int, float, str, bool, type(None))) else v
-            
-            json.dump(config_serializable, f, indent=2)
+            # Lưu model_config nguyên gốc, không ép kiểu
+            json.dump(model_config, f, indent=2, default=str)
         
         # Huấn luyện mô hình
         logger.info(f"Bắt đầu huấn luyện mô hình với {num_epochs} epochs")
@@ -349,7 +351,6 @@ class CommitAnalysisPipeline:
         logger.info(f"Đã hoàn thành huấn luyện và lưu mô hình tại {best_checkpoint_path}")
         
         return model, best_checkpoint_path
-    
     def evaluate_model(
         self,
         test_path: str,
@@ -366,15 +367,41 @@ class CommitAnalysisPipeline:
             
         Returns:
             Dict kết quả đánh giá
-        """
+            """
+        # Đảm bảo text_processor và metadata_processor đã được load (và truyền vào DataLoader worker)
+        text_processor = self.text_processor
+        metadata_processor = self.metadata_processor
+        if text_processor is None or metadata_processor is None:
+            try:
+                with open(test_path, 'r', encoding='utf-8') as f:
+                    test_json = json.load(f)
+                meta = test_json.get('metadata', {})
+                text_processor_path = meta.get('text_processor', os.path.join(self.processed_dir, 'text_processor.json'))
+                metadata_processor_path = meta.get('metadata_processor', os.path.join(self.processed_dir, 'metadata_processor.json'))
+            except Exception:
+                text_processor_path = os.path.join(self.processed_dir, 'text_processor.json')
+                metadata_processor_path = os.path.join(self.processed_dir, 'metadata_processor.json')
+
+            text_processor = TextProcessor.load(text_processor_path)
+            metadata_processor = MetadataProcessor.load(metadata_processor_path)
+            if text_processor is None or metadata_processor is None:
+                raise RuntimeError("Không thể load text_processor hoặc metadata_processor. Hãy chắc chắn đã chạy bước process/train trước đó.")
+            self.text_processor = text_processor
+            self.metadata_processor = metadata_processor
+        
         # Nếu cần tải mô hình từ checkpoint
         if model_path is not None:
             checkpoint = torch.load(model_path, map_location=self.device)
             model_config = checkpoint['model_config']
             
+            logger.info(f"Loaded model_config từ checkpoint: {model_config}")
+            logger.info(f"Task heads từ checkpoint: {model_config.get('task_heads', {})}")
+            
             self.model = EnhancedMultimodalFusionModel(model_config)
             self.model.load_state_dict(checkpoint['model_state_dict'])
             self.model.to(self.device)
+            
+            logger.info(f"Model task_heads sau khi load: {list(self.model.task_heads.keys())}")
         
         if self.model is None:
             raise ValueError("Chưa có mô hình nào được huấn luyện hoặc tải")
@@ -384,8 +411,8 @@ class CommitAnalysisPipeline:
             train_path=test_path,  # Không sử dụng trong đánh giá
             val_path=test_path,    # Không sử dụng trong đánh giá
             test_path=test_path,
-            text_processor=self.text_processor,
-            metadata_processor=self.metadata_processor,
+            text_processor=text_processor,
+            metadata_processor=metadata_processor,
             batch_size=batch_size
         )
         
