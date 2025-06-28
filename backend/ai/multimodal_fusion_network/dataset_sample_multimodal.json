@@ -1,53 +1,67 @@
 {
   "data": [
     {
-      "text": "DOC update KNNImputer `metric` parameter by describing the expected interface when passing a callable (#29776)\n\nCo-authored-by: Guillaume Lemaitre <guillaume@probabl.ai>",
+      "text": "Fix bug in user authentication and improve error handling for login endpoint.",
       "metadata": {
-        "commit_id": "b3c213b4f6a1ee9c91e0b5fb421865c9415faf7f",
-        "author": "Cailean Carter",
-        "author_email": "cailean.carter@quadram.ac.uk",
-        "timestamp": "2024-09-05T17:34:45Z",
-        "files_changed": 1,
-        "additions": 3,
+        "files_changed": 2,
+        "additions": 15,
         "deletions": 3,
-        "total_changes": 6,
+        "total_changes": 18,
         "is_merge": false,
-        "modified_files": [
-          "sklearn/impute/_knn.py"
-        ],
-        "file_types": {
-          ".py": 1
-        },
-        "modified_directories": {
-          "sklearn/impute": 1
-        },
-        "repository": "scikit-learn/scikit-learn"
+        "modified_files": ["backend/auth.py", "backend/utils.py"],
+        "file_types": {".py": 2},
+        "modified_directories": {"backend": 2}
       },
       "labels": {
-        "task_type": [
-          "documentation",
-          "security"
-        ],
+        "task_type": ["bug_fix", "security"],
         "complexity": "medium",
-        "technical_area": [
-          "frontend"
-        ],
-        "required_skills": [
-          "angular"
-        ],
+        "technical_area": ["backend", "security"],
+        "required_skills": ["python", "security"],
         "priority": "critical"
       },
       "features": {
-        "text_length": 169,
-        "word_count": 19,
-        "files_changed": 1,
-        "additions": 3,
+        "text_length": 78,
+        "word_count": 12,
+        "files_changed": 2,
+        "additions": 15,
         "deletions": 3,
-        "total_changes": 6,
+        "total_changes": 18,
         "is_merge": false,
-        "modified_files_count": 1,
-        "commit_count_by_author": 50679,
-        "risk_level": "low"
+        "modified_files_count": 2,
+        "commit_count_by_author": 120,
+        "risk_level": "medium"
+      }
+    },
+    {
+      "text": "Add new UI component for dashboard and update styles.",
+      "metadata": {
+        "files_changed": 3,
+        "additions": 120,
+        "deletions": 10,
+        "total_changes": 130,
+        "is_merge": false,
+        "modified_files": ["frontend/components/Dashboard.vue", "frontend/styles/main.css", "frontend/utils.js"],
+        "file_types": {".vue": 1, ".css": 1, ".js": 1},
+        "modified_directories": {"frontend/components": 1, "frontend/styles": 1, "frontend": 1}
+      },
+      "labels": {
+        "task_type": ["feature", "ui"],
+        "complexity": "low",
+        "technical_area": ["frontend", "ui"],
+        "required_skills": ["javascript", "css", "vue"],
+        "priority": "medium"
+      },
+      "features": {
+        "text_length": 56,
+        "word_count": 9,
+        "files_changed": 3,
+        "additions": 120,
+        "deletions": 10,
+        "total_changes": 130,
+        "is_merge": false,
+        "modified_files_count": 3,
+        "commit_count_by_author": 45,
+        "risk_level": "high"
       }
     }
   ]

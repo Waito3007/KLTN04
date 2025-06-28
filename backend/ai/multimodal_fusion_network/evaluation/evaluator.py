@@ -68,96 +68,119 @@ class CommitModelEvaluator:
             Dict kết quả đánh giá
         """
         logger.info(f"Đánh giá mô hình trên {self.device}")
-        
+        logger.info(f"Các task_names của model: {self.task_names}")
+
         self.model.eval()
-        
+
         # Lưu trữ dự đoán và nhãn thực tế
         all_predictions = {task: [] for task in self.task_names}
         all_labels = {task: [] for task in self.task_names}
         all_raw_texts = []
-        
+
         with torch.no_grad():
-            for batch in self.test_loader:
+            for batch_idx, batch in enumerate(self.test_loader):
                 # Chuyển dữ liệu tới thiết bị
                 text = batch['text'].to(self.device)
                 metadata = batch['metadata'].to(self.device)
                 labels = {task: batch['labels'][task].to(self.device) for task in self.task_names}
                 raw_texts = batch['raw_text']
-                
+
+                # Log shape của label và text cho batch đầu tiên
+                if batch_idx == 0:
+                    logger.info(f"Batch 0 - Số lượng sample: {len(raw_texts)}")
+                    for task in self.task_names:
+                        logger.info(f"  Task '{task}': label shape {labels[task].shape}")
+
                 # Forward pass
                 outputs = self.model(text, metadata)
-                
+
                 # Lưu dự đoán và nhãn
                 for task_name in self.task_names:
                     task_config = self.model.config['task_heads'][task_name]
-                    
+
                     if task_config.get('type', 'classification') == 'classification':
                         # Lấy lớp dự đoán
                         predictions = torch.argmax(outputs[task_name], dim=1).cpu().numpy()
                     else:
                         # Đối với hồi quy, lấy giá trị trực tiếp
                         predictions = outputs[task_name].squeeze().cpu().numpy()
-                    
+
                     all_predictions[task_name].extend(predictions.tolist() if isinstance(predictions, np.ndarray) else [predictions])
                     all_labels[task_name].extend(labels[task_name].cpu().numpy().tolist())
-                
+
                 all_raw_texts.extend(raw_texts)
-        
+
         # Tính toán các metrics và lưu kết quả
         results = {}
-        
+
         for task_name in self.task_names:
             task_config = self.model.config['task_heads'][task_name]
             task_results = {}
-            
+
+            logger.info(f"Tổng số sample cho task '{task_name}': {len(all_labels[task_name])}")
+
             if task_config.get('type', 'classification') == 'classification':
                 # Đối với phân lớp
                 y_true = np.array(all_labels[task_name])
                 y_pred = np.array(all_predictions[task_name])
-                
+
+                logger.info(f"  y_true shape: {y_true.shape}, y_pred shape: {y_pred.shape}")
+                logger.info(f"  y_true sample: {y_true[:10]}")
+                logger.info(f"  y_pred sample: {y_pred[:10]}")
+
                 # Các metrics cơ bản
-                task_results['accuracy'] = accuracy_score(y_true, y_pred)
-                task_results['precision'] = precision_score(y_true, y_pred, average='weighted')
-                task_results['recall'] = recall_score(y_true, y_pred, average='weighted')
-                task_results['f1'] = f1_score(y_true, y_pred, average='weighted')
-                
-                # Confusion matrix và classification report
-                task_results['confusion_matrix'] = confusion_matrix(y_true, y_pred).tolist()
-                task_results['classification_report'] = classification_report(y_true, y_pred, output_dict=True)
-                
+                if y_true.size > 0 and y_pred.size > 0:
+                    task_results['accuracy'] = accuracy_score(y_true, y_pred)
+                    task_results['precision'] = precision_score(y_true, y_pred, average='weighted', zero_division=0)
+                    task_results['recall'] = recall_score(y_true, y_pred, average='weighted', zero_division=0)
+                    task_results['f1'] = f1_score(y_true, y_pred, average='weighted', zero_division=0)
+                    # Confusion matrix và classification report
+                    task_results['confusion_matrix'] = confusion_matrix(y_true, y_pred).tolist()
+                    task_results['classification_report'] = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
+                else:
+                    logger.warning(f"Không có dữ liệu để tính metrics cho task '{task_name}'!")
+
                 # Log kết quả
-                logger.info(f"Task: {task_name}")
-                logger.info(f"  Accuracy: {task_results['accuracy']:.4f}")
-                logger.info(f"  Precision: {task_results['precision']:.4f}")
-                logger.info(f"  Recall: {task_results['recall']:.4f}")
-                logger.info(f"  F1 Score: {task_results['f1']:.4f}")
+                if 'accuracy' in task_results:
+                    logger.info(f"Task: {task_name}")
+                    logger.info(f"  Accuracy: {task_results['accuracy']:.4f}")
+                    logger.info(f"  Precision: {task_results['precision']:.4f}")
+                    logger.info(f"  Recall: {task_results['recall']:.4f}")
+                    logger.info(f"  F1 Score: {task_results['f1']:.4f}")
             else:
                 # Đối với hồi quy
                 y_true = np.array(all_labels[task_name])
                 y_pred = np.array(all_predictions[task_name])
-                
-                # Các metrics cơ bản
-                task_results['mse'] = mean_squared_error(y_true, y_pred)
-                task_results['rmse'] = np.sqrt(task_results['mse'])
-                task_results['mae'] = np.mean(np.abs(y_true - y_pred))
-                
+
+                logger.info(f"  y_true shape: {y_true.shape}, y_pred shape: {y_pred.shape}")
+                logger.info(f"  y_true sample: {y_true[:10]}")
+                logger.info(f"  y_pred sample: {y_pred[:10]}")
+
+                if y_true.size > 0 and y_pred.size > 0:
+                    task_results['mse'] = mean_squared_error(y_true, y_pred)
+                    task_results['rmse'] = np.sqrt(task_results['mse'])
+                    task_results['mae'] = np.mean(np.abs(y_true - y_pred))
+                else:
+                    logger.warning(f"Không có dữ liệu để tính metrics cho task '{task_name}'!")
+
                 # Log kết quả
-                logger.info(f"Task: {task_name}")
-                logger.info(f"  MSE: {task_results['mse']:.4f}")
-                logger.info(f"  RMSE: {task_results['rmse']:.4f}")
-                logger.info(f"  MAE: {task_results['mae']:.4f}")
-            
+                if 'mse' in task_results:
+                    logger.info(f"Task: {task_name}")
+                    logger.info(f"  MSE: {task_results['mse']:.4f}")
+                    logger.info(f"  RMSE: {task_results['rmse']:.4f}")
+                    logger.info(f"  MAE: {task_results['mae']:.4f}")
+
             results[task_name] = task_results
-        
+
         # Lưu raw predictions để phân tích chi tiết
         results['raw'] = {
             'predictions': all_predictions,
             'labels': all_labels,
             'texts': all_raw_texts
         }
-        
+
         self.evaluation_results = results
-        
+
         return results
     
     def save_results(self, output_dir: str) -> None:
@@ -351,12 +374,22 @@ def evaluate_multimodal_fusion_model(
     
     # Đánh giá model
     results = evaluator.evaluate()
-    
+    logger.info(f"Kết quả evaluate trả về: {json.dumps({k: v for k, v in results.items() if k != 'raw'}, indent=2)}")
+    if not results or all((k == 'raw' or not v) for k, v in results.items()):
+        logger.warning("Không có metrics nào được trả về từ evaluate. Kiểm tra lại model, dữ liệu test hoặc logic evaluate.")
     # Lưu kết quả nếu cần
     if output_dir:
         evaluator.save_results(output_dir)
+        # Kiểm tra file summary sau khi lưu
+        summary_path = os.path.join(output_dir, 'evaluation_summary.json')
+        if os.path.exists(summary_path):
+            with open(summary_path, 'r', encoding='utf-8') as f:
+                summary_data = json.load(f)
+            if not summary_data:
+                logger.warning(f"File evaluation_summary.json rỗng tại {summary_path}. Không có metrics nào được ghi.")
+            else:
+                logger.info(f"evaluation_summary.json đã ghi: {json.dumps(summary_data, indent=2)}")
         evaluator.analyze_errors(output_dir)
-    
     return results
 
 
