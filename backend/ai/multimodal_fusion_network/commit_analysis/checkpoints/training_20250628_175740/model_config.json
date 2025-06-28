@@ -1,0 +1,46 @@
+{
+  "text_encoder": {
+    "vocab_size": 10000,
+    "embedding_dim": 256,
+    "hidden_dim": 256,
+    "method": "transformer",
+    "num_layers": 2,
+    "num_heads": 8,
+    "dropout": 0.1
+  },
+  "metadata_encoder": {
+    "input_dim": 10,
+    "hidden_dims": [
+      128,
+      64
+    ],
+    "dropout": 0.1
+  },
+  "fusion": {
+    "fusion_dim": 256,
+    "num_heads": 4,
+    "dropout": 0.1
+  },
+  "task_heads": {
+    "task_type": {
+      "num_classes": 7,
+      "type": "multilabel"
+    },
+    "complexity": {
+      "num_classes": 3,
+      "type": "multilabel"
+    },
+    "technical_area": {
+      "num_classes": 5,
+      "type": "multilabel"
+    },
+    "required_skills": {
+      "num_classes": 10,
+      "type": "multilabel"
+    },
+    "priority": {
+      "num_classes": 4,
+      "type": "multilabel"
+    }
+  }
+}

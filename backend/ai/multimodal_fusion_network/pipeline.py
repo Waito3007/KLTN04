@@ -97,7 +97,7 @@ class CommitAnalysisPipeline:
         
         # Tạo collector nếu chưa có
         if self.github_collector is None:
-            self.github_collector = GitHubCommitCollector(self.github_token)
+            self.github_collector = GitHubDataCollector(self.github_token)
         
         # Tạo tên file nếu chưa có
         if output_file is None:
@@ -518,7 +518,211 @@ class CommitAnalysisPipeline:
         
         return results
 
-
+    def analyze_class_distribution(self, train_path: str) -> Dict[str, Any]:
+        """
+        Phân tích phân bố class để xác định class imbalance.
+        
+        Args:
+            train_path: Đường dẫn đến file dữ liệu train
+            
+        Returns:
+            Dict thống kê phân bố class
+        """
+        with open(train_path, 'r', encoding='utf-8') as f:
+            train_data = json.load(f)
+        
+        distribution = {}
+        
+        for task_name in ['task_type', 'complexity', 'technical_area', 'required_skills', 'priority']:
+            task_dist = {}
+            
+            # Lấy tất cả labels cho task này
+            all_labels = [item['labels'][task_name] for item in train_data['data']]
+            
+            if isinstance(all_labels[0], list):
+                # Multi-label: đếm số lần xuất hiện của mỗi class
+                num_classes = len(all_labels[0])
+                class_counts = [0] * num_classes
+                
+                for label_vector in all_labels:
+                    for i, val in enumerate(label_vector):
+                        if val == 1:
+                            class_counts[i] += 1
+                
+                task_dist = {
+                    'type': 'multilabel',
+                    'num_classes': num_classes,
+                    'class_counts': class_counts,
+                    'total_samples': len(all_labels),
+                    'class_frequencies': [count / len(all_labels) for count in class_counts]
+                }
+            else:
+                # Single-label: đếm số lần xuất hiện của mỗi class
+                from collections import Counter
+                class_counts = Counter(all_labels)
+                
+                task_dist = {
+                    'type': 'single_label',
+                    'num_classes': len(class_counts),
+                    'class_counts': dict(class_counts),
+                    'total_samples': len(all_labels),
+                    'class_frequencies': {k: v / len(all_labels) for k, v in class_counts.items()}
+                }
+            
+            distribution[task_name] = task_dist
+            
+            # Log kết quả
+            logger.info(f"Task '{task_name}' distribution:")
+            if task_dist['type'] == 'multilabel':
+                for i, (count, freq) in enumerate(zip(task_dist['class_counts'], task_dist['class_frequencies'])):
+                    logger.info(f"  Class {i}: {count} samples ({freq:.2%})")
+            else:
+                for class_id, count in task_dist['class_counts'].items():
+                    freq = count / task_dist['total_samples']
+                    logger.info(f"  Class {class_id}: {count} samples ({freq:.2%})")
+        
+        return distribution
+    
+    def train_model_with_class_weights(
+        self,
+        train_path: str,
+        val_path: str,
+        model_config: Optional[Dict[str, Any]] = None,
+        batch_size: int = 32,
+        num_epochs: int = 50,
+        learning_rate: float = 1e-3,
+        early_stopping_patience: int = 5,
+        text_encoder_method: str = 'transformer',
+        use_class_weights: bool = True
+    ) -> Tuple[EnhancedMultimodalFusionModel, str]:
+        """
+        Huấn luyện mô hình với class weights để xử lý class imbalance.
+        
+        Args:
+            Similar to train_model but with use_class_weights option
+            
+        Returns:
+            Tuple (model, checkpoint_path)
+        """
+        # Phân tích class distribution trước
+        if use_class_weights:
+            logger.info("Phân tích class distribution để tính class weights...")
+            distribution = self.analyze_class_distribution(train_path)
+            
+            # Tính class weights
+            task_weights = {}
+            for task_name, dist in distribution.items():
+                if dist['type'] == 'multilabel':
+                    # Cho multi-label, tính pos_weight cho từng class
+                    pos_weights = []
+                    for count in dist['class_counts']:
+                        if count > 0:
+                            neg_count = dist['total_samples'] - count
+                            pos_weight = neg_count / count if count > 0 else 1.0
+                            pos_weights.append(pos_weight)
+                        else:
+                            pos_weights.append(1.0)
+                    task_weights[task_name] = pos_weights
+                else:
+                    # Cho single-label, tính class weights thông thường
+                    max_count = max(dist['class_counts'].values())
+                    weights = {}
+                    for class_id, count in dist['class_counts'].items():
+                        weights[class_id] = max_count / count if count > 0 else 1.0
+                    task_weights[task_name] = weights
+                
+                logger.info(f"Task '{task_name}' weights: {task_weights[task_name]}")
+        else:
+            task_weights = None
+        
+        # Load processors
+        if self.text_processor is None:
+            processor_path = os.path.join(self.processed_dir, 'text_processor.json')
+            self.text_processor = TextProcessor.load(processor_path)
+            if self.text_processor is None or not self.text_processor.is_fitted:
+                raise RuntimeError("TextProcessor chưa được khởi tạo hoặc chưa fit.")
+        
+        if self.metadata_processor is None:
+            meta_processor_path = os.path.join(self.processed_dir, 'metadata_processor.json')
+            self.metadata_processor = MetadataProcessor.load(meta_processor_path)
+            if self.metadata_processor is None or not hasattr(self.metadata_processor, 'output_dim'):
+                raise RuntimeError("MetadataProcessor chưa được khởi tạo hoặc chưa fit.")
+        
+        # Tạo data loaders
+        train_loader, val_loader, _ = create_data_loaders(
+            train_path=train_path,
+            val_path=val_path,
+            test_path=val_path,
+            text_processor=self.text_processor,
+            metadata_processor=self.metadata_processor,
+            batch_size=batch_size
+        )
+        
+        # Tạo cấu hình mô hình nếu chưa có
+        if model_config is None:
+            with open(train_path, 'r', encoding='utf-8') as f:
+                train_data = json.load(f)
+            
+            sample = train_data['data'][0]
+            task_heads = {}
+            
+            for task_name, value in sample['labels'].items():
+                if isinstance(value, list):
+                    num_classes = len(value)
+                    task_heads[task_name] = {'num_classes': num_classes, 'type': 'multilabel'}
+                elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                    if value % 1 == 0:
+                        all_values = [item['labels'].get(task_name, 0) for item in train_data['data']]
+                        num_classes = len(set(all_values))
+                        task_heads[task_name] = {'num_classes': num_classes, 'type': 'classification'}
+                    else:
+                        task_heads[task_name] = {'type': 'regression'}
+            
+            model_config = create_model_config(
+                vocab_size=self.text_processor.vocab_size,
+                metadata_dim=self.metadata_processor.output_dim,
+                task_heads=task_heads,
+                text_encoder_method=text_encoder_method,
+                fusion_dim=256
+            )
+        
+        # Tạo thư mục lưu checkpoint
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        checkpoint_dir = os.path.join(self.checkpoints_dir, f"training_improved_{timestamp}")
+        os.makedirs(checkpoint_dir, exist_ok=True)
+        
+        # Lưu cấu hình mô hình
+        with open(os.path.join(checkpoint_dir, 'model_config.json'), 'w', encoding='utf-8') as f:
+            json.dump(model_config, f, indent=2, default=str)
+        
+        # Lưu class weights để tham khảo
+        if use_class_weights:
+            with open(os.path.join(checkpoint_dir, 'class_weights.json'), 'w', encoding='utf-8') as f:
+                json.dump(task_weights, f, indent=2)
+        
+        # Huấn luyện mô hình với class weights
+        logger.info(f"Bắt đầu huấn luyện mô hình cải tiến với {num_epochs} epochs")
+        
+        model, history = train_multimodal_fusion_model(
+            model_config=model_config,
+            train_loader=train_loader,
+            val_loader=val_loader,
+            num_epochs=num_epochs,
+            learning_rate=learning_rate,
+            weight_decay=1e-5,
+            task_weights=task_weights,  # Sử dụng class weights
+            checkpoint_dir=checkpoint_dir,
+            device=self.device,
+            early_stopping_patience=early_stopping_patience,
+            log_interval=1
+        )
+        
+        self.model = model
+        best_checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pt')
+        
+        logger.info(f"Đã hoàn thành huấn luyện cải tiến và lưu mô hình tại {best_checkpoint_path}")
+        
+        return model, best_checkpoint_path
 def run_end_to_end_pipeline(
     base_dir: str,
     github_token: str,

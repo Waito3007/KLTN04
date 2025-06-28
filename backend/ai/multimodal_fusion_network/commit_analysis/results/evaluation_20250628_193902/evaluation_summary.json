@@ -1,0 +1,47 @@
+{
+  "task_type": {
+    "accuracy": 0.1825537793566213,
+    "precision_samples": 0.3392539964476021,
+    "recall_samples": 0.2722518255377936,
+    "f1_samples": 0.29409249391487396,
+    "precision_macro": 0.5406178601279615,
+    "recall_macro": 0.16852288990072628,
+    "f1_macro": 0.22446903094202403
+  },
+  "complexity": {
+    "accuracy": 0.8377738306690349,
+    "precision_samples": 0.8382672192618906,
+    "recall_samples": 0.8387606078547464,
+    "f1_samples": 0.8384316821261758,
+    "precision_macro": 0.5000049394956685,
+    "recall_macro": 0.3696883468834688,
+    "f1_macro": 0.3715399804811977
+  },
+  "technical_area": {
+    "accuracy": 0.6860074995066114,
+    "precision_samples": 0.7750148016577857,
+    "recall_samples": 0.7305111505821985,
+    "f1_samples": 0.7453457009407276,
+    "precision_macro": 0.15500296033155714,
+    "recall_macro": 0.2,
+    "f1_macro": 0.17464976651100733
+  },
+  "required_skills": {
+    "accuracy": 0.3435958160647326,
+    "precision_samples": 0.5322676139727649,
+    "recall_samples": 0.43201105190447997,
+    "f1_samples": 0.46183803697125186,
+    "precision_macro": 0.2654843704642925,
+    "recall_macro": 0.14094270665518593,
+    "f1_macro": 0.16752774780340762
+  },
+  "priority": {
+    "accuracy": 0.8910597986974541,
+    "precision_samples": 0.8910597986974541,
+    "recall_samples": 0.8910597986974541,
+    "f1_samples": 0.8910597986974541,
+    "precision_macro": 0.22395833333333334,
+    "recall_macro": 0.249557815609109,
+    "f1_macro": 0.23606608804768378
+  }
+}
