@@ -6,12 +6,11 @@ Pipeline phân tích commit messages và metadata từ GitHub để hỗ trợ q
 
 Pipeline này phân tích các commit messages và metadata từ Git repositories để cung cấp các thông tin hỗ trợ quản lý dự án như:
 
-- Dự đoán mức độ rủi ro (Risk)
+- Phân loại loại nhiệm vụ commit (Task Type)
 - Dự đoán độ phức tạp (Complexity)
-- Xác định các vùng code "hotspot"
-- Dự đoán mức độ khẩn cấp (Urgency)
-- Dự đoán mức độ hoàn thiện (Completeness)
-- Ước tính công sức cần thiết (Effort)
+- Xác định lĩnh vực kỹ thuật (Technical Area)
+- Xác định kỹ năng cần thiết (Required Skills)
+- Dự đoán mức độ ưu tiên (Priority)
 
 Kết quả phân tích và dự đoán sẽ được sử dụng để đưa ra các đề xuất giúp quản lý dự án hiệu quả hơn.
 
@@ -74,10 +73,24 @@ python main.py train --train_path path/to/train.json --val_path path/to/val.json
 python main.py evaluate --test_path path/to/test.json --model_path path/to/model_checkpoint.pt
 ```
 
-### Dự đoán cho một commit
+### Dự đoán cho một commit với metadata
 
 ```bash
-python main.py predict --model_path path/to/model_checkpoint.pt --commit_message "fix: resolve authentication bug in login module"
+python main.py predict --model_path path/to/model_checkpoint.pt \
+    --commit_message "fix: resolve authentication bug in login module" \
+    --metadata_file path/to/metadata.json
+```
+
+Ví dụ metadata.json:
+
+```json
+{
+  "author": "developer1",
+  "files_changed": 3,
+  "additions": 25,
+  "deletions": 10,
+  "repository": "myproject/backend"
+}
 ```
 
 ### Dự đoán cho một batch commit
@@ -124,26 +137,77 @@ commit_analysis_pipeline/
 
 ### Kiến trúc mô hình
 
-Mô hình fusion đa phương thức kết hợp:
+Mô hình **Enhanced Multimodal Fusion Model** kết hợp:
 
-- **Text Encoder**: LSTM hai chiều hoặc Transformer để mã hóa commit messages
-- **Metadata Encoder**: MLP để mã hóa metadata
-- **Fusion Module**: Multi-head Attention để kết hợp các đặc trưng
-- **Task Heads**: Các đầu dự đoán riêng cho từng nhiệm vụ (classification hoặc regression)
+- **Text Encoder**:
+  - LSTM hai chiều (BiLSTM) hoặc Transformer để mã hóa commit messages
+  - Hỗ trợ cả hai phương pháp mã hóa text với khả năng chuyển đổi linh hoạt
+- **Metadata Encoder**:
+  - Multi-layer Perceptron (MLP) để mã hóa metadata số
+  - Normalization và feature engineering tự động
+- **Fusion Module**:
+  - Multi-head Cross-Attention để kết hợp đặc trưng text và metadata
+  - Residual connections và layer normalization
+- **Task Heads**:
+  - Các đầu dự đoán riêng biệt cho từng nhiệm vụ
+  - Hỗ trợ cả classification (single-label và multi-label) và regression
+  - Shared representation learning across tasks
 
 ### Dữ liệu đầu vào
 
-- **Text**: Commit messages
-- **Metadata**: Thông tin về commit như tác giả, số lượng file thay đổi, số dòng thêm/xóa, thời gian commit, branch, v.v.
+- **Text**: Commit messages được tokenize và encode thành vectors
+- **Metadata**: Thông tin định lượng về commit:
+  - Thông tin tác giả (author_id)
+  - Số lượng file thay đổi (files_changed)
+  - Số dòng thêm/xóa (additions, deletions, total_changes)
+  - Loại file và thư mục được modify
+  - Thông tin repository
+  - Các đặc trưng được trích xuất tự động (text_length, word_count, risk_level, v.v.)
 
 ### Đầu ra
 
-- **Risk**: Mức độ rủi ro (Low/Medium/High)
-- **Complexity**: Độ phức tạp (Simple/Moderate/Complex)
-- **Hotspot**: Mức độ hotspot (Low/Medium/High)
-- **Urgency**: Mức độ khẩn cấp (Low/Medium/High)
-- **Completeness**: Mức độ hoàn thiện (Partial/Complete/Final)
-- **Estimated Effort**: Ước tính công sức (giá trị liên tục)
+Mô hình dự đoán đa nhiệm vụ (multi-task) với các task sau:
+
+- **Task Type**: Loại nhiệm vụ commit (7 lớp multi-label)
+  - Bug Fix, Feature Addition, Refactoring, Documentation, Testing, Build/CI, Other
+- **Complexity**: Độ phức tạp của commit (3 lớp)
+  - Simple, Moderate, Complex
+- **Technical Area**: Lĩnh vực kỹ thuật (5 lớp multi-label)
+  - Frontend, Backend, Database, DevOps, Testing
+- **Required Skills**: Kỹ năng cần thiết (10 lớp multi-label)
+  - Programming, Testing, Database, DevOps, UI/UX, Security, Performance, Documentation, Architecture, Other
+- **Priority**: Mức độ ưu tiên (4 lớp)
+  - Low, Medium, High, Critical
+
+### Đặc điểm mô hình
+
+- **Multi-label Classification**: Hỗ trợ dự đoán nhiều nhãn cùng lúc cho các task như Task Type, Technical Area, Required Skills
+- **Single-label Classification**: Dự đoán một nhãn duy nhất cho Complexity và Priority
+- **Fusion Architecture**: Kết hợp hiệu quả thông tin từ text và metadata
+- **End-to-end Training**: Huấn luyện đồng thời tất cả các task với shared representations
+
+## Tính năng nâng cao
+
+### Pipeline tích hợp
+
+- **End-to-end workflow**: Từ thu thập dữ liệu đến dự đoán
+- **Automatic labeling**: Tự động gán nhãn dựa trên heuristics
+- **Flexible architecture**: Dễ dàng thêm/sửa tasks và features
+- **Batch prediction**: Hỗ trợ dự đoán hàng loạt cho nhiều commits
+
+### Đánh giá và phân tích
+
+- **Multi-task evaluation**: Đánh giá đồng thời tất cả các tasks
+- **Comprehensive metrics**: Accuracy, Precision, Recall, F1-score cho classification
+- **Error analysis**: Phân tích chi tiết các lỗi dự đoán
+- **Visualization**: Confusion matrices và biểu đồ phân bố lỗi
+
+### Khả năng mở rộng
+
+- **Modular design**: Các module độc lập, dễ maintain
+- **Configurable model**: Cấu hình linh hoạt qua JSON
+- **Multi-device support**: Hỗ trợ cả CPU và GPU
+- **Scalable processing**: Xử lý hiệu quả với datasets lớn
 
 ## Đóng góp
 

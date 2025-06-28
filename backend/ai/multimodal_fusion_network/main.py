@@ -9,7 +9,13 @@ import argparse
 import logging
 from typing import Dict, List, Optional, Union, Any, Tuple
 
-from pipeline import CommitAnalysisPipeline, run_end_to_end_pipeline
+# Thêm exception handling
+try:
+    from pipeline import CommitAnalysisPipeline, run_end_to_end_pipeline
+except ImportError as e:
+    print(f"Lỗi import: {e}")
+    print("Hãy đảm bảo rằng tất cả dependencies đã được cài đặt.")
+    sys.exit(1)
 
 # Thiết lập logging
 logging.basicConfig(
@@ -115,139 +121,207 @@ def parse_arguments():
     end_to_end_parser.add_argument('--text_encoder', type=str, default='transformer', choices=['lstm', 'transformer'],
                                   help='Phương thức mã hóa text')
     
+    # Subcommand analyze_distribution
+    analyze_parser = subparsers.add_parser('analyze_distribution', help='Phân tích phân bố class')
+    analyze_parser.add_argument('--train_path', type=str, required=True,
+                               help='Đường dẫn đến file dữ liệu train')
+    
+    # Subcommand train_with_weights
+    train_weights_parser = subparsers.add_parser('train_with_weights', help='Huấn luyện mô hình với class weights')
+    train_weights_parser.add_argument('--train_path', type=str, required=True,
+                                     help='Đường dẫn đến file dữ liệu train')
+    train_weights_parser.add_argument('--val_path', type=str, required=True,
+                                     help='Đường dẫn đến file dữ liệu validation')
+    train_weights_parser.add_argument('--batch_size', type=int, default=32,
+                                     help='Kích thước batch')
+    train_weights_parser.add_argument('--num_epochs', type=int, default=50,
+                                     help='Số epochs')
+    train_weights_parser.add_argument('--learning_rate', type=float, default=1e-3,
+                                     help='Learning rate')
+    train_weights_parser.add_argument('--early_stopping_patience', type=int, default=5,
+                                     help='Số epochs chờ trước khi dừng sớm')
+    train_weights_parser.add_argument('--text_encoder', type=str, default='transformer', choices=['lstm', 'transformer'],
+                                     help='Phương thức mã hóa text')
+    train_weights_parser.add_argument('--no_class_weights', action='store_true',
+                                     help='Không sử dụng class weights')
+    
     return parser.parse_args()
 
 
 def main():
     """Main function."""
-    args = parse_arguments()
-    
-    # Khởi tạo pipeline
-    pipeline = CommitAnalysisPipeline(args.base_dir, args.github_token, args.device)
-    
-    if args.command == 'collect':
-        # Thu thập dữ liệu
-        output_file = pipeline.collect_data(
-            repo_names=args.repo_names,
-            max_commits_per_repo=args.max_commits,
-            output_file=args.output_file
-        )
-        print(f"Đã thu thập dữ liệu và lưu vào: {output_file}")
-    
-    elif args.command == 'process':
-        # Xử lý dữ liệu
-        train_path, val_path, test_path = pipeline.process_data(
-            input_file=args.input_file,
-            train_ratio=args.train_ratio,
-            val_ratio=args.val_ratio,
-            test_ratio=args.test_ratio,
-            auto_labeling=not args.no_auto_labeling,
-            random_seed=args.random_seed
-        )
-        print(f"Đã xử lý dữ liệu và lưu vào:")
-        print(f"  Train: {train_path}")
-        print(f"  Validation: {val_path}")
-        print(f"  Test: {test_path}")
-    
-    elif args.command == 'train':
-        # Huấn luyện mô hình
-        model, checkpoint_path = pipeline.train_model(
-            train_path=args.train_path,
-            val_path=args.val_path,
-            batch_size=args.batch_size,
-            num_epochs=args.num_epochs,
-            learning_rate=args.learning_rate,
-            early_stopping_patience=args.early_stopping_patience,
-            text_encoder_method=args.text_encoder
-        )
-        print(f"Đã huấn luyện mô hình và lưu checkpoint vào: {checkpoint_path}")
-    
-    elif args.command == 'evaluate':
-        # Đánh giá mô hình
-        results = pipeline.evaluate_model(
-            test_path=args.test_path,
-            model_path=args.model_path,
-            batch_size=args.batch_size
-        )
-        print("Kết quả đánh giá:")
-        for task_name, task_results in results.items():
-            if task_name == 'raw':
-                continue
+    try:
+        args = parse_arguments()
+        
+        # Khởi tạo pipeline
+        pipeline = CommitAnalysisPipeline(args.base_dir, args.github_token, args.device)
+        
+        if args.command == 'collect':
+            # Thu thập dữ liệu
+            output_file = pipeline.collect_data(
+                repo_names=args.repo_names,
+                max_commits_per_repo=args.max_commits,
+                output_file=args.output_file
+            )
+            print(f"Đã thu thập dữ liệu và lưu vào: {output_file}")
+        
+        elif args.command == 'process':
+            # Xử lý dữ liệu
+            train_path, val_path, test_path = pipeline.process_data(
+                input_file=args.input_file,
+                train_ratio=args.train_ratio,
+                val_ratio=args.val_ratio,
+                test_ratio=args.test_ratio,
+                auto_labeling=not args.no_auto_labeling,
+                random_seed=args.random_seed
+            )
+            print(f"Đã xử lý dữ liệu và lưu vào:")
+            print(f"  Train: {train_path}")
+            print(f"  Validation: {val_path}")
+            print(f"  Test: {test_path}")
+        
+        elif args.command == 'train':
+            # Huấn luyện mô hình
+            model, checkpoint_path = pipeline.train_model(
+                train_path=args.train_path,
+                val_path=args.val_path,
+                batch_size=args.batch_size,
+                num_epochs=args.num_epochs,
+                learning_rate=args.learning_rate,
+                early_stopping_patience=args.early_stopping_patience,
+                text_encoder_method=args.text_encoder
+            )
+            print(f"Đã huấn luyện mô hình và lưu checkpoint vào: {checkpoint_path}")
+        
+        elif args.command == 'evaluate':
+            # Đánh giá mô hình
+            results = pipeline.evaluate_model(
+                test_path=args.test_path,
+                model_path=args.model_path,
+                batch_size=args.batch_size
+            )
+            print("Kết quả đánh giá:")
+            for task_name, task_results in results.items():
+                if task_name == 'raw':
+                    continue
+                
+                print(f"Task: {task_name}")
+                for metric, value in task_results.items():
+                    if isinstance(value, (int, float)):
+                        print(f"  {metric}: {value:.4f}")
+        
+        elif args.command == 'predict':
+            # Tải predictor
+            pipeline.load_predictor(args.model_path)
             
-            print(f"Task: {task_name}")
-            for metric, value in task_results.items():
-                if isinstance(value, (int, float)):
-                    print(f"  {metric}: {value:.4f}")
+            # Đọc metadata nếu có
+            metadata = None
+            if args.metadata_file:
+                with open(args.metadata_file, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+            
+            # Dự đoán
+            result = pipeline.predict(args.commit_message, metadata)
+            
+            # Hiển thị kết quả
+            print("\nDự đoán:")
+            for task, task_result in result['prediction'].items():
+                if 'label' in task_result:
+                    print(f"  {task}: {task_result['label']} (Độ tin cậy: {task_result['confidence']:.2f})")
+                else:
+                    print(f"  {task}: {task_result['value']:.2f}")
+            
+            print("\nĐề xuất:")
+            for i, rec in enumerate(result['recommendations'], 1):
+                print(f"{i}. [{rec['priority']}] {rec['message']}")
+        
+        elif args.command == 'predict_batch':
+            # Tải predictor
+            pipeline.load_predictor(args.model_path)
+            
+            # Đọc dữ liệu đầu vào
+            with open(args.input_file, 'r', encoding='utf-8') as f:
+                commit_data = json.load(f)
+            
+            # Dự đoán batch
+            results = pipeline.batch_predict(commit_data)
+            
+            # Lưu kết quả
+            output_file = args.output_file
+            if output_file is None:
+                output_file = os.path.join(args.base_dir, 'results', 'batch_predictions.json')
+            
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(results, f, indent=2)
+            
+            print(f"Đã dự đoán cho {len(results)} commits và lưu kết quả vào: {output_file}")
+        
+        elif args.command == 'end_to_end':
+            # Kiểm tra token GitHub
+            if args.github_token is None:
+                print("Lỗi: Cần cung cấp GitHub token để chạy end-to-end pipeline.")
+                return
+            
+            # Chạy toàn bộ pipeline
+            pipeline = run_end_to_end_pipeline(
+                base_dir=args.base_dir,
+                github_token=args.github_token,
+                repo_names=args.repo_names,
+                max_commits_per_repo=args.max_commits,
+                batch_size=args.batch_size,
+                num_epochs=args.num_epochs,
+                text_encoder_method=args.text_encoder
+            )
+            
+            print("Đã hoàn thành toàn bộ pipeline end-to-end!")
+        
+        elif args.command == 'analyze_distribution':
+            # Phân tích phân bố class
+            distribution = pipeline.analyze_class_distribution(args.train_path)
+            
+            print("Phân tích phân bố class:")
+            for task_name, task_dist in distribution.items():
+                print(f"\nTask: {task_name}")
+                print(f"  Type: {task_dist['type']}")
+                print(f"  Number of classes: {task_dist['num_classes']}")
+                print(f"  Total samples: {task_dist['total_samples']}")
+                
+                if task_dist['type'] == 'multilabel':
+                    print("  Class distribution:")
+                    for i, (count, freq) in enumerate(zip(task_dist['class_counts'], task_dist['class_frequencies'])):
+                        print(f"    Class {i}: {count} samples ({freq:.2%})")
+                else:
+                    print("  Class distribution:")
+                    for class_id, count in task_dist['class_counts'].items():
+                        freq = count / task_dist['total_samples']
+                        print(f"    Class {class_id}: {count} samples ({freq:.2%})")
+        
+        elif args.command == 'train_with_weights':
+            # Huấn luyện mô hình với class weights
+            model, checkpoint_path = pipeline.train_model_with_class_weights(
+                train_path=args.train_path,
+                val_path=args.val_path,
+                batch_size=args.batch_size,
+                num_epochs=args.num_epochs,
+                learning_rate=args.learning_rate,
+                early_stopping_patience=args.early_stopping_patience,
+                text_encoder_method=args.text_encoder,
+                use_class_weights=not args.no_class_weights
+            )
+            print(f"Đã huấn luyện mô hình với class weights và lưu checkpoint vào: {checkpoint_path}")
+        
+        else:
+            print("Vui lòng chọn một lệnh: collect, process, train, train_with_weights, analyze_distribution, evaluate, predict, predict_batch, end_to_end")
+            print("Sử dụng --help để xem thêm thông tin.")
     
-    elif args.command == 'predict':
-        # Tải predictor
-        pipeline.load_predictor(args.model_path)
-        
-        # Đọc metadata nếu có
-        metadata = None
-        if args.metadata_file:
-            with open(args.metadata_file, 'r', encoding='utf-8') as f:
-                metadata = json.load(f)
-        
-        # Dự đoán
-        result = pipeline.predict(args.commit_message, metadata)
-        
-        # Hiển thị kết quả
-        print("\nDự đoán:")
-        for task, task_result in result['prediction'].items():
-            if 'label' in task_result:
-                print(f"  {task}: {task_result['label']} (Độ tin cậy: {task_result['confidence']:.2f})")
-            else:
-                print(f"  {task}: {task_result['value']:.2f}")
-        
-        print("\nĐề xuất:")
-        for i, rec in enumerate(result['recommendations'], 1):
-            print(f"{i}. [{rec['priority']}] {rec['message']}")
-    
-    elif args.command == 'predict_batch':
-        # Tải predictor
-        pipeline.load_predictor(args.model_path)
-        
-        # Đọc dữ liệu đầu vào
-        with open(args.input_file, 'r', encoding='utf-8') as f:
-            commit_data = json.load(f)
-        
-        # Dự đoán batch
-        results = pipeline.batch_predict(commit_data)
-        
-        # Lưu kết quả
-        output_file = args.output_file
-        if output_file is None:
-            output_file = os.path.join(args.base_dir, 'results', 'batch_predictions.json')
-        
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(results, f, indent=2)
-        
-        print(f"Đã dự đoán cho {len(results)} commits và lưu kết quả vào: {output_file}")
-    
-    elif args.command == 'end_to_end':
-        # Kiểm tra token GitHub
-        if args.github_token is None:
-            print("Lỗi: Cần cung cấp GitHub token để chạy end-to-end pipeline.")
-            return
-        
-        # Chạy toàn bộ pipeline
-        pipeline = run_end_to_end_pipeline(
-            base_dir=args.base_dir,
-            github_token=args.github_token,
-            repo_names=args.repo_names,
-            max_commits_per_repo=args.max_commits,
-            batch_size=args.batch_size,
-            num_epochs=args.num_epochs,
-            text_encoder_method=args.text_encoder
-        )
-        
-        print("Đã hoàn thành toàn bộ pipeline end-to-end!")
-    
-    else:
-        print("Vui lòng chọn một lệnh: collect, process, train, evaluate, predict, predict_batch, end_to_end")
-        print("Sử dụng --help để xem thêm thông tin.")
+    except KeyboardInterrupt:
+        print("\nĐã hủy thực thi.")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Lỗi khi thực thi: {e}")
+        print(f"Lỗi: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -92,19 +92,23 @@ class CommitModelEvaluator:
                         logger.info(f"  Task '{task}': label shape {labels[task].shape}")
 
                 # Forward pass
-                outputs = self.model(text, metadata)
-
-                # Lưu dự đoán và nhãn
+                outputs = self.model(text, metadata)                # Lưu dự đoán và nhãn
                 for task_name in self.task_names:
                     task_config = self.model.config['task_heads'][task_name]
-
-                    if task_config.get('type', 'classification') == 'classification':
-                        # Lấy lớp dự đoán
-                        predictions = torch.argmax(outputs[task_name], dim=1).cpu().numpy()
+                    
+                    if task_config.get('type', 'classification') in ['classification', 'multilabel']:
+                        if task_config.get('type') == 'multilabel':
+                            # Multi-label: apply sigmoid + threshold
+                            predictions = torch.sigmoid(outputs[task_name]).cpu().numpy()
+                            # Convert to binary predictions using threshold 0.5
+                            predictions = (predictions > 0.5).astype(int)
+                        else:
+                            # Single-label: argmax
+                            predictions = torch.argmax(outputs[task_name], dim=1).cpu().numpy()
                     else:
                         # Đối với hồi quy, lấy giá trị trực tiếp
                         predictions = outputs[task_name].squeeze().cpu().numpy()
-
+                    
                     all_predictions[task_name].extend(predictions.tolist() if isinstance(predictions, np.ndarray) else [predictions])
                     all_labels[task_name].extend(labels[task_name].cpu().numpy().tolist())
 
@@ -119,8 +123,8 @@ class CommitModelEvaluator:
 
             logger.info(f"Tổng số sample cho task '{task_name}': {len(all_labels[task_name])}")
 
-            if task_config.get('type', 'classification') == 'classification':
-                # Đối với phân lớp
+            if task_config.get('type', 'classification') in ['classification', 'multilabel']:
+                # Đối với phân lớp (single-label hoặc multi-label)
                 y_true = np.array(all_labels[task_name])
                 y_pred = np.array(all_predictions[task_name])
 
@@ -130,13 +134,30 @@ class CommitModelEvaluator:
 
                 # Các metrics cơ bản
                 if y_true.size > 0 and y_pred.size > 0:
-                    task_results['accuracy'] = accuracy_score(y_true, y_pred)
-                    task_results['precision'] = precision_score(y_true, y_pred, average='weighted', zero_division=0)
-                    task_results['recall'] = recall_score(y_true, y_pred, average='weighted', zero_division=0)
-                    task_results['f1'] = f1_score(y_true, y_pred, average='weighted', zero_division=0)
-                    # Confusion matrix và classification report
-                    task_results['confusion_matrix'] = confusion_matrix(y_true, y_pred).tolist()
-                    task_results['classification_report'] = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
+                    if task_config.get('type') == 'multilabel':
+                        # Multi-label classification metrics
+                        task_results['accuracy'] = accuracy_score(y_true, y_pred)  # Subset accuracy
+                        task_results['precision'] = precision_score(y_true, y_pred, average='samples', zero_division=0)
+                        task_results['recall'] = recall_score(y_true, y_pred, average='samples', zero_division=0)
+                        task_results['f1'] = f1_score(y_true, y_pred, average='samples', zero_division=0)
+                        
+                        # Per-label metrics
+                        task_results['precision_macro'] = precision_score(y_true, y_pred, average='macro', zero_division=0)
+                        task_results['recall_macro'] = recall_score(y_true, y_pred, average='macro', zero_division=0)
+                        task_results['f1_macro'] = f1_score(y_true, y_pred, average='macro', zero_division=0)
+                        
+                        # Không tính confusion matrix cho multi-label
+                        task_results['classification_report'] = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
+                    else:
+                        # Single-label classification metrics
+                        task_results['accuracy'] = accuracy_score(y_true, y_pred)
+                        task_results['precision'] = precision_score(y_true, y_pred, average='weighted', zero_division=0)
+                        task_results['recall'] = recall_score(y_true, y_pred, average='weighted', zero_division=0)
+                        task_results['f1'] = f1_score(y_true, y_pred, average='weighted', zero_division=0)
+                        
+                        # Confusion matrix và classification report
+                        task_results['confusion_matrix'] = confusion_matrix(y_true, y_pred).tolist()
+                        task_results['classification_report'] = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
                 else:
                     logger.warning(f"Không có dữ liệu để tính metrics cho task '{task_name}'!")
 
@@ -147,6 +168,8 @@ class CommitModelEvaluator:
                     logger.info(f"  Precision: {task_results['precision']:.4f}")
                     logger.info(f"  Recall: {task_results['recall']:.4f}")
                     logger.info(f"  F1 Score: {task_results['f1']:.4f}")
+                    if task_config.get('type') == 'multilabel':
+                        logger.info(f"  F1 Macro: {task_results['f1_macro']:.4f}")
             else:
                 # Đối với hồi quy
                 y_true = np.array(all_labels[task_name])
@@ -203,13 +226,26 @@ class CommitModelEvaluator:
                 continue
             
             task_config = self.model.config['task_heads'][task_name]
-            if task_config.get('type', 'classification') == 'classification':
-                summary[task_name] = {
-                    'accuracy': task_results['accuracy'],
-                    'precision': task_results['precision'],
-                    'recall': task_results['recall'],
-                    'f1': task_results['f1']
-                }
+            if task_config.get('type', 'classification') in ['classification', 'multilabel']:
+                if task_config.get('type') == 'multilabel':
+                    # Multi-label: lưu cả samples và macro metrics
+                    summary[task_name] = {
+                        'accuracy': task_results['accuracy'],  # Subset accuracy
+                        'precision_samples': task_results['precision'],
+                        'recall_samples': task_results['recall'],
+                        'f1_samples': task_results['f1'],
+                        'precision_macro': task_results['precision_macro'],
+                        'recall_macro': task_results['recall_macro'],
+                        'f1_macro': task_results['f1_macro']
+                    }
+                else:
+                    # Single-label: metrics thông thường
+                    summary[task_name] = {
+                        'accuracy': task_results['accuracy'],
+                        'precision': task_results['precision'],
+                        'recall': task_results['recall'],
+                        'f1': task_results['f1']
+                    }
             else:
                 summary[task_name] = {
                     'mse': task_results['mse'],
@@ -231,10 +267,11 @@ class CommitModelEvaluator:
         df = pd.DataFrame(df_data)
         df.to_csv(os.path.join(output_dir, 'predictions.csv'), index=False)
         
-        # Vẽ confusion matrix cho các task phân lớp
+        # Vẽ confusion matrix cho các task phân lớp (chỉ single-label)
         for task_name in self.task_names:
             task_config = self.model.config['task_heads'][task_name]
-            if task_config.get('type', 'classification') == 'classification':
+            if (task_config.get('type', 'classification') == 'classification' and 
+                'confusion_matrix' in self.evaluation_results[task_name]):
                 cm = np.array(self.evaluation_results[task_name]['confusion_matrix'])
                 plt.figure(figsize=(10, 8))
                 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
@@ -266,44 +303,71 @@ class CommitModelEvaluator:
         for task_name in self.task_names:
             task_config = self.model.config['task_heads'][task_name]
             
-            if task_config.get('type', 'classification') == 'classification':
+            if task_config.get('type', 'classification') in ['classification', 'multilabel']:
                 y_true = np.array(raw_results['labels'][task_name])
                 y_pred = np.array(raw_results['predictions'][task_name])
                 texts = raw_results['texts']
                 
-                # Xác định các mẫu dự đoán sai
-                incorrect_indices = np.where(y_true != y_pred)[0]
-                incorrect_samples = []
-                
-                for idx in incorrect_indices:
-                    incorrect_samples.append({
-                        'text': texts[idx],
-                        'true_label': int(y_true[idx]),
-                        'predicted_label': int(y_pred[idx])
-                    })
-                
-                # Thống kê lỗi theo loại
-                error_counts = {}
-                for sample in incorrect_samples:
-                    error_type = f"{sample['true_label']} -> {sample['predicted_label']}"
-                    if error_type not in error_counts:
-                        error_counts[error_type] = 0
-                    error_counts[error_type] += 1
-                
-                # Lưu kết quả phân tích
-                error_analysis[task_name] = {
-                    'total_errors': len(incorrect_indices),
-                    'error_rate': len(incorrect_indices) / len(y_true),
-                    'error_counts': error_counts,
-                    'incorrect_samples': incorrect_samples
-                }
-                
-                # Log kết quả
-                logger.info(f"Phân tích lỗi cho task: {task_name}")
-                logger.info(f"  Tổng số lỗi: {len(incorrect_indices)} / {len(y_true)} ({error_analysis[task_name]['error_rate']:.2%})")
-                logger.info("  Phân bố lỗi:")
-                for error_type, count in error_counts.items():
-                    logger.info(f"    {error_type}: {count} ({count / len(incorrect_indices):.2%})")
+                if task_config.get('type') == 'multilabel':
+                    # Multi-label: so sánh từng sample (vector)
+                    incorrect_indices = []
+                    for i in range(len(y_true)):
+                        if not np.array_equal(y_true[i], y_pred[i]):
+                            incorrect_indices.append(i)
+                    
+                    incorrect_samples = []
+                    for idx in incorrect_indices[:100]:  # Giới hạn số lượng để tránh quá nhiều
+                        incorrect_samples.append({
+                            'text': texts[idx],
+                            'true_label': y_true[idx].tolist(),
+                            'predicted_label': y_pred[idx].tolist()
+                        })
+                    
+                    # Đối với multi-label, không thống kê error_counts chi tiết (quá phức tạp)
+                    error_analysis[task_name] = {
+                        'total_errors': len(incorrect_indices),
+                        'error_rate': len(incorrect_indices) / len(y_true),
+                        'incorrect_samples': incorrect_samples
+                    }
+                    
+                    # Log kết quả
+                    logger.info(f"Phân tích lỗi cho task: {task_name} (multi-label)")
+                    logger.info(f"  Tổng số lỗi: {len(incorrect_indices)} / {len(y_true)} ({error_analysis[task_name]['error_rate']:.2%})")
+                    
+                else:
+                    # Single-label: logic cũ
+                    incorrect_indices = np.where(y_true != y_pred)[0]
+                    incorrect_samples = []
+                    
+                    for idx in incorrect_indices:
+                        incorrect_samples.append({
+                            'text': texts[idx],
+                            'true_label': int(y_true[idx]),
+                            'predicted_label': int(y_pred[idx])
+                        })
+                    
+                    # Thống kê lỗi theo loại
+                    error_counts = {}
+                    for sample in incorrect_samples:
+                        error_type = f"{sample['true_label']} -> {sample['predicted_label']}"
+                        if error_type not in error_counts:
+                            error_counts[error_type] = 0
+                        error_counts[error_type] += 1
+                    
+                    # Lưu kết quả phân tích
+                    error_analysis[task_name] = {
+                        'total_errors': len(incorrect_indices),
+                        'error_rate': len(incorrect_indices) / len(y_true),
+                        'error_counts': error_counts,
+                        'incorrect_samples': incorrect_samples
+                    }
+                    
+                    # Log kết quả
+                    logger.info(f"Phân tích lỗi cho task: {task_name} (single-label)")
+                    logger.info(f"  Tổng số lỗi: {len(incorrect_indices)} / {len(y_true)} ({error_analysis[task_name]['error_rate']:.2%})")
+                    logger.info("  Phân bố lỗi:")
+                    for error_type, count in error_counts.items():
+                        logger.info(f"    {error_type}: {count} ({count / len(incorrect_indices):.2%})")
         
         # Lưu kết quả nếu cần
         if output_dir:
@@ -316,31 +380,34 @@ class CommitModelEvaluator:
                     limited_analysis[task_name] = {
                         'total_errors': analysis['total_errors'],
                         'error_rate': analysis['error_rate'],
-                        'error_counts': analysis['error_counts'],
                         'incorrect_samples': analysis['incorrect_samples'][:100]  # Giới hạn số lượng mẫu
                     }
+                    # Chỉ thêm error_counts nếu có (single-label tasks)
+                    if 'error_counts' in analysis:
+                        limited_analysis[task_name]['error_counts'] = analysis['error_counts']
                 
                 json.dump(limited_analysis, f, indent=2)
             
-            # Vẽ biểu đồ phân bố lỗi
+            # Vẽ biểu đồ phân bố lỗi (chỉ cho single-label tasks)
             for task_name, analysis in error_analysis.items():
-                error_types = list(analysis['error_counts'].keys())
-                error_values = list(analysis['error_counts'].values())
-                
-                plt.figure(figsize=(12, 8))
-                bars = plt.barh(error_types, error_values)
-                plt.title(f'Error Distribution - {task_name}')
-                plt.xlabel('Number of Errors')
-                plt.ylabel('Error Type (True -> Predicted)')
-                
-                # Thêm số lượng vào biểu đồ
-                for bar in bars:
-                    width = bar.get_width()
-                    plt.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}', ha='left', va='center')
-                
-                plt.tight_layout()
-                plt.savefig(os.path.join(output_dir, f'error_distribution_{task_name}.png'))
-                plt.close()
+                if 'error_counts' in analysis:  # Chỉ single-label tasks có error_counts
+                    error_types = list(analysis['error_counts'].keys())
+                    error_values = list(analysis['error_counts'].values())
+                    
+                    plt.figure(figsize=(12, 8))
+                    bars = plt.barh(error_types, error_values)
+                    plt.title(f'Error Distribution - {task_name}')
+                    plt.xlabel('Number of Errors')
+                    plt.ylabel('Error Type (True -> Predicted)')
+                    
+                    # Thêm số lượng vào biểu đồ
+                    for bar in bars:
+                        width = bar.get_width()
+                        plt.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}', ha='left', va='center')
+                    
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(output_dir, f'error_distribution_{task_name}.png'))
+                    plt.close()
             
             logger.info(f"Đã lưu kết quả phân tích lỗi vào {output_dir}")
         
