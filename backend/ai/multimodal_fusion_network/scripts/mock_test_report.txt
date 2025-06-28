@@ -1,0 +1,2219 @@
+BÁO CÁO KIỂM THỬ MÔ HÌNH PHÂN LOẠI COMMIT (Mock Data)
+
+1. Tổng số commit kiểm thử: 200
+
+2. Thống kê phân loại tổng quan:
+- Task type: bug_fix: 60, documentation: 53, security: 59, feature: 52, refactoring: 55, testing: 58, devops: 54
+- Complexity: medium: 75, low: 61, high: 64
+- Technical area: frontend: 70, infrastructure: 56, mobile: 47, backend: 71, database: 58
+- Required skills: javascript: 42, testing: 48, angular: 42, database: 49, security: 39, python: 42, devops: 44, react: 45, dotnet: 42
+- Priority: medium: 58, high: 39, critical: 60, low: 43
+- Risk level: high: 56, medium: 77, low: 67
+
+3. Báo cáo chi tiết từng commit:
+
+Commit 1:
+  - Tác giả: carol
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 95, Số dòng xoá: 23
+  - Task type (loại tác vụ): ['bug_fix', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 2:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 15, Số dòng xoá: 10
+  - Task type (loại tác vụ): ['security', 'bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 3:
+  - Tác giả: dave
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 75, Số dòng xoá: 12
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['angular', 'database', 'security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 4:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 18, Số dòng xoá: 47
+  - Task type (loại tác vụ): ['feature', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'security']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 5:
+  - Tác giả: eve
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 47, Số dòng xoá: 39
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'backend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'javascript', 'angular']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 6:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 10, Số dòng xoá: 39
+  - Task type (loại tác vụ): ['testing', 'documentation', 'security']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['python', 'devops', 'database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 7:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 19, Số dòng xoá: 12
+  - Task type (loại tác vụ): ['feature', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 8:
+  - Tác giả: alice
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 33, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 9:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 77, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['database', 'devops', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 10:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 2, Số dòng xoá: 36
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 11:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 37, Số dòng xoá: 2
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'react', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 12:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 10, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['testing', 'refactoring', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['security', 'python', 'javascript']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 13:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 82, Số dòng xoá: 20
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'testing', 'python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 14:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 28, Số dòng xoá: 47
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python', 'security']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 15:
+  - Tác giả: carol
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 13, Số dòng xoá: 30
+  - Task type (loại tác vụ): ['testing', 'security', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 16:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 56, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['security', 'refactoring', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 17:
+  - Tác giả: carol
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 64, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['testing', 'bug_fix', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'react', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 18:
+  - Tác giả: bob
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 59, Số dòng xoá: 8
+  - Task type (loại tác vụ): ['refactoring', 'security', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['react', 'security']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 19:
+  - Tác giả: dave
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 19, Số dòng xoá: 46
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 20:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 29, Số dòng xoá: 31
+  - Task type (loại tác vụ): ['documentation', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'testing', 'angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 21:
+  - Tác giả: eve
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 35, Số dòng xoá: 7
+  - Task type (loại tác vụ): ['feature', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 22:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 51, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['feature', 'testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'testing', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 23:
+  - Tác giả: alice
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 96, Số dòng xoá: 16
+  - Task type (loại tác vụ): ['documentation', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'python']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 24:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 23, Số dòng xoá: 13
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['python', 'testing', 'javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 25:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 2, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['documentation', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['angular', 'devops', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 26:
+  - Tác giả: eve
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 65, Số dòng xoá: 48
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['react', 'security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 27:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 61, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['testing', 'bug_fix', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 28:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 23, Số dòng xoá: 28
+  - Task type (loại tác vụ): ['bug_fix', 'devops', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 29:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 92, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['security', 'devops', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'backend']
+  - Required skills (kỹ năng cần thiết): ['database', 'testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 30:
+  - Tác giả: alice
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 25, Số dòng xoá: 48
+  - Task type (loại tác vụ): ['bug_fix', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'backend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'database', 'devops']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 31:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 7, Số dòng xoá: 10
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['angular', 'devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 32:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 80, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['documentation', 'testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 33:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 13, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['refactoring', 'testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['security', 'python', 'dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 34:
+  - Tác giả: alice
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 1, Số dòng xoá: 3
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['angular', 'security', 'database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 35:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 48, Số dòng xoá: 40
+  - Task type (loại tác vụ): ['devops', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 36:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 8, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['feature', 'refactoring', 'devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 37:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 66, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['devops', 'testing', 'bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['react', 'angular']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 38:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 99, Số dòng xoá: 42
+  - Task type (loại tác vụ): ['documentation', 'refactoring', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 39:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 59, Số dòng xoá: 37
+  - Task type (loại tác vụ): ['feature', 'devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 40:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 91, Số dòng xoá: 29
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'devops', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 41:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 2, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['security', 'testing', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['react', 'testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 42:
+  - Tác giả: alice
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 31, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['documentation', 'security']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 43:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 28, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['refactoring', 'documentation', 'bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 44:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 18, Số dòng xoá: 29
+  - Task type (loại tác vụ): ['devops', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['react', 'testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 45:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 96, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['bug_fix', 'devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['angular', 'security', 'javascript']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 46:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 81, Số dòng xoá: 46
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 47:
+  - Tác giả: dave
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 75, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['bug_fix', 'devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 48:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 69, Số dòng xoá: 27
+  - Task type (loại tác vụ): ['refactoring', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'devops', 'javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 49:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 13, Số dòng xoá: 7
+  - Task type (loại tác vụ): ['bug_fix', 'security', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['devops', 'angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 50:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 16, Số dòng xoá: 35
+  - Task type (loại tác vụ): ['devops', 'refactoring', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'security', 'dotnet']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 51:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 52, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 52:
+  - Tác giả: bob
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 13, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 53:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 50, Số dòng xoá: 10
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 54:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 25, Số dòng xoá: 2
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 55:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 75, Số dòng xoá: 48
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'angular']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 56:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 78, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['bug_fix', 'refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['devops', 'react', 'javascript']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 57:
+  - Tác giả: dave
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 14, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['documentation', 'bug_fix', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python', 'javascript', 'dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 58:
+  - Tác giả: eve
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 82, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['feature', 'refactoring']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python', 'security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 59:
+  - Tác giả: eve
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 25, Số dòng xoá: 19
+  - Task type (loại tác vụ): ['security', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 60:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 94, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['security', 'bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'python', 'security']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 61:
+  - Tác giả: alice
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 99, Số dòng xoá: 42
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['angular', 'react']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 62:
+  - Tác giả: carol
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 73, Số dòng xoá: 2
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'security']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 63:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 59, Số dòng xoá: 14
+  - Task type (loại tác vụ): ['bug_fix', 'feature']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 64:
+  - Tác giả: eve
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 32, Số dòng xoá: 13
+  - Task type (loại tác vụ): ['testing', 'refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['database', 'angular', 'security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 65:
+  - Tác giả: dave
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 55, Số dòng xoá: 14
+  - Task type (loại tác vụ): ['refactoring', 'feature', 'bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'dotnet', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 66:
+  - Tác giả: dave
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 27, Số dòng xoá: 32
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing', 'security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 67:
+  - Tác giả: dave
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 6, Số dòng xoá: 3
+  - Task type (loại tác vụ): ['refactoring', 'security', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 68:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 74, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['refactoring', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 69:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 82, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['devops', 'security']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 70:
+  - Tác giả: alice
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 58, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['testing', 'security', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 71:
+  - Tác giả: alice
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 62, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['database', 'react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 72:
+  - Tác giả: eve
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 11, Số dòng xoá: 15
+  - Task type (loại tác vụ): ['feature', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 73:
+  - Tác giả: alice
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 68, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['documentation', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 74:
+  - Tác giả: eve
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 30, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['devops', 'angular', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 75:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 51, Số dòng xoá: 19
+  - Task type (loại tác vụ): ['documentation', 'security']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['security', 'database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 76:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 85, Số dòng xoá: 19
+  - Task type (loại tác vụ): ['testing', 'bug_fix', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 77:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 2, Số dòng xoá: 23
+  - Task type (loại tác vụ): ['feature', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 78:
+  - Tác giả: alice
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 90, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 79:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 5, Số dòng xoá: 42
+  - Task type (loại tác vụ): ['security', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 80:
+  - Tác giả: carol
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 25, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['bug_fix', 'refactoring', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 81:
+  - Tác giả: alice
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 8, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['feature', 'devops', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['security', 'react', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 82:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 11, Số dòng xoá: 8
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 83:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 87, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['security', 'bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'database', 'dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 84:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 10, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['documentation', 'security', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 85:
+  - Tác giả: carol
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 14, Số dòng xoá: 37
+  - Task type (loại tác vụ): ['bug_fix', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['database', 'react', 'devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 86:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 78, Số dòng xoá: 34
+  - Task type (loại tác vụ): ['refactoring', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 87:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 77, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['react']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 88:
+  - Tác giả: bob
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 74, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 89:
+  - Tác giả: eve
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 43, Số dòng xoá: 7
+  - Task type (loại tác vụ): ['testing', 'feature', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'react']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 90:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 20, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['security', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'backend']
+  - Required skills (kỹ năng cần thiết): ['angular', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 91:
+  - Tác giả: carol
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 7, Số dòng xoá: 50
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'security', 'python']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 92:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 18, Số dòng xoá: 26
+  - Task type (loại tác vụ): ['feature', 'bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 93:
+  - Tác giả: dave
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 6, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['testing', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'database']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 94:
+  - Tác giả: carol
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 33, Số dòng xoá: 42
+  - Task type (loại tác vụ): ['feature', 'refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'dotnet', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 95:
+  - Tác giả: alice
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 33, Số dòng xoá: 4
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'dotnet', 'testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 96:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 12, Số dòng xoá: 47
+  - Task type (loại tác vụ): ['testing', 'feature', 'bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['python', 'angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 97:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 33, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['testing', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'javascript', 'react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 98:
+  - Tác giả: alice
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 22, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['devops', 'security', 'bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['security', 'testing', 'angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 99:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 38, Số dòng xoá: 28
+  - Task type (loại tác vụ): ['devops', 'security', 'bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['react', 'testing', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 100:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 98, Số dòng xoá: 37
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['database', 'devops', 'react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 101:
+  - Tác giả: bob
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 5, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 102:
+  - Tác giả: bob
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 19, Số dòng xoá: 21
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'backend']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 103:
+  - Tác giả: bob
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 47, Số dòng xoá: 34
+  - Task type (loại tác vụ): ['feature', 'bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'security']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 104:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 13, Số dòng xoá: 8
+  - Task type (loại tác vụ): ['devops', 'refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 105:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 62, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['security', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['database', 'dotnet', 'security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 106:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 3, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['security', 'devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 107:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 61, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['refactoring', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['react', 'angular', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 108:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 100, Số dòng xoá: 3
+  - Task type (loại tác vụ): ['feature', 'bug_fix', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 109:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 45, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'devops']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 110:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 81, Số dòng xoá: 7
+  - Task type (loại tác vụ): ['bug_fix', 'security', 'devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 111:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 45, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['feature', 'refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['security', 'python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 112:
+  - Tác giả: carol
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 67, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['security']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 113:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 36, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 114:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 18, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['refactoring', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['python', 'angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 115:
+  - Tác giả: dave
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 84, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['bug_fix', 'security', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 116:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 28, Số dòng xoá: 23
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'backend']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 117:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 69, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['testing', 'documentation', 'devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'angular']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 118:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 67, Số dòng xoá: 42
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 119:
+  - Tác giả: carol
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 87, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['refactoring', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 120:
+  - Tác giả: bob
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 83, Số dòng xoá: 41
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 121:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 85, Số dòng xoá: 21
+  - Task type (loại tác vụ): ['devops', 'bug_fix', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 122:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 40, Số dòng xoá: 16
+  - Task type (loại tác vụ): ['refactoring', 'bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['angular', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 123:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 84, Số dòng xoá: 21
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['react', 'devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 124:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 12, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['bug_fix', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['database', 'react', 'security']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 125:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 66, Số dòng xoá: 4
+  - Task type (loại tác vụ): ['devops', 'testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['database', 'react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 126:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 5, Số dòng xoá: 50
+  - Task type (loại tác vụ): ['devops', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'react']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 127:
+  - Tác giả: carol
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 76, Số dòng xoá: 19
+  - Task type (loại tác vụ): ['testing', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['devops', 'dotnet']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 128:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 41, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['bug_fix', 'security', 'devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 129:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 92, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['bug_fix', 'feature', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'angular', 'react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 130:
+  - Tác giả: eve
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 92, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python', 'security', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 131:
+  - Tác giả: alice
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 36, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['refactoring', 'documentation', 'testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 132:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 67, Số dòng xoá: 20
+  - Task type (loại tác vụ): ['devops', 'bug_fix', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 133:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 38, Số dòng xoá: 8
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 134:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 2, Số dòng xoá: 32
+  - Task type (loại tác vụ): ['bug_fix', 'documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['angular']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 135:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 95, Số dòng xoá: 35
+  - Task type (loại tác vụ): ['feature', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 136:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 10, Số dòng xoá: 31
+  - Task type (loại tác vụ): ['feature', 'documentation', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 137:
+  - Tác giả: carol
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 25, Số dòng xoá: 40
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 138:
+  - Tác giả: bob
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 43, Số dòng xoá: 47
+  - Task type (loại tác vụ): ['testing', 'refactoring']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['testing', 'devops']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 139:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 11, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['testing', 'devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'react', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 140:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 24, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['devops', 'feature', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 141:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 80, Số dòng xoá: 46
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'react', 'javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 142:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 42, Số dòng xoá: 21
+  - Task type (loại tác vụ): ['bug_fix', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'react']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 143:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 8, Số dòng xoá: 36
+  - Task type (loại tác vụ): ['security', 'testing', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 144:
+  - Tác giả: dave
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 33, Số dòng xoá: 34
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['testing', 'python']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 145:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 80, Số dòng xoá: 29
+  - Task type (loại tác vụ): ['testing', 'refactoring', 'documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['python', 'javascript', 'database']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 146:
+  - Tác giả: dave
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 52, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['angular', 'dotnet', 'security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 147:
+  - Tác giả: eve
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 7, Số dòng xoá: 21
+  - Task type (loại tác vụ): ['refactoring', 'security', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['database', 'devops', 'javascript']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 148:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 80, Số dòng xoá: 35
+  - Task type (loại tác vụ): ['feature', 'bug_fix', 'devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 149:
+  - Tác giả: eve
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 77, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 150:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 2, Số dòng xoá: 49
+  - Task type (loại tác vụ): ['devops', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['database', 'angular']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 151:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 44, Số dòng xoá: 2
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 152:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 24, Số dòng xoá: 23
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['python', 'security', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 153:
+  - Tác giả: eve
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 81, Số dòng xoá: 12
+  - Task type (loại tác vụ): ['refactoring', 'documentation', 'bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['python', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 154:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 11, Số dòng xoá: 4
+  - Task type (loại tác vụ): ['feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'dotnet', 'devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 155:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 100, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['feature', 'devops', 'refactoring']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 156:
+  - Tác giả: alice
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 42, Số dòng xoá: 28
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['react']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 157:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 39, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 158:
+  - Tác giả: carol
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 58, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['security', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['react', 'devops', 'javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 159:
+  - Tác giả: dave
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 78, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['refactoring', 'bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'angular']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 160:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 51, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['bug_fix', 'testing', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 161:
+  - Tác giả: dave
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 24, Số dòng xoá: 26
+  - Task type (loại tác vụ): ['security', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 162:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 30, Số dòng xoá: 6
+  - Task type (loại tác vụ): ['testing', 'security', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['react', 'angular', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 163:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 89, Số dòng xoá: 0
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 164:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 91, Số dòng xoá: 27
+  - Task type (loại tác vụ): ['bug_fix', 'refactoring', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['devops', 'angular', 'python']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): high
+
+Commit 165:
+  - Tác giả: eve
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 65, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing', 'javascript']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 166:
+  - Tác giả: bob
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 52, Số dòng xoá: 24
+  - Task type (loại tác vụ): ['devops', 'refactoring', 'testing']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 167:
+  - Tác giả: bob
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 87, Số dòng xoá: 5
+  - Task type (loại tác vụ): ['testing', 'documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['security', 'dotnet', 'react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 168:
+  - Tác giả: bob
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 76, Số dòng xoá: 10
+  - Task type (loại tác vụ): ['devops', 'testing', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['javascript']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 169:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 51, Số dòng xoá: 29
+  - Task type (loại tác vụ): ['devops', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'devops', 'angular']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): high
+
+Commit 170:
+  - Tác giả: carol
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 46, Số dòng xoá: 20
+  - Task type (loại tác vụ): ['documentation', 'bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'javascript', 'testing']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 171:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 66, Số dòng xoá: 33
+  - Task type (loại tác vụ): ['security', 'testing', 'documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 172:
+  - Tác giả: eve
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 93, Số dòng xoá: 39
+  - Task type (loại tác vụ): ['bug_fix', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['testing', 'devops']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 173:
+  - Tác giả: carol
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 68, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['testing', 'security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['security', 'python', 'react']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): medium
+
+Commit 174:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 63, Số dòng xoá: 50
+  - Task type (loại tác vụ): ['bug_fix', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['python', 'javascript']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 175:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 49, Số dòng xoá: 27
+  - Task type (loại tác vụ): ['documentation', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['react', 'dotnet']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 176:
+  - Tác giả: bob
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 46, Số dòng xoá: 41
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 177:
+  - Tác giả: alice
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 88, Số dòng xoá: 7
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['testing', 'dotnet']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 178:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 36, Số dòng xoá: 17
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'database']
+  - Required skills (kỹ năng cần thiết): ['security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 179:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 40, Số dòng xoá: 14
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'database']
+  - Required skills (kỹ năng cần thiết): ['dotnet']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): low
+
+Commit 180:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 33, Số dòng xoá: 22
+  - Task type (loại tác vụ): ['refactoring', 'testing', 'feature']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'react']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 181:
+  - Tác giả: alice
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 68, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['bug_fix', 'documentation', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'python', 'database']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 182:
+  - Tác giả: bob
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 16, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['devops']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['testing', 'security', 'angular']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 183:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 39, Số dòng xoá: 18
+  - Task type (loại tác vụ): ['refactoring']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'mobile']
+  - Required skills (kỹ năng cần thiết): ['security']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 184:
+  - Tác giả: dave
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 16, Số dòng xoá: 12
+  - Task type (loại tác vụ): ['documentation', 'testing', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'javascript', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 185:
+  - Tác giả: dave
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 6, Số dòng xoá: 9
+  - Task type (loại tác vụ): ['devops', 'security', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['react', 'devops', 'testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 186:
+  - Tác giả: alice
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 18, Số dòng xoá: 25
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'dotnet', 'testing']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 187:
+  - Tác giả: dave
+  - Nội dung: Update documentation for API
+  - Số file thay đổi: 1, Số dòng thêm: 70, Số dòng xoá: 48
+  - Task type (loại tác vụ): ['feature', 'security', 'documentation']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend']
+  - Required skills (kỹ năng cần thiết): ['python', 'testing']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 188:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 21, Số dòng xoá: 29
+  - Task type (loại tác vụ): ['refactoring', 'security']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['security', 'react']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+Commit 189:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 21, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['testing', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile']
+  - Required skills (kỹ năng cần thiết): ['python', 'database']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 190:
+  - Tác giả: alice
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 31, Số dòng xoá: 50
+  - Task type (loại tác vụ): ['devops', 'refactoring']
+  - Complexity (độ phức tạp): low
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure']
+  - Required skills (kỹ năng cần thiết): ['security', 'devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 191:
+  - Tác giả: eve
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 99, Số dòng xoá: 39
+  - Task type (loại tác vụ): ['testing']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend']
+  - Required skills (kỹ năng cần thiết): ['devops']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): high
+
+Commit 192:
+  - Tác giả: carol
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 9, Số dòng xoá: 48
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['python']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 193:
+  - Tác giả: carol
+  - Nội dung: DevOps: update CI/CD pipeline
+  - Số file thay đổi: 1, Số dòng thêm: 37, Số dòng xoá: 45
+  - Task type (loại tác vụ): ['feature', 'devops']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'python', 'database']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): medium
+
+Commit 194:
+  - Tác giả: bob
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 79, Số dòng xoá: 32
+  - Task type (loại tác vụ): ['refactoring', 'testing', 'documentation']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['backend', 'database']
+  - Required skills (kỹ năng cần thiết): ['database', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): medium
+
+Commit 195:
+  - Tác giả: bob
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 39, Số dòng xoá: 44
+  - Task type (loại tác vụ): ['security']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['mobile', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['database', 'dotnet', 'devops']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): low
+
+Commit 196:
+  - Tác giả: dave
+  - Nội dung: Add new feature for dashboard
+  - Số file thay đổi: 2, Số dòng thêm: 92, Số dòng xoá: 19
+  - Task type (loại tác vụ): ['documentation']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['frontend', 'infrastructure']
+  - Required skills (kỹ năng cần thiết): ['security', 'react', 'dotnet']
+  - Priority (ưu tiên): low
+  - Risk level (nguy cơ): medium
+
+Commit 197:
+  - Tác giả: carol
+  - Nội dung: Improve security checks
+  - Số file thay đổi: 1, Số dòng thêm: 24, Số dòng xoá: 15
+  - Task type (loại tác vụ): ['devops', 'testing', 'feature']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'frontend']
+  - Required skills (kỹ năng cần thiết): ['devops', 'python']
+  - Priority (ưu tiên): critical
+  - Risk level (nguy cơ): high
+
+Commit 198:
+  - Tác giả: bob
+  - Nội dung: Refactor data processing module
+  - Số file thay đổi: 2, Số dòng thêm: 67, Số dòng xoá: 11
+  - Task type (loại tác vụ): ['bug_fix']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['database', 'backend']
+  - Required skills (kỹ năng cần thiết): ['javascript', 'database', 'testing']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 199:
+  - Tác giả: carol
+  - Nội dung: Add unit tests for utils
+  - Số file thay đổi: 1, Số dòng thêm: 1, Số dòng xoá: 1
+  - Task type (loại tác vụ): ['devops', 'feature']
+  - Complexity (độ phức tạp): medium
+  - Technical area (lĩnh vực kỹ thuật): ['infrastructure', 'database']
+  - Required skills (kỹ năng cần thiết): ['dotnet', 'python']
+  - Priority (ưu tiên): medium
+  - Risk level (nguy cơ): low
+
+Commit 200:
+  - Tác giả: alice
+  - Nội dung: Fix bug in user authentication
+  - Số file thay đổi: 2, Số dòng thêm: 41, Số dòng xoá: 34
+  - Task type (loại tác vụ): ['refactoring', 'security', 'testing']
+  - Complexity (độ phức tạp): high
+  - Technical area (lĩnh vực kỹ thuật): ['database']
+  - Required skills (kỹ năng cần thiết): ['angular', 'dotnet']
+  - Priority (ưu tiên): high
+  - Risk level (nguy cơ): low
+
+4. Đánh giá khả năng mô hình:
+- Mô hình có thể phân loại commit theo nhiều nhãn cùng lúc (đa nhãn), ví dụ: task_type, complexity, technical_area, required_skills, priority.
+- Có thể đánh giá nguy cơ (risk_level) dựa trên đặc trưng commit.
+- Kết quả phân loại đa dạng, phù hợp với dữ liệu commit thực tế.
+- Có thể mở rộng để phân tích lịch sử đóng góp hoặc phát hiện mẫu commit bất thường nếu cung cấp thêm dữ liệu lịch sử.

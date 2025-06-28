@@ -164,7 +164,7 @@ class CommitModelTrainer:
             Tuple (val_loss, task_losses, task_accuracies)
         """
         self.model.eval()
-        val_loss = 0
+        val_loss = 0.0
         task_losses = {task: 0 for task in self.task_names}
         task_correct = {task: 0 for task in self.task_names}
         task_total = {task: 0 for task in self.task_names}
@@ -182,7 +182,7 @@ class CommitModelTrainer:
                 outputs = self.model(text, metadata)
                 
                 # Tính loss và accuracy cho từng task
-                batch_loss = 0
+                batch_loss = torch.tensor(0.0, device=self.device)
                 for task_name in self.task_names:
                     task_config = self.model.config['task_heads'][task_name]
                     

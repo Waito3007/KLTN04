@@ -1,0 +1,3313 @@
+[
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "python"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix",
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular",
+      "dotnet"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature",
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "python"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "react",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "database",
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react",
+      "python",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "bug_fix",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "database"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature",
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "angular",
+      "dotnet",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "testing",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "devops",
+      "react",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "testing",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "python"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "refactoring",
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "frontend"
+    ],
+    "required_skills": [
+      "database",
+      "testing",
+      "dotnet"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security",
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "javascript",
+      "devops",
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "security",
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "refactoring",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "security",
+      "python"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "python",
+      "database"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "mobile"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "devops",
+      "python",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "react",
+      "python"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "devops",
+      "dotnet",
+      "database"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "security",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "devops",
+      "angular",
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet",
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "refactoring",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "dotnet",
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "react",
+      "angular",
+      "database"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "documentation",
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "react",
+      "angular",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "security",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "angular",
+      "react",
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "python",
+      "testing",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "refactoring",
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "dotnet",
+      "devops",
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "mobile"
+    ],
+    "required_skills": [
+      "security",
+      "python"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "bug_fix",
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "mobile"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "python",
+      "react"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "react",
+      "javascript",
+      "python"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "angular",
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "security",
+      "testing",
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "backend"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "javascript",
+      "security",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "security",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "react",
+      "devops",
+      "database"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "devops",
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "javascript",
+      "security",
+      "testing"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "angular",
+      "javascript"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "python",
+      "testing"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript",
+      "devops",
+      "python"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "database",
+      "devops",
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "testing"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "feature",
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "mobile"
+    ],
+    "required_skills": [
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "javascript"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "dotnet",
+      "python",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "security",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "security",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "python",
+      "testing",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database",
+      "mobile"
+    ],
+    "required_skills": [
+      "testing",
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react",
+      "testing",
+      "python"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "feature",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "angular",
+      "security",
+      "testing"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "security",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "frontend"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "mobile"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "python",
+      "dotnet",
+      "testing"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript",
+      "dotnet",
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "angular",
+      "react",
+      "devops"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "python",
+      "javascript"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "dotnet",
+      "python",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "database"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "refactoring",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "backend"
+    ],
+    "required_skills": [
+      "react",
+      "security",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix",
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "database"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "python",
+      "javascript",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend",
+      "mobile"
+    ],
+    "required_skills": [
+      "testing",
+      "devops",
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "react",
+      "security",
+      "dotnet"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security",
+      "feature",
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "testing",
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend",
+      "mobile"
+    ],
+    "required_skills": [
+      "testing"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "dotnet",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "bug_fix",
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "testing",
+      "react",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "frontend"
+    ],
+    "required_skills": [
+      "database",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "angular",
+      "testing",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "testing",
+      "react"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "database"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile",
+      "backend"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature",
+      "testing",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "database"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "python",
+      "database",
+      "dotnet"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "security",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation",
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "security",
+      "dotnet",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops",
+      "security",
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "javascript",
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react",
+      "devops",
+      "security"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "angular",
+      "database",
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "react",
+      "security",
+      "python"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "refactoring",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "security",
+      "database",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "devops",
+      "react",
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "bug_fix",
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "devops",
+      "database",
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature",
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation",
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "database"
+    ],
+    "required_skills": [
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "python"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "testing",
+      "devops",
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "frontend"
+    ],
+    "required_skills": [
+      "testing",
+      "devops",
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "database"
+    ],
+    "required_skills": [
+      "devops",
+      "database",
+      "testing"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "python",
+      "javascript"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix",
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "testing",
+      "devops",
+      "database"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "react",
+      "testing",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "feature",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "dotnet",
+      "security",
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "security",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "frontend"
+    ],
+    "required_skills": [
+      "database",
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "testing",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "database",
+      "devops",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "devops",
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "python",
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "dotnet",
+      "database",
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "python",
+      "angular",
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "security",
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security",
+      "refactoring",
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "angular",
+      "react",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database",
+      "react",
+      "testing"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "python",
+      "react",
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation",
+      "testing"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile",
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing",
+      "documentation",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature",
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "feature",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "python",
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "database"
+    ],
+    "required_skills": [
+      "angular",
+      "python",
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "feature",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "testing",
+      "devops",
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "database",
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular",
+      "devops"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "testing",
+      "react",
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing",
+      "documentation",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "database",
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "security",
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "database"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "devops",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript",
+      "dotnet",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "dotnet",
+      "javascript"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature",
+      "bug_fix",
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "angular",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "database",
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "database"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "devops",
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure",
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "feature",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "bug_fix",
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet",
+      "react",
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "dotnet",
+      "javascript"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "javascript"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "backend",
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet",
+      "database"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "python",
+      "dotnet"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend",
+      "mobile"
+    ],
+    "required_skills": [
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "devops",
+      "testing",
+      "python"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "documentation",
+      "feature"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular",
+      "react"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "high",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "medium",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "feature"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "react",
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "documentation",
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "angular",
+      "security",
+      "testing"
+    ],
+    "priority": "low",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "testing",
+      "refactoring"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "infrastructure"
+    ],
+    "required_skills": [
+      "database",
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security",
+      "devops"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "security"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database",
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "angular"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation",
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure",
+      "backend"
+    ],
+    "required_skills": [
+      "devops",
+      "angular"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "backend"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "devops",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "frontend",
+      "backend"
+    ],
+    "required_skills": [
+      "security",
+      "react",
+      "database"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "documentation",
+      "devops"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "security",
+      "angular",
+      "database"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "frontend"
+    ],
+    "required_skills": [
+      "security",
+      "python"
+    ],
+    "priority": "high",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "security",
+      "feature",
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "security",
+      "react"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "documentation"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "devops",
+      "security"
+    ],
+    "priority": "high",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "security",
+      "devops",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile",
+      "backend"
+    ],
+    "required_skills": [
+      "security",
+      "javascript",
+      "testing"
+    ],
+    "priority": "critical",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "backend",
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "feature",
+      "documentation"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "angular",
+      "devops",
+      "react"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "devops",
+      "documentation",
+      "bug_fix"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "backend"
+    ],
+    "required_skills": [
+      "database",
+      "python",
+      "javascript"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet",
+      "security"
+    ],
+    "priority": "medium",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "devops"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "dotnet",
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "infrastructure"
+    ],
+    "required_skills": [
+      "testing",
+      "angular",
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "refactoring"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "infrastructure",
+      "database"
+    ],
+    "required_skills": [
+      "dotnet"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "bug_fix",
+      "devops",
+      "refactoring"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database"
+    ],
+    "required_skills": [
+      "database"
+    ],
+    "priority": "low",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "testing",
+      "security"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "frontend"
+    ],
+    "required_skills": [
+      "javascript",
+      "angular",
+      "devops"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "testing",
+      "refactoring",
+      "documentation"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "database",
+      "frontend"
+    ],
+    "required_skills": [
+      "react",
+      "devops",
+      "testing"
+    ],
+    "priority": "medium",
+    "risk_level": "high"
+  },
+  {
+    "task_type": [
+      "security",
+      "refactoring",
+      "feature"
+    ],
+    "complexity": "medium",
+    "technical_area": [
+      "mobile"
+    ],
+    "required_skills": [
+      "javascript",
+      "security"
+    ],
+    "priority": "critical",
+    "risk_level": "medium"
+  },
+  {
+    "task_type": [
+      "feature",
+      "refactoring",
+      "bug_fix"
+    ],
+    "complexity": "high",
+    "technical_area": [
+      "database",
+      "mobile"
+    ],
+    "required_skills": [
+      "angular",
+      "react",
+      "devops"
+    ],
+    "priority": "critical",
+    "risk_level": "low"
+  },
+  {
+    "task_type": [
+      "refactoring",
+      "testing"
+    ],
+    "complexity": "low",
+    "technical_area": [
+      "database",
+      "mobile"
+    ],
+    "required_skills": [
+      "angular"
+    ],
+    "priority": "low",
+    "risk_level": "low"
+  }
+]
