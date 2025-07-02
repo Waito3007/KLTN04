@@ -12,6 +12,7 @@ from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 from starlette.requests import Request
 from typing import Optional, Dict, Any
 import httpx
+import asyncio
 import logging
 from functools import lru_cache
 
@@ -93,28 +94,63 @@ class CurrentUser:
 
 async def verify_github_token(token: str) -> Optional[Dict[str, Any]]:
     """
-    Verify GitHub token and get user info
-    Note: LRU cache removed as it doesn't work with async functions
+    Verify GitHub token and get user info with enhanced error handling
     """
     try:
-        async with httpx.AsyncClient() as client:
+        # Validate token format
+        if not token or len(token) < 20:
+            logger.warning("Invalid token format provided")
+            return None
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
             headers = {
                 "Authorization": f"token {token}",
-                "Accept": "application/vnd.github.v3+json"
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "KLTN04-Backend/1.0"
             }
             
-            # Get user info from GitHub API
-            response = await client.get("https://api.github.com/user", headers=headers)
-            
-            if response.status_code == 200:
-                github_user = response.json()
-                return github_user
-            elif response.status_code == 401:
-                logger.warning("Invalid GitHub token provided")
-                return None
-            else:
-                logger.error(f"GitHub API error: {response.status_code}")
-                return None
+            # Get user info from GitHub API with retry logic
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    response = await client.get("https://api.github.com/user", headers=headers)
+                    
+                    if response.status_code == 200:
+                        github_user = response.json()
+                        # Validate required fields
+                        if not github_user.get("id") or not github_user.get("login"):
+                            logger.error("Invalid user data from GitHub API")
+                            return None
+                        return github_user
+                    elif response.status_code == 401:
+                        logger.warning("Invalid GitHub token provided")
+                        return None
+                    elif response.status_code == 403:
+                        logger.warning("GitHub API rate limit exceeded or token lacks permissions")
+                        return None
+                    elif response.status_code == 429:
+                        # Rate limit - wait and retry
+                        if attempt < max_retries - 1:
+                            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                            continue
+                        logger.error("GitHub API rate limit exceeded after retries")
+                        return None
+                    else:
+                        logger.error(f"GitHub API error: {response.status_code} - {response.text}")
+                        return None
+                        
+                except httpx.ConnectError:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                        continue
+                    logger.error("Failed to connect to GitHub API")
+                    return None
+                except httpx.TimeoutException:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                        continue
+                    logger.error("GitHub API request timeout")
+                    return None
                 
     except Exception as e:
         logger.error(f"Error verifying GitHub token: {e}")

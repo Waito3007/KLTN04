@@ -200,13 +200,13 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
       
       const { stats } = response.data;
       message.success(
-        `Đồng bộ thành công! ${stats.new_commits_saved} commits mới được lưu cho branch "${selectedBranch}"`
+        `Đồng bộ thành công! ${stats.commits_processed} commits được xử lý cho branch "${selectedBranch}"`
       );
       
       // Update commit stats
       setCommitStats({
         totalCommits: stats.total_commits_in_database,
-        newCommits: stats.new_commits_saved,
+        newCommits: stats.commits_processed,
         lastSync: new Date().toLocaleString()
       });
       
