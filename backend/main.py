@@ -11,7 +11,14 @@ from api.routes.projects import router as projects_router
 from api.routes.sync import sync_router
 from api.routes.contributors import router as contributors_router
 from api.routes.member_analysis import router as member_analysis_router
+import sys
+import os
+
+# Add the parent directory to the sys.path to allow imports from the 'ai' module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from api.routes.repositories import router as repositories_router
+from ai.api.endpoints import router as ai_router
 
 setup_logger()  # Bật logger trước khi chạy app
 
@@ -27,6 +34,7 @@ app.include_router(sync_router, prefix="/api")
 app.include_router(contributors_router, prefix="/api/contributors")
 app.include_router(member_analysis_router)  # Already has /api prefix
 app.include_router(repositories_router)  # Already has /api prefix
+app.include_router(ai_router, prefix="/api/ai")
 
 @app.get("/")
 def root():
