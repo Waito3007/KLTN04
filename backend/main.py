@@ -18,7 +18,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.routes.repositories import router as repositories_router
-from ai.api.endpoints import router as ai_router
+from aiApi.api.endpoints import router as ai_router
 
 setup_logger()  # Bật logger trước khi chạy app
 
