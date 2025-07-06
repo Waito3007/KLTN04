@@ -61,9 +61,9 @@ class MultiFusionV2Service:
         self.scaler = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.max_len = 128
-        self.model_path = Path("c:/SAN/KLTN/KLTN04/backend/ai/models/multifusion/multifusionV2.pth")
-        self.metadata_path = Path("c:/SAN/KLTN/KLTN04/backend/ai/models/multifusion/metadata_v2.json")
-        
+        self.model_path = Path(__file__).parent.parent / "ai" / "models" / "multifusion" / "multifusionV2.pth"
+        self.metadata_path = Path(__file__).parent.parent / "ai" / "models" / "multifusion" / "metadata_v2.json"
+
         # Load model and metadata
         self._load_model()
     
