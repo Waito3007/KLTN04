@@ -29,6 +29,9 @@ class GitHubTokenBearer(SecurityBase):
     """
     def __init__(self, auto_error: bool = True):
         self.auto_error = auto_error
+        # Add the model attribute required by FastAPI OpenAPI generation
+        self.model = HTTPBearerModel()
+        self.scheme_name = "GitHubTokenBearer"
 
     async def __call__(self, request: Request) -> Optional[str]:
         authorization = request.headers.get("Authorization")

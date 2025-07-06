@@ -11,18 +11,154 @@ from typing import Dict, List, Optional, Any
 from pathlib import Path
 import asyncio
 from functools import lru_cache
-
-# Add AI directory to path
-ai_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ai')
-sys.path.insert(0, ai_dir)
-
-try:
-    from ai.han_commit_analyzer import HANCommitAnalyzer
-except ImportError as e:
-    logging.warning(f"HAN model not available: {e}")
-    HANCommitAnalyzer = None
+import torch
+import torch.nn as nn
+import numpy as np
+import re
+from collections import Counter
 
 logger = logging.getLogger(__name__)
+
+# HAN Model Classes - integrated directly to avoid import issues
+class SimpleHANModel(nn.Module):
+    """
+    Simplified Hierarchical Attention Network for commit classification
+    """
+    def __init__(self, vocab_size, embed_dim=100, hidden_dim=128, num_classes=None):
+        super(SimpleHANModel, self).__init__()
+        
+        self.embed_dim = embed_dim
+        self.hidden_dim = hidden_dim
+        
+        # Embedding layer
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        
+        # Word-level LSTM
+        self.word_lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True, bidirectional=True)
+        
+        # Word-level attention
+        self.word_attention = nn.Linear(hidden_dim * 2, 1)
+        
+        # Sentence-level LSTM
+        self.sentence_lstm = nn.LSTM(hidden_dim * 2, hidden_dim, batch_first=True, bidirectional=True)
+        
+        # Sentence-level attention
+        self.sentence_attention = nn.Linear(hidden_dim * 2, 1)
+        
+        # Multi-task classification heads
+        self.classifiers = nn.ModuleDict()
+        if num_classes:
+            for task, num_class in num_classes.items():
+                self.classifiers[task] = nn.Linear(hidden_dim * 2, num_class)
+        
+        self.dropout = nn.Dropout(0.3)
+        
+    def forward(self, input_ids, attention_mask=None):
+        batch_size, max_sentences, max_words = input_ids.size()
+        
+        # Reshape for word-level processing
+        input_ids = input_ids.view(-1, max_words)  # (batch_size * max_sentences, max_words)
+        
+        # Word embeddings
+        embedded = self.embedding(input_ids)  # (batch_size * max_sentences, max_words, embed_dim)
+        
+        # Word-level LSTM
+        word_output, _ = self.word_lstm(embedded)  # (batch_size * max_sentences, max_words, hidden_dim * 2)
+        
+        # Word-level attention
+        word_attention_weights = torch.softmax(self.word_attention(word_output), dim=1)
+        sentence_vectors = torch.sum(word_attention_weights * word_output, dim=1)  # (batch_size * max_sentences, hidden_dim * 2)
+        
+        # Reshape back to sentence level
+        sentence_vectors = sentence_vectors.view(batch_size, max_sentences, -1)  # (batch_size, max_sentences, hidden_dim * 2)
+        
+        # Sentence-level LSTM
+        sentence_output, _ = self.sentence_lstm(sentence_vectors)  # (batch_size, max_sentences, hidden_dim * 2)
+        
+        # Sentence-level attention
+        sentence_attention_weights = torch.softmax(self.sentence_attention(sentence_output), dim=1)
+        document_vector = torch.sum(sentence_attention_weights * sentence_output, dim=1)  # (batch_size, hidden_dim * 2)
+        
+        document_vector = self.dropout(document_vector)
+        
+        # Multi-task outputs
+        outputs = {}
+        for task, classifier in self.classifiers.items():
+            outputs[task] = classifier(document_vector)
+        
+        return outputs
+
+class SimpleTokenizer:
+    """Simple tokenizer for commit messages"""
+    
+    def __init__(self, vocab_size=10000):
+        self.vocab_size = vocab_size
+        self.word_to_idx = {'<PAD>': 0, '<UNK>': 1}
+        self.idx_to_word = {0: '<PAD>', 1: '<UNK>'}
+        self.word_counts = Counter()
+        
+    def fit(self, texts):
+        """Build vocabulary from texts"""
+        logger.info("Building vocabulary...")
+        
+        for text in texts:
+            # Split into sentences
+            sentences = self.split_sentences(text)
+            for sentence in sentences:
+                words = self.tokenize_words(sentence)
+                self.word_counts.update(words)
+        
+        # Keep most frequent words
+        most_common = self.word_counts.most_common(self.vocab_size - 2)
+        
+        for i, (word, count) in enumerate(most_common):
+            idx = i + 2  # Start from 2 (after PAD and UNK)
+            self.word_to_idx[word] = idx
+            self.idx_to_word[idx] = word
+        
+        logger.info(f"Vocabulary built with {len(self.word_to_idx)} words")
+        
+    def split_sentences(self, text):
+        """Split text into sentences"""
+        # Simple sentence splitting for commit messages
+        sentences = re.split(r'[.!?;]|\\n', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+        return sentences if sentences else [text]
+    
+    def tokenize_words(self, sentence):
+        """Tokenize sentence into words"""
+        # Simple word tokenization
+        words = re.findall(r'\b\w+\b', sentence.lower())
+        return words
+    
+    def encode_text(self, text, max_sentences, max_words):
+        """Encode text to token ids"""
+        sentences = self.split_sentences(text)
+        
+        # Pad or truncate sentences
+        if len(sentences) > max_sentences:
+            sentences = sentences[:max_sentences]
+        while len(sentences) < max_sentences:
+            sentences.append("")
+        
+        encoded_sentences = []
+        for sentence in sentences:
+            words = self.tokenize_words(sentence)
+            
+            # Convert words to indices
+            word_ids = []
+            for word in words:
+                word_ids.append(self.word_to_idx.get(word, 1))  # 1 is UNK
+            
+            # Pad or truncate words
+            if len(word_ids) > max_words:
+                word_ids = word_ids[:max_words]
+            while len(word_ids) < max_words:
+                word_ids.append(0)  # 0 is PAD
+            
+            encoded_sentences.append(word_ids)
+        
+        return encoded_sentences
 
 class HANAIService:
     """
@@ -30,25 +166,167 @@ class HANAIService:
     """
     
     def __init__(self):
-        self.analyzer = None
+        self.model = None
+        self.tokenizer = None
+        self.label_encoders = None
         self.is_model_loaded = False
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self._initialize_model()
     
     def _initialize_model(self):
         """Initialize HAN model with error handling"""
         try:
-            if HANCommitAnalyzer is None:
-                logger.warning("HAN analyzer not available - using mock responses")
-                return
+            success = self._load_han_model()
+            if success:
+                self.is_model_loaded = True
+                logger.info("HAN model loaded successfully")
+            else:
+                logger.warning("HAN model not available - using mock responses")
+                self.is_model_loaded = False
                 
-            self.analyzer = HANCommitAnalyzer()
-            self.analyzer.load_model()
-            self.is_model_loaded = True
-            logger.info("HAN model loaded successfully")
-            
         except Exception as e:
             logger.error(f"Failed to load HAN model: {e}")
             self.is_model_loaded = False
+    
+    def _load_han_model(self):
+        """Load HAN model from file"""
+        try:
+            # Find model path
+            current_dir = Path(__file__).parent
+            model_path = current_dir.parent / "ai" / "models" / "han_github_model" / "best_model.pth"
+            
+            if not model_path.exists():
+                logger.warning(f"Model not found: {model_path}")
+                return False
+            
+            logger.info(f"Loading HAN model from: {model_path}")
+            
+            # Register classes for unpickling
+            import sys
+            import types
+            
+            # Create a mock module to register classes
+            mock_main = types.ModuleType('__main__')
+            mock_main.SimpleTokenizer = SimpleTokenizer
+            mock_main.SimpleHANModel = SimpleHANModel
+            sys.modules['__main__'] = mock_main
+            
+            # Also register in torch serialization
+            try:
+                torch.serialization.add_safe_globals([SimpleTokenizer, SimpleHANModel])
+            except:
+                pass
+            
+            # Load checkpoint
+            checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
+            
+            # Extract model components
+            if 'tokenizer' not in checkpoint:
+                logger.error("Tokenizer not found in checkpoint. Creating default tokenizer.")
+                # Create a default tokenizer as fallback
+                self.tokenizer = SimpleTokenizer()
+                # Set up basic vocabulary
+                self.tokenizer.word_to_idx = checkpoint.get('vocab', {'<PAD>': 0, '<UNK>': 1})
+            else:
+                self.tokenizer = checkpoint['tokenizer']
+            
+            self.label_encoders = checkpoint.get('label_encoders', {})
+            model_state = checkpoint['model_state_dict']
+            num_classes = checkpoint.get('num_classes', {})
+            
+            if not num_classes:
+                # Create default classes if not found
+                num_classes = {
+                    'type': 8,  # feat, fix, docs, style, refactor, test, chore, other
+                    'area': 5,  # frontend, backend, database, testing, general
+                    'impact': 3  # low, medium, high
+                }
+                logger.warning("Using default num_classes")
+            
+            # Load model architecture
+            self.model = SimpleHANModel(
+                vocab_size=len(self.tokenizer.word_to_idx),
+                embed_dim=100,
+                hidden_dim=128,
+                num_classes=num_classes
+            )
+            
+            # Load trained weights
+            self.model.load_state_dict(model_state)
+            self.model.to(self.device)
+            self.model.eval()
+            
+            logger.info("HAN model loaded successfully!")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error loading HAN model: {e}")
+            return False
+    
+    def _preprocess_commit_message(self, message, max_sentences=10, max_words=50):
+        """Preprocess commit message for HAN model"""
+        if not self.tokenizer:
+            return None
+        
+        try:
+            tokenized_sentences = self.tokenizer.encode_text(message, max_sentences, max_words)
+            return torch.tensor([tokenized_sentences], dtype=torch.long).to(self.device)
+        except Exception as e:
+            logger.error(f"Error preprocessing message: {e}")
+            return None
+    
+    def _predict_with_han_model(self, commit_message):
+        """Predict with HAN model"""
+        try:
+            # Preprocess
+            input_tensor = self._preprocess_commit_message(commit_message)
+            if input_tensor is None:
+                return None
+            
+            # Predict
+            with torch.no_grad():
+                outputs = self.model(input_tensor)
+            
+            # Decode predictions
+            predictions = {}
+            
+            for task, output in outputs.items():
+                # Get prediction probabilities
+                probabilities = torch.softmax(output, dim=1)
+                confidence, predicted_idx = torch.max(probabilities, 1)
+                
+                # Decode label
+                if task in self.label_encoders and self.label_encoders[task]:
+                    encoder_keys = list(self.label_encoders[task].keys())
+                    if predicted_idx.item() < len(encoder_keys):
+                        predicted_label = encoder_keys[predicted_idx.item()]
+                    else:
+                        predicted_label = "unknown"
+                else:
+                    # Fallback labels
+                    if task == 'type':
+                        labels = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'other']
+                    elif task == 'area':
+                        labels = ['frontend', 'backend', 'database', 'testing', 'general']
+                    elif task == 'impact':
+                        labels = ['low', 'medium', 'high']
+                    else:
+                        labels = ['unknown']
+                    
+                    predicted_label = labels[predicted_idx.item() % len(labels)]
+                
+                confidence_score = confidence.item()
+                
+                predictions[task] = {
+                    'label': predicted_label,
+                    'confidence': confidence_score
+                }
+            
+            return predictions
+            
+        except Exception as e:
+            logger.error(f"Error in HAN prediction: {e}")
+            return None
     
     async def analyze_commit_message(self, message: str) -> Dict[str, Any]:
         """
@@ -68,16 +346,66 @@ class HANAIService:
             loop = asyncio.get_event_loop()
             result = await loop.run_in_executor(
                 None, 
-                self.analyzer.predict_commit_analysis, 
+                self._predict_with_han_model, 
                 message
             )
+            
+            if result is None:
+                return self._mock_commit_analysis(message)
+            
+            # Convert HAN results to the application's expected format
+            # The raw 'result' from the model has keys: 'commit_type', 'purpose', 'sentiment', 'tech_tag'
+            commit_type_pred = result.get('commit_type', {})
+            purpose_pred = result.get('purpose', {})
+            tech_tag_pred = result.get('tech_tag', {})
+            sentiment_pred = result.get('sentiment', {})
+
+            # Start with the model's main prediction for commit type
+            final_type = commit_type_pred.get('label', 'other')
+
+            # If the main type is 'other', use the 'purpose' prediction to refine it.
+            if final_type == 'other':
+                purpose_label = purpose_pred.get('label', 'Other').lower()
+                if 'fix' in purpose_label:
+                    final_type = 'fix'
+                elif 'feature' in purpose_label:
+                    final_type = 'feat'
+                elif 'doc' in purpose_label:
+                    final_type = 'docs'
+                elif 'test' in purpose_label:
+                    final_type = 'test'
+                elif 'refactor' in purpose_label:
+                    final_type = 'refactor'
+                elif 'style' in purpose_label:
+                    final_type = 'style'
+                elif 'build' in purpose_label or 'ci' in purpose_label:
+                    final_type = 'chore'
+
+            # Map sentiment to a simple impact score
+            sentiment_label = sentiment_pred.get('label', 'neutral')
+            impact_map = {'positive': 'low', 'neutral': 'medium', 'negative': 'high'}
+            final_impact = impact_map.get(sentiment_label, 'medium')
+
+            analysis_result = {
+                'type': final_type,
+                'category': final_type,  # Keep for compatibility
+                'tech_area': tech_tag_pred.get('label', 'general'),
+                'impact': final_impact,
+                'urgency': 'normal',  # Urgency is not predicted by this model
+                'confidence': {
+                    'type': commit_type_pred.get('confidence', 0.0),
+                    'area': tech_tag_pred.get('confidence', 0.0),
+                    'impact': sentiment_pred.get('confidence', 0.0)
+                },
+                'raw_model_output': result # Include raw output for debugging
+            }
             
             return {
                 'success': True,
                 'message': message,
-                'analysis': result,
+                'analysis': analysis_result,
                 'model_version': 'HAN-v1',
-                'confidence': result.get('confidence', {})
+                'confidence': analysis_result['confidence']
             }
             
         except Exception as e:

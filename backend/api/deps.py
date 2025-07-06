@@ -3,25 +3,16 @@
 
 # Import AsyncSession từ SQLAlchemy để làm việc với database async
 from sqlalchemy.ext.asyncio import AsyncSession
-
-# Import kết nối database từ module database
 from db.database import database
+from services.multifusion_ai_service import MultiFusionAIService
+from services.multifusion_v2_service import MultiFusionV2Service
 
-# Dependency (phụ thuộc) để lấy database session
 async def get_db() -> AsyncSession:
-    """
-    Dependency tạo và quản lý database session
-    
-    Cách hoạt động:
-    - Tạo một async session mới từ connection pool
-    - Yield session để sử dụng trong request
-    - Đảm bảo session được đóng sau khi request hoàn thành
-    
-    Returns:
-        AsyncSession: Session database async để tương tác với DB
-    """
-    # Tạo và quản lý session thông qua context manager
     async with database.session() as session:
-        # Yield session để sử dụng trong route
         yield session
-        # Session sẽ tự động đóng khi ra khỏi block with
+
+def get_multifusion_ai_service() -> MultiFusionAIService:
+    return MultiFusionAIService()
+
+def get_multifusion_v2_service() -> MultiFusionV2Service:
+    return MultiFusionV2Service()
