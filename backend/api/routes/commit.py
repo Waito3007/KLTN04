@@ -112,6 +112,7 @@ async def get_branch_commits(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
+                "modified_files": commit.modified_files,
                 "is_merge": commit.is_merge,
                 "merge_from_branch": commit.merge_from_branch,
                 "branch_name": commit.branch_name,

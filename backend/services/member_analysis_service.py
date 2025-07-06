@@ -5,12 +5,12 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import re
 import asyncio
-from services.han_real_ai_service import HANRealAIService
+from services.han_ai_service import HANAIService
 
 class MemberAnalysisService:
     def __init__(self, db: Session):        
         self.db = db
-        self.ai_service = HANRealAIService()
+        self.ai_service = HANAIService()
     
     def get_repository_members(self, repository_id: int) -> List[Dict[str, Any]]:
         """Lấy danh sách members của repository từ collaborators table và commit authors"""
@@ -303,7 +303,7 @@ class MemberAnalysisService:
         base_query = f"""
             SELECT 
                 id, sha, message, author_name, author_email,
-                date, branch_name, insertions, deletions, files_changed
+                date, branch_name, insertions, deletions, files_changed, modified_files
             FROM commits 
             WHERE repo_id = :repo_id 
                 AND LOWER(author_name) IN ({author_placeholders})
@@ -353,6 +353,9 @@ class MemberAnalysisService:
             # Simple pattern-based analysis
             analysis = self._analyze_commit_message(commit[2])  # commit.message
             
+            # Detect language from modified files
+            detected_language = self._detect_language_from_files(commit[10])  # modified_files is index 10
+            
             commit_info = {
                 "id": commit[0],
                 "sha": commit[1][:8] if commit[1] else "N/A",
@@ -360,6 +363,10 @@ class MemberAnalysisService:
                 "author": commit[3],
                 "date": commit[5].isoformat() if commit[5] else None,  # date is index 5
                 "branch": commit[6] or "main",
+                "insertions": commit[7] or 0,
+                "deletions": commit[8] or 0,
+                "files_changed": commit[9] or 0,
+                "detected_language": detected_language,
                 "stats": {
                     "insertions": commit[7] or 0,
                     "deletions": commit[8] or 0,
@@ -415,7 +422,7 @@ class MemberAnalysisService:
         base_query = f"""
             SELECT 
                 id, sha, message, author_name, author_email,
-                committer_date, branch_name, insertions, deletions, files_changed
+                committer_date, branch_name, insertions, deletions, files_changed, modified_files
             FROM commits 
             WHERE repo_id = :repo_id 
                 AND ({author_conditions})
@@ -460,7 +467,7 @@ class MemberAnalysisService:
         
         # Get AI analysis
         try:
-            # Sửa: Gọi đúng hàm analyze_commits_batch thay vì analyze_commits
+            # Sử dụng HAN AI Service mới
             ai_analysis_result = await self.ai_service.analyze_commits_batch(commit_messages)
             ai_analysis = {}
             # Chuẩn hóa kết quả: lấy từng commit analysis từ 'results' nếu có
@@ -486,14 +493,22 @@ class MemberAnalysisService:
         
         for i, commit in enumerate(commits_data):
             ai_result = ai_analysis.get(i, {}) if ai_analysis else {}
+            
             # Map lại các trường từ AI cho đúng chuẩn frontend
-            commit_type = ai_result.get("type", "other")
-            tech_area = ai_result.get("tech_area", "general")
-            # Nếu AI trả về label thô, ánh xạ lại
-            if 'label' in ai_result and not ai_result.get('type'):
-                commit_type = ai_result['label']
-            if 'label' in ai_result and not ai_result.get('tech_area'):
-                tech_area = ai_result['label']
+            # NEW: Ưu tiên lấy 'type' từ 'analysis', sau đó mới đến 'category'
+            if 'analysis' in ai_result and 'type' in ai_result['analysis']:
+                commit_type = ai_result['analysis']['type']
+            else:
+                commit_type = ai_result.get("type", ai_result.get("category", "other"))
+
+            if 'analysis' in ai_result and 'tech_area' in ai_result['analysis']:
+                tech_area = ai_result['analysis']['tech_area']
+            else:
+                tech_area = ai_result.get("tech_area", "general")
+            
+            # Detect language from modified files
+            detected_language = self._detect_language_from_files(commit[10])  # modified_files is index 10
+            
             commit_info = {
                 "id": commit[0],
                 "sha": commit[1][:8] if commit[1] else "N/A",
@@ -501,6 +516,10 @@ class MemberAnalysisService:
                 "author": commit[3],
                 "date": commit[5].isoformat() if commit[5] else None,
                 "branch": commit[6] or "main",
+                "insertions": commit[7] or 0,
+                "deletions": commit[8] or 0,
+                "files_changed": commit[9] or 0,
+                "detected_language": detected_language,
                 "stats": {
                     "insertions": commit[7] or 0,
                     "deletions": commit[8] or 0,
@@ -522,12 +541,15 @@ class MemberAnalysisService:
             total_additions += commit[7] or 0
             total_deletions += commit[8] or 0
         
+        # NEW: Return the raw AI analysis result directly
         return {
+            "success": True,
             "member": {"login": member_login, "display_name": member_login},
             "summary": {
                 "total_commits": len(commits_with_analysis),
                 "branch_filter": branch_name,
                 "ai_powered": True,
+                "model_used": "HAN AI",
                 "analysis_date": datetime.now().isoformat()
             },
             "commits": commits_with_analysis,
@@ -538,8 +560,230 @@ class MemberAnalysisService:
                     "total_additions": total_additions,
                     "total_deletions": total_deletions
                 }
+            },
+            "raw_ai_analysis": ai_analysis_result # NEW: Expose raw analysis
+        }
+    
+    async def get_member_commits_with_multifusion_v2_analysis(
+        self, 
+        repository_id: int, 
+        member_login: str, 
+        limit: int = 50,
+        branch_name: str = None
+    ) -> Dict[str, Any]:
+        """Lấy commits của member với MultiFusion V2 AI analysis"""
+        from services.multifusion_v2_service import MultiFusionV2Service
+        
+        # Get all author names associated with this member
+        all_author_names = self._get_all_author_names_for_member(repository_id, member_login)
+        
+        # Build query to match any of the associated author names
+        author_conditions = " OR ".join([f"LOWER(author_name) = LOWER(:author_name_{i})" for i in range(len(all_author_names))])
+        
+        base_query = f"""
+            SELECT 
+                id, sha, message, author_name, author_email,
+                committer_date, branch_name, insertions, deletions, files_changed, modified_files
+            FROM commits 
+            WHERE repo_id = :repo_id 
+                AND ({author_conditions})
+        """
+        
+        params = {
+            "repo_id": repository_id,
+            "limit": limit
+        }
+        
+        # Add all author names as parameters
+        for i, author_name in enumerate(all_author_names):
+            params[f"author_name_{i}"] = author_name
+        
+        # Add branch filter if specified
+        if branch_name:
+            base_query += " AND branch_name = :branch_name"
+            params["branch_name"] = branch_name
+            
+        base_query += " ORDER BY committer_date DESC LIMIT :limit"
+        
+        query = text(base_query)
+        
+        commits_data = self.db.execute(query, params).fetchall()
+        
+        if not commits_data:
+            return {
+                "member": {"login": member_login, "display_name": member_login},
+                "summary": {
+                    "total_commits": 0, 
+                    "message": f"No commits found{' on branch ' + branch_name if branch_name else ''}",
+                    "branch_filter": branch_name,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2",
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": [],
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        # Initialize MultiFusion V2 service
+        multifusion_v2 = MultiFusionV2Service()
+        
+        if not multifusion_v2.is_model_available():
+            # Fallback to HAN AI if MultiFusion V2 not available
+            print("MultiFusion V2 not available, falling back to HAN AI")
+            return await self.get_member_commits_with_ai_analysis(repository_id, member_login, limit, branch_name)
+        
+        # Prepare commits for AI analysis
+        commits_for_ai = []
+        for commit in commits_data:
+            # Skip commits with empty messages
+            if not commit[2]:  # message
+                continue
+                
+            # Detect language from modified files
+            Column('files_changed', Integer, nullable=True),            
+            detected_language = self._detect_language_from_files(commit[10])  # modified_files is index 10
+            
+            commits_for_ai.append({
+                'id': commit[1] or '',  # sha
+                'message': commit[2],   # message
+                'date': commit[5].isoformat() if commit[5] else '',  # committer_date
+                'lines_added': commit[7] or 0,    # insertions
+                'lines_removed': commit[8] or 0,  # deletions
+                'files_count': commit[9] or 1,    # files_changed
+                'detected_language': detected_language
+            })
+        
+        if not commits_for_ai:
+            return {
+                "member": {"login": member_login, "display_name": member_login},
+                "summary": {
+                    "total_commits": 0, 
+                    "message": "No valid commits for AI analysis",
+                    "branch_filter": branch_name,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2",
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": [],
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        # Get AI analysis from MultiFusion V2
+        try:
+            ai_analysis_result = multifusion_v2.analyze_member_commits(commits_for_ai)
+            
+            if "error" in ai_analysis_result:
+                print(f"MultiFusion V2 analysis failed: {ai_analysis_result['error']}")
+                # Fallback to HAN AI
+                return await self.get_member_commits_with_ai_analysis(repository_id, member_login, limit, branch_name)
+                
+        except Exception as e:
+            print(f"MultiFusion V2 analysis failed with exception: {e}")
+            # Fallback to HAN AI
+            return await self.get_member_commits_with_ai_analysis(repository_id, member_login, limit, branch_name)
+        
+        # Combine commits with AI analysis
+        commits_with_analysis = []
+        commit_type_stats = defaultdict(int)
+        tech_stats = defaultdict(int)
+        total_additions = 0
+        total_deletions = 0
+        
+        # Get individual commit predictions from analysis result
+        commit_predictions = ai_analysis_result.get('commit_predictions', [])
+        
+        for i, commit in enumerate(commits_data):
+            # Skip commits with empty messages
+            if not commit[2]:
+                continue
+                
+            # Get AI prediction for this commit
+            ai_prediction = {}
+            if i < len(commit_predictions):
+                ai_prediction = commit_predictions[i]
+            
+            # Extract prediction data
+            commit_type = ai_prediction.get("predicted_type", "other")
+            confidence = ai_prediction.get("confidence", 0.0)
+            
+            # Map tech area based on commit type
+            tech_area = self._map_commit_type_to_tech_area(commit_type)
+            
+            # Detect language from modified files
+            detected_language = self._detect_language_from_files(commit[10])
+            
+            commit_info = {
+                "id": commit[0],
+                "sha": commit[1][:8] if commit[1] else "N/A",
+                "message": commit[2],
+                "author": commit[3],
+                "date": commit[5].isoformat() if commit[5] else None,
+                "branch": commit[6] or "main",
+                "insertions": commit[7] or 0,
+                "deletions": commit[8] or 0,
+                "files_changed": commit[9] or 0,
+                "detected_language": detected_language,
+                "stats": {
+                    "insertions": commit[7] or 0,
+                    "deletions": commit[8] or 0,
+                    "files_changed": commit[9] or 0
+                },
+                "analysis": {
+                    "type": commit_type,
+                    "type_icon": self._get_type_icon(commit_type),
+                    "tech_area": tech_area,
+                    "confidence": confidence,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2"
+                }
+            }
+            
+            commits_with_analysis.append(commit_info)
+            commit_type_stats[commit_type] += 1
+            tech_stats[tech_area] += 1
+            total_additions += commit[7] or 0
+            total_deletions += commit[8] or 0
+        
+        # Get overall statistics from AI analysis
+        overall_stats = ai_analysis_result.get('overall_statistics', {})
+        
+        return {
+            "member": {"login": member_login, "display_name": member_login},
+            "summary": {
+                "total_commits": len(commits_with_analysis),
+                "branch_filter": branch_name,
+                "ai_powered": True,
+                "ai_model": "MultiFusion V2",
+                "analysis_date": datetime.now().isoformat()
+            },
+            "commits": commits_with_analysis,
+            "statistics": {
+                "commit_types": dict(commit_type_stats),
+                "tech_analysis": dict(tech_stats),
+                "productivity": {
+                    "total_additions": total_additions,
+                    "total_deletions": total_deletions
+                },
+                "ai_insights": overall_stats
             }
         }
+
+    def _map_commit_type_to_tech_area(self, commit_type: str) -> str:
+        """Map AI-predicted commit type to technology area"""
+        type_to_tech = {
+            "feature": "Frontend",
+            "bug_fix": "Bugfix",
+            "documentation": "Documentation",
+            "refactoring": "Refactoring",
+            "test": "Testing",
+            "build": "Build",
+            "configuration": "Configuration",
+            "merge": "Version Control",
+            "performance": "Performance",
+            "security": "Security",
+            "dependency": "Dependencies"
+        }
+        return type_to_tech.get(commit_type, "General")
     
     def _analyze_commit_message(self, message: str) -> Dict[str, str]:
         """Simple pattern-based commit analysis"""
@@ -594,35 +838,164 @@ class MemberAnalysisService:
         return icons.get(commit_type, "📦")
     
     def _get_all_author_names_for_member(self, repository_id: int, member_login: str) -> List[str]:
-        """Get all author names associated with a member - CONSERVATIVE approach based on email evidence only"""
-        author_names = []
-        
-        # 1. Add the member login itself
-        author_names.append(member_login)
-        
-        # 2. Only add names that have CLEAR email evidence of being the same person
+        """Get all author names associated with a member - MORE INCLUSIVE approach."""
+        # Start with the primary login name
+        author_names = {member_login.lower()}
+
+        # Find all author names from the commits table for this repo
         query = text("""
             SELECT DISTINCT author_name, author_email
             FROM commits 
             WHERE repo_id = :repo_id
         """)
-        
         all_authors = self.db.execute(query, {"repo_id": repository_id}).fetchall()
-        
+
+        # Find the primary email of the member from the collaborators table if they exist
+        primary_email_query = text("""
+            SELECT email FROM collaborators WHERE LOWER(github_username) = LOWER(:member_login)
+        """)
+        primary_email_result = self.db.execute(primary_email_query, {"member_login": member_login}).fetchone()
+        primary_email = primary_email_result[0] if primary_email_result else None
+
         for author_name, author_email in all_authors:
-            # Only check GitHub noreply email pattern (most reliable)
+            # 1. Match by primary email (if available)
+            if primary_email and author_email and primary_email.lower() == author_email.lower():
+                author_names.add(author_name.lower())
+                continue
+
+            # 2. Match by GitHub noreply email convention
             if author_email and '@users.noreply.github.com' in author_email:
-                email_parts = author_email.split('@')[0]
-                if '+' in email_parts:
-                    github_username = email_parts.split('+')[1]
-                    # Only match if GitHub username exactly matches member login
-                    if github_username.lower() == member_login.lower():
-                        if author_name not in author_names:
-                            author_names.append(author_name)
+                if f"+{member_login.lower()}@" in author_email.lower():
+                    author_names.add(author_name.lower())
+                    continue
             
-            # Exact name match (case-insensitive) - very conservative
-            if author_name.lower() == member_login.lower():
-                if author_name not in author_names:
-                    author_names.append(author_name)
+            # 3. Match by name similarity (as a fallback)
+            if self._are_names_similar(member_login, author_name):
+                author_names.add(author_name.lower())
+
+        return list(author_names)
+
+    def _are_names_similar(self, name1: str, name2: str) -> bool:
+        """Basic name similarity check."""
+        if not name1 or not name2:
+            return False
+        return name1.lower() in name2.lower() or name2.lower() in name1.lower()
+    
+    def _get_member_commits_raw(self, repository_id: int, member_login: str, limit: int = 50, branch_name: str = None):
+        """Get raw commit data for a member"""
         
-        return author_names
+        # Get all author names associated with this member
+        all_author_names = self._get_all_author_names_for_member(repository_id, member_login)
+        
+        if not all_author_names:
+            all_author_names = [member_login]  # Fallback
+        
+        # Create IN clause for multiple author names
+        author_placeholders = ', '.join([f':author_{i}' for i in range(len(all_author_names))])
+        
+        # Query commits của member với multiple author names và branch filter
+        base_query = f"""
+            SELECT 
+                sha, author_name, message, committer_date, 
+                insertions, deletions, files_changed, modified_files
+            FROM commits 
+            WHERE repo_id = :repo_id 
+                AND LOWER(author_name) IN ({author_placeholders})
+        """
+        
+        params = {
+            "repo_id": repository_id,
+            "limit": limit
+        }
+        
+        # thêm tên tác giả vào params
+        for i, author_name in enumerate(all_author_names):
+            params[f"author_{i}"] = author_name.lower()
+        
+        # Add branch filter if specified
+        if branch_name:
+            base_query += " AND branch_name = :branch_name"
+            params["branch_name"] = branch_name
+            
+        base_query += " ORDER BY committer_date DESC LIMIT :limit"
+        
+        query = text(base_query)
+        
+        commits_data = self.db.execute(query, params).fetchall()
+        
+        # Add detected language to each commit
+        enhanced_commits = []
+        for commit in commits_data:
+            detected_language = self._detect_language_from_files(commit[7])  # modified_files is index 7
+            enhanced_commit = list(commit) + [detected_language]  # Add detected_language
+            enhanced_commits.append(enhanced_commit)
+        
+        return enhanced_commits
+    
+    def _detect_language_from_files(self, modified_files) -> str:
+        """Phát hiện ngôn ngữ chính từ danh sách file thay đổi"""
+        if not modified_files:
+            return "unknown_language"
+        
+        # Parse JSON if it's a string
+        import json
+        try:
+            if isinstance(modified_files, str):
+                files_list = json.loads(modified_files)
+            elif isinstance(modified_files, list):
+                files_list = modified_files
+            else:
+                return "unknown_language"
+        except:
+            return "unknown_language"
+        
+        # Map file extensions to languages
+        language_map = {
+            '.py': 'python',
+            '.js': 'javascript', 
+            '.jsx': 'javascript',
+            '.ts': 'typescript',
+            '.tsx': 'typescript',
+            '.java': 'java',
+            '.cpp': 'cpp',
+            '.c': 'c',
+            '.cs': 'csharp',
+            '.php': 'php',
+            '.rb': 'ruby',
+            '.go': 'go',
+            '.rs': 'rust',
+            '.swift': 'swift',
+            '.kt': 'kotlin',
+            '.scala': 'scala',
+            '.r': 'r',
+            '.sql': 'sql',
+            '.sh': 'shell',
+            '.html': 'html',
+            '.css': 'css',
+            '.scss': 'css',
+            '.sass': 'css',
+            '.vue': 'vue',
+            '.json': 'json',
+            '.xml': 'xml',
+            '.yaml': 'yaml',
+            '.yml': 'yaml',
+            '.md': 'markdown',
+            '.dockerfile': 'dockerfile'
+        }
+        
+        # Count languages by file extensions
+        language_count = {}
+        for file_path in files_list:
+            if isinstance(file_path, str):
+                # Get file extension
+                import os
+                _, ext = os.path.splitext(file_path.lower())
+                language = language_map.get(ext, 'other')
+                language_count[language] = language_count.get(language, 0) + 1
+        
+        # Return most common language, fallback to python
+        if language_count:
+            most_common_lang = max(language_count.items(), key=lambda x: x[1])[0]
+            return most_common_lang if most_common_lang != 'other' else 'python'
+        
+        return "python"  # Default fallback

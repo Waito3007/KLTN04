@@ -238,11 +238,17 @@ def prepare_label_encoders(labels):
     num_classes = {}
     
     for task, label_set in label_sets.items():
-        sorted_labels = sorted(list(label_set))
-        label_encoders[task] = {label: idx for idx, label in enumerate(sorted_labels)}
-        num_classes[task] = len(sorted_labels)
-        
-        print(f"  {task}: {len(sorted_labels)} classes -> {sorted_labels}")
+        if task == 'commit_type':
+            # Remap commit_type to a more granular set of labels
+            sorted_labels = sorted(list(label_set))
+            label_encoders[task] = {label: idx for idx, label in enumerate(sorted_labels)}
+            num_classes[task] = len(sorted_labels)
+            print(f"  {task}: {len(sorted_labels)} classes -> {sorted_labels}")
+        else:
+            sorted_labels = sorted(list(label_set))
+            label_encoders[task] = {label: idx for idx, label in enumerate(sorted_labels)}
+            num_classes[task] = len(sorted_labels)
+            print(f"  {task}: {len(sorted_labels)} classes -> {sorted_labels}")
     
     return label_encoders, num_classes
 

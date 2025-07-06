@@ -1,12 +1,14 @@
-# File: backend/api/routes/commit_routes.py
-from fastapi import APIRouter, HTTPException, UploadFile, File, Header
+# File: backend/api/routes/commit_routes.py xóa đi 
+from fastapi import APIRouter, HTTPException, UploadFile, File, Header, Depends
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 import pandas as pd
 from services.model_loader import predict_commit
+from services.multifusion_ai_service import MultiFusionAIService
 from pathlib import Path
 import tempfile
 import httpx
+from datetime import datetime
 
 router = APIRouter(prefix="/api/commits", tags=["Commit Analysis"])
 
@@ -135,18 +137,43 @@ async def analyze_github_commits(
             status_code=500,
             detail=f"Error analyzing GitHub commits: {str(e)}"
         )
-@router.post("/analyze-text")
+@router.get("/analyze-text")
 async def analyze_commit_text(message: str):
     """
     Phân tích một commit message dạng text
     
     Args:
-        message: Nội dung commit message
+        message: Nội dung commit message (query parameter)
     
     Returns:
         {"is_critical": 0|1, "message": string}
     """
     try:
+        is_critical = predict_commit(message)
+        return {
+            "is_critical": is_critical,
+            "message": "Phân tích thành công",
+            "input_sample": message[:100] + "..." if len(message) > 100 else message
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi phân tích: {str(e)}")
+
+@router.post("/analyze-text-post")
+async def analyze_commit_text_post(request_data: dict):
+    """
+    Phân tích một commit message dạng text (POST method)
+    
+    Args:
+        request_data: {"message": "commit message text"}
+    
+    Returns:
+        {"is_critical": 0|1, "message": string}
+    """
+    try:
+        message = request_data.get("message", "")
+        if not message:
+            raise HTTPException(status_code=400, detail="Missing 'message' field")
+            
         is_critical = predict_commit(message)
         return {
             "is_critical": is_critical,
