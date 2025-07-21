@@ -8,7 +8,9 @@ from services.multifusion_ai_service import MultiFusionAIService
 from pathlib import Path
 import tempfile
 import httpx
+import asyncio
 from datetime import datetime
+from api.routes.commit import fetch_raw_github_content
 
 router = APIRouter(prefix="/api/commits", tags=["Commit Analysis"])
 
@@ -19,7 +21,8 @@ async def analyze_github_commits(
     authorization: str = Header(..., alias="Authorization"),
     per_page: int = 30,
     since: Optional[str] = None,
-    until: Optional[str] = None
+    until: Optional[str] = None,
+    include_diff: bool = False  # New parameter
 ):
     """
     Phân tích commit từ repository GitHub
@@ -31,6 +34,7 @@ async def analyze_github_commits(
         per_page: Số commit tối đa cần phân tích (1-100)
         since: Lọc commit từ ngày (YYYY-MM-DDTHH:MM:SSZ)
         until: Lọc commit đến ngày (YYYY-MM-DDTHH:MM:SSZ)
+        include_diff: Có bao gồm nội dung diff đầy đủ của mỗi commit hay không (mặc định: False)
     
     Returns:
         {
@@ -49,6 +53,11 @@ async def analyze_github_commits(
                 status_code=400,
                 detail="per_page must be between 1 and 100"
             )
+
+        # Extract token from Authorization header
+        token = authorization.replace("Bearer ", "")
+        if not token:
+            raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
 
         # Configure GitHub API request
         headers = {
@@ -81,15 +90,31 @@ async def analyze_github_commits(
             commits_data = response.json()
 
         # Prepare analysis data
-        commits_for_analysis = [
-            {
-                "id": commit["sha"],
-                "message": commit["commit"]["message"],
-                "date": commit["commit"]["committer"]["date"] if commit["commit"]["committer"] else None
-            }
-            for commit in commits_data
-            if commit.get("sha") and commit.get("commit", {}).get("message")
-        ]
+        commits_for_analysis = []
+        for commit_data in commits_data:
+            commit_sha = commit_data.get("sha")
+            commit_message = commit_data.get("commit", {}).get("message")
+            commit_date = commit_data.get("commit", {}).get("committer", {}).get("date")
+
+            if commit_sha and commit_message:
+                commit_info = {
+                    "id": commit_sha,
+                    "message": commit_message,
+                    "date": commit_date
+                }
+                
+                if include_diff:
+                    try:
+                        # Fetch full diff content for the commit
+                        diff_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}"
+                        full_commit_details = await fetch_raw_github_content(diff_url, token)
+                        commit_info["diff_content"] = full_commit_details
+                    except Exception as e:
+                        # Log error but don't fail the whole request
+                        print(f"Warning: Could not fetch diff for commit {commit_sha}: {e}")
+                        commit_info["diff_content"] = "Error fetching diff"
+                
+                commits_for_analysis.append(commit_info)
 
         # Analyze commits
         results = {
@@ -106,12 +131,16 @@ async def analyze_github_commits(
             if is_critical:
                 results["critical"] += 1
             
-            results["details"].append({
+            detail_entry = {
                 "id": commit["id"],
                 "is_critical": is_critical,
                 "message_preview": commit['message'][:100] + "..." if len(commit['message']) > 100 else commit['message'],
                 "date": commit["date"]
-            })
+            }
+            if include_diff:
+                detail_entry["diff_content"] = commit.get("diff_content", "")
+            
+            results["details"].append(detail_entry)
 
         # Calculate percentage
         if results["total"] > 0:

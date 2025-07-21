@@ -61,3 +61,12 @@ class CommitAnalysis(BaseModel):
     commit: CommitOut
     analysis: Dict[str, Any]
     recommendations: List[str]
+
+
+class CommitAreaAnalysisRequest(BaseModel):
+    commit_message: str
+    diff_content: str
+    files_count: int
+    lines_added: int
+    lines_removed: int
+    total_changes: int

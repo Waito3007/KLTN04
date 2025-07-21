@@ -189,7 +189,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     setSyncLoading(true);
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches/${selectedBranch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
+        `http://localhost:8000/api/github/${owner}/${repo}/branches/${selectedBranch}/sync-commits?include_stats=true&per_page=100&max_pages=5&include_diff=true`,
         {},
         {
           headers: {

@@ -232,6 +232,7 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
             "change_type": change_type,
             "commit_size": commit_size,
             "last_synced": datetime.utcnow(),
+            "diff_content": commit_data.get("diff_content"),
             # User IDs và permissions sẽ được resolve sau nếu có user service
         }
         
