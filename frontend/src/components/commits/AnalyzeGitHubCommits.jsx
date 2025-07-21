@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button, Badge, Popover, List, Typography, Divider, Spin, Tag, Alert, Tooltip } from 'antd';
-import { ExclamationCircleFilled, CheckCircleFilled, InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Badge, Popover, List, Typography, Divider, Spin, Tag, Alert, Tooltip, Modal } from 'antd';
+import { ExclamationCircleFilled, CheckCircleFilled, InfoCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Text, Title } = Typography;
@@ -10,6 +10,8 @@ const AnalyzeGitHubCommits = ({ repo }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentDiff, setCurrentDiff] = useState('');
 
   const analyzeCommits = async () => {
     try {
@@ -30,6 +32,7 @@ const AnalyzeGitHubCommits = ({ repo }) => {
           },
           params: { 
             per_page: 10,
+            include_diff: true, // Request full diff content
             // Add cache busting to avoid stale data
             timestamp: Date.now()
           },
@@ -91,6 +94,16 @@ const AnalyzeGitHubCommits = ({ repo }) => {
       ? <ExclamationCircleFilled /> 
       : <CheckCircleFilled />;
   };
+  const handleShowDiff = (diffContent) => {
+    setCurrentDiff(diffContent);
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setCurrentDiff('');
+  };
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -160,6 +173,17 @@ const AnalyzeGitHubCommits = ({ repo }) => {
                 >
                   {item.message_preview}
                 </Text>
+                {item.diff_content && item.diff_content !== "Error fetching diff" && (
+                  <Button 
+                    type="link" 
+                    size="small" 
+                    icon={<FileTextOutlined />} 
+                    onClick={() => handleShowDiff(item.diff_content)}
+                    style={{ paddingLeft: 0 }}
+                  >
+                    View Diff
+                  </Button>
+                )}
               </div>
             </List.Item>
           )}
@@ -175,49 +199,65 @@ const AnalyzeGitHubCommits = ({ repo }) => {
   };
 
   return (
-    <Popover 
-      content={renderContent()}
-      title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>Commit Analysis</span>
-          {analysis && (
-            <Badge 
-              count={`${analysis.critical_percentage}%`} 
-              style={{ 
-                backgroundColor: analysis.critical > 0 ? '#f5222d' : '#52c41a'
-              }} 
-            />
-          )}
-        </div>
-      }
-      trigger="click"
-      open={popoverVisible}
-      onOpenChange={handlePopoverOpen}
-      overlayStyle={{ width: 350 }}
-      placement="bottomRight"
-    >
-      <Badge 
-        count={analysis?.critical || 0} 
-        color={getStatusColor()}
-        offset={[-10, 10]}
+    <>
+      <Popover 
+        content={renderContent()}
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Commit Analysis</span>
+            {analysis && (
+              <Badge 
+                count={`${analysis.critical_percentage}%`} 
+                style={{ 
+                  backgroundColor: analysis.critical > 0 ? '#f5222d' : '#52c41a'
+                }} 
+              />
+            )}
+          </div>
+        }
+        trigger="click"
+        open={popoverVisible}
+        onOpenChange={handlePopoverOpen}
+        overlayStyle={{ width: 350 }}
+        placement="bottomRight"
       >
-        <Button 
-          type={error ? 'default' : analysis ? (analysis.critical ? 'danger' : 'success') : 'default'}
-          icon={getStatusIcon()}
-          loading={loading}
-          onClick={(e) => e.stopPropagation()}
-          style={{ 
-            marginLeft: 'auto',
-            fontWeight: 500,
-            borderRadius: 20,
-            padding: '0 16px',
-            border: error ? '1px solid #faad14' : undefined
-          }}
+        <Badge 
+          count={analysis?.critical || 0} 
+          color={getStatusColor()}
+          offset={[-10, 10]}
         >
-          {getStatusText()}
-        </Button>
-      </Badge>
-    </Popover>
+          <Button 
+            type={error ? 'default' : analysis ? (analysis.critical ? 'danger' : 'success') : 'default'}
+            icon={getStatusIcon()}
+            loading={loading}
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              marginLeft: 'auto',
+              fontWeight: 500,
+              borderRadius: 20,
+              padding: '0 16px',
+              border: error ? '1px solid #faad14' : undefined
+            }}
+          >
+            {getStatusText()}
+          </Button>
+        </Badge>
+      </Popover>
+
+      <Modal
+        title="Commit Diff"
+        open={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null}
+        width={800}
+        style={{ top: 20 }}
+        bodyStyle={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}
+      >
+        <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          {currentDiff}
+        </pre>
+      </Modal>
+    </>
   );
 };
 

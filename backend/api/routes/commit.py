@@ -28,16 +28,19 @@ USAGE GUIDELINES:
 - Use SYNC endpoints to populate/update database from GitHub
 - Use ANALYTICS endpoints for insights and statistics
 """
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, BackgroundTasks, status, Request
+from fastapi.responses import JSONResponse
 import httpx
 import asyncio
 import logging
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from services.commit_service import (
-    save_commit, save_multiple_commits, get_commits_by_repo_id, 
-    get_commit_by_sha, get_commit_statistics
+    get_commit_by_sha, save_commit, get_commits_by_branch_safe, 
+    get_commits_by_repo_id, get_commit_statistics, 
+    get_enhanced_commit_statistics, analyze_commit_trends
 )
+from core.security import security # Import security dependency
 from services.repo_service import get_repo_id_by_owner_and_name, get_repository
 from services.branch_service import get_branches_by_repo_id
 from services.github_service import fetch_commits, fetch_commit_details
@@ -65,6 +68,27 @@ async def github_api_call(url: str, token: str, params: dict = None):
             )
         
         return response.json()
+
+async def fetch_raw_github_content(url: str, token: str):
+    """Helper function to fetch raw content (e.g., diffs) from GitHub API."""
+    headers = {
+        "Authorization": token,
+        "Accept": "application/vnd.github.v3.diff", # Yêu cầu định dạng diff
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.get(url, headers=headers)
+        
+        if response.status_code == 429:
+            raise HTTPException(status_code=429, detail="GitHub API rate limit exceeded")
+        elif response.status_code != 200:
+            logger.error(f"GitHub API error fetching raw content from {url}. Status: {response.status_code}, Detail: {response.text}")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"GitHub API error fetching raw content: {response.text}"
+            )
+        
+        return response.text # Trả về văn bản thuần túy
 
 # ==================== NEW BRANCH-SPECIFIC COMMIT ENDPOINTS ====================
 
@@ -116,7 +140,8 @@ async def get_branch_commits(
                 "is_merge": commit.is_merge,
                 "merge_from_branch": commit.merge_from_branch,
                 "branch_name": commit.branch_name,
-                "author_role_at_commit": commit.author_role_at_commit
+                "author_role_at_commit": commit.author_role_at_commit,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -218,7 +243,8 @@ async def compare_branch_commits(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
-                "is_merge": commit.is_merge
+                "is_merge": commit.is_merge,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -602,7 +628,8 @@ async def get_repository_commits_from_database(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
-                "is_merge": commit.is_merge
+                "is_merge": commit.is_merge,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -854,6 +881,7 @@ async def sync_branch_commits_enhanced(
     per_page: int = Query(100, ge=1, le=100, description="Number of commits per page"),
     max_pages: int = Query(10, ge=1, le=50, description="Maximum pages to fetch"),
     include_stats: bool = Query(True, description="Include detailed commit statistics"),
+    include_diff: bool = Query(False, description="Include commit diff content (slower)"),
     force_update: bool = Query(True, description="Force update existing commits with new data")
 ):
     """
@@ -940,8 +968,8 @@ async def sync_branch_commits_enhanced(
                 break
             
             # Enhance commits with detailed stats if requested
-            if include_stats:
-                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats...")
+            if include_stats or include_diff:
+                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats/diff...")
                 for commit in commits_data:
                     sha = commit.get("sha")
                     if sha:
@@ -951,8 +979,59 @@ async def sync_branch_commits_enhanced(
                             detailed_commit = await github_api_call(detail_url, token)
                             
                             if detailed_commit:
-                                commit["stats"] = detailed_commit.get("stats", {})
-                                commit["files"] = detailed_commit.get("files", [])
+                                if include_stats:
+                                    commit["stats"] = detailed_commit.get("stats", {})
+                                    commit["files"] = detailed_commit.get("files", [])
+                                
+                                if include_diff:
+                                    full_diff_content = None
+                                    # Ưu tiên: Lấy diff bằng GitHub Compare API (so sánh với commit cha)
+                                    parents = commit.get("parents")
+                                    parent_sha = parents[0].get("sha") if parents and len(parents) > 0 else None
+
+                                    if parent_sha:
+                                        compare_url = f"https://api.github.com/repos/{owner}/{repo}/compare/{parent_sha}...{sha}"
+                                        try:
+                                            compare_response = await github_api_call(compare_url, token)
+                                            # Compare API trả về JSON, trường 'patch' chứa diff
+                                            if compare_response and compare_response.get("files"):
+                                                compare_diff_lines = []
+                                                for file_data in compare_response["files"]:
+                                                    if file_data.get("patch"):
+                                                        compare_diff_lines.append(file_data["patch"])
+                                                full_diff_content = "\n".join(compare_diff_lines)
+                                                logger.debug(f"Successfully fetched diff via Compare API for {sha}. Length: {len(full_diff_content) if full_diff_content else 0}")
+                                            else:
+                                                logger.debug(f"Compare API returned no files or patch for {sha}")
+                                        except Exception as compare_e:
+                                            logger.warning(f"Could not fetch diff via Compare API for {sha}: {compare_e}. Falling back to detailed_commit patch.")
+                                    else:
+                                        logger.debug(f"Commit {sha} has no parent. Skipping Compare API call.")
+
+                                    # Dự phòng: Nếu Compare API không thành công hoặc không có diff, sử dụng patch từ detailed_commit
+                                    if not full_diff_content and detailed_commit and detailed_commit.get("files"):
+                                        patch_content_lines = []
+                                        for file_diff in detailed_commit["files"]:
+                                            if file_diff.get("patch"):
+                                                patch_content_lines.append(file_diff["patch"])
+                                        full_diff_content = "\n".join(patch_content_lines)
+                                        logger.debug(f"Used fallback patch content from detailed_commit for {sha}. Length: {len(full_diff_content) if full_diff_content else 0}")
+                                        logger.debug(f"Detailed commit files for fallback: {[(f.get('filename'), len(f.get('patch', ''))) for f in detailed_commit.get('files', [])]}")
+                                    elif not full_diff_content:
+                                        logger.debug(f"No diff content available for {sha} after all attempts.")
+
+                                    if full_diff_content:
+                                        # Lọc bỏ các dòng tiêu đề Git không mong muốn (diff --git, index, ---, +++)
+                                        filtered_diff_lines = []
+                                        for line in full_diff_content.splitlines():
+                                            if not (line.startswith("diff --git") or \
+                                                    line.startswith("index ") or \
+                                                    line.startswith("--- a/") or \
+                                                    line.startswith("+++ b/")):
+                                                filtered_diff_lines.append(line)
+                                        commit["diff_content"] = "\n".join(filtered_diff_lines)
+                                    else:
+                                        commit["diff_content"] = ""
                                 
                         except Exception as e:
                             logger.warning(f"Could not fetch details for commit {sha}: {e}")
@@ -1133,7 +1212,8 @@ async def analyze_single_commit(
                     "modified_files": commit.modified_files,
                     "file_types": commit.file_types,
                     "modified_directories": commit.modified_directories
-                }
+                },
+                "diff_content": commit.diff_content
             },
             "analysis": {
                 "pattern_analysis": pattern_analysis,
@@ -1394,37 +1474,20 @@ async def compare_commits_github(
     repo: str,
     base: str,
     head: str,
-    request: Request = None
+    token: str = Depends(security)
 ):
     """
     Compare two commits using GitHub API to get detailed change information
     """
     try:
         from services.github_service import get_commit_comparison
-        
-        # Get user token
-        token = None
-        if hasattr(request, 'headers'):
-            auth_header = request.headers.get("Authorization", "")
-            if auth_header.startswith(("Bearer ", "token ")):
-                token = auth_header.split(" ", 1)[1]
-        
-        # Get comparison data
-        comparison = await get_commit_comparison(owner, repo, base, head, token)
-        
-        if not comparison:
-            raise HTTPException(status_code=404, detail="Comparison not found")
-        
-        return {
-            "success": True,
-            "repository": f"{owner}/{repo}",
-            "comparison": {
-                "base": base,
-                "head": head,
-                **comparison
-            }
-        }
-        
+        comparison_data = await get_commit_comparison(owner, repo, base, head, token)
+        return comparison_data
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        logger.error(f"Error comparing commits {base}...{head}: {e}")
+        logger.error(f"Error comparing commits {base}...{head} for {owner}/{repo}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to compare commits: {str(e)}")
+
+
+

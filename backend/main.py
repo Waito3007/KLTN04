@@ -1,6 +1,7 @@
 # backend/main.py
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from core.lifespan import lifespan
 from core.config import setup_middlewares
 from core.logger import setup_logger
@@ -12,6 +13,7 @@ from api.routes.sync import sync_router
 from api.routes.contributors import router as contributors_router
 from api.routes.member_analysis import router as member_analysis_router
 from api.routes.commit_routes import router as commit_router
+from api.routes.area_analysis import area_analysis_router # New import
 import sys
 import os
 
@@ -25,6 +27,8 @@ setup_logger()  # Bật logger trước khi chạy app
 
 app = FastAPI(lifespan=lifespan)
 
+# PI(lifespan=lifespan)
+
 setup_middlewares(app)
 
 # Include routers trực tiếp
@@ -36,6 +40,7 @@ app.include_router(contributors_router, prefix="/api/contributors")
 app.include_router(member_analysis_router)  # Already has /api prefix
 app.include_router(repositories_router)  # Already has /api prefix
 app.include_router(commit_router)  # Already has /api prefix
+app.include_router(area_analysis_router) # New router
 #app.include_router(ai_router, prefix="/api/ai")
 
 @app.get("/")
