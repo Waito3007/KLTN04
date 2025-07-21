@@ -5,6 +5,7 @@ import { Card, Row, Col, Typography, Empty, message, Spin } from 'antd';
 import MemberList from './components/MemberList';
 import CommitAnalyst from './components/CommitAnalyst';
 import AreaAnalyst from './components/AreaAnalyst';
+import RiskAnalyst from './components/RiskAnalyst'; // New import for RiskAnalyst
 import CommitList from './components/CommitList';
 import { Tabs } from 'antd';
 import MultiFusionInsights from './components/MultiFusionInsights';
@@ -219,10 +220,11 @@ const RepositoryMembers = ({ selectedRepo }) => {
           setMemberCommits({
             statistics: {
               commit_types: data.analysis.commit_type_distribution || {},
-              tech_analysis: data.statistics.tech_analysis || {}, // Lấy tech_analysis từ phản hồi backend
+              tech_analysis: data.statistics?.tech_analysis || {},
+              risk_analysis: data.statistics?.risk_analysis || {},
               productivity: data.analysis.productivity_metrics || {}
             },
-            commits: data.analysis.commits || [],
+            commits: data.commits || [],
             summary: {
               total_commits: data.analysis.total_commits || 0,
               ai_powered: true,
@@ -359,6 +361,13 @@ const RepositoryMembers = ({ selectedRepo }) => {
                   label: '🌐 Lĩnh vực công nghệ',
                   children: (
                     <AreaAnalyst memberCommits={memberCommits} />
+                  )
+                },
+                {
+                  key: 'riskAnalysis',
+                  label: '⚠️ Phân tích rủi ro',
+                  children: (
+                    <RiskAnalyst memberCommits={memberCommits} />
                   )
                 },
                 {
