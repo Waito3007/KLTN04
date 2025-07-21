@@ -173,12 +173,48 @@ export const useTasks = (selectedRepo, dataSourcePreference = 'auto') => {
     }
   }, [selectedRepo, fetchTasks]);
 
-  const updateTaskStatus = useCallback(async (taskId, newStatus) => {
+  const updateTaskStatus = useCallback(async (taskId, newStatus, options = {}) => {
+    const { optimistic = false } = options;
     const taskToUpdate = tasks.find(t => t.id === taskId);
     if (!taskToUpdate) return;
 
-    await updateTask(taskId, { ...taskToUpdate, status: newStatus });
-  }, [tasks, updateTask]);
+    // Optimistic update: Update UI immediately
+    if (optimistic) {
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+        )
+      );
+    }
+
+    try {
+      await taskAPI.update(
+        selectedRepo.owner.login,
+        selectedRepo.name,
+        taskId,
+        { ...taskToUpdate, status: newStatus }
+      );
+      // If not optimistic, or if optimistic and API call succeeds, refresh from server
+      if (!optimistic) {
+        await fetchTasks();
+      } else {
+        // If optimistic and API succeeds, ensure local state is consistent (optional, but good practice)
+        // No need to fetchTasks if optimistic update was correct
+      }
+      message.success('Cập nhật trạng thái task thành công!');
+    } catch (error) {
+      console.error('API failed to update task status:', error);
+      message.error('Lỗi khi cập nhật trạng thái task!');
+      // Revert optimistic update if API call fails
+      if (optimistic) {
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === taskId ? { ...task, status: taskToUpdate.status } : task
+          )
+        );
+      }
+    }
+  }, [tasks, selectedRepo, fetchTasks]);
 
   const deleteTask = useCallback(async (taskId) => {
     try {
