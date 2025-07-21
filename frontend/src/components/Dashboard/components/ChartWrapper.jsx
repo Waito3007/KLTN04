@@ -1,5 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { Pie, Bar } from 'react-chartjs-2';
+import { Chart, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+
+// Đăng ký các thành phần cần thiết cho Chart.js
+Chart.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Wrapper component để handle chart cleanup
 export const ChartWrapper = ({ type, data, options, style }) => {
