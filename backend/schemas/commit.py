@@ -31,12 +31,14 @@ class CommitCreate(BaseModel):
     parent_sha: Optional[str] = Field(None, description="Parent commit SHA")
     branch_name: Optional[str] = Field(None, description="Branch name")
     merge_from_branch: Optional[str] = Field(None, description="Source branch for merge commits")
+    diff_content: Optional[str] = Field(None, description="Diff content for the commit")
 
 
 class CommitOut(CommitCreate):
     id: int
     created_at: Optional[datetime] = None
     last_synced: Optional[datetime] = None
+    diff_content: Optional[str] = None
 
     class Config:
         from_attributes = True  # For Pydantic V2

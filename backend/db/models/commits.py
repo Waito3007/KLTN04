@@ -41,4 +41,5 @@ commits = Table(
     Column('commit_size', String(20), nullable=True, comment='Size category: small, medium, large'),
     Column('created_at', DateTime, nullable=True, server_default=func.now()),
     Column('last_synced', DateTime, nullable=True, server_default=func.now()),
+    Column('diff_content', Text, nullable=True, comment='Raw diff content for the commit'),
 )
