@@ -119,6 +119,8 @@ const CommitList = ({
           const techArea = commit.analysis?.tech_area || commit.tech_area || 'general';
           const confidence = commit.confidence || commit.analysis?.confidence || null;
           const isMultiFusion = !!commit.predicted_type;
+          const commitRisk = commit.risk; // Lấy thông tin rủi ro từ commit
+
           // Việt hóa commit type
           const commitTypeVN = {
             'feat': 'Tính năng',
@@ -159,6 +161,11 @@ const CommitList = ({
                     {confidence && (
                       <Tag color={confidence > 0.9 ? 'green' : confidence > 0.7 ? 'orange' : 'red'}>
                         {(confidence * 100).toFixed(1)}% độ tin cậy
+                      </Tag>
+                    )}
+                    {commitRisk && (
+                      <Tag color={commitRisk === 'highrisk' ? 'red' : 'green'}>
+                        Rủi ro: {commitRisk === 'highrisk' ? 'Cao' : 'Thấp'}
                       </Tag>
                     )}
                     {commit.analysis?.ai_powered && !isMultiFusion && (

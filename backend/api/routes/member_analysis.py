@@ -421,9 +421,16 @@ async def get_member_commits_analysis_v2(
         from services.area_analysis_service import AreaAnalysisService
         area_analysis_service = AreaAnalysisService()
         
+        # Thêm phân tích risk từ RiskAnalysisService
+        from services.risk_analysis_service import RiskAnalysisService
+        risk_analysis_service = RiskAnalysisService()
+        
         tech_analysis_results = {}
+        risk_analysis_results = {"lowrisk": 0, "highrisk": 0}
+        
+        processed_commits = []
         for commit in commits_analysis['commits']:
-            commit_data_for_area_analysis = {
+            commit_data_for_analysis = {
                 "commit_message": commit.get('message', ''),
                 "diff_content": commit.get('diff_content', ''),
                 "files_count": commit.get('files_changed', 0),
@@ -432,12 +439,22 @@ async def get_member_commits_analysis_v2(
                 "total_changes": (commit.get('insertions', 0) + commit.get('deletions', 0))
             }
             
+            current_commit_risk = "unknown"
             try:
-                predicted_area = area_analysis_service.predict_area(commit_data_for_area_analysis)
+                predicted_area = area_analysis_service.predict_area(commit_data_for_analysis)
                 tech_analysis_results[predicted_area] = tech_analysis_results.get(predicted_area, 0) + 1
             except Exception as e:
                 print(f"Error predicting area for commit {commit.get('sha')}: {e}")
-                # Optionally, handle commits that fail area analysis
+
+            try:
+                current_commit_risk = risk_analysis_service.predict_risk(commit_data_for_analysis)
+                risk_analysis_results[current_commit_risk] = risk_analysis_results.get(current_commit_risk, 0) + 1
+            except Exception as e:
+                print(f"Error predicting risk for commit {commit.get('sha')}: {e}")
+            
+            # Add risk to the individual commit object
+            commit['risk'] = current_commit_risk
+            processed_commits.append(commit)
         
         return {
             "success": True,
@@ -446,9 +463,10 @@ async def get_member_commits_analysis_v2(
             "branch_filter": branch_name,
             "model_used": "MultiFusion V2",
             "analysis": analysis,
-            "commits": commits_analysis['commits'],
+            "commits": processed_commits, # Return processed commits
             "statistics": {
-                "tech_analysis": tech_analysis_results
+                "tech_analysis": tech_analysis_results,
+                "risk_analysis": risk_analysis_results
             }
         }
         
