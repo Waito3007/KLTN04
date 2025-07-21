@@ -164,14 +164,17 @@ class HANAIService:
     """
     Service class for HAN-based AI analysis in project management
     """
-    
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(HANAIService, cls).__new__(cls)
+            cls._instance._initialize_model()
+        return cls._instance
+
     def __init__(self):
-        self.model = None
-        self.tokenizer = None
-        self.label_encoders = None
-        self.is_model_loaded = False
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self._initialize_model()
+        # __init__ will be called every time HANAIService() is called, but _initialize_model only once
+        pass
     
     def _initialize_model(self):
         """Initialize HAN model with error handling"""
