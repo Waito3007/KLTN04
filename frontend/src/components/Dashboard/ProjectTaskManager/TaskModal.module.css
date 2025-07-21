@@ -1,0 +1,119 @@
+.taskModal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modalHeaderContent {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px 24px;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+  margin-bottom: 24px; /* Add margin-bottom here */
+}
+
+.modalTitle {
+  color: white !important;
+  margin: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+}
+
+.modalSubtitle {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 14px !important;
+}
+
+.taskForm .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.section {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.sectionIcon {
+  color: #1890ff;
+  font-size: 20px;
+}
+
+.sectionHeader .anticon-team {
+  color: #52c41a;
+}
+
+.sectionHeader .anticon-calendar {
+  color: #fa8c16;
+}
+
+.inputField.ant-input,
+.inputField.ant-input-borderless,
+.inputField.ant-input-focused,
+.inputField.ant-input-status-error,
+.inputField.ant-input-status-warning,
+.selectField.ant-select-single:not(.ant-select-customize-input) .ant-select-selector,
+.selectField.ant-select-single:not(.ant-select-customize-input) .ant-select-selector:hover,
+.selectField.ant-select-single:not(.ant-select-customize-input) .ant-select-selector:focus,
+.selectField.ant-select-single:not(.ant-select-customize-input) .ant-select-selector:active,
+.ant-picker {
+  border-radius: 6px !important;
+  border-color: #d9d9d9 !important;
+}
+
+.inputField.ant-input:focus,
+.inputField.ant-input-focused,
+.selectField.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important; /* Custom focus shadow */
+  border-color: #667eea !important; /* Custom focus border */
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.cancelButton {
+  min-width: 100px;
+  border-radius: 6px;
+}
+
+.submitButton {
+  min-width: 120px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+  background: linear-gradient(135deg, #5a6be0 0%, #6a3fa0 100%);
+}
+
+/* Custom styles for priority options */
+.ant-select-item-option-content .ant-space-item .ant-tag {
+  margin-left: 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.ant-select-item-option-content .ant-space-item .anticon {
+  font-size: 16px;
+}
