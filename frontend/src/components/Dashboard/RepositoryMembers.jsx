@@ -3,8 +3,10 @@ import { Card, Row, Col, Typography, Empty, message, Spin } from 'antd';
 
 // Import các component con
 import MemberList from './components/MemberList';
-import CommitAnalyticsPanel from './components/CommitAnalyticsPanel';
+import CommitAnalyst from './components/CommitAnalyst';
+import AreaAnalyst from './components/AreaAnalyst';
 import CommitList from './components/CommitList';
+import { Tabs } from 'antd';
 import MultiFusionInsights from './components/MultiFusionInsights';
 import ControlPanel from './components/ControlPanel';
 import AIFeaturesPanel from './components/AIFeaturesPanel';
@@ -26,11 +28,14 @@ const RepositoryMembers = ({ selectedRepo }) => {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(undefined); // Sửa: undefined thay vì null
   const [branchesLoading, setBranchesLoading] = useState(false);
-  // State for commit filter and pagination
+  // State for commit filter, pagination, tab, multi-member mode
   const [commitTypeFilter, setCommitTypeFilter] = useState('all');
   const [techAreaFilter, setTechAreaFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
+  const [activeTab, setActiveTab] = useState('commitType'); // commitType | techArea | commitList
+  const [multiMemberMode, setMultiMemberMode] = useState(false);
+  const [multiMemberAnalysis, setMultiMemberAnalysis] = useState(null);
 
   // Debug: Log component render and props
   console.log('RepositoryMembers RENDER:', { 
@@ -326,39 +331,55 @@ const RepositoryMembers = ({ selectedRepo }) => {
       )}
 
       <Row gutter={[24, 24]}>
-        {/* Members List */}
+        {/* MemberList luôn hiển thị bên trái để chọn thành viên */}
         <Col xs={24} md={8}>
           <MemberList 
             members={members} 
             loading={loading} 
             selectedMember={selectedMember} 
-            onMemberClick={handleMemberClick} 
+            onMemberClick={handleMemberClick}
           />
         </Col>
-
-        {/* Member Analysis */}
+        {/* Member Analysis với Tabs bên phải */}
         <Col xs={24} md={16}>
-          <CommitAnalyticsPanel 
-            key={`analytics-${selectedMember?.login || 'none'}-${memberCommits?.commits?.length || 0}`}
-            memberCommits={memberCommits}
-            selectedMember={selectedMember}
-            selectedBranch={selectedBranch}
-            analysisLoading={analysisLoading}
-          />
-          
-          {/* Commit List */}
-          {memberCommits && memberCommits.commits && memberCommits.commits.length > 0 && (
-            <CommitList
-              memberCommits={memberCommits}
-              selectedMember={selectedMember}
-              selectedBranch={selectedBranch}
-              commitTypeFilter={commitTypeFilter}
-              setCommitTypeFilter={setCommitTypeFilter}
-              techAreaFilter={techAreaFilter}
-              setTechAreaFilter={setTechAreaFilter}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              pageSize={pageSize}
+          {(!multiMemberMode && !multiMemberAnalysis) && (
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              items={[
+                {
+                  key: 'commitType',
+                  label: '🏷️ Loại Commit',
+                  children: (
+                    <CommitAnalyst memberCommits={memberCommits} />
+                  )
+                },
+                {
+                  key: 'techArea',
+                  label: '🌐 Lĩnh vực công nghệ',
+                  children: (
+                    <AreaAnalyst memberCommits={memberCommits} />
+                  )
+                },
+                {
+                  key: 'commitList',
+                  label: '📝 Danh sách commit gần đây',
+                  children: (
+                    <CommitList
+                      memberCommits={memberCommits}
+                      selectedMember={selectedMember}
+                      selectedBranch={selectedBranch}
+                      commitTypeFilter={commitTypeFilter}
+                      setCommitTypeFilter={setCommitTypeFilter}
+                      techAreaFilter={techAreaFilter}
+                      setTechAreaFilter={setTechAreaFilter}
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                      pageSize={pageSize}
+                    />
+                  )
+                }
+              ]}
             />
           )}
         </Col>
