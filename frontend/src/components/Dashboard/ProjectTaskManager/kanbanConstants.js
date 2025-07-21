@@ -9,7 +9,9 @@ export const COLUMN_CONFIG = [
     color: '#faad14',
     bgColor: '#faad14',
     borderColor: '#faad14',
-    cssClass: 'todo'
+    cssClass: 'todo',
+    prevStatus: null,
+    nextStatus: 'IN_PROGRESS'
   },
   {
     id: 'IN_PROGRESS',
@@ -18,7 +20,9 @@ export const COLUMN_CONFIG = [
     color: '#1890ff',
     bgColor: '#1890ff',
     borderColor: '#1890ff',
-    cssClass: 'inProgress'
+    cssClass: 'inProgress',
+    prevStatus: 'TODO',
+    nextStatus: 'DONE'
   },
   {
     id: 'DONE',
@@ -27,7 +31,9 @@ export const COLUMN_CONFIG = [
     color: '#52c41a',
     bgColor: '#52c41a',
     borderColor: '#52c41a',
-    cssClass: 'done'
+    cssClass: 'done',
+    prevStatus: 'IN_PROGRESS',
+    nextStatus: null
   }
 ];
 

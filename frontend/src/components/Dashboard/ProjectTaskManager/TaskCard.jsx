@@ -1,111 +1,117 @@
-import React from 'react';
-import { Card, Space, Button, Tooltip, Tag, Avatar, Select } from 'antd';
-import { EditOutlined, DeleteOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Card, Avatar, Tag, Space, Typography, Button, Tooltip } from 'antd';
+import { EditOutlined, DeleteOutlined, UserOutlined, CalendarOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { formatDate, formatFullDate } from './kanbanUtils';
 import { getAvatarUrl } from '../../../utils/taskUtils.jsx';
-import styled from 'styled-components';
+import { TASK_CARD_CONFIG } from './kanbanConstants';
+import styles from './KanbanBoard.module.css';
 
-const { Option } = Select;
-
-const TaskHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-`;
-
-const TaskActions = styled.div`
-  display: flex;
-  gap: 8px;
-`;
-
-const PriorityTag = styled(Tag)`
-  font-weight: 500;
-`;
+const { Text } = Typography;
 
 const TaskCard = ({
   task,
   getAssigneeInfo,
-  getStatusIcon,
   getPriorityColor,
-  updateTaskStatus,
   showTaskModal,
-  deleteTask
+  deleteTask,
+  onStatusChange // New prop for status change
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const assigneeInfo = getAssigneeInfo(task.assignee);
+
   return (
-    <Card size="small">
-      <TaskHeader>
-        <Space>
-          {getStatusIcon(task.status)}
-          <strong>{task.title}</strong>
-          <PriorityTag color={getPriorityColor(task.priority)}>
-            {task.priority?.toUpperCase()}
-          </PriorityTag>
-        </Space>
-        <TaskActions>
+    <Card
+      className={styles.taskCard}
+      styles={{ body: { padding: 12 } }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className={styles.taskCardHeader}>
+        <div className={styles.taskTitle}>{task.title}</div>
+        <div className={styles.taskActions}>
           <Tooltip title="Chỉnh sửa">
-            <Button 
-              size="small" 
+            <Button
+              type="text"
+              size="small"
               icon={<EditOutlined />}
-              onClick={() => showTaskModal(task)}
+              onClick={(e) => {
+                e.stopPropagation();
+                showTaskModal(task);
+              }}
             />
           </Tooltip>
           <Tooltip title="Xóa">
-            <Button 
-              size="small" 
+            <Button
+              type="text"
+              size="small"
               danger
               icon={<DeleteOutlined />}
-              onClick={() => deleteTask(task.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteTask(task.id);
+              }}
             />
           </Tooltip>
-        </TaskActions>
-      </TaskHeader>
-      <div style={{ marginBottom: 8 }}>
-        {task.description}
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Space>          <Avatar 
-            src={getAvatarUrl(assigneeInfo.avatar_url, assigneeInfo.login || assigneeInfo.github_username)} 
-            icon={<UserOutlined />}
-            size="small"
-          /><div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 12, fontWeight: 500 }}>
-              {assigneeInfo.display_name || assigneeInfo.login || assigneeInfo.github_username}
-            </span>
-            {(assigneeInfo.type || assigneeInfo.is_owner || assigneeInfo.role) && (
-              <Tag 
-                size="small" 
-                color={
-                  assigneeInfo.is_owner ? 'gold' : 
-                  assigneeInfo.type === 'Owner' ? 'gold' : 
-                  'blue'
-                }
-                style={{ fontSize: '9px', marginTop: 2 }}
-              >
-                {assigneeInfo.is_owner ? 'Owner' : assigneeInfo.type || assigneeInfo.role}
-              </Tag>
-            )}
-          </div>
-        </Space>
-        <Space>
+
+      {task.description && (
+        <Text className={styles.taskDescription}>
+          {task.description}
+        </Text>
+      )}
+
+      <div className={styles.taskMeta}>
+        <Space size="small">
+          <Tag color={getPriorityColor(task.priority)} style={{ margin: 0 }}>
+            {task.priority?.toUpperCase()}
+          </Tag>
           {task.due_date && (
-            <Space style={{ fontSize: 12, color: '#666' }}>
-              <CalendarOutlined />
-              {task.due_date}
-            </Space>
+            <Tooltip title={`Hạn: ${formatFullDate(task.due_date)}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#666' }}>
+                <CalendarOutlined style={{ fontSize: 12 }} />
+                <Text style={{ fontSize: 11, color: '#666'}}>
+                  {formatDate(task.due_date)}
+                </Text>
+              </div>
+            </Tooltip>
           )}
-          <Select 
-            size="small"
-            value={task.status}
-            onChange={(newStatus) => updateTaskStatus(task.id, newStatus)}
-            style={{ width: 100 }}
-          >
-            <Option value="todo">To Do</Option>
-            <Option value="in_progress">Đang làm</Option>
-            <Option value="done">Hoàn thành</Option>
-          </Select>
         </Space>
       </div>
+
+      <div className={styles.taskFooter}>
+        <Space>
+          <Avatar
+            size={TASK_CARD_CONFIG.AVATAR_SIZE}
+            src={getAvatarUrl(assigneeInfo.avatar_url, assigneeInfo.login)}
+            icon={<UserOutlined />}
+          />
+          <Text style={{ fontSize: 12, color: '#666' }}>
+            {assigneeInfo.login}
+          </Text>
+        </Space>
+        <Text style={{ fontSize: 11, color: '#999' }}>
+          #{task.id}
+        </Text>
+      </div>
+
+      {isHovered && (
+        <div className={styles.statusChangeArrows}>
+          <Button
+            type="text"
+            icon={<LeftOutlined />}
+            onClick={() => onStatusChange(task.id, task.status, 'left')}
+            className={styles.arrowButtonLeft}
+          />
+          <Button
+            type="text"
+            icon={<RightOutlined />}
+            onClick={() => onStatusChange(task.id, task.status, 'right')}
+            className={styles.arrowButtonRight}
+          />
+        </div>
+      )}
     </Card>
   );
 };
