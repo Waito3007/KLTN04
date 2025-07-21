@@ -219,7 +219,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
           setMemberCommits({
             statistics: {
               commit_types: data.analysis.commit_type_distribution || {},
-              tech_analysis: {}, // MultiFusion doesn't have tech_analysis, so empty
+              tech_analysis: data.statistics.tech_analysis || {}, // Lấy tech_analysis từ phản hồi backend
               productivity: data.analysis.productivity_metrics || {}
             },
             commits: data.analysis.commits || [],
