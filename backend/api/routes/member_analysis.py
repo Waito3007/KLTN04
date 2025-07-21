@@ -47,10 +47,15 @@ async def get_member_commits_analysis(
         # Đảm bảo trả về đúng định dạng frontend mong muốn
         # Nếu analysis là dict và có statistics thì trả về trực tiếp
         if isinstance(analysis, dict) and "statistics" in analysis:
+            # Đảm bảo diff_content có trong mỗi commit
+            commits = analysis.get("commits", [])
+            for c in commits:
+                if "diff_content" not in c:
+                    c["diff_content"] = None
             return {
                 "success": True,
                 "statistics": analysis["statistics"],
-                "commits": analysis.get("commits", []),
+                "commits": commits,
                 "branch_filter": branch_name
             }
         # Nếu analysis là list hoặc không có statistics, trả về như cũ

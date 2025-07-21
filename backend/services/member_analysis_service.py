@@ -583,7 +583,7 @@ class MemberAnalysisService:
         base_query = f"""
             SELECT 
                 id, sha, message, author_name, author_email,
-                committer_date, branch_name, insertions, deletions, files_changed, modified_files
+                committer_date, branch_name, insertions, deletions, files_changed, modified_files, diff_content
             FROM commits 
             WHERE repo_id = :repo_id 
                 AND ({author_conditions})
@@ -638,11 +638,7 @@ class MemberAnalysisService:
             # Skip commits with empty messages
             if not commit[2]:  # message
                 continue
-                
-            # Detect language from modified files
-            Column('files_changed', Integer, nullable=True),            
             detected_language = self._detect_language_from_files(commit[10])  # modified_files is index 10
-            
             commits_for_ai.append({
                 'id': commit[1] or '',  # sha
                 'message': commit[2],   # message
@@ -650,7 +646,8 @@ class MemberAnalysisService:
                 'lines_added': commit[7] or 0,    # insertions
                 'lines_removed': commit[8] or 0,  # deletions
                 'files_count': commit[9] or 1,    # files_changed
-                'detected_language': detected_language
+                'detected_language': detected_language,
+                'diff_content': commit[11] if len(commit) > 11 else None
             })
         
         if not commits_for_ai:
@@ -723,6 +720,7 @@ class MemberAnalysisService:
                 "deletions": commit[8] or 0,
                 "files_changed": commit[9] or 0,
                 "detected_language": detected_language,
+                "diff_content": commit[11] if len(commit) > 11 else None,
                 "stats": {
                     "insertions": commit[7] or 0,
                     "deletions": commit[8] or 0,

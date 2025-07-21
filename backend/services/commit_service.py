@@ -40,7 +40,7 @@ def normalize_datetime(dt):
     else:
         # Already timezone-naive, assume it's UTC
         return dt
-
+# lưu commit 
 async def save_commit(commit_data, force_update=False):
     """
     Save commit with full data model support including enhanced analysis
@@ -110,6 +110,7 @@ async def save_commit(commit_data, force_update=False):
             # User IDs sẽ được resolve sau nếu có user mapping
             "author_user_id": commit_data.get("author_user_id"),
             "committer_user_id": commit_data.get("committer_user_id"),
+            "diff_content": commit_data.get("diff_content"),
         }
 
         if existing_commit:
