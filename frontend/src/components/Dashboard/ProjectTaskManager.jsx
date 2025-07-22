@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import { 
   AppstoreOutlined, UnorderedListOutlined, PlusOutlined,
-  ReloadOutlined, TeamOutlined 
+  ReloadOutlined, TeamOutlined, RobotOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
@@ -23,6 +23,7 @@ import TaskList from './ProjectTaskManager/TaskList';
 import TaskModal from './ProjectTaskManager/TaskModal';
 import KanbanBoard from './ProjectTaskManager/KanbanBoard';
 import RepositoryMembers from './RepositoryMembers';
+import AssignmentRecommendation from './ProjectTaskManager/AssignmentRecommendation';
 
 const { Title } = Typography;
 
@@ -56,6 +57,7 @@ const ProjectTaskManager = ({ repositories, repoLoading }) => {
   const [form] = Form.useForm();
   const [viewMode, setViewMode] = useState(true); // true = Kanban, false = List
   const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' or 'members'
+  const [showAIInsights, setShowAIInsights] = useState(false);
   
   // Filter states
   const [searchText, setSearchText] = useState('');
@@ -168,6 +170,21 @@ const ProjectTaskManager = ({ repositories, repoLoading }) => {
               👥 Members
             </Button>
           </Space.Compact>
+
+          {/* AI Insights Button */}
+          <Button
+            icon={<RobotOutlined />}
+            onClick={() => setShowAIInsights(true)}
+            disabled={!selectedRepo}
+            style={{ 
+              borderRadius: 6,
+              background: 'linear-gradient(135deg, #fa8c16 0%, #faad14 100%)',
+              border: 'none',
+              color: 'white'
+            }}
+          >
+            🤖 AI Insights
+          </Button>
 
           {/* Task View Mode (only show when on tasks tab) */}
           {activeTab === 'tasks' && (
@@ -307,7 +324,19 @@ const ProjectTaskManager = ({ repositories, repoLoading }) => {
         handleTaskSubmit={handleTaskSubmit}
         setIsModalVisible={setIsModalVisible}
         collaborators={collaborators}
+        selectedRepo={selectedRepo}
       />
+
+      {/* AI Assignment Recommendation Modal */}
+      {selectedRepo && (
+        <AssignmentRecommendation
+          selectedRepo={selectedRepo}
+          isVisible={showAIInsights}
+          onClose={() => setShowAIInsights(false)}
+          onSelectAssignee={() => {}} // Not used in insights mode
+          currentTaskData={null}
+        />
+      )}
     </Card>
   );
 };
