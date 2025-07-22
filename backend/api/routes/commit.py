@@ -37,7 +37,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 from services.commit_service import (
     get_commit_by_sha, save_commit, get_commits_by_branch_safe, 
-    get_commits_by_repo_id, get_commit_statistics, 
+    get_commits_by_repo_id, get_commit_statistics, save_multiple_commits, 
     get_enhanced_commit_statistics, analyze_commit_trends
 )
 from core.security import security # Import security dependency

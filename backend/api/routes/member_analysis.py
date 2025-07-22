@@ -172,6 +172,150 @@ async def get_developer_insights(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting developer insights: {str(e)}")
 
+@router.get("/{repo_id}/members/full-analysis")
+async def get_full_members_analysis(
+    repo_id: int,
+    limit_per_member: int = 50, # Default limit for commits per member
+    db: Session = Depends(get_db)
+):
+    """
+    Thực hiện phân tích toàn diện cho tất cả thành viên trong một repository
+    sử dụng MultiFusion V2 model.
+    
+    Args:
+        repo_id: ID của repository.
+        limit_per_member: Số lượng commit tối đa để phân tích cho mỗi thành viên.
+    
+    Returns:
+        Dict[str, Any]: Kết quả phân tích tổng hợp cho tất cả thành viên.
+    """
+    try:
+        service = MemberAnalysisService(db)
+        members = service.get_repository_members(repo_id)
+        
+        full_analysis_results = {
+            "success": True,
+            "repository_id": repo_id,
+            "total_members": len(members),
+            "members_analysis": []
+        }
+        
+        for member in members:
+            member_login = member['github_username']
+            try:
+                member_analysis = await service.get_member_commits_with_multifusion_v2_analysis(
+                    repo_id, member_login, limit_per_member
+                )
+                full_analysis_results["members_analysis"].append({
+                    "member_login": member_login,
+                    "analysis_status": "success",
+                    "data": member_analysis
+                })
+            except HTTPException as he:
+                full_analysis_results["members_analysis"].append({
+                    "member_login": member_login,
+                    "analysis_status": "failed",
+                    "error": he.detail
+                })
+            except Exception as e:
+                full_analysis_results["members_analysis"].append({
+                    "member_login": member_login,
+                    "analysis_status": "failed",
+                    "error": f"Error analyzing member {member_login}: {str(e)}"
+                })
+                
+        return full_analysis_results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting full members analysis: {str(e)}")
+
+@router.get("/{repo_id}/commits/all")
+async def get_all_repo_commits(
+    repo_id: int,
+    limit: int = 50,
+    offset: int = 0,
+    branch_name: str = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Lấy tất cả commits của repository (không theo thành viên).
+    
+    Args:
+        repo_id: ID của repository.
+        limit: Số lượng commit tối đa.
+        offset: Vị trí bắt đầu lấy commit.
+        branch_name: Tên branch để lọc (optional).
+    
+    Returns:
+        Dict[str, Any]: Danh sách commits.
+    """
+    try:
+        service = MemberAnalysisService(db)
+        commits_data = service.get_all_repo_commits_raw(repo_id, limit, offset, branch_name)
+        
+        # Format the data to match frontend expectations
+        formatted_commits = []
+        for commit in commits_data:
+            formatted_commits.append({
+                "sha": commit[0],
+                "author_name": commit[1],
+                "message": commit[2],
+                "date": commit[3].isoformat() if commit[3] else None,
+                "insertions": commit[4],
+                "deletions": commit[5],
+                "files_changed": commit[6],
+                "modified_files": commit[7],
+                "diff_content": commit[8],
+                "detected_language": commit[9] # This is the added field
+            })
+
+        return {
+            "success": True,
+            "repository_id": repo_id,
+            "commits": formatted_commits,
+            "total_commits": len(formatted_commits),
+            "limit": limit,
+            "offset": offset,
+            "branch_filter": branch_name
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting all repo commits: {str(e)}")
+
+@router.get("/{repo_id}/commits/all/analysis")
+async def get_all_repo_commits_analysis(
+    repo_id: int,
+    limit: int = 50,
+    offset: int = 0,
+    branch_name: str = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Lấy phân tích loại commit cho tất cả commits của repository.
+    
+    Args:
+        repo_id: ID của repository.
+        limit: Số lượng commit tối đa.
+        offset: Vị trí bắt đầu lấy commit.
+        branch_name: Tên branch để lọc (optional).
+    
+    Returns:
+        Dict[str, Any]: Kết quả phân tích tổng hợp.
+    """
+    try:
+        service = MemberAnalysisService(db)
+        analysis_results = await service.get_all_repo_commits_with_multifusion_v2_analysis(
+            repo_id, limit, offset, branch_name
+        )
+        return {
+            "success": True,
+            "repository_id": repo_id,
+            "analysis": analysis_results
+        }
+    except Exception as e:
+        import traceback
+        print("❌ Error in get_all_repo_commits_analysis:", e)
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error getting all repo commits analysis: {str(e)}")
+
 @router.post("/{repo_id}/ai/model-status")
 async def get_ai_model_status(repo_id: int):
     """Kiểm tra trạng thái AI model (HAN Commit Analyzer)"""

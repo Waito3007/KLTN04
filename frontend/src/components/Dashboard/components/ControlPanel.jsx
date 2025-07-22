@@ -19,7 +19,10 @@ const ControlPanel = ({
   aiModelStatus,
   multiFusionV2Status,
   showAIFeatures,
-  setShowAIFeatures
+  setShowAIFeatures,
+  // NEW PROPS
+  fullAnalysisLoading,
+  onAnalyzeFullRepo
 }) => {
   return (
     <Space wrap>
@@ -104,6 +107,22 @@ const ControlPanel = ({
         }}
       >
         🤖 AI Features
+      </Button>
+
+      {/* NEW: Button for Full Repo Analysis */}
+      <Button
+        type="default"
+        icon={<BranchesOutlined />}
+        onClick={onAnalyzeFullRepo}
+        loading={fullAnalysisLoading}
+        disabled={fullAnalysisLoading}
+        style={{
+          background: '#f0f2f5',
+          borderColor: '#d9d9d9',
+          color: 'rgba(0, 0, 0, 0.85)'
+        }}
+      >
+        Phân tích toàn bộ kho lưu trữ
       </Button>
     </Space>
   );

@@ -38,6 +38,14 @@ const RepositoryMembers = ({ selectedRepo }) => {
   const [multiMemberMode, setMultiMemberMode] = useState(false);
   const [multiMemberAnalysis, setMultiMemberAnalysis] = useState(null);
 
+  // NEW STATES FOR FULL REPO ANALYSIS
+  const [fullAreaAnalysis, setFullAreaAnalysis] = useState(null);
+  const [fullRiskAnalysis, setFullRiskAnalysis] = useState(null);
+  const [fullAnalysisLoading, setFullAnalysisLoading] = useState(false);
+  const [allRepoCommits, setAllRepoCommits] = useState(null); // NEW: State for all repo commits
+  const [allRepoCommitAnalysis, setAllRepoCommitAnalysis] = useState(null); // NEW: State for all repo commit analysis
+
+
   // Debug: Log component render and props
   console.log('RepositoryMembers RENDER:', { 
     selectedRepo, 
@@ -140,6 +148,103 @@ const RepositoryMembers = ({ selectedRepo }) => {
     }
   }, [selectedRepo]);
 
+  // NEW: Load all repo commits
+  const loadAllRepoCommits = useCallback(async () => {
+    if (!selectedRepo?.id) return;
+    setFullAnalysisLoading(true);
+    try {
+      const url = `http://localhost:8000/api/repositories/${selectedRepo.id}/commits/all`;
+      console.log('Fetching all repo commits from URL:', url);
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('All Repo Commits Response:', data); // Debug log
+        setAllRepoCommits(data.commits);
+      } else {
+        console.error('All Repo Commits API Error:', response.status, response.statusText, await response.text()); // Added await response.text()
+        message.error(`Không thể tải tất cả commits của repo: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error loading all repo commits:', error);
+      message.error('Lỗi khi tải tất cả commits của repo');
+    } finally {
+      setFullAnalysisLoading(false);
+    }
+  }, [selectedRepo?.id]);
+
+  // NEW: Load all repo commit analysis
+  const loadAllRepoCommitAnalysis = useCallback(async () => {
+    if (!selectedRepo?.id) return;
+    setFullAnalysisLoading(true);
+    try {
+      const url = `http://localhost:8000/api/repositories/${selectedRepo.id}/commits/all/analysis`;
+      console.log('Fetching all repo commit analysis from URL:', url);
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('All Repo Commit Analysis Response:', data); // Debug log
+        setAllRepoCommitAnalysis(data.analysis);
+      } else {
+        console.error('All Repo Commit Analysis API Error:', response.status, response.statusText, await response.text()); // Added await response.text()
+        message.error(`Không thể tải phân tích commit toàn bộ repo: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error loading all repo commit analysis:', error);
+      message.error('Lỗi khi tải phân tích commit toàn bộ repo');
+    } finally {
+      setFullAnalysisLoading(false);
+    }
+  }, [selectedRepo?.id]);
+
+  // NEW: Load full area analysis for the repository
+  const loadFullAreaAnalysis = useCallback(async () => {
+    if (!selectedRepo?.id) return;
+    setFullAnalysisLoading(true);
+    try {
+      const url = `http://localhost:8000/api/area-analysis/repositories/${selectedRepo.id}/full-area-analysis`;
+      console.log('Fetching full area analysis from URL:', url);
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Full Area Analysis Response:', data);
+        setFullAreaAnalysis(data);
+      } else {
+        console.error('Full Area Analysis API Error:', response.status, response.statusText, await response.text()); // Added await response.text()
+        message.error(`Không thể tải phân tích khu vực toàn diện: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error loading full area analysis:', error);
+      message.error('Lỗi khi tải phân tích khu vực toàn diện');
+    } finally {
+      setFullAnalysisLoading(false);
+    }
+  }, [selectedRepo?.id]);
+
+  // NEW: Load full risk analysis for the repository
+  const loadFullRiskAnalysis = useCallback(async () => {
+    if (!selectedRepo?.id) return;
+    setFullAnalysisLoading(true); // Use the same loading state for now
+    try {
+      const url = `http://localhost:8000/api/risk-analysis/repositories/${selectedRepo.id}/full-risk-analysis`;
+      console.log('Fetching full risk analysis from URL:', url);
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Full Risk Analysis Response:', data);
+        setFullRiskAnalysis(data);
+      } else {
+        console.error('Full Risk Analysis API Error:', response.status, response.statusText, await response.text()); // Added await response.text()
+        message.error(`Không thể tải phân tích rủi ro toàn diện: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error loading full risk analysis:', error);
+      message.error('Lỗi khi tải phân tích rủi ro toàn diện');
+    } finally {
+      setFullAnalysisLoading(false);
+    }
+  }, [selectedRepo?.id]);
+
+
   // Load members when repo changes
   useEffect(() => {
     console.log('RepositoryMembers useEffect triggered:', {
@@ -153,6 +258,11 @@ const RepositoryMembers = ({ selectedRepo }) => {
       loadRepositoryMembers();
       loadRepositoryBranches();
       _loadAIModelStatus();
+      // NEW: Trigger full analysis when repo changes
+      loadFullAreaAnalysis();
+      loadFullRiskAnalysis();
+      loadAllRepoCommits(); // NEW
+      loadAllRepoCommitAnalysis(); // NEW
     } else {
       console.log('❌ No selectedRepo or selectedRepo.id found:', {
         selectedRepo: !!selectedRepo,
@@ -160,7 +270,12 @@ const RepositoryMembers = ({ selectedRepo }) => {
       });
       // Clear members if no repo
       setMembers([]);
-    }  }, [selectedRepo, loadRepositoryMembers, loadRepositoryBranches, _loadAIModelStatus]); // Remove selectedRepo?.id to avoid redundancy
+      // Clear full analysis results
+      setFullAreaAnalysis(null);
+      setFullRiskAnalysis(null);
+      setAllRepoCommits(null); // NEW
+      setAllRepoCommitAnalysis(null); // NEW
+    }  }, [selectedRepo, loadRepositoryMembers, loadRepositoryBranches, _loadAIModelStatus, loadFullAreaAnalysis, loadFullRiskAnalysis, loadAllRepoCommits, loadAllRepoCommitAnalysis]); // Add new dependencies
 
   // Re-analyze when branch or model changes
   useEffect(() => {
@@ -316,6 +431,14 @@ const RepositoryMembers = ({ selectedRepo }) => {
           multiFusionV2Status={multiFusionV2Status}
           showAIFeatures={showAIFeatures}
           setShowAIFeatures={setShowAIFeatures}
+          // NEW PROPS FOR FULL ANALYSIS
+          fullAnalysisLoading={fullAnalysisLoading}
+          onAnalyzeFullRepo={() => {
+            loadFullAreaAnalysis();
+            loadFullRiskAnalysis();
+            loadAllRepoCommits(); // NEW
+            loadAllRepoCommitAnalysis(); // NEW
+          }}
         />
       </div>
 
@@ -331,6 +454,8 @@ const RepositoryMembers = ({ selectedRepo }) => {
           aiModel={aiModel}
         />
       )}
+
+      {fullAnalysisLoading && <Spin tip="Đang phân tích toàn bộ kho lưu trữ..." style={{ width: '100%', textAlign: 'center', marginBottom: '20px' }} />}
 
       <Row gutter={[24, 24]}>
         {/* MemberList luôn hiển thị bên trái để chọn thành viên */}
@@ -353,21 +478,30 @@ const RepositoryMembers = ({ selectedRepo }) => {
                   key: 'commitType',
                   label: '🏷️ Loại Commit',
                   children: (
-                    <CommitAnalyst memberCommits={memberCommits} />
+                    <CommitAnalyst 
+                      memberCommits={memberCommits} 
+                      allRepoCommitAnalysis={allRepoCommitAnalysis} // NEW
+                    />
                   )
                 },
                 {
                   key: 'techArea',
                   label: '🌐 Lĩnh vực công nghệ',
                   children: (
-                    <AreaAnalyst memberCommits={memberCommits} />
+                    <AreaAnalyst 
+                      memberCommits={memberCommits} 
+                      fullAreaAnalysis={fullAreaAnalysis} // Pass new prop
+                    />
                   )
                 },
                 {
                   key: 'riskAnalysis',
                   label: '⚠️ Phân tích rủi ro',
                   children: (
-                    <RiskAnalyst memberCommits={memberCommits} />
+                    <RiskAnalyst 
+                      memberCommits={memberCommits} 
+                      fullRiskAnalysis={fullRiskAnalysis} // Pass new prop
+                    />
                   )
                 },
                 {
@@ -385,6 +519,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
                       currentPage={currentPage}
                       setCurrentPage={setCurrentPage}
                       pageSize={pageSize}
+                      allRepoCommits={allRepoCommits} // NEW
                     />
                   )
                 }

@@ -1,4 +1,9 @@
 .env
+# GitHub tokens and sensitive data
+test_diff_sync.py
+tokens.txt
+*token*.txt
+
 # Python
 __pycache__/
 *.py[cod]
