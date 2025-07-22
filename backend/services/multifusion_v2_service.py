@@ -166,6 +166,14 @@ class MultiFusionV2Service:
             return {"error": "Model not available", "commit_type": "unknown"}
         
         try:
+            # Debug logging input data
+            logger.info(f"🔍 MultiFusion V2 Input Debug:")
+            logger.info(f"   - commit_message: {commit_message[:100]}...")
+            logger.info(f"   - lines_added: {lines_added}")
+            logger.info(f"   - lines_removed: {lines_removed}")
+            logger.info(f"   - files_count: {files_count}")
+            logger.info(f"   - detected_language: {detected_language}")
+            
             # Prepare text features
             encoding = self.tokenizer.encode_plus(
                 commit_message,
@@ -219,6 +227,13 @@ class MultiFusionV2Service:
                 confidence = probabilities[0][predicted_class_id].item()
             
             predicted_type = self.label_encoder_type.classes_[predicted_class_id]
+            
+            # Debug logging prediction result
+            logger.info(f"🎯 MultiFusion V2 Prediction Debug:")
+            logger.info(f"   - predicted_class_id: {predicted_class_id}")
+            logger.info(f"   - predicted_type: {predicted_type}")
+            logger.info(f"   - confidence: {confidence:.4f}")
+            logger.info(f"   - all_classes: {list(self.label_encoder_type.classes_)}")
             
             # Get all class probabilities
             all_probabilities = {}
@@ -321,7 +336,15 @@ class MultiFusionV2Service:
                     "avg_files_per_commit": round(avg_files_per_commit, 2)
                 },
                 "languages_used": list(languages_used),
-                "commits": results
+                "commit_predictions": results,  # ✅ Fixed: Use commit_predictions instead of commits
+                "commits": results,  # Keep both for backwards compatibility
+                "overall_statistics": {
+                    "total_commits": total_commits,
+                    "commit_type_distribution": commit_type_counts,
+                    "dominant_commit_type": dominant_type[0],
+                    "avg_changes_per_commit": avg_changes_per_commit,
+                    "languages_used": list(languages_used)
+                }
             }
             
         except Exception as e:

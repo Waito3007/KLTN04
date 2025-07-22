@@ -5,7 +5,11 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import re
 import asyncio
+import logging
 from services.han_ai_service import HANAIService
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 class MemberAnalysisService:
     def __init__(self, db: Session):        
@@ -285,7 +289,7 @@ class MemberAnalysisService:
         self, 
         repository_id: int, 
         member_login: str, 
-        limit: int = 50,
+        limit: int = 1000,
         branch_name: str = None  # NEW: Optional branch filter
     ) -> Dict[str, Any]:
         """Lấy commits của member với analysis đơn giản và branch filter"""
@@ -408,7 +412,7 @@ class MemberAnalysisService:
         self, 
         repository_id: int, 
         member_login: str, 
-        limit: int = 50,
+        limit: int = 1000,
         branch_name: str = None  # NEW: Optional branch filter
     ) -> Dict[str, Any]:
         """Lấy commits của member với AI analysis và branch filter"""
@@ -568,7 +572,7 @@ class MemberAnalysisService:
         self, 
         repository_id: int, 
         member_login: str, 
-        limit: int = 50,
+        limit: int = 1000,
         branch_name: str = None
     ) -> Dict[str, Any]:
         """Lấy commits của member với MultiFusion V2 AI analysis"""
@@ -699,12 +703,12 @@ class MemberAnalysisService:
             if i < len(commit_predictions):
                 ai_prediction = commit_predictions[i]
             
-            # Extract prediction data
+            logger.info(f"DEBUG: ai_prediction for commit {commit[0][:8]}: {ai_prediction}")
+            
             commit_type = ai_prediction.get("predicted_type", "other")
             confidence = ai_prediction.get("confidence", 0.0)
-            
-            # Map tech area based on commit type
             tech_area = self._map_commit_type_to_tech_area(commit_type)
+            logger.info(f"DEBUG: predicted_type for commit {commit[0][:8]}: {commit_type}")
             
             # Detect language from modified files
             detected_language = self._detect_language_from_files(commit[10])
@@ -879,7 +883,7 @@ class MemberAnalysisService:
             return False
         return name1.lower() in name2.lower() or name2.lower() in name1.lower()
     
-    def _get_member_commits_raw(self, repository_id: int, member_login: str, limit: int = 50, branch_name: str = None):
+    def _get_member_commits_raw(self, repository_id: int, member_login: str, limit: int = 1000, branch_name: str = None):
         """Get raw commit data for a member"""
         
         # Get all author names associated with this member
@@ -895,7 +899,7 @@ class MemberAnalysisService:
         base_query = f"""
             SELECT 
                 sha, author_name, message, committer_date, 
-                insertions, deletions, files_changed, modified_files
+                insertions, deletions, files_changed, modified_files, diff_content
             FROM commits 
             WHERE repo_id = :repo_id 
                 AND LOWER(author_name) IN ({author_placeholders})
@@ -947,38 +951,31 @@ class MemberAnalysisService:
         except:
             return "unknown_language"
         
-        # Map file extensions to languages
+        # Map file extensions to languages (phải khớp với metadata_v2.json)
         language_map = {
-            '.py': 'python',
-            '.js': 'javascript', 
-            '.jsx': 'javascript',
-            '.ts': 'typescript',
-            '.tsx': 'typescript',
-            '.java': 'java',
-            '.cpp': 'cpp',
-            '.c': 'c',
-            '.cs': 'csharp',
-            '.php': 'php',
-            '.rb': 'ruby',
-            '.go': 'go',
-            '.rs': 'rust',
-            '.swift': 'swift',
-            '.kt': 'kotlin',
-            '.scala': 'scala',
-            '.r': 'r',
-            '.sql': 'sql',
-            '.sh': 'shell',
-            '.html': 'html',
-            '.css': 'css',
-            '.scss': 'css',
-            '.sass': 'css',
-            '.vue': 'vue',
-            '.json': 'json',
-            '.xml': 'xml',
-            '.yaml': 'yaml',
-            '.yml': 'yaml',
-            '.md': 'markdown',
-            '.dockerfile': 'dockerfile'
+            '.py': 'Python',
+            '.js': 'JavaScript', 
+            '.jsx': 'JavaScript',
+            '.ts': 'TypeScript',
+            '.tsx': 'TypeScript',
+            '.java': 'Java',
+            '.cpp': 'C++',
+            '.c': 'C++',
+            '.cs': 'C#',
+            '.php': 'PHP',
+            '.rb': 'Ruby',
+            '.go': 'Go',
+            '.rs': 'Rust',
+            '.html': 'HTML',
+            '.css': 'CSS',
+            '.scss': 'CSS',
+            '.sass': 'CSS',
+            '.json': 'JSON',
+            '.xml': 'XML',
+            '.yaml': 'YAML',
+            '.yml': 'YAML',
+            '.md': 'other',
+            '.dockerfile': 'other'
         }
         
         # Count languages by file extensions
@@ -991,9 +988,233 @@ class MemberAnalysisService:
                 language = language_map.get(ext, 'other')
                 language_count[language] = language_count.get(language, 0) + 1
         
-        # Return most common language, fallback to python
+        # Return most common language, fallback to Python
         if language_count:
             most_common_lang = max(language_count.items(), key=lambda x: x[1])[0]
-            return most_common_lang if most_common_lang != 'other' else 'python'
+            return most_common_lang if most_common_lang != 'other' else 'Python'
         
-        return "python"  # Default fallback
+        return "Python"  # Default fallback
+
+    def get_all_repo_commits_raw(self, repository_id: int, limit: int = 5000, offset: int = 0, branch_name: Optional[str] = None):
+        """Get raw commit data for the entire repository"""
+        base_query = """
+            SELECT 
+                sha, author_name, message, committer_date, 
+                insertions, deletions, files_changed, modified_files, diff_content
+            FROM commits 
+            WHERE repo_id = :repo_id 
+        """
+        
+        params = {
+            "repo_id": repository_id,
+            "limit": limit,
+            "offset": offset
+        }
+        
+        if branch_name:
+            base_query += " AND branch_name = :branch_name"
+            params["branch_name"] = branch_name
+            
+        base_query += " ORDER BY committer_date DESC LIMIT :limit OFFSET :offset"
+        
+        query = text(base_query)
+        
+        commits_data = self.db.execute(query, params).fetchall()
+        
+        enhanced_commits = []
+        for commit in commits_data:
+            detected_language = self._detect_language_from_files(commit[7])  # modified_files is index 7
+            enhanced_commit = list(commit) + [detected_language]  # Add detected_language
+            enhanced_commits.append(enhanced_commit)
+        
+        return enhanced_commits
+
+    async def get_all_repo_commits_with_multifusion_v2_analysis(
+        self, 
+        repository_id: int, 
+        limit: int = 500, 
+        offset: int = 0, 
+        branch_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Lấy commits của toàn bộ repo với MultiFusion V2 AI analysis"""
+        from services.multifusion_v2_service import MultiFusionV2Service
+        
+        raw_commits = self.get_all_repo_commits_raw(repository_id, limit, offset, branch_name)
+        
+        if not raw_commits:
+            return {
+                "summary": {
+                    "total_commits": 0, 
+                    "message": f"No commits found{' on branch ' + branch_name if branch_name else ''}",
+                    "branch_filter": branch_name,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2",
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": [],
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        multifusion_v2 = MultiFusionV2Service()
+        
+        if not multifusion_v2.is_model_available():
+            print("MultiFusion V2 not available for full repo analysis.")
+            # Fallback to simple analysis if AI model is not available
+            return {
+                "summary": {
+                    "total_commits": len(raw_commits), 
+                    "message": "MultiFusion V2 not available, showing raw commits",
+                    "branch_filter": branch_name,
+                    "ai_powered": False,
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": raw_commits, # Return raw commits if AI not available
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        commits_for_ai = []
+        for commit in raw_commits:
+            if not commit[2]:  # message
+                continue
+            detected_language = self._detect_language_from_files(commit[7])  # modified_files is index 7
+            logger.info(f"🔍 Commit {commit[0][:8] if commit[0] else 'N/A'} - Detected language: {detected_language}, Modified files: {commit[7]}")
+            commits_for_ai.append({
+                'id': commit[0] or '',  # sha
+                'message': commit[2],   # message
+                'date': commit[3].isoformat() if commit[3] else '',  # committer_date
+                'lines_added': commit[4] or 0,    # insertions
+                'lines_removed': commit[5] or 0,  # deletions
+                'files_count': commit[6] or 1,    # files_changed
+                'detected_language': detected_language,
+                'diff_content': commit[8] if len(commit) > 8 else None
+            })
+        
+        if not commits_for_ai:
+            logger.warning("No valid commits for AI analysis in get_all_repo_commits_with_multifusion_v2_analysis.")
+            return {
+                "summary": {
+                    "total_commits": 0, 
+                    "message": "No valid commits for AI analysis",
+                    "branch_filter": branch_name,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2",
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": [],
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        logger.info(f"Preparing to send {len(commits_for_ai)} commits to MultiFusion V2 for full repo analysis.")
+        logger.debug(f"Sample commit for AI analysis: {commits_for_ai[0] if commits_for_ai else 'N/A'}")
+
+        try:
+            ai_analysis_result = multifusion_v2.analyze_member_commits(commits_for_ai) # Reusing analyze_member_commits for now
+            logger.info(f"MultiFusion V2 analysis result for full repo: {ai_analysis_result}")
+            
+            if "error" in ai_analysis_result:
+                logger.error(f"MultiFusion V2 analysis failed for full repo: {ai_analysis_result['error']}")
+                return {
+                    "summary": {
+                        "total_commits": len(raw_commits), 
+                        "message": "MultiFusion V2 analysis failed, showing raw commits",
+                        "branch_filter": branch_name,
+                        "ai_powered": False,
+                        "analysis_date": datetime.now().isoformat()
+                    },
+                    "commits": raw_commits,
+                    "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+                }
+                
+        except Exception as e:
+            logger.error(f"MultiFusion V2 analysis failed with exception for full repo: {e}", exc_info=True)
+            return {
+                "summary": {
+                    "total_commits": len(raw_commits), 
+                    "message": "MultiFusion V2 analysis failed, showing raw commits",
+                    "branch_filter": branch_name,
+                    "ai_powered": False,
+                    "analysis_date": datetime.now().isoformat()
+                },
+                "commits": raw_commits,
+                "statistics": {"commit_types": {}, "tech_analysis": {}, "productivity": {"total_additions": 0, "total_deletions": 0}}
+            }
+        
+        commits_with_analysis = []
+        commit_type_stats = defaultdict(int)
+        tech_stats = defaultdict(int)
+        total_additions = 0
+        total_deletions = 0
+        
+        commit_predictions = ai_analysis_result.get('commit_predictions', [])
+        
+        for i, commit in enumerate(raw_commits):
+            if not commit[2]:
+                continue
+                
+            ai_prediction = {}
+            if i < len(commit_predictions):
+                ai_prediction = commit_predictions[i]
+            
+            logger.info(f"DEBUG: ai_prediction for commit {commit[0][:8]}: {ai_prediction}")
+            
+            commit_type = ai_prediction.get("predicted_type", "other")
+            logger.info(f"DEBUG: predicted_type for commit {commit[0][:8]}: {commit_type}")
+            confidence = ai_prediction.get("confidence", 0.0)
+            tech_area = self._map_commit_type_to_tech_area(commit_type)
+            detected_language = self._detect_language_from_files(commit[7])
+            
+            commit_info = {
+                "id": commit[0],
+                "sha": commit[0][:8] if commit[0] else "N/A", # Use full SHA for ID, short for display
+                "message": commit[2],
+                "author": commit[1], # author_name
+                "date": commit[3].isoformat() if commit[3] else None, # committer_date
+                "branch": branch_name or "main", # Use branch_name from filter or default
+                "insertions": commit[4] or 0,
+                "deletions": commit[5] or 0,
+                "files_changed": commit[6] or 0,
+                "detected_language": detected_language,
+                "diff_content": commit[8] if len(commit) > 8 else None,
+                "stats": {
+                    "insertions": commit[4] or 0,
+                    "deletions": commit[5] or 0,
+                    "files_changed": commit[6] or 0
+                },
+                "analysis": {
+                    "type": commit_type,
+                    "type_icon": self._get_type_icon(commit_type),
+                    "tech_area": tech_area,
+                    "confidence": confidence,
+                    "ai_powered": True,
+                    "ai_model": "MultiFusion V2"
+                }
+            }
+            
+            commits_with_analysis.append(commit_info)
+            commit_type_stats[commit_type] += 1
+            tech_stats[tech_area] += 1
+            total_additions += commit[4] or 0
+            total_deletions += commit[5] or 0
+        
+        overall_stats = ai_analysis_result.get('overall_statistics', {})
+        
+        return {
+            "success": True,
+            "summary": {
+                "total_commits": len(commits_with_analysis),
+                "branch_filter": branch_name,
+                "ai_powered": True,
+                "ai_model": "MultiFusion V2",
+                "analysis_date": datetime.now().isoformat()
+            },
+            "commits": commits_with_analysis,
+            "statistics": {
+                "commit_types": dict(commit_type_stats),
+                "tech_analysis": dict(tech_stats),
+                "productivity": {
+                    "total_additions": total_additions,
+                    "total_deletions": total_deletions
+                },
+                "ai_insights": overall_stats
+            }
+        }

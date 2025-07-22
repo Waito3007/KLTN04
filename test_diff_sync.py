@@ -10,9 +10,9 @@ BRANCH = "NghiaDemo"
 MAX_COMMITS_TO_SYNC = 5
 
 # --- GitHub Token ---
-github_token = "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" 
+github_token = "YOUR_GITHUB_TOKEN_HERE"  # Replace with your actual token
 
-if github_token == "":
+if github_token == "YOUR_GITHUB_TOKEN_HERE" or github_token == "":
     print("ERROR: Please replace 'YOUR_GITHUB_TOKEN_HERE' with your actual GitHub API token in the script file.")
     exit()
 

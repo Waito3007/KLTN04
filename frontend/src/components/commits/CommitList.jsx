@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination, Select } from "antd";
+import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination, Select, Empty } from "antd";
 import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
-import axios from "axios";
 import styled from "styled-components";
 
 const { Title, Text } = Typography;
@@ -59,55 +58,52 @@ const PageSizeSelector = styled.div`
   gap: 8px;
 `;
 
-const CommitList = ({ owner, repo, branch }) => {
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(30);
+const CommitList = ({
+  memberCommits,
+  selectedMember,
+  selectedBranch,
+  commitTypeFilter,
+  setCommitTypeFilter,
+  techAreaFilter,
+  setTechAreaFilter,
+  currentPage,
+  setCurrentPage,
+  pageSize,
+  allRepoCommits // NEW PROP
+}) => {
+  const [loading, setLoading] = useState(false); // Loading state is now managed by parent
+  const [paginatedCommits, setPaginatedCommits] = useState([]);
   const [totalCommits, setTotalCommits] = useState(0);
-  const [allCommits, setAllCommits] = useState([]); // Lưu tất cả commits để phân trang client-side// Function để fetch commits từ API - lấy nhiều commits để phân trang client-side
-  const fetchCommits = useCallback(async (requestedPageSize = pageSize) => {
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
 
-    try {
-      setLoading(true);
-      // Lấy số lượng commits lớn hơn để có đủ dữ liệu phân trang
-      const fetchSize = Math.max(requestedPageSize, 100); // Ít nhất 100 commits
-      
-      const response = await axios.get(
-        `http://localhost:8000/api/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`,
-        {
-          headers: {
-            Authorization: `token ${token}`,
-          },
-          params: {
-            per_page: fetchSize,
-            page: 1 // Luôn lấy từ trang 1
-          }
-        }
-      );
-      
-      const commitsData = response.data.commits || response.data;
-      const newCommits = Array.isArray(commitsData) ? commitsData : [];
-      
-      setAllCommits(newCommits);
-      setTotalCommits(newCommits.length);
-        console.log(`Fetched ${newCommits.length} commits from GitHub API`);
-      
-    } catch (err) {
-      console.error(err);
-      message.error("Lỗi khi lấy danh sách commit");
-      setAllCommits([]);
-      setTotalCommits(0);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    let commitsToFilter = [];
+
+    if (selectedMember) {
+      // Member-specific commits
+      if (memberCommits && memberCommits.commits) {
+        commitsToFilter = memberCommits.commits;
+      }
+    } else if (allRepoCommits) {
+      // All repo commits
+      commitsToFilter = allRepoCommits;
     }
-  }, [owner, repo, branch, pageSize]);useEffect(() => {
-    if (!branch) return;
-    
-    setCurrentPage(1);
-    fetchCommits(pageSize);
-  }, [owner, repo, branch, pageSize, fetchCommits]);const formatDate = (dateString) => {
+
+    const filteredCommits = commitsToFilter.filter(commit => {
+      const matchesType = commitTypeFilter === 'all' || 
+                            (commit.analysis && commit.analysis.type === commitTypeFilter);
+      const matchesTechArea = techAreaFilter === 'all' || 
+                              (commit.analysis && commit.analysis.tech_area === techAreaFilter);
+      return matchesType && matchesTechArea;
+    });
+
+    setTotalCommits(filteredCommits.length);
+    setPaginatedCommits(filteredCommits.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    ));
+  }, [memberCommits, currentPage, pageSize, commitTypeFilter, techAreaFilter, selectedMember, allRepoCommits]);
+
+  const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
   };
@@ -118,19 +114,19 @@ const CommitList = ({ owner, repo, branch }) => {
 
   // Xử lý thay đổi số lượng commits trên trang
   const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize);
+    // pageSize is now a prop, so we need to call setPageSize from parent
+    // This function might not be needed here if pageSize is controlled by parent
+    // For now, we'll just update currentPage
     setCurrentPage(1);
-    // Nếu cần thêm dữ liệu, fetch lại
-    if (newPageSize > allCommits.length) {
-      fetchCommits(newPageSize);
-    }
   };
 
-  // Tính toán dữ liệu hiển thị theo trang hiện tại (client-side pagination)
-  const paginatedCommits = Array.isArray(allCommits) ? allCommits.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  ) : [];
+  if (!selectedMember && (!allRepoCommits || allRepoCommits.length === 0)) {
+    return (
+      <Card>
+        <Empty description="Không có commit nào được tìm thấy cho repository này." />
+      </Card>
+    );
+  }
 
   if (loading) {
     return (
@@ -143,10 +139,24 @@ const CommitList = ({ owner, repo, branch }) => {
     );
   }
 
+  const commitsToDisplay = selectedMember ? (memberCommits?.commits || []) : (allRepoCommits || []);
+
+  if (commitsToDisplay.length === 0) {
+    return (
+      <Card>
+        <Empty description="Không có commit nào được tìm thấy." />
+      </Card>
+    );
+  }
+
+  const displayTitle = selectedMember 
+    ? `Commit của ${selectedMember.login} trên nhánh: ${selectedBranch || "Tất cả"}`
+    : `Tất cả Commit trên nhánh: ${selectedBranch || "Tất cả"}`;
+
   return (
     <div style={{ padding: '16px' }}>      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>        <Title level={4} style={{ margin: 0, flex: 1 }}>
           <BranchesOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
-          Commit trên branch: <Tag color="blue">{branch}</Tag>
+          {displayTitle}
           <Tag style={{ marginLeft: '8px' }}>{totalCommits} commits</Tag>
         </Title>
         
@@ -181,8 +191,8 @@ const CommitList = ({ owner, repo, branch }) => {
                 </Tooltip>
               </CommitHeader>
                 <CommitMessage>
-                <Tooltip title={item.message || item.commit?.message} placement="topLeft">
-                  {(item.message || item.commit?.message || '').split('\n')[0]}
+                <Tooltip title={item.message} placement="topLeft">
+                  {(item.message || '').split('\n')[0]}
                 </Tooltip>
               </CommitMessage>
               
@@ -194,12 +204,12 @@ const CommitList = ({ owner, repo, branch }) => {
                     icon={<UserOutlined />}
                     style={{ marginRight: '8px' }}
                   />
-                  <Text>{item.author_name || item.commit?.author?.name || 'Unknown'}</Text>
+                  <Text>{item.author_name || 'Unknown'}</Text>
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <ClockCircleOutlined style={{ marginRight: '4px' }} />
-                  <Text>{formatDate(item.author_date || item.commit?.author?.date)}</Text>
+                  <Text>{formatDate(item.date)}</Text>
                 </div>
               </CommitMeta>
             </CommitCard>
