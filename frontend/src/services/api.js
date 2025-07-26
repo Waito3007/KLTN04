@@ -241,4 +241,63 @@ export const branchAPI = {  // 🌿 Lấy branches từ database
   }
 };
 
+// ==================== ASSIGNMENT RECOMMENDATION API ====================
+export const assignmentRecommendationAPI = {
+  // 🎯 Lấy kỹ năng của các thành viên (simplified endpoint)
+  getMemberSkills: async (owner, repoName) => {
+    console.log(`🔍 Getting member skills for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/member-skills-simple/${owner}/${repoName}`);
+    console.log('🎯 Member skills response:', response.data);
+    return response.data;
+  },
+
+  // 🤖 Lấy gợi ý phân công cho task
+  getRecommendations: async (owner, repoName, taskDescription, requiredSkills = [], maxRecommendations = 3) => {
+    console.log(`🤖 Getting recommendations for task: "${taskDescription}"`);
+    const response = await apiClient.post(`/assignment-recommendation/recommend/${owner}/${repoName}`, {
+      task_description: taskDescription,
+      required_skills: requiredSkills,
+      max_recommendations: maxRecommendations
+    });
+    console.log('🤖 Recommendations response:', response.data);
+    return response.data;
+  },
+
+  // ⚖️ Phân công thông minh với cân bằng workload (simplified endpoint)
+  getSmartAssignment: async (owner, repoName, taskDescription, requiredSkills = [], considerWorkload = true) => {
+    console.log(`⚖️ Getting smart assignment for task: "${taskDescription}"`);
+    const response = await apiClient.post(`/assignment-recommendation/smart-assign-simple/${owner}/${repoName}`, {
+      task_description: taskDescription,
+      required_skills: requiredSkills,
+      consider_workload: considerWorkload
+    });
+    console.log('⚖️ Smart assignment response:', response.data);
+    return response.data;
+  },
+
+  // 📊 Lấy insights về team
+  getTeamInsights: async (owner, repoName) => {
+    console.log(`📊 Getting team insights for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/team-insights/${owner}/${repoName}`);
+    console.log('📊 Team insights response:', response.data);
+    return response.data;
+  },
+
+  // 📈 Lấy phân tích workload
+  getWorkloadAnalysis: async (owner, repoName) => {
+    console.log(`📈 Getting workload analysis for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/workload-analysis/${owner}/${repoName}`);
+    console.log('📈 Workload analysis response:', response.data);
+    return response.data;
+  },
+
+  // 🔍 Lấy chi tiết kỹ năng của một thành viên
+  getMemberSkillDetails: async (owner, repoName, username) => {
+    console.log(`🔍 Getting skill details for member: ${username}`);
+    const response = await apiClient.get(`/assignment-recommendation/member-skills/${owner}/${repoName}/${username}`);
+    console.log('🔍 Member skill details response:', response.data);
+    return response.data;
+  }
+};
+
 export default apiClient;

@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Modal, Form, Input, Select, DatePicker, Button, Space, Avatar, Tag, 
   Card, Divider, Typography, Row, Col 
 } from 'antd';
 import { 
   UserOutlined, CalendarOutlined, FlagOutlined, 
-  FileTextOutlined, TeamOutlined 
+  FileTextOutlined, TeamOutlined, RobotOutlined 
 } from '@ant-design/icons';
 import { getAvatarUrl } from '../../../utils/taskUtils.jsx';
+import AssignmentRecommendation from './AssignmentRecommendation';
 
 import styles from './TaskModal.module.css';
 
@@ -21,11 +22,30 @@ const TaskModal = ({
   form,
   handleTaskSubmit,
   setIsModalVisible,
-  collaborators
+  collaborators,
+  selectedRepo // Add selectedRepo prop for AI recommendations
 }) => {
+  const [showAIRecommendation, setShowAIRecommendation] = useState(false);
+  
   console.log('🎯 TaskModal rendered with collaborators:', collaborators);
   console.log('🎯 TaskModal collaborators type:', typeof collaborators);
   console.log('🎯 TaskModal collaborators isArray:', Array.isArray(collaborators));
+
+  // Handle AI recommendation selection
+  const handleAIAssigneeSelect = (username) => {
+    form.setFieldsValue({ assignee: username });
+    setShowAIRecommendation(false);
+  };
+
+  // Get current task data for AI recommendations
+  const getCurrentTaskData = () => {
+    const formValues = form.getFieldsValue();
+    return {
+      title: formValues.title || '',
+      description: formValues.description || '',
+      ...editingTask
+    };
+  };
 
   // Get current user and ensure they're in the assignee list
   const getCurrentUser = () => {
@@ -135,6 +155,26 @@ const TaskModal = ({
                   filterOption={(input, option) =>
                     option.children.props.children[1].toLowerCase().includes(input.toLowerCase())
                   }
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <Divider style={{ margin: '8px 0' }} />
+                      <div style={{ padding: '8px' }}>
+                        <Button
+                          type="text"
+                          icon={<RobotOutlined />}
+                          onClick={() => setShowAIRecommendation(true)}
+                          style={{ 
+                            width: '100%',
+                            color: '#1890ff',
+                            fontWeight: 500
+                          }}
+                        >
+                          🤖 AI Gợi ý phân công thông minh
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 >
                   {allAssignees.map((collab, index) => {
                     const username = collab.login || collab.github_username;
@@ -228,6 +268,17 @@ const TaskModal = ({
           </Button>
         </div>
       </Form>
+
+      {/* AI Assignment Recommendation Modal */}
+      {selectedRepo && (
+        <AssignmentRecommendation
+          selectedRepo={selectedRepo}
+          isVisible={showAIRecommendation}
+          onClose={() => setShowAIRecommendation(false)}
+          onSelectAssignee={handleAIAssigneeSelect}
+          currentTaskData={getCurrentTaskData()}
+        />
+      )}
     </Modal>
   );
 };
