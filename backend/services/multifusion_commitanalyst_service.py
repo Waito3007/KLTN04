@@ -10,6 +10,7 @@ import torch.nn as nn
 import json
 import numpy as np
 import joblib
+import pandas as pd
 from transformers import RobertaTokenizer, RobertaModel
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
@@ -89,7 +90,7 @@ class MultiFusionV2Service:
             model_dir = Path(__file__).parent.parent / "ai" / "models" / "multifusion" / "commitanalyst"
             print(f"1. Model directory: {model_dir}")
 
-            model_path = model_dir / "best_multi_modal_fusion_model.pth"
+            model_path = model_dir / "commitanalyst.pth"
             scaler_path = model_dir / "scaler.pkl"
             label_map_path = model_dir / "label_map.json"
             reverse_label_map_path = model_dir / "reverse_label_map.json"
@@ -117,13 +118,9 @@ class MultiFusionV2Service:
             self.tokenizer = RobertaTokenizer.from_pretrained('microsoft/codebert-base')
             print("10. Tokenizer loaded.")
 
-            if hasattr(self.scaler, 'get_feature_names_out'):
-                self.numeric_features = self.scaler.get_feature_names_out().tolist()
-                print("11a. Extracted numeric features via get_feature_names_out().")
-            else:
-                self.numeric_features = ['file_count', 'lines_added', 'lines_removed', 'total_changes', 'num_dirs_changed']
-                print("11b. Using fallback numeric features.")
-
+            # Always use the expected numeric features for commit analysis
+            self.numeric_features = ['file_count', 'lines_added', 'lines_removed', 'total_changes', 'num_dirs_changed']
+            print("11. Using fixed numeric features for commit analysis.")
             print(f"12. Numeric features: {self.numeric_features}")
 
             print("13. Initializing MultiModalFusionModel...")
@@ -205,14 +202,29 @@ class MultifusionCommitAnalystService:
     def __init__(self, db: Session):
         self.db = db
         self.multifusion_v2_service = MultiFusionV2Service()
+        print("Session DB:", self.db)
 
     def get_branches(self, repo_id: int):
-        # TODO: Trả về danh sách branches thực tế từ DB
-        return []
+        """Trả về danh sách branches thực tế từ DB"""
+        query = """
+            SELECT id, name, sha, is_default, is_protected, created_at, last_commit_date, commits_count, contributors_count
+            FROM branches
+            WHERE repo_id = :repo_id
+            ORDER BY is_default DESC, name ASC
+        """
+        params = {"repo_id": repo_id}
+        return self._get_commits_from_db(query, params)
 
     def get_all_repo_commits_raw(self, repo_id: int):
-        # TODO: Trả về danh sách tất cả commits thực tế từ DB
-        return []
+        """Trả về danh sách tất cả commits thực tế từ DB"""
+        query = """
+            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
+            FROM commits
+            WHERE repo_id = :repo_id
+            ORDER BY committer_date DESC
+        """
+        params = {"repo_id": repo_id}
+        return self._get_commits_from_db(query, params)
         self.multifusion_v2_service = MultiFusionV2Service()
 
     def _get_commits_from_db(self, query: str, params: Dict) -> List[Dict[str, Any]]:
@@ -231,9 +243,13 @@ class MultifusionCommitAnalystService:
                 'diff_content': commit.get('diff_content', ''),
                 'lines_added': insertions,
                 'lines_removed': deletions,
-                'file_count': commit.get('files_changed', 1) or 1,
+                'file_count': commit.get('files_changed', commit.get('files_count', 1)) or 1,
                 'total_changes': insertions + deletions,
-                'num_dirs_changed': 0,  # Not available from DB, default to 0
+                'num_dirs_changed': commit.get('num_dirs_changed', 0),
+                'branch_name': commit.get('branch_name', ''),
+                'author_name': commit.get('author_name', ''),
+                'sha': commit.get('sha', ''),
+                'date': commit.get('committer_date', None)
             })
         return formatted_commits
 
@@ -260,6 +276,16 @@ class MultifusionCommitAnalystService:
 
     async def get_all_repo_commits_with_analysis(self, repo_id: int, limit: int, offset: int, branch_name: Optional[str]) -> Dict[str, Any]:
         """Gets all repository commits with AI analysis."""
+        # Get total commits count
+        count_query = "SELECT COUNT(id) FROM commits WHERE repo_id = :repo_id"
+        count_params = {"repo_id": repo_id}
+        if branch_name:
+            count_query += " AND LOWER(branch_name) = LOWER(:branch_name)"
+            count_params["branch_name"] = branch_name
+        
+        total_commits = self.db.execute(text(count_query), count_params).scalar() or 0
+
+        # Get paginated commits
         query = """
             SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
             FROM commits 
@@ -267,14 +293,18 @@ class MultifusionCommitAnalystService:
         """
         params = {"repo_id": repo_id, "limit": limit, "offset": offset}
         if branch_name:
-            query += " AND branch_name = :branch_name"
+            query += " AND LOWER(branch_name) = LOWER(:branch_name)"
             params["branch_name"] = branch_name
         query += " ORDER BY committer_date DESC LIMIT :limit OFFSET :offset"
 
         db_commits = self._get_commits_from_db(query, params)
         
         if not db_commits:
-            return {"summary": {"total_commits": 0}, "commits": [], "statistics": {}}
+            return {
+                "summary": {"total_commits": total_commits, "page_commits": 0},
+                "commits": [],
+                "statistics": {}
+            }
 
         commits_for_ai = self._format_commits_for_ai(db_commits)
         ai_results = self.multifusion_v2_service.predict_commit_type_batch(commits_for_ai)
@@ -287,7 +317,7 @@ class MultifusionCommitAnalystService:
             commit_type_stats[c['analysis']['type']] += 1
 
         return {
-            "summary": {"total_commits": len(commits_with_analysis)},
+            "summary": {"total_commits": total_commits, "page_commits": len(commits_with_analysis)},
             "commits": commits_with_analysis,
             "statistics": {"commit_types": dict(commit_type_stats)}
         }
