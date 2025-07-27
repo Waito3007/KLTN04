@@ -26,6 +26,7 @@ __pycache__/
 *.sqlite3
 
 # Large training data files (>50MB)
+backend/ai/models/multifusion/areaAnalyst/train.jsonl
 backend/ai/models/multifusion/areaAnalyst/train.py
 backend/ai/models/multifusion/areaAnalyst/best_area_classifier.pt
 backend/ai/models/multifusion/riskAnalyst/risk_model.pt
