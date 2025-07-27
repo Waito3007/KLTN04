@@ -67,6 +67,21 @@ class MultiFusionV2Service:
         self.max_len = 512
         self._load_model()
         self._initialized = True
+    
+    def get_model_info(self):
+        return {
+            "model_name": "MultiFusion V2",
+            "status": "available",
+            "input_features": [
+                "message",
+                "file_count",
+                "lines_added",
+                "lines_removed",
+                "total_changes",
+                "num_dirs_changed"
+            ],
+            "num_classes": 11
+        }
 
     def _load_model(self):
         print("--- Starting _load_model ---")
@@ -189,6 +204,15 @@ class MultiFusionV2Service:
 class MultifusionCommitAnalystService:
     def __init__(self, db: Session):
         self.db = db
+        self.multifusion_v2_service = MultiFusionV2Service()
+
+    def get_branches(self, repo_id: int):
+        # TODO: Trả về danh sách branches thực tế từ DB
+        return []
+
+    def get_all_repo_commits_raw(self, repo_id: int):
+        # TODO: Trả về danh sách tất cả commits thực tế từ DB
+        return []
         self.multifusion_v2_service = MultiFusionV2Service()
 
     def _get_commits_from_db(self, query: str, params: Dict) -> List[Dict[str, Any]]:
