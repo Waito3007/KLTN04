@@ -9,14 +9,20 @@ const { Option } = Select;
 
 // Modern, unified diagnosis panel for all repo analyses
 const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
+  // State for member selection and compare mode (area)
+  const [selectedMemberArea, setSelectedMemberArea] = useState('');
+  const [compareAreaMode, setCompareAreaMode] = useState(false);
+  const [compareMemberArea, setCompareMemberArea] = useState('');
+
+  // State for member selection and compare mode (risk)
+  const [selectedMemberRisk, setSelectedMemberRisk] = useState('');
+  const [compareRiskMode, setCompareRiskMode] = useState(false);
+  const [compareMemberRisk, setCompareMemberRisk] = useState('');
   // State cho lọc thành viên
   const [selectedMember, setSelectedMember] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [commitAnalysis, setCommitAnalysis] = useState(null);
   const [areaAnalysis, setAreaAnalysis] = useState(null);
   const [riskAnalysis, setRiskAnalysis] = useState(null);
-  const [allCommits, setAllCommits] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [repoId, setRepoId] = useState(null);
   const [repoSource, setRepoSource] = useState('database'); // 'database' | 'github'
@@ -44,6 +50,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
       setRepoId(githubRepos[0].id || githubRepos[0].github_id || githubRepos[0].id);
       if (onRepoChange) onRepoChange(githubRepos[0]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repositories, githubRepos, repoSource]);
 
   // Fetch branch list when repoId or repoSource changes
@@ -83,33 +90,62 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
       }
     };
     fetchBranches();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repoId, repoSource, githubRepos]);
 
-  // Fetch analysis data when repoId changes
+  // Auto-load area analysis when repoId changes
+  const [areaLoading, setAreaLoading] = useState(false);
+  const [areaLoadedRepo, setAreaLoadedRepo] = useState(null);
+
+  // Auto-load risk analysis when repoId changes
+  const [riskLoading, setRiskLoading] = useState(false);
+  const [riskLoadedRepo, setRiskLoadedRepo] = useState(null);
+
+  // Auto-load area and risk analysis when repoId changes
   useEffect(() => {
-    if (!repoId) {
-      setAreaAnalysis(null);
-      setRiskAnalysis(null);
-      setAllCommits(null);
-      return;
+    const loadAreaAnalysis = async () => {
+      if (!repoId || areaLoadedRepo === repoId) return;
+      setAreaLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis`);
+        const data = await res.ok ? await res.json() : null;
+        console.log('Area Analysis Data:', data); // Debug log
+        setAreaAnalysis(data);
+        setAreaLoadedRepo(repoId);
+      } catch (err) {
+        console.error('Area Analysis Error:', err); // Debug log
+        setError('Lỗi khi tải dữ liệu phân tích lĩnh vực.');
+        setAreaAnalysis(null);
+      } finally {
+        setAreaLoading(false);
+      }
+    };
+
+    const loadRiskAnalysis = async () => {
+      if (!repoId || riskLoadedRepo === repoId) return;
+      setRiskLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis`);
+        const data = await res.ok ? await res.json() : null;
+        console.log('Risk Analysis Data:', data); // Debug log
+        setRiskAnalysis(data);
+        setRiskLoadedRepo(repoId);
+      } catch (err) {
+        console.error('Risk Analysis Error:', err); // Debug log
+        setError('Lỗi khi tải dữ liệu phân tích rủi ro.');
+        setRiskAnalysis(null);
+      } finally {
+        setRiskLoading(false);
+      }
+    };
+
+    if (repoId) {
+      loadAreaAnalysis();
+      loadRiskAnalysis();
     }
-    setLoading(true);
-    setError(null);
-    // Chỉ fetch các phân tích tổng thể, không fetch commit analysis theo branch tự động
-    Promise.all([
-      fetch(`http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis`).then(r => r.ok ? r.json() : null),
-      fetch(`http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis`).then(r => r.ok ? r.json() : null),
-      fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all`).then(r => r.ok ? r.json() : null)
-    ]).then(([areaData, riskData, allData]) => {
-      setAreaAnalysis(areaData);
-      setRiskAnalysis(riskData);
-      setAllCommits(allData);
-    }).catch(() => {
-      setError('Lỗi khi tải dữ liệu phân tích kho lưu trữ.');
-    }).finally(() => {
-      setLoading(false);
-    });
-  }, [repoId, repoSource, githubRepos]);
+  }, [repoId, areaLoadedRepo, riskLoadedRepo]);
 
   // Hàm thực hiện phân tích commit theo branch khi ấn nút
   const handleAnalyzeBranch = async () => {
@@ -129,6 +165,14 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
       setBranchAnalysisLoading(false);
     }
   };
+
+  // Auto-load branch analysis when selectedBranch changes
+  useEffect(() => {
+    if (selectedBranch && repoId) {
+      handleAnalyzeBranch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBranch, repoId]);
 
   // Handle repo selection
   const handleRepoSelect = (id) => {
@@ -300,7 +344,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
           onChange={handleSourceToggle}
           checkedChildren="GitHub API"
           unCheckedChildren="Database"
-          disabled={loading || githubLoading}
+          disabled={githubLoading}
         />
         <span style={{ fontWeight: 500, color: repoSource === 'github' ? '#3b82f6' : '#64748b' }}>
           {repoSource === 'github' ? 'Đang lấy từ GitHub API' : 'Đang lấy từ Database'}
@@ -310,16 +354,16 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
           value={searchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 220 }}
-          disabled={loading || githubLoading}
+          disabled={githubLoading}
         />
         <Select
           showSearch
           style={{ minWidth: 260 }}
-          placeholder={loading || githubLoading ? 'Đang tải danh sách...' : 'Chọn repository'}
+          placeholder={githubLoading ? 'Đang tải danh sách...' : 'Chọn repository'}
           value={repoId}
           onChange={handleRepoSelect}
           filterOption={false}
-          loading={loading || githubLoading}
+          loading={githubLoading}
         >
           {filteredRepos.map(repo => (
             <Option key={repo.id || repo.github_id} value={repo.id || repo.github_id}>
@@ -335,7 +379,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
             placeholder={branchList.length === 0 ? 'Không có branch' : 'Chọn branch'}
             value={selectedBranch}
             onChange={setSelectedBranch}
-            disabled={loading || githubLoading || branchList.length === 0}
+            disabled={githubLoading || branchList.length === 0}
           >
             {branchList.map(branch => (
               <Option key={branch.name || branch} value={branch.name || branch}>{branch.name || branch}</Option>
@@ -350,14 +394,14 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
         </div>
       </div>
       <Divider />
-      {(loading || githubLoading) && (
+      {githubLoading && (
         <div style={{ width: '100%', marginBottom: 16, textAlign: 'center' }}>
           <Spin />
           <div style={{ marginTop: 8, color: '#666' }}>Đang tải dữ liệu phân tích...</div>
         </div>
       )}
       {error && <Empty description={error} />}
-      {!loading && !error && repoId && (
+      {!githubLoading && !error && repoId && (
         <>
           <FadeInWrapper delay={0.1}>
             <Card title={<Text strong>Phân tích loại commit theo nhánh</Text>} size="small" style={{ marginBottom: 32, borderRadius: 28, boxShadow: '0 4px 24px rgba(59,130,246,0.12)', background: '#f6f8fc', border: '1px solid #e0e7ef' }}>
@@ -454,73 +498,266 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
               </div>
             </Card>
           </FadeInWrapper>
+
           <FadeInWrapper delay={0.3}>
             <Card title={<Text strong>Phân tích lĩnh vực công nghệ</Text>} size="small" style={{ marginBottom: 32, borderRadius: 16, boxShadow: '0 2px 8px rgba(168,85,247,0.08)' }}>
-              {areaAnalysis && areaAnalysis.area_distribution ? (
+              {areaLoading && (
+                <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                  <Spin />
+                  <div style={{ marginTop: 8, color: '#666' }}>Đang tải phân tích lĩnh vực...</div>
+                </div>
+              )}
+              {areaAnalysis && areaAnalysis.success && areaAnalysis.area_distribution ? (
                 <>
-                  <div style={{ width: 320, height: 320, margin: '0 auto' }}>
-                    <Pie
-                      data={{
-                        labels: Object.keys(areaAnalysis.area_distribution),
-                        datasets: [
-                          {
-                            data: Object.values(areaAnalysis.area_distribution),
-                            backgroundColor: ["#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#f59e42", "#ef4444", "#22c55e"],
-                          },
-                        ],
-                      }}
-                      options={{
-                        plugins: {
-                          legend: { position: 'right', labels: { font: { size: 14 } } },
-                        },
-                      }}
-                    />
+                  {/* Member selector and compare mode */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                    <Text strong>Chọn thành viên:</Text>
+                    <Select
+                      style={{ minWidth: 180 }}
+                      value={selectedMemberArea || ''}
+                      onChange={v => setSelectedMemberArea(v)}
+                      allowClear
+                    >
+                      <Select.Option value="">Tất cả</Select.Option>
+                      {areaAnalysis.members_area_analysis.map(m => (
+                        <Select.Option key={m.member_login} value={m.member_login}>{m.member_login}</Select.Option>
+                      ))}
+                    </Select>
+                    <Switch checked={compareAreaMode} onChange={setCompareAreaMode} checkedChildren="So sánh" unCheckedChildren="Xem đơn" />
+                    {compareAreaMode && (
+                      <>
+                        <Text strong>So với:</Text>
+                        <Select
+                          style={{ minWidth: 180 }}
+                          value={compareMemberArea || ''}
+                          onChange={v => setCompareMemberArea(v)}
+                          allowClear
+                        >
+                          <Select.Option value="">Tất cả</Select.Option>
+                          {areaAnalysis.members_area_analysis.map(m => (
+                            <Select.Option key={m.member_login} value={m.member_login}>{m.member_login}</Select.Option>
+                          ))}
+                        </Select>
+                      </>
+                    )}
                   </div>
-                  <List
-                    dataSource={Object.entries(areaAnalysis.area_distribution)}
-                    renderItem={([area, value]) => (
-                      <List.Item>
-                        <Tag color="purple" style={{ fontSize: 15 }}>{area}</Tag>: <Text>{value}</Text>
-                      </List.Item>
-                    )}
-                    style={{ paddingLeft: 0 }}
-                  />
-                  <Divider />
-                  <Title level={5}>Phân tích theo thành viên</Title>
-                  <List
-                    dataSource={areaAnalysis.members_area_analysis}
-                    renderItem={member => (
-                      <List.Item>
-                        <Text strong>{member.member_login}</Text>
-                        <List
-                          dataSource={Object.entries(member.area_summary)}
-                          renderItem={([area, value]) => (
-                            <span style={{ marginRight: 12 }}>
-                              <Tag color="blue">{area}</Tag>: <Text>{value}</Text>
-                            </span>
-                          )}
-                          style={{ display: 'inline-block' }}
+                  <div style={{ display: 'flex', gap: 32 }}>
+                    {/* Main chart */}
+                    <div style={{ width: 320 }}>
+                      <Text strong>{selectedMemberArea ? selectedMemberArea : 'Tất cả'}</Text>
+                      <Pie
+                        data={{
+                          labels: selectedMemberArea
+                            ? Object.keys({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === selectedMemberArea)?.area_summary, total_commits: undefined }).filter(k => k !== 'total_commits')
+                            : Object.keys(areaAnalysis.area_distribution),
+                          datasets: [
+                            {
+                              data: selectedMemberArea
+                                ? Object.entries({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === selectedMemberArea)?.area_summary, total_commits: undefined })
+                                    .filter(([k]) => k !== 'total_commits')
+                                    .map(([, v]) => v)
+                                : Object.values(areaAnalysis.area_distribution),
+                              backgroundColor: ["#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#f59e42", "#ef4444", "#22c55e"],
+                            },
+                          ],
+                        }}
+                        options={{
+                          plugins: {
+                            legend: { position: 'right', labels: { font: { size: 14 } } },
+                          },
+                        }}
+                      />
+                      <List
+                        dataSource={selectedMemberArea
+                          ? Object.entries({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === selectedMemberArea)?.area_summary, total_commits: undefined }).filter(([k]) => k !== 'total_commits')
+                          : Object.entries(areaAnalysis.area_distribution)}
+                        renderItem={([area, value]) => (
+                          <List.Item>
+                            <Tag color="purple" style={{ fontSize: 15 }}>{area}</Tag>: <Text>{value}</Text>
+                          </List.Item>
+                        )}
+                        style={{ paddingLeft: 0 }}
+                      />
+                      <Text type="secondary">Tổng số commit: {selectedMemberArea
+                        ? areaAnalysis.members_area_analysis.find(m => m.member_login === selectedMemberArea)?.area_summary.total_commits || 0
+                        : areaAnalysis.total_commits_analyzed || 0}</Text>
+                    </div>
+                    {/* Compare chart */}
+                    {compareAreaMode && compareMemberArea !== undefined && (
+                      <div style={{ width: 320 }}>
+                        <Text strong>{compareMemberArea ? compareMemberArea : 'Tất cả'}</Text>
+                        <Pie
+                          data={{
+                            labels: compareMemberArea
+                              ? Object.keys({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === compareMemberArea)?.area_summary, total_commits: undefined }).filter(k => k !== 'total_commits')
+                              : Object.keys(areaAnalysis.area_distribution),
+                            datasets: [
+                              {
+                                data: compareMemberArea
+                                  ? Object.entries({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === compareMemberArea)?.area_summary, total_commits: undefined })
+                                      .filter(([k]) => k !== 'total_commits')
+                                      .map(([, v]) => v)
+                                  : Object.values(areaAnalysis.area_distribution),
+                                backgroundColor: ["#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#f59e42", "#ef4444", "#22c55e"],
+                              },
+                            ],
+                          }}
+                          options={{
+                            plugins: {
+                              legend: { position: 'right', labels: { font: { size: 14 } } },
+                            },
+                          }}
                         />
-                      </List.Item>
+                        <List
+                          dataSource={compareMemberArea
+                            ? Object.entries({ ...areaAnalysis.members_area_analysis.find(m => m.member_login === compareMemberArea)?.area_summary, total_commits: undefined }).filter(([k]) => k !== 'total_commits')
+                            : Object.entries(areaAnalysis.area_distribution)}
+                          renderItem={([area, value]) => (
+                            <List.Item>
+                              <Tag color="purple" style={{ fontSize: 15 }}>{area}</Tag>: <Text>{value}</Text>
+                            </List.Item>
+                          )}
+                          style={{ paddingLeft: 0 }}
+                        />
+                        <Text type="secondary">Tổng số commit: {compareMemberArea
+                          ? areaAnalysis.members_area_analysis.find(m => m.member_login === compareMemberArea)?.area_summary.total_commits || 0
+                          : areaAnalysis.total_commits_analyzed || 0}</Text>
+                      </div>
                     )}
-                  />
+                  </div>
                 </>
-              ) : <Empty description="Không có dữ liệu lĩnh vực." />}
+              ) : !areaLoading ? (
+                areaAnalysis && !areaAnalysis.success ? 
+                  <Empty description={`API Error: ${areaAnalysis.message || 'Unknown error'}`} /> :
+                  <Empty description="Không có dữ liệu lĩnh vực." />
+              ) : null}
             </Card>
           </FadeInWrapper>
+
           <FadeInWrapper delay={0.4}>
             <Card title={<Text strong>Phân tích rủi ro</Text>} size="small" style={{ borderRadius: 16, boxShadow: '0 2px 8px rgba(239,68,68,0.08)' }}>
-              {riskAnalysis && riskAnalysis.risks ? (
-                <List
-                  dataSource={Object.entries(riskAnalysis.risks)}
-                  renderItem={([risk, value]) => (
-                    <List.Item>
-                      <Tag color="red" style={{ fontSize: 15 }}>{risk}</Tag>: <Text>{value}</Text>
-                    </List.Item>
-                  )}
-                  style={{ paddingLeft: 0 }}
-                />
-              ) : <Empty description="Không có dữ liệu rủi ro." />}
+              {riskLoading && (
+                <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                  <Spin />
+                  <div style={{ marginTop: 8, color: '#666' }}>Đang tải phân tích rủi ro...</div>
+                </div>
+              )}
+              {riskAnalysis && riskAnalysis.success && riskAnalysis.risk_distribution ? (
+                <>
+                  {/* Member selector and compare mode */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                    <Text strong>Chọn thành viên:</Text>
+                    <Select
+                      style={{ minWidth: 180 }}
+                      value={selectedMemberRisk || ''}
+                      onChange={v => setSelectedMemberRisk(v)}
+                      allowClear
+                    >
+                      <Select.Option value="">Tất cả</Select.Option>
+                      {riskAnalysis.members_risk_analysis.map(m => (
+                        <Select.Option key={m.member_login} value={m.member_login}>{m.member_login}</Select.Option>
+                      ))}
+                    </Select>
+                    <Switch checked={compareRiskMode} onChange={setCompareRiskMode} checkedChildren="So sánh" unCheckedChildren="Xem đơn" />
+                    {compareRiskMode && (
+                      <>
+                        <Text strong>So với:</Text>
+                        <Select
+                          style={{ minWidth: 180 }}
+                          value={compareMemberRisk || ''}
+                          onChange={v => setCompareMemberRisk(v)}
+                          allowClear
+                        >
+                          <Select.Option value="">Tất cả</Select.Option>
+                          {riskAnalysis.members_risk_analysis.map(m => (
+                            <Select.Option key={m.member_login} value={m.member_login}>{m.member_login}</Select.Option>
+                          ))}
+                        </Select>
+                      </>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 32 }}>
+                    {/* Main chart */}
+                    <div style={{ width: 320 }}>
+                      <Text strong>{selectedMemberRisk ? selectedMemberRisk : 'Tất cả'}</Text>
+                      <Pie
+                        data={{
+                          labels: ['lowrisk', 'highrisk'],
+                          datasets: [
+                            {
+                              data: selectedMemberRisk
+                                ? ['lowrisk', 'highrisk'].map(label => riskAnalysis.members_risk_analysis.find(m => m.member_login === selectedMemberRisk)?.risk_summary[label] || 0)
+                                : [riskAnalysis.risk_distribution.lowrisk || 0, riskAnalysis.risk_distribution.highrisk || 0, riskAnalysis.risk_distribution.unknown || 0],
+                              backgroundColor: ["#22c55e", "#ef4444", "#64748b"],
+                            },
+                          ],
+                        }}
+                        options={{
+                          plugins: {
+                            legend: { position: 'right', labels: { font: { size: 14 } } },
+                          },
+                        }}
+                      />
+                      <List
+                        dataSource={['lowrisk', 'highrisk'].map(label => [label, selectedMemberRisk
+                          ? riskAnalysis.members_risk_analysis.find(m => m.member_login === selectedMemberRisk)?.risk_summary[label] || 0
+                          : riskAnalysis.risk_distribution[label] || 0])}
+                        renderItem={([label, value]) => (
+                          <List.Item>
+                            <Tag color={label === 'lowrisk' ? 'green' : label === 'highrisk' ? 'red' : 'default'} style={{ fontSize: 15 }}>{label}</Tag>: <Text>{value}</Text>
+                          </List.Item>
+                        )}
+                        style={{ paddingLeft: 0 }}
+                      />
+                      <Text type="secondary">Tổng số commit: {selectedMemberRisk
+                        ? riskAnalysis.members_risk_analysis.find(m => m.member_login === selectedMemberRisk)?.risk_summary.total_commits || 0
+                        : riskAnalysis.total_commits_analyzed || 0}</Text>
+                    </div>
+                    {/* Compare chart */}
+                    {compareRiskMode && compareMemberRisk !== undefined && (
+                      <div style={{ width: 320 }}>
+                        <Text strong>{compareMemberRisk ? compareMemberRisk : 'Tất cả'}</Text>
+                        <Pie
+                          data={{
+                            labels: ['lowrisk', 'highrisk'],
+                            datasets: [
+                              {
+                                data: compareMemberRisk
+                                  ? ['lowrisk', 'highrisk'].map(label => riskAnalysis.members_risk_analysis.find(m => m.member_login === compareMemberRisk)?.risk_summary[label] || 0)
+                                  : [riskAnalysis.risk_distribution.lowrisk || 0, riskAnalysis.risk_distribution.highrisk || 0, riskAnalysis.risk_distribution.unknown || 0],
+                                backgroundColor: ["#22c55e", "#ef4444", "#64748b"],
+                              },
+                            ],
+                          }}
+                          options={{
+                            plugins: {
+                              legend: { position: 'right', labels: { font: { size: 14 } } },
+                            },
+                          }}
+                        />
+                        <List
+                          dataSource={['lowrisk', 'highrisk'].map(label => [label, compareMemberRisk
+                            ? riskAnalysis.members_risk_analysis.find(m => m.member_login === compareMemberRisk)?.risk_summary[label] || 0
+                            : riskAnalysis.risk_distribution[label] || 0])}
+                          renderItem={([label, value]) => (
+                            <List.Item>
+                              <Tag color={label === 'lowrisk' ? 'green' : label === 'highrisk' ? 'red' : 'default'} style={{ fontSize: 15 }}>{label}</Tag>: <Text>{value}</Text>
+                            </List.Item>
+                          )}
+                          style={{ paddingLeft: 0 }}
+                        />
+                        <Text type="secondary">Tổng số commit: {compareMemberRisk
+                          ? riskAnalysis.members_risk_analysis.find(m => m.member_login === compareMemberRisk)?.risk_summary.total_commits || 0
+                          : riskAnalysis.total_commits_analyzed || 0}</Text>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : !riskLoading ? (
+                riskAnalysis && !riskAnalysis.success ? 
+                  <Empty description={`API Error: ${riskAnalysis.message || 'Unknown error'}`} /> :
+                  <Empty description="Không có dữ liệu rủi ro." />
+              ) : null}
             </Card>
           </FadeInWrapper>
         </>
