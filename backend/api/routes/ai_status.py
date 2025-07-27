@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any
 from db.database import get_db
 from services.assignment_recommendation_service import AssignmentRecommendationService
-from services.multifusion_v2_service import MultiFusionV2Service
+from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService
 from services.area_analysis_service import AreaAnalysisService
 from services.risk_analysis_service import RiskAnalysisService
 import logging
@@ -19,24 +19,24 @@ async def get_assignment_ai_models_status() -> Dict[str, Any]:
     """
     try:
         # Initialize services
-        multifusion_v2 = MultiFusionV2Service()
+        multifusion_commit_analyst = MultifusionCommitAnalystService(None)
         area_service = AreaAnalysisService()
         risk_service = RiskAnalysisService()
         
         return {
             "success": True,
             "models": {
-                "multifusion_v2": {
-                    "name": "MultiFusion V2",
+                "multifusion_commit_analyst": {
+                    "name": "MultiFusion Commit Analyst",
                     "purpose": "Commit Type Classification",
-                    "status": "available" if multifusion_v2.is_model_available() else "unavailable",
+                    "status": "available" if multifusion_commit_analyst.is_model_available() else "unavailable",
                     "features": [
                         "BERT-based semantic analysis",
                         "Code metrics integration", 
                         "Programming language detection",
                         "Multi-modal fusion"
                     ],
-                    "supported_commit_types": multifusion_v2.get_model_info().get("supported_commit_types", []) if multifusion_v2.is_model_available() else []
+                    "supported_commit_types": list(multifusion_commit_analyst.label_map.keys()) if multifusion_commit_analyst.is_model_available() and multifusion_commit_analyst.label_map else []
                 },
                 "area_analyst": {
                     "name": "Area Analysis Model",

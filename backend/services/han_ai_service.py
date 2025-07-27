@@ -178,6 +178,7 @@ class HANAIService:
     
     def _initialize_model(self):
         """Initialize HAN model with error handling"""
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         try:
             success = self._load_han_model()
             if success:

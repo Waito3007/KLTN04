@@ -60,24 +60,19 @@ const RepositoryMembers = ({ selectedRepo }) => {
     if (!selectedRepo?.id) return;
     
     try {
-      // Load HAN model status - Using POST method since that's how the backend expects it
-      const response = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/ai/model-status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      // Load HAN model status
+      const hanResponse = await fetch(`http://localhost:8000/api/han-commit-analysis/${selectedRepo.id}/model-status`);
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('AI Model Status:', data); // Debug log
-        setAiModelStatus(data);
+      if (hanResponse.ok) {
+        const hanData = await hanResponse.json();
+        console.log('HAN Model Status:', hanData); // Debug log
+        setAiModelStatus(hanData);
       } else {
-        console.error('AI Status Error:', response.status);
+        console.error('HAN Status Error:', hanResponse.status);
       }
 
       // Load MultiFusion V2 status
-      const multiFusionResponse = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/ai/model-v2-status`);
+      const multiFusionResponse = await fetch(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepo.id}/ai/model-v2-status`);
       
       if (multiFusionResponse.ok) {
         const multiFusionData = await multiFusionResponse.json();
@@ -95,7 +90,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
     if (!selectedRepo?.id) return;
     setBranchesLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/repositories/${selectedRepo.id}/branches`);
+      const response = await fetch(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepo.id}/branches`);
       if (response.ok) {
         const data = await response.json();
         setBranches(data.branches || []);
@@ -153,7 +148,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
     if (!selectedRepo?.id) return;
     setFullAnalysisLoading(true);
     try {
-      const url = `http://localhost:8000/api/repositories/${selectedRepo.id}/commits/all`;
+      const url = `http://localhost:8000/api/multifusion-commit-analysis/${selectedRepo.id}/commits/all`;
       console.log('Fetching all repo commits from URL:', url);
       const response = await fetch(url);
       if (response.ok) {
@@ -177,7 +172,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
     if (!selectedRepo?.id) return;
     setFullAnalysisLoading(true);
     try {
-      const url = `http://localhost:8000/api/repositories/${selectedRepo.id}/commits/all/analysis`;
+      const url = `http://localhost:8000/api/multifusion-commit-analysis/${selectedRepo.id}/commits/all/analysis`;
       console.log('Fetching all repo commit analysis from URL:', url);
       const response = await fetch(url);
       if (response.ok) {
@@ -294,17 +289,15 @@ const RepositoryMembers = ({ selectedRepo }) => {
       let requestData = null;
 
       if (aiModel === 'han' && useAI) {
-        // Use original HAN analysis endpoint
-        const aiParam = useAI ? '?use_ai=true' : '?use_ai=false';
-        const branchParam = selectedBranch ? `&branch_name=${encodeURIComponent(selectedBranch)}` : '';
-        url = `http://localhost:8000/api/repositories/${selectedRepo.id}/members/${member.login}/commits-han${aiParam}${branchParam}`;
-      } else if (aiModel === 'multifusion' && useAI) {
-        // Use MultiFusion V2 analysis endpoint
-        url = `http://localhost:8000/api/repositories/${selectedRepo.id}/members/${member.login}/commits-v2`;
+        // HAN commit analysis endpoint
         const branchParam = selectedBranch ? `?branch_name=${encodeURIComponent(selectedBranch)}` : '';
-        url += branchParam;
+        url = `http://localhost:8000/api/han-commit-analysis/${selectedRepo.id}/members/${member.login}/commits-han${branchParam}`;
+      } else if (aiModel === 'multifusion' && useAI) {
+        // MultiFusion commit analysis endpoint
+        const branchParam = selectedBranch ? `?branch_name=${encodeURIComponent(selectedBranch)}` : '';
+        url = `http://localhost:8000/api/multifusion-commit-analysis/${selectedRepo.id}/members/${member.login}/commits${branchParam}`;
       } else {
-        // Use original HAN analysis endpoint
+        // Default analysis endpoint
         const aiParam = useAI ? '?use_ai=true' : '?use_ai=false';
         const branchParam = selectedBranch ? `&branch_name=${encodeURIComponent(selectedBranch)}` : '';
         url = `http://localhost:8000/api/repositories/${selectedRepo.id}/members/${member.login}/commits${aiParam}${branchParam}`;
@@ -327,61 +320,20 @@ const RepositoryMembers = ({ selectedRepo }) => {
         console.log('AI Model used:', aiModel); // Debug AI model
         
         // Handle different response formats
-        if (aiModel === 'han' && data.data) {
-            setMemberCommits(data.data);
-        } else if (aiModel === 'multifusion' && data.analysis) {
-          // MultiFusion V2 response format
-          console.log('Using MultiFusion response format');
-          setMemberCommits({
-            statistics: {
-              commit_types: data.analysis.commit_type_distribution || {},
-              tech_analysis: data.statistics?.tech_analysis || {},
-              risk_analysis: data.statistics?.risk_analysis || {},
-              productivity: data.analysis.productivity_metrics || {}
-            },
-            commits: data.commits || [],
-            summary: {
-              total_commits: data.analysis.total_commits || 0,
-              ai_powered: true,
-              model_used: 'MultiFusion V2',
-              analysis_date: new Date().toISOString(),
-              dominant_type: data.analysis.dominant_commit_type
-            },
-            multifusion_insights: data.analysis // Store full MultiFusion analysis
-          });
-        } else if (data.success && data.statistics && data.commits) {
-          // HAN API response format (new format with success flag)
-          console.log('Using HAN API response format');
+        if (data.success && data.statistics && data.commits) {
+          // New HAN and MultiFusion API response format
+          console.log(`Using ${aiModel.toUpperCase()} API response format`);
           setMemberCommits({
             statistics: data.statistics,
             commits: data.commits,
             summary: {
               ai_powered: true,
-              model_used: 'HAN AI',
+              model_used: aiModel === 'han' ? 'HAN AI' : 'MultiFusion V2',
               analysis_date: new Date().toISOString(),
-              total_commits: data.commits.length
+              total_commits: data.commits.length,
             },
+            ...(data.multifusion_insights && { multifusion_insights: data.multifusion_insights }),
           });
-        } else if (data.statistics && data.commits) {
-          // Direct HAN model response format  
-          console.log('Using direct HAN response format');
-          setMemberCommits({
-            statistics: data.statistics,
-            commits: data.commits,
-            summary: data.summary || {
-              ai_powered: true,
-              model_used: 'HAN AI',
-              analysis_date: new Date().toISOString()
-            },
-          });
-        } else if (data.success && data.data) {
-          // Alternative response format with data wrapper
-          console.log('Using wrapped data format');
-          setMemberCommits(data.data);
-        } else if (data.data) {
-          // Legacy format
-          console.log('Using legacy data format');
-          setMemberCommits(data.data);
         } else {
           setMemberCommits(null);
         }

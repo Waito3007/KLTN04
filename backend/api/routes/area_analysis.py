@@ -7,16 +7,17 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from services.member_analysis_service import MemberAnalysisService
+from api.deps import get_area_analysis_service
 
 logger = logging.getLogger(__name__)
 
 area_analysis_router = APIRouter(prefix="/api/area-analysis", tags=["Area Analysis"])
 
-# Initialize AreaAnalysisService
-area_analysis_service = AreaAnalysisService()
-
 @area_analysis_router.post("/predict")
-async def predict_commit_area(commit_data: CommitAreaAnalysisRequest) -> Dict[str, str]:
+async def predict_commit_area(
+    commit_data: CommitAreaAnalysisRequest,
+    area_analysis_service: AreaAnalysisService = Depends(get_area_analysis_service)
+) -> Dict[str, str]:
     """
     Phân tích phạm vi công việc (dev area) của một commit dựa trên message và diff.
     
@@ -38,7 +39,8 @@ async def predict_commit_area(commit_data: CommitAreaAnalysisRequest) -> Dict[st
 async def get_full_area_analysis(
     repo_id: int,
     limit_per_member: int = 50, # Default limit for commits per member
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    area_analysis_service: AreaAnalysisService = Depends(get_area_analysis_service)
 ):
     """
     Thực hiện phân tích khu vực phát triển toàn diện cho tất cả thành viên trong một repository.

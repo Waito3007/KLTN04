@@ -5,12 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.lifespan import lifespan
 from core.config import setup_middlewares
 from core.logger import setup_logger
-
 from api.routes.auth import auth_router
 from api.routes.github import github_router
 from api.routes.projects import router as projects_router
 from api.routes.sync import sync_router
 from api.routes.contributors import router as contributors_router
+from api.routes.han_commitanalyst import router as han_commit_analyst_router
+from api.routes.multifusion_commitanalyst import router as multifusion_commit_analyst_router
 from api.routes.member_analysis import router as member_analysis_router
 from api.routes.commit_routes import router as commit_router
 from api.routes.area_analysis import area_analysis_router
@@ -40,7 +41,9 @@ app.include_router(github_router, prefix="/api")
 app.include_router(projects_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
 app.include_router(contributors_router, prefix="/api/contributors")
-app.include_router(member_analysis_router)  # Already has /api prefix
+app.include_router(han_commit_analyst_router, prefix="/api/han-commit-analysis")
+app.include_router(multifusion_commit_analyst_router, prefix="/api/multifusion-commit-analysis")
+app.include_router(member_analysis_router)
 app.include_router(repositories_router)  # Already has /api prefix
 app.include_router(commit_router)  # Already has /api prefix
 app.include_router(area_analysis_router)

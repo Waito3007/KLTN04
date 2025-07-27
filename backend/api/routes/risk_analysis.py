@@ -7,16 +7,17 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from services.member_analysis_service import MemberAnalysisService
+from api.deps import get_risk_analysis_service
 
 logger = logging.getLogger(__name__)
 
 risk_analysis_router = APIRouter(prefix="/api/risk-analysis", tags=["Risk Analysis"])
 
-# Initialize RiskAnalysisService
-risk_analysis_service = RiskAnalysisService()
-
 @risk_analysis_router.post("/predict")
-async def predict_commit_risk(commit_data: CommitAreaAnalysisRequest) -> Dict[str, str]:
+async def predict_commit_risk(
+    commit_data: CommitAreaAnalysisRequest,
+    risk_analysis_service: RiskAnalysisService = Depends(get_risk_analysis_service)
+) -> Dict[str, str]:
     """
     Phân tích độ rủi ro của một commit dựa trên message và diff.
     
@@ -38,7 +39,8 @@ async def predict_commit_risk(commit_data: CommitAreaAnalysisRequest) -> Dict[st
 async def get_full_risk_analysis(
     repo_id: int,
     limit_per_member: int = 50, # Default limit for commits per member
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    risk_analysis_service: RiskAnalysisService = Depends(get_risk_analysis_service)
 ):
     """
     Thực hiện phân tích rủi ro toàn diện cho tất cả thành viên trong một repository.
