@@ -13,6 +13,7 @@ import ControlPanel from '../components/Dashboard/components/ControlPanel';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
 import CommitAnalyst from '../components/Dashboard/components/CommitAnalyst';
+import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -588,6 +589,12 @@ const Dashboard = () => {
               useAI={useAI}
               aiModelStatus={aiModelStatus}
               multiFusionV2Status={multiFusionV2Status}
+            />
+            {/* RepoDiagnosisPanel: Manual diagnosis for selected repo */}
+            <RepoDiagnosisPanel 
+              repositories={repositories}
+              selectedRepoId={selectedRepoId}
+              onRepoChange={repo => setSelectedRepoId(repo?.id)}
             />
           </DashboardCard>
 

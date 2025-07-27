@@ -73,10 +73,10 @@ const ControlPanel = ({
               {aiModelStatus?.model_loaded ? <Tag color="green" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
             </span>
           </Select.Option>
-          <Select.Option value="multifusion" disabled={!multiFusionV2Status?.model_info?.is_available}>
+          <Select.Option value="multifusion" disabled={multiFusionV2Status?.model_info?.status !== "available"}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               MultiFusion
-              {multiFusionV2Status?.model_info?.is_available ? <Tag color="blue" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
+              {multiFusionV2Status?.model_info?.status === "available" ? <Tag color="blue" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
             </span>
           </Select.Option>
         </Select>

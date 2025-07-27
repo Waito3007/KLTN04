@@ -86,6 +86,20 @@ const RepositoryMembers = ({ selectedRepo }) => {
     }
   }, [selectedRepo?.id]);
 
+  // Tự động kiểm tra trạng thái model, nếu chưa có thì gọi lại sau 2 giây
+  useEffect(() => {
+    if (!selectedRepo?.id) return;
+    
+    // Chỉ gọi lại nếu chưa có trạng thái cho cả 2 model
+    if (!aiModelStatus || !multiFusionV2Status) {
+      const timer = setTimeout(() => {
+        console.log('Auto-retry loading AI model status...');
+        _loadAIModelStatus();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedRepo?.id, aiModelStatus, multiFusionV2Status, _loadAIModelStatus]);
+
   const loadRepositoryBranches = useCallback(async () => {
     if (!selectedRepo?.id) return;
     setBranchesLoading(true);
@@ -428,7 +442,7 @@ const RepositoryMembers = ({ selectedRepo }) => {
               items={[
                 {
                   key: 'commitType',
-                  label: '🏷️ Loại Commit',
+                  label: 'Loại Commit',
                   children: (
                     <CommitAnalyst 
                       memberCommits={memberCommits} 
