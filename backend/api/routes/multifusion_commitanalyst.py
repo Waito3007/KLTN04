@@ -111,7 +111,7 @@ async def get_member_commits_analyst(
         raise HTTPException(status_code=500, detail=f"Error analyzing member commits with MultiFusion V2: {str(e)}")
 # Direct diagnosis using GitHub API data
 
-
+# Phân tích một commit 
 @router.post("/{repo_id}/analyze-commit")
 async def analyze_single_commit(repo_id: int, commit_data: dict):
     """
@@ -148,15 +148,16 @@ async def analyze_single_commit(repo_id: int, commit_data: dict):
     except Exception as e:
         logger.error(f"Error analyzing single commit: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+# Batch phân tích nhiều commits 
 @router.post("/{repo_id}/batch-analyze-commits")
 async def batch_analyze_commits(repo_id: int, request_data: dict):
     """
-    Batch phân tích nhiều commits sử dụng MultiFusion V2
+    Batch phân tích nhiều commits sử dụng MultiFusion 
     Đầu vào: request_data["commits"]: list các dict với các trường như trên
     """
     try:
         if not multifusion_v2.is_model_available():
-            raise HTTPException(status_code=503, detail="MultiFusion V2 model is not available.")
+            raise HTTPException(status_code=503, detail="MultiFusion model is not available.")
         commits = request_data.get("commits", [])
         results = []
         for commit in commits:
@@ -174,6 +175,7 @@ async def batch_analyze_commits(repo_id: int, request_data: dict):
     except Exception as e:
         logger.error(f"Error batch analyzing commits: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+# Lấy tất cả commits của repo
 @router.get("/{repo_id}/members/{member_login}/commits")
 async def get_member_commits(repo_id: int, member_login: str, db: Session = Depends(get_db)):
     """
@@ -186,7 +188,7 @@ async def get_member_commits(repo_id: int, member_login: str, db: Session = Depe
     except Exception as e:
         logger.error(f"Error getting member commits: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-    
+# Lấy tất cả commits của repo
 @router.get("/{repo_id}/commits/all")
 async def get_all_commits(repo_id: int, db: Session = Depends(get_db)):
     """
@@ -199,6 +201,7 @@ async def get_all_commits(repo_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error getting all commits: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+# Lấy danh sách branches của repo từ DB
 @router.get("/{repo_id}/branches")
 async def get_branches(repo_id: int, db: Session = Depends(get_db)):
     """
