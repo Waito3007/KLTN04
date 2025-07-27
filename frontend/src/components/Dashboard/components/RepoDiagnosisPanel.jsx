@@ -1,77 +1,7 @@
-  const [allMembersAnalysis, setAllMembersAnalysis] = useState(null);
-  // Fetch all members commit analysis when repoId, repoSource, selectedBranch thay đổi
-  useEffect(() => {
-    if (!repoId || repoSource !== 'database') {
-      setAllMembersAnalysis(null);
-      return;
-    }
-    setLoading(true);
-    const branchParam = selectedBranch ? `?branch_name=${encodeURIComponent(selectedBranch)}` : '';
-    fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/members/commits-analyst${branchParam}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        setAllMembersAnalysis(data && data.data ? data.data : []);
-      })
-      .catch(() => {
-        setAllMembersAnalysis([]);
-      })
-      .finally(() => {
-        setLoading(false);
-  const [allMembersAnalysis, setAllMembersAnalysis] = useState(null);
-
-  // Fetch all members commit analysis when repoId, repoSource, selectedBranch thay đổi
-  useEffect(() => {
-    if (!repoId || repoSource !== 'database') {
-      setAllMembersAnalysis(null);
-      return;
-    }
-    setLoading(true);
-    const branchParam = selectedBranch ? `?branch_name=${encodeURIComponent(selectedBranch)}` : '';
-    fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/members/commits-analyst${branchParam}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        setAllMembersAnalysis(data && data.data ? data.data : []);
-      })
-      .catch(() => {
-        setAllMembersAnalysis([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [repoId, repoSource, selectedBranch]);
-      });
-  }, [repoId, repoSource, selectedBranch]);
-      {/* Hiển thị phân tích commit cho toàn bộ thành viên */}
-      {allMembersAnalysis && allMembersAnalysis.length > 0 && (
-        <FadeInWrapper delay={0.15}>
-          <Card title={<Text strong>Phân tích commit toàn bộ thành viên</Text>} size="small" style={{ marginBottom: 32, borderRadius: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
-            {allMembersAnalysis.map(member => (
-              <div key={member.member_login} style={{ marginBottom: 24 }}>
-                <Text strong style={{ fontSize: 15 }}>
-                  <Tag color="blue">{member.member_login}</Tag> - Tổng commit: {member.total_commits}
-                </Text>
-                {member.commits && member.commits.length > 0 ? (
-                  <div style={{ marginTop: 8 }}>
-                    {renderCommitList(member.commits)}
-                  </div>
-                ) : (
-                  <Empty description="Không có commit cho thành viên này." />
-                )}
-                {member.statistics && member.statistics.commit_types && (
-                  <div style={{ marginTop: 8 }}>
-                    <CommitTypeChart commitTypes={member.statistics.commit_types} totalCommits={member.total_commits} />
-                  </div>
-                )}
-                <Divider />
-              </div>
-            ))}
-          </Card>
-        </FadeInWrapper>
-      )}
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Spin, Empty, Tag, Divider, List, Select, Input, Avatar, Button, Switch } from 'antd';
+import { Pie } from 'react-chartjs-2';
 import FadeInWrapper from './FadeInWrapper';
-import CommitTypeChart from './CommitTypeChart';
 import CommitDetailModal from './CommitDetailModal';
 
 const { Title, Text } = Typography;
@@ -79,6 +9,8 @@ const { Option } = Select;
 
 // Modern, unified diagnosis panel for all repo analyses
 const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
+  // State cho lọc thành viên
+  const [selectedMember, setSelectedMember] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [commitAnalysis, setCommitAnalysis] = useState(null);
@@ -92,6 +24,9 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
   const [githubLoading, setGithubLoading] = useState(false);
   const [branchList, setBranchList] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState('');
+  const [branchAnalysis, setBranchAnalysis] = useState(null);
+  const [branchAnalysisLoading, setBranchAnalysisLoading] = useState(false);
+  const [branchAnalysisError, setBranchAnalysisError] = useState(null);
 
   // Filtered repo list for search
   const filteredRepos = (repoSource === 'github' ? githubRepos : repositories).filter(repo =>
@@ -153,7 +88,6 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
   // Fetch analysis data when repoId changes
   useEffect(() => {
     if (!repoId) {
-      setCommitAnalysis(null);
       setAreaAnalysis(null);
       setRiskAnalysis(null);
       setAllCommits(null);
@@ -161,52 +95,40 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
     }
     setLoading(true);
     setError(null);
-    if (repoSource === 'github') {
-      // Fetch commit analysis from GitHub API endpoint theo branch
-      const token = localStorage.getItem('access_token');
-      const repo = githubRepos.find(r => (r.id || r.github_id) === repoId);
-      const owner = repo?.owner?.login || repo?.owner;
-      const name = repo?.name;
-      if (!owner || !name || !selectedBranch) {
-        setLoading(false);
-        return;
-      }
-      fetch(`http://localhost:8000/api/github/${owner}/${name}/branches/${selectedBranch}/commits?per_page=100&page=1`, {
-        headers: { Authorization: `token ${token}` },
-      })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-          setCommitAnalysis({ commits: data.commits || [], summary: { total_commits: data.count || 0 }, statistics: {} });
-          setAreaAnalysis(null);
-          setRiskAnalysis(null);
-          setAllCommits(null);
-        })
-        .catch(() => {
-          setError('Lỗi khi tải dữ liệu commit từ GitHub API.');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      // DB source: truyền branch_name cho API /commits/all và /commits/all/analysis
-      const branchParam = selectedBranch ? `?branch_name=${encodeURIComponent(selectedBranch)}` : '';
-      Promise.all([
-        fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis${branchParam}`).then(r => r.ok ? r.json() : null),
-        fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all${branchParam}`).then(r => r.ok ? r.json() : null),
-        fetch(`http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis`).then(r => r.ok ? r.json() : null),
-        fetch(`http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis`).then(r => r.ok ? r.json() : null)
-      ]).then(([analystData, allData, areaData, riskData]) => {
-        setCommitAnalysis(analystData);
-        setAreaAnalysis(areaData);
-        setRiskAnalysis(riskData);
-        setAllCommits(allData);
-      }).catch(() => {
-        setError('Lỗi khi tải dữ liệu phân tích kho lưu trữ.');
-      }).finally(() => {
-        setLoading(false);
-      });
+    // Chỉ fetch các phân tích tổng thể, không fetch commit analysis theo branch tự động
+    Promise.all([
+      fetch(`http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis`).then(r => r.ok ? r.json() : null),
+      fetch(`http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis`).then(r => r.ok ? r.json() : null),
+      fetch(`http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all`).then(r => r.ok ? r.json() : null)
+    ]).then(([areaData, riskData, allData]) => {
+      setAreaAnalysis(areaData);
+      setRiskAnalysis(riskData);
+      setAllCommits(allData);
+    }).catch(() => {
+      setError('Lỗi khi tải dữ liệu phân tích kho lưu trữ.');
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [repoId, repoSource, githubRepos]);
+
+  // Hàm thực hiện phân tích commit theo branch khi ấn nút
+  const handleAnalyzeBranch = async () => {
+    if (!repoId || !selectedBranch) return;
+    setBranchAnalysisLoading(true);
+    setBranchAnalysisError(null);
+    let url = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Lỗi khi phân tích commit cho nhánh này.');
+      const data = await resp.json();
+      setBranchAnalysis(data);
+    } catch (err) {
+      setBranchAnalysisError(err.message);
+      setBranchAnalysis(null);
+    } finally {
+      setBranchAnalysisLoading(false);
     }
-  }, [repoId, repoSource, githubRepos, selectedBranch]);
+  };
 
   // Handle repo selection
   const handleRepoSelect = (id) => {
@@ -406,18 +328,26 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
             </Option>
           ))}
         </Select>
-        {/* Branch select */}
-        <Select
-          style={{ minWidth: 180 }}
-          placeholder={branchList.length === 0 ? 'Không có branch' : 'Chọn branch'}
-          value={selectedBranch}
-          onChange={setSelectedBranch}
-          disabled={loading || githubLoading || branchList.length === 0}
-        >
-          {branchList.map(branch => (
-            <Option key={branch.name || branch} value={branch.name || branch}>{branch.name || branch}</Option>
-          ))}
-        </Select>
+        {/* Branch select + nút phân tích */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder={branchList.length === 0 ? 'Không có branch' : 'Chọn branch'}
+            value={selectedBranch}
+            onChange={setSelectedBranch}
+            disabled={loading || githubLoading || branchList.length === 0}
+          >
+            {branchList.map(branch => (
+              <Option key={branch.name || branch} value={branch.name || branch}>{branch.name || branch}</Option>
+            ))}
+          </Select>
+          <Button
+            type="primary"
+            onClick={handleAnalyzeBranch}
+            disabled={!selectedBranch || branchAnalysisLoading}
+            loading={branchAnalysisLoading}
+          >Phân tích</Button>
+        </div>
       </div>
       <Divider />
       {(loading || githubLoading) && (
@@ -430,45 +360,151 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
       {!loading && !error && repoId && (
         <>
           <FadeInWrapper delay={0.1}>
-            <Card title={<Text strong>Phân tích loại commit</Text>} size="small" style={{ marginBottom: 32, borderRadius: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.08)' }}>
-              {commitAnalysis && commitAnalysis.statistics && commitAnalysis.statistics.commit_types ? (
-                <CommitTypeChart
-                  commitTypes={commitAnalysis.statistics.commit_types}
-                  totalCommits={commitAnalysis.summary?.total_commits || 0}
-                />
-              ) : <Empty description="Không có dữ liệu commit." />}
-              {/* Hiển thị danh sách commit nếu có */}
-              {commitAnalysis && commitAnalysis.commits && commitAnalysis.commits.length > 0 && (
-                <FadeInWrapper delay={0.2}>
-                  <div style={{ marginTop: 24 }}>
-                    <Text strong style={{ fontSize: 16 }}>Danh sách commit:</Text>
-                    {renderCommitList(commitAnalysis.commits)}
-                  </div>
-                </FadeInWrapper>
-              )}
-              {/* Nếu không có, thử lấy từ allCommits */}
-              {(!commitAnalysis || !commitAnalysis.commits || commitAnalysis.commits.length === 0) && allCommits && allCommits.commits && allCommits.commits.length > 0 && (
-                <FadeInWrapper delay={0.2}>
-                  <div style={{ marginTop: 24 }}>
-                    <Text strong style={{ fontSize: 16 }}>Danh sách commit:</Text>
-                    {renderCommitList(allCommits.commits)}
-                  </div>
-                </FadeInWrapper>
-              )}
+            <Card title={<Text strong>Phân tích loại commit theo nhánh</Text>} size="small" style={{ marginBottom: 32, borderRadius: 28, boxShadow: '0 4px 24px rgba(59,130,246,0.12)', background: '#f6f8fc', border: '1px solid #e0e7ef' }}>
+              {branchAnalysisLoading && <Spin />}
+              {branchAnalysisError && <Empty description={branchAnalysisError} />}
+              <div style={{ width: '100%', background: '#fff', borderRadius: 24, boxShadow: '0 2px 12px rgba(59,130,246,0.08)', padding: 24, display: 'flex', flexDirection: 'row', gap: 32, alignItems: 'flex-start', justifyContent: 'center' }}>
+                {/* Table left, chart right */}
+                <div style={{ flex: 1, minWidth: 320 }}>
+                  <Text strong style={{ fontSize: 16, marginBottom: 16, display: 'block' }}>Lọc theo thành viên:</Text>
+                  <Select
+                    style={{ minWidth: 180, marginBottom: 16 }}
+                    placeholder="Chọn thành viên"
+                    value={selectedMember}
+                    onChange={setSelectedMember}
+                    allowClear
+                    disabled={!branchAnalysis || !branchAnalysis.commits}
+                  >
+                    <Select.Option value="">Tất cả</Select.Option>
+                    {(branchAnalysis && branchAnalysis.commits)
+                      ? Array.from(new Set(branchAnalysis.commits.map(c => c.author_name || 'Không rõ'))).map(author => (
+                          <Select.Option key={author} value={author}>{author}</Select.Option>
+                        ))
+                      : null}
+                  </Select>
+                  <Text strong style={{ fontSize: 16, marginBottom: 8, display: 'block' }}>Loại commit / Số lượng:</Text>
+                  <List
+                    dataSource={(() => {
+                      if (!branchAnalysis || !branchAnalysis.commits) return [];
+                      let typeCount = {};
+                      let filtered = selectedMember
+                        ? branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember)
+                        : branchAnalysis.commits;
+                      filtered.forEach(c => {
+                        const type = c.analysis?.type || 'other';
+                        typeCount[type] = (typeCount[type] || 0) + 1;
+                      });
+                      return Object.entries(typeCount);
+                    })()}
+                    renderItem={([type, count]) => (
+                      <List.Item>
+                        <Tag color="blue" style={{ fontSize: 15 }}>{type}</Tag>: <Text>{count}</Text>
+                      </List.Item>
+                    )}
+                    style={{ paddingLeft: 0 }}
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Text strong style={{ fontSize: 16, marginBottom: 16 }}>Biểu đồ loại commit:</Text>
+                  {branchAnalysis && branchAnalysis.commits && (() => {
+                    let typeCount = {};
+                    let filtered = selectedMember
+                      ? branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember)
+                      : branchAnalysis.commits;
+                    filtered.forEach(c => {
+                      const type = c.analysis?.type || 'other';
+                      typeCount[type] = (typeCount[type] || 0) + 1;
+                    });
+                    const pieLabels = Object.keys(typeCount);
+                    const pieValues = Object.values(typeCount);
+                    if (pieLabels.length === 0) return <Empty description="Không có dữ liệu." />;
+                    return (
+                      <div style={{ width: 320, height: 320 }}>
+                        <Pie
+                          data={{
+                            labels: pieLabels,
+                            datasets: [
+                              {
+                                data: pieValues,
+                                backgroundColor: ["#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#f59e42", "#ef4444", "#22c55e"],
+                              },
+                            ],
+                          }}
+                          options={{
+                            plugins: {
+                              legend: { position: 'right', labels: { font: { size: 14 } } },
+                            },
+                          }}
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+              {/* Danh sách commit đã lọc */}
+              <div style={{ marginTop: 32, padding: '0 24px' }}>
+                <Text strong style={{ fontSize: 16 }}>Danh sách commit:</Text>
+                {(branchAnalysis && branchAnalysis.commits)
+                  ? (selectedMember
+                      ? renderCommitList(branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember))
+                      : renderCommitList(branchAnalysis.commits)
+                    )
+                  : <Empty description="Chưa có dữ liệu commit cho nhánh này." />
+                }
+              </div>
             </Card>
           </FadeInWrapper>
           <FadeInWrapper delay={0.3}>
             <Card title={<Text strong>Phân tích lĩnh vực công nghệ</Text>} size="small" style={{ marginBottom: 32, borderRadius: 16, boxShadow: '0 2px 8px rgba(168,85,247,0.08)' }}>
-              {areaAnalysis && areaAnalysis.areas ? (
-                <List
-                  dataSource={Object.entries(areaAnalysis.areas)}
-                  renderItem={([area, value]) => (
-                    <List.Item>
-                      <Tag color="purple" style={{ fontSize: 15 }}>{area}</Tag>: <Text>{value}</Text>
-                    </List.Item>
-                  )}
-                  style={{ paddingLeft: 0 }}
-                />
+              {areaAnalysis && areaAnalysis.area_distribution ? (
+                <>
+                  <div style={{ width: 320, height: 320, margin: '0 auto' }}>
+                    <Pie
+                      data={{
+                        labels: Object.keys(areaAnalysis.area_distribution),
+                        datasets: [
+                          {
+                            data: Object.values(areaAnalysis.area_distribution),
+                            backgroundColor: ["#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#f59e42", "#ef4444", "#22c55e"],
+                          },
+                        ],
+                      }}
+                      options={{
+                        plugins: {
+                          legend: { position: 'right', labels: { font: { size: 14 } } },
+                        },
+                      }}
+                    />
+                  </div>
+                  <List
+                    dataSource={Object.entries(areaAnalysis.area_distribution)}
+                    renderItem={([area, value]) => (
+                      <List.Item>
+                        <Tag color="purple" style={{ fontSize: 15 }}>{area}</Tag>: <Text>{value}</Text>
+                      </List.Item>
+                    )}
+                    style={{ paddingLeft: 0 }}
+                  />
+                  <Divider />
+                  <Title level={5}>Phân tích theo thành viên</Title>
+                  <List
+                    dataSource={areaAnalysis.members_area_analysis}
+                    renderItem={member => (
+                      <List.Item>
+                        <Text strong>{member.member_login}</Text>
+                        <List
+                          dataSource={Object.entries(member.area_summary)}
+                          renderItem={([area, value]) => (
+                            <span style={{ marginRight: 12 }}>
+                              <Tag color="blue">{area}</Tag>: <Text>{value}</Text>
+                            </span>
+                          )}
+                          style={{ display: 'inline-block' }}
+                        />
+                      </List.Item>
+                    )}
+                  />
+                </>
               ) : <Empty description="Không có dữ liệu lĩnh vực." />}
             </Card>
           </FadeInWrapper>
