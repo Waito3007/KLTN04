@@ -1,0 +1,66 @@
+{
+    "language_classes": [
+      "C#",
+      "C++",
+      "CSS",
+      "Go",
+      "HTML",
+      "JSON",
+      "Java",
+      "JavaScript",
+      "PHP",
+      "Python",
+      "Ruby",
+      "Rust",
+      "TypeScript",
+      "XML",
+      "YAML",
+      "other"
+    ],
+    "commit_type_classes": [
+      "build",
+      "chore",
+      "ci",
+      "docs",
+      "feat",
+      "fix",
+      "other_type",
+      "perf",
+      "refactor",
+      "revert",
+      "style",
+      "test"
+    ],
+    "num_numerical_features": 5,
+    "num_language_features": 16,
+    "num_classes": 12,
+    "scaler_mean": [
+      151.22071109384106,
+      98.06209442393627,
+      6.196541674761997,
+      249.28280551777735,
+      21.420552112604284
+    ],
+    "scaler_scale": [
+      1410.8306875467952,
+      1484.1120538858268,
+      20.458735442940156,
+      2305.152361267064,
+      261.5671279534481
+    ],
+    "model_info": {
+      "bert_model": "distilbert-base-uncased",
+      "max_length": 128,
+      "created_date": "2025-01-06",
+      "version": "2.0",
+      "training_samples": 25735
+    },
+    "statistics": {
+      "total_commits": 25735,
+      "unique_languages": 16,
+      "unique_commit_types": 12,
+      "avg_lines_added": 151.22071109384106,
+      "avg_lines_removed": 98.06209442393627,
+      "avg_files_count": 6.196541674761997
+    }
+  }
