@@ -89,6 +89,11 @@ const CommitList = ({
 
   return (
     <Card title="📝 Danh sách commit gần đây" style={{ marginTop: '20px' }}>
+      {memberCommits && (memberCommits.summary?.ai_model || memberCommits.model_used) && (
+        <Typography.Text strong style={{ marginBottom: '10px', display: 'block' }}>
+          Model phân tích: {memberCommits.summary?.ai_model || memberCommits.model_used}
+        </Typography.Text>
+      )}
       <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
         <Select
           value={commitTypeFilter}

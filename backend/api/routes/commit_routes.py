@@ -1,10 +1,7 @@
-# File: backend/api/routes/commit_routes.py xóa đi 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Header, Depends
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 import pandas as pd
-from services.model_loader import predict_commit
-from services.multifusion_ai_service import MultiFusionAIService
 from pathlib import Path
 import tempfile
 import httpx

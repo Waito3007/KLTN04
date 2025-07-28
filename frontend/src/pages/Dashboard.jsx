@@ -9,8 +9,11 @@ import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
 import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
 import RepoListFilter from '../components/Dashboard/RepoListFilter';
 import TaskBoard from '../components/Dashboard/TaskBoard';
+import ControlPanel from '../components/Dashboard/components/ControlPanel';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
+import CommitAnalyst from '../components/Dashboard/components/CommitAnalyst';
+import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -185,6 +188,110 @@ const Dashboard = () => {
   const [repositories, setRepositories] = useState([]);
   const [repoLoading, setRepoLoading] = useState(true);
 
+  // AI Model States
+  const [aiModel, setAiModel] = useState('multifusion'); // Default to multifusion
+  const [useAI, setUseAI] = useState(true); // Whether to use AI analysis
+  const [aiModelStatus, setAiModelStatus] = useState(null); // For HAN model status
+  const [multiFusionV2Status, setMultiFusionV2Status] = useState(null); // For MultiFusion V2 model status
+
+  // Commit Analysis States
+  const [selectedRepoId, setSelectedRepoId] = useState(null); // Currently selected repository for analysis
+  const [memberCommits, setMemberCommits] = useState(null); // Analysis for a specific member's commits
+  const [allRepoCommitAnalysis, setAllRepoCommitAnalysis] = useState(null); // Analysis for all repo commits
+  const [commitAnalysisLoading, setCommitAnalysisLoading] = useState(false);
+
+  // Fetch AI model statuses
+  useEffect(() => {
+    const fetchModelStatuses = async () => {
+      try {
+        // Fetch HAN model status
+        const hanStatusRes = await axios.get('http://localhost:8000/api/han-commit-analysis/1/model-status');
+        setAiModelStatus(hanStatusRes.data);
+        console.log("HAN Model Status:", hanStatusRes.data);
+
+        // Fetch MultiFusion V2 model status
+        const mfV2StatusRes = await axios.get('http://localhost:8000/api/multifusion-commit-analysis/1/ai/model-v2-status');
+        setMultiFusionV2Status(mfV2StatusRes.data);
+        console.log("MultiFusion V2 Model Status:", mfV2StatusRes.data);
+
+        // Set default AI model based on availability
+        if (mfV2StatusRes.data?.model_info?.is_available) {
+          setAiModel('multifusion');
+        } else if (hanStatusRes.data?.model_loaded) {
+          setAiModel('han');
+        } else {
+          setUseAI(false); // Disable AI if no models are available
+        }
+
+      } catch (error) {
+        console.error('Error fetching AI model statuses:', error);
+        setUseAI(false); // Disable AI on error
+      }
+    };
+    fetchModelStatuses();
+  }, []);
+
+  // Fetch commit analysis data based on selectedRepoId, aiModel, and useAI
+  useEffect(() => {
+    const fetchCommitAnalysis = async () => {
+      if (!selectedRepoId || !useAI) {
+        setMemberCommits(null);
+        setAllRepoCommitAnalysis(null);
+        return;
+      }
+
+      setCommitAnalysisLoading(true);
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        message.error('Vui lòng đăng nhập lại!');
+        setCommitAnalysisLoading(false);
+        return;
+      }
+
+      try {
+        let memberCommitsData = null;
+        let allRepoCommitsData = null;
+        const defaultMemberLogin = user?.username || 'octocat'; // Placeholder, replace with actual selected member
+
+        if (aiModel === 'han') {
+          // Fetch HAN analysis for a member
+          const hanMemberRes = await axios.get(`http://localhost:8000/api/han-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-han`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          memberCommitsData = hanMemberRes.data.data; // Assuming data is nested under 'data'
+
+        } else if (aiModel === 'multifusion') {
+          // Fetch MultiFusion V2 analysis for a member
+          const mfMemberRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-v2`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          memberCommitsData = mfMemberRes.data; // Assuming data is directly the response
+
+          // Fetch MultiFusion V2 analysis for all repo commits
+          const mfAllRepoRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/commits/all/analysis`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          allRepoCommitsData = mfAllRepoRes.data.analysis; // Assuming data is nested under 'analysis'
+        }
+
+        setMemberCommits(memberCommitsData);
+        setAllRepoCommitAnalysis(allRepoCommitsData);
+        console.log("Fetched Member Commits:", memberCommitsData);
+        console.log("Fetched All Repo Commits:", allRepoCommitsData);
+
+      } catch (error) {
+        console.error('Error fetching commit analysis:', error);
+        message.error('Không thể tải dữ liệu phân tích commit!');
+        setMemberCommits(null);
+        setAllRepoCommitAnalysis(null);
+      } finally {
+        setCommitAnalysisLoading(false);
+      }
+    };
+
+    fetchCommitAnalysis();
+  }, [selectedRepoId, aiModel, useAI, user]); // user dependency for defaultMemberLogin
+
   // Pre-fetch repositories từ database ngầm trong nền
   const preloadRepositoriesFromDB = async () => {
     const token = localStorage.getItem('access_token');
@@ -198,6 +305,10 @@ const Dashboard = () => {
       
       setRepositories(response.data);
       console.log(`Pre-loaded ${response.data.length} repositories from database`);
+      // Set the first repository as selected by default if available
+      if (response.data.length > 0 && selectedRepoId === null) {
+        setSelectedRepoId(response.data[0].id);
+      }
     } catch (error) {
       console.error('Lỗi khi pre-load repositories:', error);
     } finally {
@@ -208,7 +319,7 @@ const Dashboard = () => {
   // Pre-load repositories ngay khi vào Dashboard
   useEffect(() => {
     preloadRepositoriesFromDB();
-  }, []);
+  }, [selectedRepoId]); // Add selectedRepoId to dependencies to avoid re-setting it
 
   const syncAllRepositories = async () => {
     const token = localStorage.getItem('access_token');
@@ -473,7 +584,18 @@ const Dashboard = () => {
               </SectionTitle>
             }
           >
-            <AIInsightWidget />
+            <AIInsightWidget 
+              aiModel={aiModel}
+              useAI={useAI}
+              aiModelStatus={aiModelStatus}
+              multiFusionV2Status={multiFusionV2Status}
+            />
+            {/* RepoDiagnosisPanel: Manual diagnosis for selected repo */}
+            <RepoDiagnosisPanel 
+              repositories={repositories}
+              selectedRepoId={selectedRepoId}
+              onRepoChange={repo => setSelectedRepoId(repo?.id)}
+            />
           </DashboardCard>
 
           {/* Filters Section */}
@@ -481,6 +603,28 @@ const Dashboard = () => {
             title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
           >
             <RepoListFilter onFilterChange={handleFilterChange} />
+          </DashboardCard>
+
+          {/* Control Panel */}
+          <DashboardCard
+            title={<SectionTitle level={5}>Control Panel</SectionTitle>}
+          >
+            <ControlPanel
+              branches={[]}
+              selectedBranch={null}
+              setSelectedBranch={() => {}}
+              branchesLoading={false}
+              aiModel={aiModel}
+              setAiModel={setAiModel}
+              useAI={useAI}
+              setUseAI={setUseAI}
+              aiModelStatus={aiModelStatus}
+              multiFusionV2Status={multiFusionV2Status}
+              showAIFeatures={false}
+              setShowAIFeatures={() => {}}
+              fullAnalysisLoading={false}
+              onAnalyzeFullRepo={() => {}}
+            />
           </DashboardCard>
 
           {/* Main Content Sections */}
@@ -499,10 +643,14 @@ const Dashboard = () => {
             </DashboardCard>
 
             <DashboardCard 
-              title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
-            >
-              <TaskBoard onStatusChange={handleStatusChange} />
-            </DashboardCard>
+            title={<SectionTitle level={5}>Commit Analysis</SectionTitle>}
+          >
+            <CommitAnalyst 
+              memberCommits={memberCommits}
+              allRepoCommitAnalysis={allRepoCommitAnalysis}
+              loading={commitAnalysisLoading}
+            />
+          </DashboardCard>
           </ContentSection>
         </MainContent>
       </MainLayout>

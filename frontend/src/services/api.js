@@ -48,15 +48,23 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error(`❌ API Error:`, {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      message: error.message
-    });
-    
+    // Log chi tiết lỗi API
+    if (error.response) {
+      console.error(`❌ API Error:`, {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      // Log thêm chi tiết nếu có
+      if (error.response.data) {
+        console.error('❌ API Error Data:', error.response.data);
+      }
+    } else {
+      console.error('❌ API Error:', error.message || error);
+    }
     if (error.response?.status === 401) {
       message.error('Phiên đăng nhập đã hết hạn');
       // Có thể redirect đến login page

@@ -133,7 +133,7 @@ const CommitAnalyticsPanel = ({ memberCommits, selectedMember, selectedBranch, a
           <Row gutter={[16, 16]}>
             {/* Commit Types Chart */}
             <Col xs={24} lg={12}>
-              <Card title="🏷️ Loại Commit" size="small">
+              <Card title="Loại Commit hiện tại" size="small">
                 {chartData && (
                   <ChartWrapper
                     type="pie"

@@ -69,14 +69,14 @@ const ControlPanel = ({
         >
           <Select.Option value="han" disabled={!aiModelStatus?.model_loaded}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              🧠 HAN Model
+              HAN Model
               {aiModelStatus?.model_loaded ? <Tag color="green" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
             </span>
           </Select.Option>
-          <Select.Option value="multifusion" disabled={!multiFusionV2Status?.model_info?.is_available}>
+          <Select.Option value="multifusion" disabled={multiFusionV2Status?.model_info?.status !== "available"}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              🔬 MultiFusion V2
-              {multiFusionV2Status?.model_info?.is_available ? <Tag color="blue" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
+              MultiFusion
+              {multiFusionV2Status?.model_info?.status === "available" ? <Tag color="blue" size="small">✅</Tag> : <Tag color="red" size="small">❌</Tag>}
             </span>
           </Select.Option>
         </Select>
@@ -88,8 +88,8 @@ const ControlPanel = ({
         <Switch 
           checked={useAI}
           onChange={setUseAI}
-          checkedChildren="🤖 AI"
-          unCheckedChildren="📝 Cơ bản"
+          checkedChildren="AI"
+          unCheckedChildren="Cơ bản"
           style={{
             backgroundColor: useAI ? '#52c41a' : '#d9d9d9'
           }}

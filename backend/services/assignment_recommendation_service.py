@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import logging
 import math
-from services.multifusion_v2_service import MultiFusionV2Service
+from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService
 from services.area_analysis_service import AreaAnalysisService
 from services.risk_analysis_service import RiskAnalysisService
 
@@ -21,7 +21,7 @@ class AssignmentRecommendationService:
     def __init__(self, db: Session):
         self.db = db
         # Initialize AI services
-        self.multifusion_v2_service = MultiFusionV2Service()
+        self.multifusion_commit_analyst_service = MultifusionCommitAnalystService()
         self.area_analysis_service = AreaAnalysisService()
         self.risk_analysis_service = RiskAnalysisService()
     

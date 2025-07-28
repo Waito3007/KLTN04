@@ -26,6 +26,11 @@ __pycache__/
 *.sqlite3
 
 # Large training data files (>50MB)
+backend/ai/models/multifusion/areaAnalyst/train.jsonl
+backend/ai/models/multifusion/areaAnalyst/train.py
+backend/ai/models/multifusion/areaAnalyst/best_area_classifier.pt
+backend/ai/models/multifusion/riskAnalyst/risk_model.pt
+backend/ai/models/multifusion/riskAnalyst/train.jsonl
 backend/ai/training_data/kaggle_github_commit_messages_dataset_*.json
 backend/ai/multimodal_fusion_network/data/parallel_commits/temp_commits
 backend/ai/training_data/*_large.json
@@ -43,7 +48,6 @@ backend/ai/kaggle_data/**/*.csv
 backend/ai/kaggle_data/**/*.json
 
 # Model files (>50MB)
-backend/ai/models/
 backend/ai/trained_models/
 backend/ai/deployment_packages/
 *.pth
