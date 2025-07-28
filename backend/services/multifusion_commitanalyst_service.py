@@ -118,9 +118,19 @@ class MultiFusionV2Service:
             self.tokenizer = RobertaTokenizer.from_pretrained('microsoft/codebert-base')
             print("10. Tokenizer loaded.")
 
-            # Always use the expected numeric features for commit analysis
-            self.numeric_features = ['file_count', 'lines_added', 'lines_removed', 'total_changes', 'num_dirs_changed']
-            print("11. Using fixed numeric features for commit analysis.")
+
+            # Sử dụng đúng 8 đặc trưng số học như khi train model (bạn cần chỉnh lại cho đúng thứ tự nếu khác)
+            self.numeric_features = [
+                'file_count',
+                'lines_added',
+                'lines_removed',
+                'total_changes',
+                'num_dirs_changed',
+                'num_py_files',
+                'num_js_files',
+                'num_md_files'
+            ]
+            print("11. Using 8 numeric features for commit analysis.")
             print(f"12. Numeric features: {self.numeric_features}")
 
             print("13. Initializing MultiModalFusionModel...")
@@ -198,6 +208,57 @@ class MultiFusionV2Service:
         return {"commit_type": "chore", "confidence": 0.70}
 
 
+def extract_commit_numeric_features(commit):
+    """
+    Sinh các đặc trưng số học từ commit: num_{ext}_files, num_build_files, num_test_files, num_doc_files, num_dirs_changed.
+    """
+    import json, os
+    modified_files = commit.get('modified_files', [])
+    if isinstance(modified_files, str):
+        try:
+            modified_files = json.loads(modified_files)
+        except Exception:
+            modified_files = []
+    file_types = commit.get('file_types', {})
+    if isinstance(file_types, str):
+        try:
+            file_types = json.loads(file_types)
+        except Exception:
+            file_types = {}
+
+    filetype_counts = {}
+    dirs = set()
+    num_build_files = 0
+    num_test_files = 0
+    num_doc_files = 0
+
+    for file in modified_files:
+        fname = file.lower()
+        ext = os.path.splitext(fname)[1][1:]
+        if ext:
+            filetype_counts[ext] = filetype_counts.get(ext, 0) + 1
+        if os.path.basename(fname) in {'package.json', 'pom.xml', 'build.gradle', 'makefile', 'cmakelists.txt'} or ext in {'yml', 'yaml', 'xml', 'gradle'}:
+            num_build_files += 1
+        if 'test' in fname or 'spec' in fname:
+            num_test_files += 1
+        if ext in {'md', 'rst'} or 'doc' in fname:
+            num_doc_files += 1
+        dir_path = os.path.dirname(fname)
+        if dir_path:
+            dirs.add(dir_path)
+
+    for ext, count in file_types.items():
+        ext_key = ext.lstrip('.')
+        filetype_counts[ext_key] = filetype_counts.get(ext_key, 0) + count
+
+    features = {f'num_{ext}_files': count for ext, count in filetype_counts.items() if ext}
+    features['num_build_files'] = num_build_files
+    features['num_test_files'] = num_test_files
+    features['num_doc_files'] = num_doc_files
+    features['num_dirs_changed'] = len(dirs)
+    return features
+
+# dịch vụ commit analyst cho MultiFusion
 class MultifusionCommitAnalystService:
     def __init__(self, db: Session):
         self.db = db
@@ -218,7 +279,7 @@ class MultifusionCommitAnalystService:
     def get_all_repo_commits_raw(self, repo_id: int):
         """Trả về danh sách tất cả commits thực tế từ DB"""
         query = """
-            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
+            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content, modified_files, file_types
             FROM commits
             WHERE repo_id = :repo_id
             ORDER BY committer_date DESC
@@ -232,13 +293,16 @@ class MultifusionCommitAnalystService:
         results = self.db.execute(text(query), params).mappings().all()
         return [dict(row) for row in results]
 
+    # Đã tách logic ra ngoài, không cần hàm này nữa
+
     def _format_commits_for_ai(self, commits_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Prepares commit data for the prediction model."""
+        """Prepares commit data for the prediction model, tự động sinh đặc trưng số học từ filetype."""
         formatted_commits = []
         for commit in commits_data:
             insertions = commit.get('insertions', 0) or 0
             deletions = commit.get('deletions', 0) or 0
-            formatted_commits.append({
+            numeric_features = extract_commit_numeric_features(commit)
+            formatted = {
                 'message': commit.get('message', ''),
                 'diff_content': commit.get('diff_content', ''),
                 'lines_added': insertions,
@@ -249,19 +313,33 @@ class MultifusionCommitAnalystService:
                 'branch_name': commit.get('branch_name', ''),
                 'author_name': commit.get('author_name', ''),
                 'sha': commit.get('sha', ''),
-                'date': commit.get('committer_date', None)
-            })
+                'date': commit.get('committer_date', None),
+                **numeric_features
+            }
+            formatted_commits.append(formatted)
         return formatted_commits
 
-    def _combine_results(self, db_commits: List[Dict], ai_results: List[Dict]) -> List[Dict]:
-        """Combines database data with AI analysis results."""
+    def _combine_results(self, db_commits: List[Dict], ai_results: List[Dict], commits_for_ai: List[Dict] = None) -> List[Dict]:
+        """Combines database data with AI analysis results and merges numeric features."""
         combined = []
+        # If commits_for_ai is not provided, fallback to old behavior
+        if commits_for_ai is None:
+            commits_for_ai = [{} for _ in db_commits]
         for i, commit in enumerate(db_commits):
             ai_data = ai_results[i] if i < len(ai_results) else {}
             commit_type = ai_data.get("commit_type", "other")
-            
+            # Merge numeric features from commits_for_ai
+            numeric_features = {}
+            if i < len(commits_for_ai):
+                # Only include keys that are numeric features (num_*, *_files, num_dirs_changed)
+                numeric_features = {k: v for k, v in commits_for_ai[i].items() if (k.startswith("num_") or k.endswith("_files") or k == "num_dirs_changed")}
+            # Rename 'modified_files' to 'files_changed' in output
+            commit_dict = dict(commit)
+            if 'modified_files' in commit_dict:
+                commit_dict['files_changed'] = commit_dict.pop('modified_files')
             commit_info = {
-                **commit,
+                **commit_dict,
+                **numeric_features,
                 "sha_short": commit.get('sha', 'N/A')[:8],
                 "date": commit.get('committer_date').isoformat() if commit.get('committer_date') else None,
                 "analysis": {
@@ -287,7 +365,7 @@ class MultifusionCommitAnalystService:
 
         # Get paginated commits
         query = """
-            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
+            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content, modified_files, file_types
             FROM commits 
             WHERE repo_id = :repo_id
         """
@@ -308,8 +386,8 @@ class MultifusionCommitAnalystService:
 
         commits_for_ai = self._format_commits_for_ai(db_commits)
         ai_results = self.multifusion_v2_service.predict_commit_type_batch(commits_for_ai)
-        
-        commits_with_analysis = self._combine_results(db_commits, ai_results)
+        # Pass commits_for_ai to _combine_results to merge numeric features
+        commits_with_analysis = self._combine_results(db_commits, ai_results, commits_for_ai)
 
         # Basic statistics
         commit_type_stats = defaultdict(int)
