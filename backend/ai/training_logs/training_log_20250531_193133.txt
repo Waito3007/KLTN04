@@ -1,8 +1,0 @@
-Training Configuration
-====================
-Device: cpu
-Batch size: 8
-Number of workers: 0
-Dataset sizes - Train: 207, Val: 52
-Model classes: {'purpose': 9, 'tech_tag': 79, 'suspicious': 2, 'sentiment': 3, 'author': 16, 'source_repo': 2, 'commit_type': 8}
-
