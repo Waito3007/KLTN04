@@ -4,14 +4,10 @@ import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message,
 import { LogoutOutlined, GithubOutlined, NotificationOutlined, TeamOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
-// import RepoListFilter from '../components/Dashboard/RepoListFilter';
-// import TaskBoard from '../components/Dashboard/TaskBoard';
-
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
-
-import RepoDiagnosisPanel from '../components/Dashboard/MemberAnalyst/RepoDiagnosisPanel';
-import MemberSkillProfilePanel from '../components/Dashboard/MemberAnalyst/MemberSkillProfilePanel';
+import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
+import MemberSkillProfilePanel from '../components/Dashboard/MemberSkill/MemberSkillProfilePanel';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
