@@ -24,15 +24,15 @@ ChartJS.register(
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId }) => {
+const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId, selectedBranch }) => {
   const [loading, setLoading] = useState(false);
   const [memberProfiles, setMemberProfiles] = useState([]);
   const [selectedMember, setSelectedMember] = useState('');
   const [error, setError] = useState(null);
 
   // Fetch member skill profiles
-  const fetchMemberProfiles = async (repoId) => {
-    if (!repoId) return;
+  const fetchMemberProfiles = async (repoId, branch) => {
+    if (!repoId || !branch) return;
 
     setLoading(true);
     setError(null);
@@ -45,7 +45,7 @@ const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId }) => {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/assignment-recommendation/member-skills/${selectedRepo.owner.login}/${selectedRepo.name}`,
+        `http://localhost:8000/api/assignment-recommendation/member-skills/${selectedRepo.owner.login}/${selectedRepo.name}?branch_name=${encodeURIComponent(branch)}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -75,10 +75,10 @@ const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId }) => {
   };
 
   useEffect(() => {
-    if (selectedRepoId) {
-      fetchMemberProfiles(selectedRepoId);
+    if (selectedRepoId && selectedBranch) {
+      fetchMemberProfiles(selectedRepoId, selectedBranch);
     }
-  }, [selectedRepoId, repositories]);
+  }, [selectedRepoId, selectedBranch, repositories]);
 
   // Prepare radar chart data for selected member
   const getRadarChartData = () => {

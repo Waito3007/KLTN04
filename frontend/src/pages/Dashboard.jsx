@@ -193,6 +193,7 @@ const Dashboard = () => {
   const [memberCommits, setMemberCommits] = useState(null); // Analysis for a specific member's commits
   const [allRepoCommitAnalysis, setAllRepoCommitAnalysis] = useState(null); // Analysis for all repo commits
   const [commitAnalysisLoading, setCommitAnalysisLoading] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(''); // New state for selected branch
 
   // Fetch AI model statuses
   useEffect(() => {
@@ -584,6 +585,7 @@ const Dashboard = () => {
               repositories={repositories}
               selectedRepoId={selectedRepoId}
               onRepoChange={repo => setSelectedRepoId(repo?.id)}
+              onBranchChange={setSelectedBranch}
             />
           </DashboardCard>
 
@@ -599,6 +601,7 @@ const Dashboard = () => {
             <MemberSkillProfilePanel 
               repositories={repositories}
               selectedRepoId={selectedRepoId}
+              selectedBranch={selectedBranch}
             />
           </DashboardCard>
 

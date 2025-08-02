@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Spin, Empty, Tag, Divider, Select, Input, Avatar, Button, Switch } from 'antd';
 import BranchCommitAnalysis from '../CommitAnalyst/BranchCommitAnalysis';
@@ -9,7 +8,7 @@ import RiskAnalysis from '../RiskAnalyst/RiskAnalysis';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
+const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange }) => {
   const [selectedMemberArea, setSelectedMemberArea] = useState('');
   const [compareAreaMode, setCompareAreaMode] = useState(false);
   const [compareMemberArea, setCompareMemberArea] = useState('');
@@ -28,12 +27,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
   const [branchList, setBranchList] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState('');
   const [branchAnalysis, setBranchAnalysis] = useState(null);
-  const [branchAnalysisLoading, setBranchAnalysisLoading] = useState(false);
-  const [branchAnalysisError, setBranchAnalysisError] = useState(null);
-  const [areaLoading, setAreaLoading] = useState(false);
-  const [areaLoadedRepo, setAreaLoadedRepo] = useState(null);
-  const [riskLoading, setRiskLoading] = useState(false);
-  const [riskLoadedRepo, setRiskLoadedRepo] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const filteredRepos = (repoSource === 'github' ? githubRepos : repositories).filter(
     repo =>
@@ -55,9 +49,10 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
   }, [repositories, githubRepos, repoSource, repoId, onRepoChange]);
 
   useEffect(() => {
+    setBranchList([]); // Clear branchList immediately on repoId change
+    setSelectedBranch(''); // Clear selectedBranch immediately on repoId change
+
     if (!repoId) {
-      setBranchList([]);
-      setSelectedBranch('');
       return;
     }
     const fetchBranches = async () => {
@@ -73,8 +68,11 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
         });
         const data = await res.json();
         setBranchList(Array.isArray(data) ? data : []);
-        if (data && data.length > 0)
+        if (data && data.length > 0 && data[0].name) // Ensure data[0].name exists
           setSelectedBranch(data[0].name);
+        else {
+          setSelectedBranch(''); // Clear if no branches found
+        }
       } else {
         const repo = repositories.find(r => r.id === repoId);
         const owner = repo?.owner?.login || repo?.owner;
@@ -87,87 +85,70 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
         const res = await fetch(`http://localhost:8000/api/commits/${owner}/${name}/branches`);
         const data = await res.json();
         setBranchList(Array.isArray(data.branches) ? data.branches : []);
-        if (data.branches && data.branches.length > 0)
+        if (data.branches && data.branches.length > 0 && data.branches[0].name) // Ensure data.branches[0].name exists
           setSelectedBranch(data.branches[0].name);
+        else {
+          setSelectedBranch(''); // Clear if no branches found
+        }
       }
     };
     fetchBranches();
   }, [repoId, repoSource, githubRepos, repositories]);
 
-  useEffect(() => {
-    const loadAreaAnalysis = async () => {
-      if (!repoId || areaLoadedRepo === repoId)
-        return;
-      setAreaLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis`);
-        const data = res.ok ? await res.json() : null;
-        setAreaAnalysis(data);
-        setAreaLoadedRepo(repoId);
-      } catch (err) {
-        setError('Lỗi khi tải dữ liệu phân tích lĩnh vực.');
-        setAreaAnalysis(null);
-      } finally {
-        setAreaLoading(false);
-      }
-    };
-
-    const loadRiskAnalysis = async () => {
-      if (!repoId || riskLoadedRepo === repoId)
-        return;
-      setRiskLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis`);
-        const data = res.ok ? await res.json() : null;
-        setRiskAnalysis(data);
-        setRiskLoadedRepo(repoId);
-      } catch (err) {
-        setError('Lỗi khi tải dữ liệu phân tích rủi ro.');
-        setRiskAnalysis(null);
-      } finally {
-        setRiskLoading(false);
-      }
-    };
-
-    if (repoId) {
-      loadAreaAnalysis();
-      loadRiskAnalysis();
-    }
-  }, [repoId, areaLoadedRepo, riskLoadedRepo]);
-
-  const handleAnalyzeBranch = async () => {
+  const handleAnalyze = async () => {
     if (!repoId || !selectedBranch)
       return;
-    setBranchAnalysisLoading(true);
-    setBranchAnalysisError(null);
-    let url = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+
+    setAnalysisLoading(true);
+    setError(null);
+    setBranchAnalysis(null);
+    setAreaAnalysis(null);
+    setRiskAnalysis(null);
+
     try {
-      const resp = await fetch(url);
-      if (!resp.ok)
+      const commitAnalysisUrl = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+      const areaAnalysisUrl = `http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+      const riskAnalysisUrl = `http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+
+      const [commitRes, areaRes, riskRes] = await Promise.all([
+        fetch(commitAnalysisUrl),
+        fetch(areaAnalysisUrl),
+        fetch(riskAnalysisUrl),
+      ]);
+
+      if (!commitRes.ok)
         throw new Error('Lỗi khi phân tích commit cho nhánh này.');
-      const data = await resp.json();
-      setBranchAnalysis(data);
+      if (!areaRes.ok)
+        throw new Error('Lỗi khi tải dữ liệu phân tích lĩnh vực.');
+      if (!riskRes.ok)
+        throw new new Error('Lỗi khi tải dữ liệu phân tích rủi ro.');
+
+      const commitData = await commitRes.json();
+      const areaData = await areaRes.json();
+      const riskData = await riskRes.json();
+
+      setBranchAnalysis(commitData);
+      setAreaAnalysis(areaData);
+      setRiskAnalysis(riskData);
     } catch (err) {
-      setBranchAnalysisError(err.message);
-      setBranchAnalysis(null);
+      setError(err.message);
     } finally {
-      setBranchAnalysisLoading(false);
+      setAnalysisLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (selectedBranch && repoId) {
-      handleAnalyzeBranch();
-    }
-  }, [selectedBranch, repoId]);
 
   const handleRepoSelect = id => {
     setRepoId(id);
     if (onRepoChange) {
       const repo = repositories.find(r => r.id === id);
       onRepoChange(repo);
+    }
+  };
+
+  const handleBranchChange = (branch) => {
+    setSelectedBranch(branch);
+    if (onBranchChange) {
+      onBranchChange(branch);
     }
   };
 
@@ -245,7 +226,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
             style={{ minWidth: 180 }}
             placeholder={branchList.length === 0 ? 'Không có branch' : 'Chọn branch'}
             value={selectedBranch}
-            onChange={setSelectedBranch}
+            onChange={handleBranchChange}
             disabled={githubLoading || branchList.length === 0}
           >
             {branchList.map(branch => (
@@ -254,54 +235,51 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
               </Option>
             ))}
           </Select>
-          <Button
-            type="primary"
-            onClick={handleAnalyzeBranch}
-            disabled={!selectedBranch || branchAnalysisLoading}
-            loading={branchAnalysisLoading}
-          >
+          <Button type="primary" onClick={handleAnalyze} disabled={!selectedBranch || analysisLoading} loading={analysisLoading}>
             Phân tích
           </Button>
         </div>
       </div>
       <Divider />
-      {githubLoading && (
+      {analysisLoading && (
         <div style={{ width: '100%', marginBottom: 16, textAlign: 'center' }}>
           <Spin />
           <div style={{ marginTop: 8, color: '#666' }}>Đang tải dữ liệu phân tích...</div>
         </div>
       )}
       {error && <Empty description={error} />}
-      {!githubLoading && !error && repoId && (
+      {!analysisLoading && !error && repoId && (
         <>
-          <BranchCommitAnalysis
-            branchAnalysis={branchAnalysis}
-            branchAnalysisLoading={branchAnalysisLoading}
-            branchAnalysisError={branchAnalysisError}
-            selectedMember={selectedMember}
-            setSelectedMember={setSelectedMember}
-            renderCommitList={commits => <CommitList commits={commits} />}
-          />
-          <AreaAnalysis
-            areaAnalysis={areaAnalysis}
-            areaLoading={areaLoading}
-            selectedMemberArea={selectedMemberArea}
-            setSelectedMemberArea={setSelectedMemberArea}
-            compareAreaMode={compareAreaMode}
-            setCompareAreaMode={setCompareAreaMode}
-            compareMemberArea={compareMemberArea}
-            setCompareMemberArea={setCompareMemberArea}
-          />
-          <RiskAnalysis
-            riskAnalysis={riskAnalysis}
-            riskLoading={riskLoading}
-            selectedMemberRisk={selectedMemberRisk}
-            setSelectedMemberRisk={setSelectedMemberRisk}
-            compareRiskMode={compareRiskMode}
-            setCompareRiskMode={setCompareRiskMode}
-            compareMemberRisk={compareMemberRisk}
-            setCompareMemberRisk={setCompareMemberRisk}
-          />
+          {branchAnalysis && (
+            <BranchCommitAnalysis
+              branchAnalysis={branchAnalysis}
+              selectedMember={selectedMember}
+              setSelectedMember={setSelectedMember}
+              renderCommitList={commits => <CommitList commits={commits} />}
+            />
+          )}
+          {areaAnalysis && (
+            <AreaAnalysis
+              areaAnalysis={areaAnalysis}
+              selectedMemberArea={selectedMemberArea}
+              setSelectedMemberArea={setSelectedMemberArea}
+              compareAreaMode={compareAreaMode}
+              setCompareAreaMode={setCompareAreaMode}
+              compareMemberArea={compareMemberArea}
+              setCompareMemberArea={setCompareMemberArea}
+            />
+          )}
+          {riskAnalysis && (
+            <RiskAnalysis
+              riskAnalysis={riskAnalysis}
+              selectedMemberRisk={selectedMemberRisk}
+              setSelectedMemberRisk={setSelectedMemberRisk}
+              compareRiskMode={compareRiskMode}
+              setCompareRiskMode={setCompareRiskMode}
+              compareMemberRisk={compareMemberRisk}
+              setCompareMemberRisk={compareMemberRisk}
+            />
+          )}
         </>
       )}
     </Card>
