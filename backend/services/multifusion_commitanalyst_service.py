@@ -90,7 +90,8 @@ class MultiFusionV2Service:
             model_dir = Path(__file__).parent.parent / "ai" / "models" / "multifusion" / "commitanalyst"
             print(f"1. Model directory: {model_dir}")
 
-            model_path = model_dir / "commitanalyst.pth"
+            # model_path = model_dir / "commitanalyst.pth"
+            model_path = model_dir / "ver4.3.pth"
             scaler_path = model_dir / "scaler.pkl"
             label_map_path = model_dir / "label_map.json"
             reverse_label_map_path = model_dir / "reverse_label_map.json"
@@ -119,18 +120,20 @@ class MultiFusionV2Service:
             print("10. Tokenizer loaded.")
 
 
-            # Sử dụng đúng 8 đặc trưng số học như khi train model (bạn cần chỉnh lại cho đúng thứ tự nếu khác)
+            # SỬA: Sử dụng đúng 10 đặc trưng số học như khi train model, sắp xếp theo alphabet
             self.numeric_features = [
+                'confidence_score',
                 'file_count',
                 'lines_added',
                 'lines_removed',
-                'total_changes',
+                'num_build_files',
                 'num_dirs_changed',
-                'num_py_files',
-                'num_js_files',
-                'num_md_files'
+                'num_doc_files',
+                'num_test_files',
+                'risk',
+                'total_changes'
             ]
-            print("11. Using 8 numeric features for commit analysis.")
+            print("11. Using 10 numeric features for commit analysis.")
             print(f"12. Numeric features: {self.numeric_features}")
 
             print("13. Initializing MultiModalFusionModel...")

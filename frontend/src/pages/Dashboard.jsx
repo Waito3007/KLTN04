@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message, Spin } from 'antd';
-import { LogoutOutlined, GithubOutlined, NotificationOutlined } from '@ant-design/icons';
+import { LogoutOutlined, GithubOutlined, NotificationOutlined, TeamOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
-import OverviewCard from '../components/Dashboard/OverviewCard';
-import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
-import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
-import RepoListFilter from '../components/Dashboard/RepoListFilter';
-import TaskBoard from '../components/Dashboard/TaskBoard';
-import ControlPanel from '../components/Dashboard/components/ControlPanel';
+// import RepoListFilter from '../components/Dashboard/RepoListFilter';
+// import TaskBoard from '../components/Dashboard/TaskBoard';
+
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
-import CommitAnalyst from '../components/Dashboard/components/CommitAnalyst';
+
 import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
+import MemberSkillProfilePanel from '../components/Dashboard/components/MemberSkillProfilePanel';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -526,7 +524,7 @@ const Dashboard = () => {
       <MainLayout>        {/* Sidebar bên trái */}
         <Sidebar>
           {/* Overview Metrics trong Sidebar */}
-          <OverviewCard sidebar={true} />
+          {/* <OverviewCard sidebar={true} /> */}
           
           {/* Quick Actions */}
           <SidebarCard 
@@ -567,12 +565,13 @@ const Dashboard = () => {
         </Sidebar>
 
         {/* Main Content bên phải */}
-        <MainContent>          {/* Project Task Manager - Full Width */}
+        <MainContent>          
+          {/* Project Task Manager - Full Width */}
           <DashboardCard>
-            <ProjectTaskManager 
+            {/* <ProjectTaskManager  
               repositories={repositories}
               repoLoading={repoLoading}
-            />
+            /> */}
           </DashboardCard>
 
           {/* Repository Analysis */}
@@ -584,12 +583,6 @@ const Dashboard = () => {
               </SectionTitle>
             }
           >
-            <AIInsightWidget 
-              aiModel={aiModel}
-              useAI={useAI}
-              aiModelStatus={aiModelStatus}
-              multiFusionV2Status={multiFusionV2Status}
-            />
             {/* RepoDiagnosisPanel: Manual diagnosis for selected repo */}
             <RepoDiagnosisPanel 
               repositories={repositories}
@@ -598,34 +591,24 @@ const Dashboard = () => {
             />
           </DashboardCard>
 
-          {/* Filters Section */}
+          {/* Member Skill Profiles */}
           <DashboardCard 
-            title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
+            title={
+              <SectionTitle level={5}>
+                <TeamOutlined />
+                Member Skill Profiles
+              </SectionTitle>
+            }
           >
-            <RepoListFilter onFilterChange={handleFilterChange} />
-          </DashboardCard>
-
-          {/* Control Panel */}
-          <DashboardCard
-            title={<SectionTitle level={5}>Control Panel</SectionTitle>}
-          >
-            <ControlPanel
-              branches={[]}
-              selectedBranch={null}
-              setSelectedBranch={() => {}}
-              branchesLoading={false}
-              aiModel={aiModel}
-              setAiModel={setAiModel}
-              useAI={useAI}
-              setUseAI={setUseAI}
-              aiModelStatus={aiModelStatus}
-              multiFusionV2Status={multiFusionV2Status}
-              showAIFeatures={false}
-              setShowAIFeatures={() => {}}
-              fullAnalysisLoading={false}
-              onAnalyzeFullRepo={() => {}}
+            <MemberSkillProfilePanel 
+              repositories={repositories}
+              selectedRepoId={selectedRepoId}
             />
           </DashboardCard>
+
+          
+
+          
 
           {/* Main Content Sections */}
           <ContentSection>
@@ -642,15 +625,7 @@ const Dashboard = () => {
               <RepoList />
             </DashboardCard>
 
-            <DashboardCard 
-            title={<SectionTitle level={5}>Commit Analysis</SectionTitle>}
-          >
-            <CommitAnalyst 
-              memberCommits={memberCommits}
-              allRepoCommitAnalysis={allRepoCommitAnalysis}
-              loading={commitAnalysisLoading}
-            />
-          </DashboardCard>
+            
           </ContentSection>
         </MainContent>
       </MainLayout>

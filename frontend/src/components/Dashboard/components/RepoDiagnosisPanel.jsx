@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Spin, Empty, Tag, Divider, List, Select, Input, Avatar, Button, Switch } from 'antd';
 import { Pie } from 'react-chartjs-2';
-import FadeInWrapper from './FadeInWrapper';
-import CommitDetailModal from './CommitDetailModal';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -183,39 +185,10 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
     }
   };
 
-  // State for commit detail modal
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [detailCommit, setDetailCommit] = useState(null);
-  const [detailFiles, setDetailFiles] = useState([]);
-  const [detailDiffs, setDetailDiffs] = useState({});
-
   // Handler for showing commit detail
   const handleShowDetail = async (commit) => {
-    setDetailCommit(commit);
-    setDetailModalOpen(true);
-    // Nếu là github, lấy files và diff từ commit.files
-    if (repoSource === 'github' && commit.files) {
-      setDetailFiles(commit.files.map(f => ({
-        filename: f.filename,
-        status: f.status,
-        language: '', // Có thể dùng thư viện detect language nếu cần
-      })));
-      const diffs = {};
-      commit.files.forEach(f => {
-        diffs[f.filename] = f.patch || '';
-      });
-      setDetailDiffs(diffs);
-    } else {
-      // Demo/fallback cho database
-      setDetailFiles(commit.files || [
-        { filename: 'src/App.js', status: 'modified', language: 'javascript' },
-        { filename: 'README.md', status: 'added', language: 'markdown' }
-      ]);
-      setDetailDiffs({
-        'src/App.js': `-console.log('Hello')\n+console.log('Hello World!')`,
-        'README.md': `+# Project\n+This is a new README file.`
-      });
-    }
+    // Demo/fallback for commit detail
+    window.alert(`Chi tiết commit: ${commit.message || commit.commit?.message}`);
   };
 
   // Helper for commit list rendering with pagination and search/filter
@@ -290,13 +263,13 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
             showSizeChanger: false,
           }}
         />
-        <CommitDetailModal
+        {/* <CommitDetailModal
           visible={detailModalOpen}
           onClose={() => setDetailModalOpen(false)}
           commit={detailCommit}
           files={detailFiles}
           diffs={detailDiffs}
-        />
+        /> */}
       </>
     );
   };
@@ -403,7 +376,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
       {error && <Empty description={error} />}
       {!githubLoading && !error && repoId && (
         <>
-          <FadeInWrapper delay={0.1}>
+          {/* <FadeInWrapper delay={0.1}> */}
             <Card title={<Text strong>Phân tích loại commit theo nhánh</Text>} size="small" style={{ marginBottom: 32, borderRadius: 28, boxShadow: '0 4px 24px rgba(59,130,246,0.12)', background: '#f6f8fc', border: '1px solid #e0e7ef' }}>
               {branchAnalysisLoading && <Spin />}
               {branchAnalysisError && <Empty description={branchAnalysisError} />}
@@ -497,9 +470,9 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
                 }
               </div>
             </Card>
-          </FadeInWrapper>
+          {/* </FadeInWrapper> */}
 
-          <FadeInWrapper delay={0.3}>
+          {/* <FadeInWrapper delay={0.3}> */}
             <Card title={<Text strong>Phân tích lĩnh vực công nghệ</Text>} size="small" style={{ marginBottom: 32, borderRadius: 16, boxShadow: '0 2px 8px rgba(168,85,247,0.08)' }}>
               {areaLoading && (
                 <div style={{ textAlign: 'center', marginBottom: 16 }}>
@@ -632,9 +605,9 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
                   <Empty description="Không có dữ liệu lĩnh vực." />
               ) : null}
             </Card>
-          </FadeInWrapper>
+          {/* </FadeInWrapper> */}
 
-          <FadeInWrapper delay={0.4}>
+          {/* <FadeInWrapper delay={0.4}> */}
             <Card title={<Text strong>Phân tích rủi ro</Text>} size="small" style={{ borderRadius: 16, boxShadow: '0 2px 8px rgba(239,68,68,0.08)' }}>
               {riskLoading && (
                 <div style={{ textAlign: 'center', marginBottom: 16 }}>
@@ -759,7 +732,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange }) => {
                   <Empty description="Không có dữ liệu rủi ro." />
               ) : null}
             </Card>
-          </FadeInWrapper>
+          {/* </FadeInWrapper> */}
         </>
       )}
     </Card>

@@ -17,29 +17,21 @@ from services.risk_analysis_service import RiskAnalysisService
 
 logger = logging.getLogger(__name__)
 
-class AssignmentRecommendationService:
+class MemberSkillProfileService:
+    """
+    Service tạo hồ sơ kỹ năng thành viên dựa trên kết quả phân tích AI commit type, area, risk.
+    """
     def __init__(self, db: Session):
         self.db = db
-        # Initialize AI services
-        self.multifusion_commit_analyst_service = MultifusionCommitAnalystService()
-        self.area_analysis_service = AreaAnalysisService()
-        self.risk_analysis_service = RiskAnalysisService()
-    
-    def analyze_member_skills(self, repository_id: int, days_back: int = 90) -> Dict[str, Dict[str, Any]]:
+        self.commit_analyst = MultifusionCommitAnalystService(db)
+        self.area_analyst = AreaAnalysisService()
+        self.risk_analyst = RiskAnalysisService()
+
+    def build_member_skill_profiles(self, repository_id: int, days_back: int = 90) -> Dict[str, Dict[str, Any]]:
         """
-        Phân tích kỹ năng và thế mạnh của từng thành viên dựa trên commit history
-        Sử dụng AI models: MultiFusion V2, Area Analyst, Risk Analyst
-        
-        Args:
-            repository_id: ID của repository
-            days_back: Số ngày quay lại để phân tích (mặc định 90 ngày)
-            
-        Returns:
-            Dict với key là member login, value là skill profile với AI analysis
+        Tạo hồ sơ kỹ năng cho từng thành viên dựa trên kết quả phân tích AI.
         """
         cutoff_date = datetime.now() - timedelta(days=days_back)
-        
-        # Query để lấy thống kê commit của từng member
         query = text("""
             SELECT 
                 c.author_name,
@@ -56,33 +48,23 @@ class AssignmentRecommendationService:
                 AND c.committer_date >= :cutoff_date
             ORDER BY c.committer_date DESC
         """)
-        
         commits_data = self.db.execute(query, {
             "repo_id": repository_id,
             "cutoff_date": cutoff_date
         }).fetchall()
-        
-        member_skills = defaultdict(lambda: {
+
+        member_profiles = defaultdict(lambda: {
             'commit_types': defaultdict(int),
             'areas': defaultdict(int),
             'risk_levels': defaultdict(int),
-            'languages': defaultdict(int),
             'total_commits': 0,
             'total_changes': 0,
-            'avg_files_per_commit': 0.0,
             'recent_activity_score': 0.0,
             'expertise_areas': [],
             'risk_tolerance': 'low',
-            'ai_analysis_count': 0,
-            'ai_predictions': {
-                'commit_types': defaultdict(int),
-                'areas': defaultdict(int), 
-                'risks': defaultdict(int)
-            }
+            'ai_coverage': 0.0
         })
-        
-        logger.info(f"Analyzing {len(commits_data)} commits with AI models...")
-        
+
         for commit in commits_data:
             author = commit[0]
             message = commit[1]
@@ -92,111 +74,78 @@ class AssignmentRecommendationService:
             modified_files = commit[5]
             commit_date = commit[6]
             diff_content = commit[8] or ''
-            
-            # Legacy analysis (fallback)
-            commit_type_legacy = self._analyze_commit_type_from_message(message)
-            area_legacy = self._analyze_area_from_files(modified_files)
-            risk_level_legacy = self._analyze_risk_level(insertions, deletions, files_changed)
-            language = self._detect_language_from_files(modified_files)
-            
-            # AI Analysis using the 3 models
+
+            # Chuẩn bị dữ liệu cho các service phân tích
+            commit_data_for_ai = {
+                'message': message,
+                'diff_content': diff_content,
+                'lines_added': insertions,
+                'lines_removed': deletions,
+                'file_count': files_changed,
+                'total_changes': insertions + deletions
+            }
+
+            # Phân tích AI
+            commit_type = None
+            area = None
+            risk = None
             try:
-                # 1. MultiFusion V2 for commit type
-                ai_commit_prediction = self.multifusion_v2_service.predict_commit_type(
-                    commit_message=message,
-                    lines_added=insertions,
-                    lines_removed=deletions,
-                    files_count=files_changed,
-                    detected_language=language
-                )
-                
-                # 2. Area Analysis
-                commit_data_for_area = {
+                # Commit type
+                ai_result = self.commit_analyst.multifusion_v2_service.predict_commit_type_batch([commit_data_for_ai])
+                commit_type = ai_result[0]['commit_type'] if ai_result else 'other'
+            except Exception as e:
+                commit_type = 'other'
+            try:
+                area = self.area_analyst.predict_area({
                     'commit_message': message,
                     'diff_content': diff_content,
                     'files_count': files_changed,
                     'lines_added': insertions,
                     'lines_removed': deletions,
                     'total_changes': insertions + deletions
-                }
-                ai_area = self.area_analysis_service.predict_area(commit_data_for_area)
-                
-                # 3. Risk Analysis
-                ai_risk = self.risk_analysis_service.predict_risk(commit_data_for_area)
-                
-                # Use AI predictions if available, fallback to legacy
-                commit_type = ai_commit_prediction.get('commit_type', commit_type_legacy)
-                area = ai_area if ai_area != "Model not loaded" else area_legacy
-                risk_level = ai_risk if ai_risk != "Model not loaded" else risk_level_legacy
-                
-                # Track AI predictions
-                profile = member_skills[author]
-                profile['ai_predictions']['commit_types'][commit_type] += 1
-                profile['ai_predictions']['areas'][area] += 1
-                profile['ai_predictions']['risks'][risk_level] += 1
-                profile['ai_analysis_count'] += 1
-                
-                logger.debug(f"AI Analysis for {author}: type={commit_type}, area={area}, risk={risk_level}")
-                
+                })
             except Exception as e:
-                logger.warning(f"AI analysis failed for commit by {author}, using fallback: {e}")
-                commit_type = commit_type_legacy
-                area = area_legacy
-                risk_level = risk_level_legacy
-            
-            # Cập nhật skill profile
-            profile = member_skills[author]
+                area = 'general'
+            try:
+                risk = self.risk_analyst.predict_risk({
+                    'commit_message': message,
+                    'diff_content': diff_content,
+                    'files_count': files_changed,
+                    'lines_added': insertions,
+                    'lines_removed': deletions,
+                    'total_changes': insertions + deletions
+                })
+            except Exception as e:
+                risk = 'low'
+
+            profile = member_profiles[author]
             profile['commit_types'][commit_type] += 1
             profile['areas'][area] += 1
-            profile['risk_levels'][risk_level] += 1
-            profile['languages'][language] += 1
+            profile['risk_levels'][risk] += 1
             profile['total_commits'] += 1
             profile['total_changes'] += insertions + deletions
-            
             # Tính recent activity score (commits gần đây có trọng số cao hơn)
-            days_ago = (datetime.now() - commit_date).days if commit_date else 90
+            days_ago = (datetime.now() - commit_date).days if commit_date else days_back
             recency_weight = max(0.1, 1.0 - (days_ago / days_back))
             profile['recent_activity_score'] += recency_weight
-        
-        # Tính toán các metric cuối cùng
-        for author, profile in member_skills.items():
+
+        # Tổng hợp expertise area và risk tolerance
+        for author, profile in member_profiles.items():
             if profile['total_commits'] > 0:
-                # Tính average files per commit
-                total_files = sum(profile['areas'].values())
-                profile['avg_files_per_commit'] = total_files / profile['total_commits']
-                
-                # Xác định expertise areas (top 2 areas, ưu tiên AI predictions)
-                if profile['ai_analysis_count'] > 0:
-                    # Use AI predictions for expertise areas
-                    ai_areas = profile['ai_predictions']['areas']
-                    sorted_areas = sorted(ai_areas.items(), key=lambda x: x[1], reverse=True)
-                else:
-                    # Fallback to legacy analysis
-                    sorted_areas = sorted(profile['areas'].items(), key=lambda x: x[1], reverse=True)
-                
+                sorted_areas = sorted(profile['areas'].items(), key=lambda x: x[1], reverse=True)
                 profile['expertise_areas'] = [area for area, count in sorted_areas[:2] if count >= 2]
-                
-                # Xác định risk tolerance (ưu tiên AI predictions)
-                if profile['ai_analysis_count'] > 0:
-                    ai_risks = profile['ai_predictions']['risks']
-                    total_ai_commits = sum(ai_risks.values())
-                    high_risk_ratio = (ai_risks.get('highrisk', 0) + ai_risks.get('high', 0)) / total_ai_commits if total_ai_commits > 0 else 0
-                else:
-                    # Fallback to legacy analysis
-                    high_risk_ratio = profile['risk_levels']['high'] / profile['total_commits']
-                
-                if high_risk_ratio > 0.3:
+                total_risk = sum(profile['risk_levels'].values())
+                high_risk = profile['risk_levels'].get('highrisk', 0) + profile['risk_levels'].get('high', 0)
+                ratio = high_risk / total_risk if total_risk > 0 else 0
+                if ratio > 0.3:
                     profile['risk_tolerance'] = 'high'
-                elif high_risk_ratio > 0.1:
+                elif ratio > 0.1:
                     profile['risk_tolerance'] = 'medium'
                 else:
                     profile['risk_tolerance'] = 'low'
-                
-                # Add AI analysis summary
-                profile['ai_coverage'] = profile['ai_analysis_count'] / profile['total_commits'] if profile['total_commits'] > 0 else 0
-        
-        logger.info(f"Completed AI-enhanced analysis for {len(member_skills)} members")
-        return dict(member_skills)
+                profile['ai_coverage'] = 1.0  # Vì toàn bộ commit đều dùng AI
+
+        return dict(member_profiles)
     
     def recommend_assignees(
         self, 
@@ -223,7 +172,8 @@ class AssignmentRecommendationService:
         Returns:
             List các đề xuất với score và lý do
         """
-        member_skills = self.analyze_member_skills(repository_id)
+        # SỬA: Gọi đúng hàm build_member_skill_profiles
+        member_skills = self.build_member_skill_profiles(repository_id)
         
         if not member_skills:
             return []
@@ -282,11 +232,12 @@ class AssignmentRecommendationService:
         # Determine whether to use AI predictions or legacy analysis
         use_ai = profile.get('ai_coverage', 0) > 0.5  # Use AI if >50% commits analyzed by AI
         
-        if use_ai and 'ai_predictions' in profile:
+        # SỬA: Bỏ điều kiện `and 'ai_predictions' in profile` và dùng trực tiếp profile data
+        if use_ai:
             # Use AI predictions for scoring
-            ai_commit_types = profile['ai_predictions']['commit_types']
-            ai_areas = profile['ai_predictions']['areas']
-            ai_risks = profile['ai_predictions']['risks']
+            ai_commit_types = profile['commit_types']
+            ai_areas = profile['areas']
+            ai_risks = profile['risk_levels']
             
             # 1. Task type experience (30% of total score) - AI enhanced
             ai_task_type_count = ai_commit_types.get(task_type, 0)
@@ -315,7 +266,7 @@ class AssignmentRecommendationService:
             logger.debug(f"AI Risk score: {risk_match_score * 25}")
             
         else:
-            # Fallback to legacy analysis
+            # Fallback to legacy analysis (giữ nguyên logic này phòng trường hợp ai_coverage thấp)
             total_commits = profile['total_commits']
             
             # 1. Task type experience (25% of total score)
@@ -339,18 +290,18 @@ class AssignmentRecommendationService:
         activity_score = min(1.0, profile['recent_activity_score'] / 10)  # Normalize
         score += activity_score * 10
         
-        # 5. Overall experience (10% of total score)
+        # 5. Overall experience (5% of total score, giảm trọng số)
         total_commits = profile['total_commits']
         experience_score = min(1.0, total_commits / 50)  # Normalize với max 50 commits
-        score += experience_score * 10
+        score += experience_score * 5
         
-        # Bonus for required skills
-        if required_skills:
-            skill_bonus = 0
-            for skill in required_skills:
-                if skill in profile['languages'] and profile['languages'][skill] > 0:
-                    skill_bonus += 5
-            score += min(skill_bonus, 15)  # Max 15 bonus points
+        # SỬA: Tạm thời loại bỏ bonus này vì profile không có 'languages'
+        # if required_skills:
+        #     skill_bonus = 0
+        #     for skill in required_skills:
+        #         if skill in profile['languages'] and profile['languages'][skill] > 0:
+        #             skill_bonus += 5
+        #     score += min(skill_bonus, 15)  # Max 15 bonus points
         
         # AI analysis bonus
         if use_ai:
@@ -415,21 +366,22 @@ class AssignmentRecommendationService:
         # Determine if using AI analysis
         use_ai = profile.get('ai_coverage', 0) > 0.5
         
-        if use_ai and 'ai_predictions' in profile:
+        # SỬA: Bỏ điều kiện `and 'ai_predictions' in profile` và dùng trực tiếp profile data
+        if use_ai:
             # AI-enhanced explanations
-            ai_commit_types = profile['ai_predictions']['commit_types']
-            ai_areas = profile['ai_predictions']['areas']
-            ai_risks = profile['ai_predictions']['risks']
+            ai_commit_types = profile['commit_types']
+            ai_areas = profile['areas']
+            ai_risks = profile['risk_levels']
             
             # Experience với task type (AI)
             task_type_count = ai_commit_types.get(task_type, 0)
             if task_type_count > 0:
-                explanations.append(f"AI phân tích: {task_type_count} commits loại {task_type}")
+                explanations.append(f"AI phân tích: {task_type_count} commits loại '{task_type}'")
             
             # Experience với area (AI)
             area_count = ai_areas.get(task_area, 0)
             if area_count > 0:
-                explanations.append(f"AI phân tích: {area_count} commits trong {task_area}")
+                explanations.append(f"AI phân tích: {area_count} commits trong '{task_area}'")
             
             # Risk tolerance (AI)
             ai_risk_tolerance = self._calculate_ai_risk_tolerance(ai_risks)
@@ -438,21 +390,17 @@ class AssignmentRecommendationService:
             elif ai_risk_tolerance == 'low' and risk_level == 'low':
                 explanations.append("AI xác nhận: Chuyên xử lý tasks ổn định")
                 
-            # AI coverage info
-            ai_coverage_pct = int(profile['ai_coverage'] * 100)
-            explanations.append(f"Phân tích AI: {ai_coverage_pct}% commits")
-            
         else:
             # Legacy explanations
             # Experience với task type
             task_type_count = profile['commit_types'].get(task_type, 0)
             if task_type_count > 0:
-                explanations.append(f"Có {task_type_count} commits loại {task_type}")
+                explanations.append(f"Có {task_type_count} commits loại '{task_type}'")
             
             # Experience với area
             area_count = profile['areas'].get(task_area, 0)
             if area_count > 0:
-                explanations.append(f"Có {area_count} commits trong {task_area}")
+                explanations.append(f"Có {area_count} commits trong '{task_area}'")
             
             # Risk tolerance
             risk_tolerance = profile['risk_tolerance']
@@ -468,155 +416,9 @@ class AssignmentRecommendationService:
         
         # Expertise areas
         if task_area in profile['expertise_areas']:
-            explanations.append(f"Chuyên gia về {task_area}")
+            explanations.append(f"Là chuyên gia trong lĩnh vực '{task_area}'")
         
-        return "; ".join(explanations) if explanations else "Thành viên phù hợp dựa trên tổng thể"
-    
-    def _analyze_commit_type_from_message(self, message: str) -> str:
-        """Phân tích loại commit từ message"""
-        if not message:
-            return 'other'
-        
-        message_lower = message.lower()
-        
-        # Conventional commit format
-        if message_lower.startswith('feat'):
-            return 'feat'
-        elif message_lower.startswith('fix'):
-            return 'fix'
-        elif message_lower.startswith('docs'):
-            return 'docs'
-        elif message_lower.startswith('refactor'):
-            return 'refactor'
-        elif message_lower.startswith('test'):
-            return 'test'
-        elif message_lower.startswith('chore'):
-            return 'chore'
-        elif message_lower.startswith('style'):
-            return 'style'
-        elif message_lower.startswith('perf'):
-            return 'perf'
-        
-        # Keyword-based detection
-        if any(word in message_lower for word in ['feature', 'add', 'implement']):
-            return 'feat'
-        elif any(word in message_lower for word in ['fix', 'bug', 'error', 'issue']):
-            return 'fix'
-        elif any(word in message_lower for word in ['doc', 'readme', 'comment']):
-            return 'docs'
-        elif any(word in message_lower for word in ['refactor', 'cleanup', 'restructure']):
-            return 'refactor'
-        elif any(word in message_lower for word in ['test', 'spec', 'coverage']):
-            return 'test'
-        
-        return 'other'
-    
-    def _analyze_area_from_files(self, modified_files) -> str:
-        """Phân tích area từ danh sách files được modify"""
-        if not modified_files:
-            return 'general'
-        
-        try:
-            import json
-            if isinstance(modified_files, str):
-                files_list = json.loads(modified_files)
-            elif isinstance(modified_files, list):
-                files_list = modified_files
-            else:
-                return 'general'
-        except:
-            return 'general'
-        
-        area_indicators = {
-            'frontend': ['.jsx', '.tsx', '.js', '.ts', '.vue', '.css', '.scss', '.html'],
-            'backend': ['.py', '.java', '.go', '.php', '.rb', '.cs'],
-            'database': ['.sql', 'migration', 'schema'],
-            'devops': ['dockerfile', '.yml', '.yaml', '.sh', '.json', 'docker'],
-            'mobile': ['.swift', '.kt', '.dart'],
-            'docs': ['.md', '.txt', '.rst', 'readme']
-        }
-        
-        area_scores = defaultdict(int)
-        
-        for file_path in files_list:
-            if isinstance(file_path, str):
-                file_lower = file_path.lower()
-                
-                for area, indicators in area_indicators.items():
-                    for indicator in indicators:
-                        if indicator in file_lower:
-                            area_scores[area] += 1
-        
-        if area_scores:
-            return max(area_scores.items(), key=lambda x: x[1])[0]
-        
-        return 'general'
-    
-    def _analyze_risk_level(self, insertions: int, deletions: int, files_changed: int) -> str:
-        """Phân tích mức độ rủi ro dựa trên metrics"""
-        total_changes = insertions + deletions
-        
-        # High risk indicators
-        if (total_changes > 1000 or 
-            files_changed > 20 or 
-            deletions > 500):
-            return 'high'
-        
-        # Medium risk indicators  
-        if (total_changes > 200 or 
-            files_changed > 5 or
-            deletions > 100):
-            return 'medium'
-        
-        return 'low'
-    
-    def _detect_language_from_files(self, modified_files) -> str:
-        """Phát hiện ngôn ngữ lập trình chính"""
-        if not modified_files:
-            return 'unknown'
-        
-        try:
-            import json
-            if isinstance(modified_files, str):
-                files_list = json.loads(modified_files)
-            elif isinstance(modified_files, list):
-                files_list = modified_files
-            else:
-                return 'unknown'
-        except:
-            return 'unknown'
-        
-        language_map = {
-            '.py': 'Python',
-            '.js': 'JavaScript', 
-            '.jsx': 'JavaScript',
-            '.ts': 'TypeScript',
-            '.tsx': 'TypeScript',
-            '.java': 'Java',
-            '.cpp': 'C++',
-            '.c': 'C++',
-            '.cs': 'C#',
-            '.php': 'PHP',
-            '.rb': 'Ruby',
-            '.go': 'Go',
-            '.rs': 'Rust',
-            '.html': 'HTML',
-            '.css': 'CSS',
-            '.scss': 'CSS'
-        }
-        
-        language_count = defaultdict(int)
-        for file_path in files_list:
-            if isinstance(file_path, str):
-                import os
-                _, ext = os.path.splitext(file_path.lower())
-                language = language_map.get(ext, 'other')
-                language_count[language] += 1
-        
-        if language_count:
-            return max(language_count.items(), key=lambda x: x[1])[0]
-        
-        return 'unknown'
+        return "; ".join(explanations) if explanations else "Đề xuất dựa trên phân tích tổng thể."
 
     def get_member_workload(self, repository_id: int, days_back: int = 30) -> Dict[str, Dict[str, Any]]:
         """

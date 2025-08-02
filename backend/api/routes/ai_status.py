@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 from db.database import get_db
-from services.assignment_recommendation_service import AssignmentRecommendationService
+from services.assignment_recommendation_service import MemberSkillProfileService
 from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService
 from services.area_analysis_service import AreaAnalysisService
 from services.risk_analysis_service import RiskAnalysisService
@@ -88,7 +88,7 @@ async def test_ai_assignment_recommendation(
     Test endpoint để kiểm tra Assignment Recommendation với AI models
     """
     try:
-        service = AssignmentRecommendationService(db)
+        service = MemberSkillProfileService(db)
         
         # Analyze task to determine characteristics
         task_type = "feature"
@@ -115,7 +115,7 @@ async def test_ai_assignment_recommendation(
         )
         
         # Analyze member skills to see AI coverage
-        member_skills = service.analyze_member_skills(repo_id)
+        member_skills = service.build_member_skill_profiles(repo_id)
         
         ai_stats = {
             "total_members": len(member_skills),
@@ -155,10 +155,10 @@ async def compare_legacy_vs_ai_analysis(
     So sánh kết quả phân tích giữa legacy methods và AI models cho một member
     """
     try:
-        service = AssignmentRecommendationService(db)
+        service = MemberSkillProfileService(db)
         
         # Get analysis results (will include both legacy and AI)
-        member_skills = service.analyze_member_skills(repo_id)
+        member_skills = service.build_member_skill_profiles(repo_id)
         
         if member_login not in member_skills:
             raise HTTPException(status_code=404, detail=f"Member {member_login} not found")

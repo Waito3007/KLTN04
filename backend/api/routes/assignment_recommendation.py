@@ -11,7 +11,8 @@ from sqlalchemy import select
 from pydantic import BaseModel
 from db.database import get_db
 from db.models.repositories import repositories
-from services.assignment_recommendation_service import AssignmentRecommendationService
+# SỬA: Import đúng class service
+from services.assignment_recommendation_service import MemberSkillProfileService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,7 @@ class RecommendationResponse(BaseModel):
     profile_summary: Dict[str, Any]
     workload_info: Optional[Dict[str, Any]] = None
 
+# SỬA: Đơn giản hóa model cho phù hợp với dữ liệu trả về mới
 class SkillAnalysisResponse(BaseModel):
     member: str
     total_commits: int
@@ -43,8 +45,6 @@ class SkillAnalysisResponse(BaseModel):
     risk_tolerance: str
     recent_activity_score: float
     top_commit_types: Dict[str, int]
-    top_areas: Dict[str, int]
-    top_languages: Dict[str, int]
 
 # ==================== SIMPLIFIED ENDPOINTS FOR FRONTEND ====================
 
@@ -75,18 +75,19 @@ async def test_endpoint(
         
         repo_id = result.id
         
-        service = AssignmentRecommendationService(db)
-        member_skills = service.analyze_member_skills(repo_id, 90)
+        # SỬA: Khởi tạo đúng service và gọi đúng hàm
+        service = MemberSkillProfileService(db)
+        member_skills = service.build_member_skill_profiles(repo_id, 90)
         
         return {
             "repo_id": repo_id,
             "member_skills_type": str(type(member_skills)),
             "member_count": len(member_skills) if hasattr(member_skills, '__len__') else 0,
-            "first_member": list(member_skills.keys())[0] if member_skills and hasattr(member_skills, 'keys') else None
+            "first_member_profile": list(member_skills.values())[0] if member_skills else None
         }
         
     except Exception as e:
-        logger.error(f"Error in test endpoint: {e}")
+        logger.error(f"Error in test endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/member-skills/{owner}/{repo_name}")
@@ -111,10 +112,10 @@ async def get_member_skills_simple(
         
         repo_id = result.id
         
-        service = AssignmentRecommendationService(db)
-        member_skills = service.analyze_member_skills(repo_id, 90)
+        # SỬA: Khởi tạo đúng service và gọi đúng hàm
+        service = MemberSkillProfileService(db)
+        member_skills = service.build_member_skill_profiles(repo_id, 90)
         
-        # Ensure member_skills is a dictionary
         if not isinstance(member_skills, dict):
             logger.error(f"member_skills is not a dict: {type(member_skills)}")
             member_skills = {}
@@ -125,22 +126,14 @@ async def get_member_skills_simple(
             if not isinstance(profile, dict) or profile.get('total_commits', 0) == 0:
                 continue
                 
-            # Get top skills with confidence scores
             skills = []
             expertise_areas = profile.get('expertise_areas', [])
             
             # Handle expertise_areas as list (from service)
             if isinstance(expertise_areas, list):
                 for skill in expertise_areas:
-                    # Get confidence from area counts
                     area_counts = profile.get('areas', {})
                     confidence = area_counts.get(skill, 0) / max(profile.get('total_commits', 1), 1)
-                    skills.append({
-                        'skill': skill,
-                        'confidence': float(confidence)
-                    })
-            elif isinstance(expertise_areas, dict):
-                for skill, confidence in expertise_areas.items():
                     skills.append({
                         'skill': skill,
                         'confidence': float(confidence)
@@ -156,29 +149,19 @@ async def get_member_skills_simple(
                         'confidence': float(confidence)
                     })
             
-            # Add top languages as skills
-            languages = profile.get('languages', {})
-            for language, count in sorted(languages.items(), key=lambda x: x[1], reverse=True)[:3]:
-                if count >= 2:  # Only include if significant
-                    confidence = count / max(profile.get('total_commits', 1), 1)
-                    skills.append({
-                        'skill': f"lang_{language}",
-                        'confidence': float(confidence)
-                    })
-            
-            # Sort skills by confidence
+            # SỬA: Loại bỏ phần 'languages' không còn tồn tại trong profile
+
             skills.sort(key=lambda x: x['confidence'], reverse=True)
             
             members.append({
                 'username': username,
-                'display_name': username,  # Could enhance this later
+                'display_name': username,
                 'avatar_url': f"https://github.com/{username}.png",
                 'total_commits': profile.get('total_commits', 0),
                 'skills': skills[:10],  # Top 10 skills
                 'recent_activity_score': round(profile.get('recent_activity_score', 0), 2)
             })
         
-        # Sort members by total commits
         members.sort(key=lambda x: x['total_commits'], reverse=True)
         
         return {
@@ -187,7 +170,7 @@ async def get_member_skills_simple(
         }
         
     except Exception as e:
-        logger.error(f"Error getting member skills: {e}")
+        logger.error(f"Error getting member skills: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/member-skills-simple/{owner}/{repo_name}")
@@ -224,14 +207,14 @@ async def smart_assign_simple(
         
         repo_id = result.id
         
-        service = AssignmentRecommendationService(db)
+        # SỬA: Khởi tạo đúng service
+        service = MemberSkillProfileService(db)
         
         # Analyze task description to determine task characteristics
-        task_type = "feature"  # Default
+        task_type = "feat"  # Default
         task_area = "general"  # Default  
         risk_level = "medium"  # Default
         
-        # Simple heuristics to determine task characteristics from description
         description_lower = request.task_description.lower()
         if any(word in description_lower for word in ["fix", "bug", "error", "issue"]):
             task_type = "fix"
@@ -244,12 +227,12 @@ async def smart_assign_simple(
         
         if any(word in description_lower for word in ["frontend", "ui", "interface", "react", "component"]):
             task_area = "frontend"
-        elif any(word in description_lower for word in ["backend", "api", "server", "database"]):
+        elif any(word in description_lower for word in ["backend", "api", "server"]):
             task_area = "backend"
         elif any(word in description_lower for word in ["database", "sql", "query"]):
             task_area = "database"
         
-        # Get recommendations
+        # SỬA: Gọi đúng hàm recommend_with_workload_balance
         recommendations = service.recommend_with_workload_balance(
             repository_id=repo_id,
             task_type=task_type,
@@ -270,7 +253,7 @@ async def smart_assign_simple(
         }
         
     except Exception as e:
-        logger.error(f"Error in smart assignment: {e}")
+        logger.error(f"Error in smart assignment: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/team-insights/{owner}/{repo_name}")
@@ -284,7 +267,6 @@ async def get_team_insights(
     Phân tích insights tổng thể về team
     """
     try:
-        # Get repository from owner/repo_name
         query = select(repositories).where(
             repositories.c.owner == owner,
             repositories.c.name == repo_name
@@ -296,40 +278,34 @@ async def get_team_insights(
         
         repo_id = result.id
         
-        service = AssignmentRecommendationService(db)
-        member_skills = service.analyze_member_skills(repo_id, days_back)
+        # SỬA: Khởi tạo đúng service và gọi đúng hàm
+        service = MemberSkillProfileService(db)
+        member_skills = service.build_member_skill_profiles(repo_id, days_back)
         
-        # Ensure member_skills is a dictionary
         if not isinstance(member_skills, dict):
             logger.error(f"member_skills is not a dict: {type(member_skills)}")
             member_skills = {}
         
-        # Calculate team insights
         active_profiles = {m: p for m, p in member_skills.items() if isinstance(p, dict) and p.get('total_commits', 0) > 0}
         total_members = len(active_profiles)
         total_commits = sum(p.get('total_commits', 0) for p in active_profiles.values())
         
-        # Top skills across team
-        all_skills = {}
+        all_areas = defaultdict(lambda: {'member_count': 0, 'total_score': 0})
         for profile in active_profiles.values():
             if not isinstance(profile, dict):
                 continue
-            expertise_areas = profile.get('expertise_areas', {})
-            if isinstance(expertise_areas, dict):
-                for skill, confidence in expertise_areas.items():
-                    if skill not in all_skills:
-                        all_skills[skill] = {'total_confidence': 0, 'member_count': 0}
-                    all_skills[skill]['total_confidence'] += confidence
-                    all_skills[skill]['member_count'] += 1
-        
+            # SỬA: Tính toán dựa trên 'areas' thay vì 'expertise_areas' để có dữ liệu đầy đủ hơn
+            for area, count in profile.get('areas', {}).items():
+                all_areas[area]['member_count'] += 1
+                all_areas[area]['total_score'] += count
+
         top_skills = sorted(
-            [{'skill': skill, 'member_count': data['member_count'], 'avg_confidence': data['total_confidence']/data['member_count']} 
-             for skill, data in all_skills.items()],
-            key=lambda x: (x['member_count'], x['avg_confidence']),
+            [{'skill': area, 'member_count': data['member_count'], 'avg_commits': data['total_score'] / data['member_count']} 
+             for area, data in all_areas.items()],
+            key=lambda x: (x['member_count'], x['avg_commits']),
             reverse=True
         )[:10]
         
-        # Top contributors
         top_contributors = sorted(
             [{'username': member, 'commits': profile.get('total_commits', 0)} 
              for member, profile in active_profiles.items()],
@@ -342,13 +318,13 @@ async def get_team_insights(
             "active_members": len([m for m, p in active_profiles.items() if p.get('recent_activity_score', 0) > 0.1]),
             "total_commits": total_commits,
             "avg_commits_per_member": round(total_commits / max(total_members, 1), 1),
-            "total_skills": len(all_skills),
+            "total_skills": len(all_areas),
             "top_skills": top_skills,
             "top_contributors": top_contributors
         }
         
     except Exception as e:
-        logger.error(f"Error getting team insights: {e}")
+        logger.error(f"Error getting team insights: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/workload-analysis/{owner}/{repo_name}")
@@ -362,7 +338,6 @@ async def get_workload_analysis(
     Phân tích workload của các thành viên
     """
     try:
-        # Get repository from owner/repo_name
         query = select(repositories).where(
             repositories.c.owner == owner,
             repositories.c.name == repo_name
@@ -374,13 +349,14 @@ async def get_workload_analysis(
         
         repo_id = result.id
         
-        service = AssignmentRecommendationService(db)
+        # SỬA: Khởi tạo đúng service
+        service = MemberSkillProfileService(db)
         workload = service.get_member_workload(repo_id, days_back)
         
         return workload
         
     except Exception as e:
-        logger.error(f"Error getting workload analysis: {e}")
+        logger.error(f"Error getting workload analysis: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==================== ALIAS ENDPOINTS FOR FRONTEND COMPATIBILITY ====================
