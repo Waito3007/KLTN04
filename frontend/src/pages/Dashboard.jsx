@@ -10,8 +10,8 @@ import RepoList from '../components/repo/RepoList';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
 
-import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
-import MemberSkillProfilePanel from '../components/Dashboard/components/MemberSkillProfilePanel';
+import RepoDiagnosisPanel from '../components/Dashboard/MemberAnalyst/RepoDiagnosisPanel';
+import MemberSkillProfilePanel from '../components/Dashboard/MemberAnalyst/MemberSkillProfilePanel';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
