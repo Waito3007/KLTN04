@@ -14,7 +14,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
   const [compareMemberArea, setCompareMemberArea] = useState('');
   const [selectedMemberRisk, setSelectedMemberRisk] = useState('');
   const [compareRiskMode, setCompareRiskMode] = useState(false);
-  const [compareMemberRisk, setCompareMemberRisk] = useState('');
+  const [compareMemberRisk] = useState('');
   const [selectedMember, setSelectedMember] = useState('');
   const [error, setError] = useState(null);
   const [areaAnalysis, setAreaAnalysis] = useState(null);
