@@ -170,7 +170,11 @@ class MultiFusionV2Service:
             return [self._mock_prediction(c.get('message', '')) for c in commits]
 
         try:
-            text_inputs = [f"{c.get('message', '')} [SEP] {c.get('diff_content', '')[:500]}" for c in commits]
+            # Sửa lỗi: Đảm bảo diff_content là chuỗi trước khi cắt
+            text_inputs = [
+                f"{c.get('message', '')} [SEP] {(c.get('diff_content') or '')[:500]}" 
+                for c in commits
+            ]
             encodings = self.tokenizer.batch_encode_plus(
                 text_inputs, add_special_tokens=True, max_length=self.max_len,
                 padding='max_length', truncation=True, return_attention_mask=True, return_tensors='pt'
