@@ -170,7 +170,11 @@ class MultiFusionV2Service:
             return [self._mock_prediction(c.get('message', '')) for c in commits]
 
         try:
-            text_inputs = [f"{c.get('message', '')} [SEP] {c.get('diff_content', '')[:500]}" for c in commits]
+            # Sửa lỗi: Đảm bảo diff_content là chuỗi trước khi cắt
+            text_inputs = [
+                f"{c.get('message', '')} [SEP] {(c.get('diff_content') or '')[:500]}" 
+                for c in commits
+            ]
             encodings = self.tokenizer.batch_encode_plus(
                 text_inputs, add_special_tokens=True, max_length=self.max_len,
                 padding='max_length', truncation=True, return_attention_mask=True, return_tensors='pt'
@@ -289,7 +293,6 @@ class MultifusionCommitAnalystService:
         """
         params = {"repo_id": repo_id}
         return self._get_commits_from_db(query, params)
-        self.multifusion_v2_service = MultiFusionV2Service()
 
     def _get_commits_from_db(self, query: str, params: Dict) -> List[Dict[str, Any]]:
         """Executes a query and returns a list of dictionaries."""
@@ -319,6 +322,9 @@ class MultifusionCommitAnalystService:
                 'date': commit.get('committer_date', None),
                 **numeric_features
             }
+            # Add missing features with defaults to prevent KeyError
+            formatted.setdefault('risk', 0)
+            formatted.setdefault('confidence_score', 1.0)
             formatted_commits.append(formatted)
         return formatted_commits
 

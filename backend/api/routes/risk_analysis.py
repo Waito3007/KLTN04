@@ -38,7 +38,8 @@ async def predict_commit_risk(
 @risk_analysis_router.get("/repositories/{repo_id}/full-risk-analysis")
 async def get_full_risk_analysis(
     repo_id: int,
-    limit_per_member: int = 50, # Default limit for commits per member
+    limit_per_member: int = 1000, # Increased default limit for commits per member
+    branch_name: str = None, # Optional branch filter
     db: Session = Depends(get_db),
     risk_analysis_service: RiskAnalysisService = Depends(get_risk_analysis_service)
 ):
@@ -48,6 +49,7 @@ async def get_full_risk_analysis(
     Args:
         repo_id: ID của repository.
         limit_per_member: Số lượng commit tối đa để phân tích cho mỗi thành viên.
+        branch_name: Tên branch để lọc commits (tùy chọn).
     
     Returns:
         Dict[str, Any]: Kết quả phân tích rủi ro tổng hợp cho tất cả thành viên.
@@ -59,6 +61,7 @@ async def get_full_risk_analysis(
         full_risk_results = {
             "success": True,
             "repository_id": repo_id,
+            "branch_name": branch_name,
             "total_members": len(members),
             "total_commits_analyzed": 0,
             "risk_distribution": {"lowrisk": 0, "highrisk": 0, "unknown": 0},
@@ -70,7 +73,7 @@ async def get_full_risk_analysis(
         
         for member in members:
             member_login = member['login']
-            member_commits_data = member_service._get_member_commits_raw(repo_id, member_login, limit_per_member)
+            member_commits_data = member_service._get_member_commits_raw(repo_id, member_login, limit_per_member, branch_name)
             
             member_risk_summary = {"lowrisk": 0, "highrisk": 0, "unknown": 0, "total_commits": len(member_commits_data)}
             

@@ -2,8 +2,10 @@ from services.repo_service import fetch_repo_from_github
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import Optional
 import logging
+from collections import defaultdict
 from db.database import get_db
 from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService, MultiFusionV2Service
 router = APIRouter(tags=["multifusion-commit-analysis"])
@@ -29,7 +31,9 @@ async def get_all_members_commits_analyst(
         results = []
         for member_login in member_logins:
             query = """
-                SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
+                SELECT id, sha, message, author_name, committer_date, branch_name, 
+                       insertions, deletions, files_changed, diff_content,
+                       modified_files, file_types
                 FROM commits
                 WHERE repo_id = :repo_id AND LOWER(author_name) = LOWER(:member_login)
             """
@@ -80,7 +84,9 @@ async def get_member_commits_analyst(
         service = MultifusionCommitAnalystService(db)
         # Lấy commit của member, lọc theo branch nếu có
         query = """
-            SELECT id, sha, message, author_name, committer_date, branch_name, insertions, deletions, files_changed, diff_content
+            SELECT id, sha, message, author_name, committer_date, branch_name, 
+                   insertions, deletions, files_changed, diff_content, 
+                   modified_files, file_types
             FROM commits
             WHERE repo_id = :repo_id AND LOWER(author_name) = LOWER(:member_login)
         """
@@ -122,25 +128,28 @@ async def analyze_single_commit(repo_id: int, commit_data: dict):
         if not multifusion_v2.is_model_available():
             logger.warning("MultiFusion V2 model is not available for single commit analysis.")
             raise HTTPException(status_code=503, detail="MultiFusion V2 model is not available.")
-        message = commit_data.get("message", "")
-        file_count = commit_data.get("file_count", commit_data.get("files_count", 0))
-        lines_added = commit_data.get("lines_added", 0)
-        lines_removed = commit_data.get("lines_removed", 0)
-        total_changes = commit_data.get("total_changes", lines_added + lines_removed)
-        num_dirs_changed = commit_data.get("num_dirs_changed", 1)
         
-        # Prepare single commit data as a list for batch prediction
-        single_commit_for_prediction = [{
-            "message": message,
-            "file_count": file_count,
-            "lines_added": lines_added,
-            "lines_removed": lines_removed,
-            "total_changes": total_changes,
-            "num_dirs_changed": num_dirs_changed
-        }]
+        # Sửa: Chuẩn bị đầy đủ 10 đặc trưng số học với giá trị mặc định
+        single_commit_for_prediction = {
+            "message": commit_data.get("message", ""),
+            "diff_content": commit_data.get("diff_content", ""),
+            "file_count": commit_data.get("file_count", commit_data.get("files_count", 0)),
+            "lines_added": commit_data.get("lines_added", 0),
+            "lines_removed": commit_data.get("lines_removed", 0),
+            "total_changes": commit_data.get("total_changes", 
+                                             commit_data.get("lines_added", 0) + commit_data.get("lines_removed", 0)),
+            "num_dirs_changed": commit_data.get("num_dirs_changed", 1),
+            # Thêm các trường còn thiếu với giá trị mặc định
+            "risk": commit_data.get("risk", 0),
+            "confidence_score": commit_data.get("confidence_score", 1.0),
+            "num_build_files": commit_data.get("num_build_files", 0),
+            "num_doc_files": commit_data.get("num_doc_files", 0),
+            "num_test_files": commit_data.get("num_test_files", 0),
+        }
         
         logger.info(f"Input for single commit prediction: {single_commit_for_prediction}")
-        results = multifusion_v2.predict_commit_type_batch(single_commit_for_prediction)
+        # API giờ nhận list các commit
+        results = multifusion_v2.predict_commit_type_batch([single_commit_for_prediction])
         result = results[0] if results else None # Extract the single result
         logger.info(f"Result from single commit prediction: {result}")
         
@@ -148,6 +157,7 @@ async def analyze_single_commit(repo_id: int, commit_data: dict):
     except Exception as e:
         logger.error(f"Error analyzing single commit: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
 # Batch phân tích nhiều commits 
 @router.post("/{repo_id}/batch-analyze-commits")
 async def batch_analyze_commits(repo_id: int, request_data: dict):
@@ -158,19 +168,39 @@ async def batch_analyze_commits(repo_id: int, request_data: dict):
     try:
         if not multifusion_v2.is_model_available():
             raise HTTPException(status_code=503, detail="MultiFusion model is not available.")
-        commits = request_data.get("commits", [])
-        results = []
-        for commit in commits:
-            message = commit.get("message", "")
-            file_count = commit.get("file_count", commit.get("files_count", 0))
-            lines_added = commit.get("lines_added", 0)
-            lines_removed = commit.get("lines_removed", 0)
-            total_changes = commit.get("total_changes", lines_added + lines_removed)
-            num_dirs_changed = commit.get("num_dirs_changed", 1)
-            result = multifusion_v2.predict_commit_type(
-                message, file_count, lines_added, lines_removed, total_changes, num_dirs_changed
-            )
-            results.append({"input": commit, "prediction": result})
+        
+        commits_in = request_data.get("commits", [])
+        if not commits_in:
+            return {"success": True, "results": []}
+
+        # Sửa: Chuẩn bị dữ liệu cho batch prediction
+        commits_for_prediction = []
+        for commit in commits_in:
+            # Chuẩn bị đầy đủ 10 đặc trưng số học với giá trị mặc định
+            prepared_commit = {
+                "message": commit.get("message", ""),
+                "diff_content": commit.get("diff_content", ""),
+                "file_count": commit.get("file_count", commit.get("files_count", 0)),
+                "lines_added": commit.get("lines_added", 0),
+                "lines_removed": commit.get("lines_removed", 0),
+                "total_changes": commit.get("total_changes", 
+                                            commit.get("lines_added", 0) + commit.get("lines_removed", 0)),
+                "num_dirs_changed": commit.get("num_dirs_changed", 1),
+                # Thêm các trường còn thiếu với giá trị mặc định
+                "risk": commit.get("risk", 0),
+                "confidence_score": commit.get("confidence_score", 1.0),
+                "num_build_files": commit.get("num_build_files", 0),
+                "num_doc_files": commit.get("num_doc_files", 0),
+                "num_test_files": commit.get("num_test_files", 0),
+            }
+            commits_for_prediction.append(prepared_commit)
+
+        logger.info(f"Input for batch commit prediction: {len(commits_for_prediction)} commits")
+        predictions = multifusion_v2.predict_commit_type_batch(commits_for_prediction)
+        
+        # Kết hợp input với prediction
+        results = [{"input": commits_in[i], "prediction": predictions[i]} for i in range(len(commits_in))]
+
         return {"success": True, "results": results}
     except Exception as e:
         logger.error(f"Error batch analyzing commits: {e}", exc_info=True)
@@ -234,7 +264,7 @@ async def get_multifusion_v2_status(repo_id: int):
 @router.get("/{repo_id}/commits/all/analysis")
 async def get_all_repo_commits_analysis(
     repo_id: int,
-    limit: int = 100,
+    limit: int = 1000,  # Tăng default limit để lấy tất cả commits
     offset: int = 0,
     branch_name: Optional[str] = None,
     db: Session = Depends(get_db)

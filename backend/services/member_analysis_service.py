@@ -15,119 +15,35 @@ class MemberAnalysisService:
         self.db = db
     
     def get_repository_members(self, repository_id: int) -> List[Dict[str, Any]]:
-        """Lấy danh sách members của repository từ collaborators table và commit authors"""
-        # First get formal collaborators with their commit counts
+        """Lấy danh sách members của repository trực tiếp từ commit authors - KHÔNG MAPPING"""
+        # Get all unique commit authors directly from commits table
         query = text("""
             SELECT 
-                c.id,
-                c.github_username,
-                c.display_name,
-                c.avatar_url,
-                COUNT(co.id) as total_commits
-            FROM collaborators c
-            JOIN repository_collaborators rc ON c.id = rc.collaborator_id
-            LEFT JOIN commits co ON (
-                (LOWER(co.author_name) = LOWER(c.github_username)) OR 
-                (LOWER(co.author_name) = LOWER(c.display_name))
-            ) AND co.repo_id = :repo_id
-            WHERE rc.repository_id = :repo_id
-            GROUP BY c.id, c.github_username, c.display_name, c.avatar_url
+                author_name,
+                COUNT(*) as total_commits
+            FROM commits 
+            WHERE repo_id = :repo_id
+            GROUP BY author_name
+            HAVING COUNT(*) > 0
             ORDER BY total_commits DESC
         """)
         
         result = self.db.execute(query, {"repo_id": repository_id}).fetchall()
         
         members = []
-        processed_authors = set()
-          # Helper function to normalize names for comparison
-        def normalize_name(name):
-            if not name:
-                return ""
-            # Remove accents and normalize to lowercase
-            import unicodedata
-            normalized = unicodedata.normalize('NFD', name)
-            without_accents = ''.join(char for char in normalized if unicodedata.category(char) != 'Mn')
-            return without_accents.lower().strip()
-        
-        # Helper function to extract name parts for better matching
-        def extract_name_parts(name):
-            if not name:
-                return set()
-            # Split by common separators and extract meaningful parts
-            parts = re.split(r'[\s\-_\.@]+', name.lower().strip())
-            # Remove empty parts and very short parts (< 2 chars)
-            meaningful_parts = {part for part in parts if len(part) >= 2}
-            return meaningful_parts        # Helper function to check if names are similar
-        def are_names_similar(name1, name2):
-            if not name1 or not name2:
-                return False
-                
-            n1, n2 = normalize_name(name1), normalize_name(name2)
-            
-            # Exact match
-            if n1 == n2:
-                return True
-              # For very short names (like "San", "SAN"), be very strict
-            # Only match if they are exact (case-insensitive) matches
-            if len(n1) <= 3 or len(n2) <= 3:
-                return n1 == n2
-            
-            # For longer names, check substring matches but be very careful
-            # Require the shorter name to be at least 70% of the longer name
-            if len(n1) > 4 and len(n2) > 4:
-                shorter = min(n1, n2, key=len)
-                longer = max(n1, n2, key=len)
-                
-                if shorter in longer:
-                    # Check if the shorter name is substantial part of the longer name
-                    ratio = len(shorter) / len(longer)
-                    if ratio >= 0.7:  # At least 70% overlap
-                        return True
-            
-            # Check name parts intersection (for complex names)
-            # But be very strict about part matching
-            parts1 = extract_name_parts(name1)
-            parts2 = extract_name_parts(name2)
-            
-            if parts1 and parts2:
-                # For single part names (like "San"), be very strict
-                if len(parts1) == 1 and len(parts2) == 1:
-                    # Only match if exactly the same
-                    return parts1 == parts2
-                
-                # For multi-part names, require substantial overlap
-                common_parts = parts1.intersection(parts2)
-                if common_parts:
-                    # Require multiple common parts OR one very long common part
-                    if len(common_parts) >= 2:  # Multiple common parts
-                        return True
-                    elif len(common_parts) == 1:  # Single common part
-                        part = list(common_parts)[0]
-                        if len(part) > 4:  # Very long common part
-                            part_ratio1 = len(part) / len(n1) if n1 else 0
-                            part_ratio2 = len(part) / len(n2) if n2 else 0
-                            if part_ratio1 > 0.7 or part_ratio2 > 0.7:
-                                return True
-            
-            return False
-        
         for row in result:
-            github_username = row[1]
-            display_name = row[2] or row[1]
-            commit_count = row[4]
+            author_name = row[0]
+            commit_count = row[1]
             
             members.append({
-                "id": row[0],
-                "login": github_username,  # Use github_username as primary login
-                "display_name": display_name,
-                "avatar_url": row[3],
+                "id": f"author_{author_name}",  # Use author name as ID
+                "login": author_name,
+                "display_name": author_name,
+                "avatar_url": None,  # No avatar for commit authors
                 "total_commits": commit_count
             })
-            
-            # Track processed authors (case-insensitive and similar names)
-            processed_authors.add(normalize_name(github_username))
-            if display_name:
-                processed_authors.add(normalize_name(display_name))
+        
+        return members
           # Get commit authors who aren't formal collaborators
         unmatched_query = text("""
             SELECT 
@@ -459,42 +375,10 @@ class MemberAnalysisService:
         return icons.get(commit_type, "📦")
     
     def _get_all_author_names_for_member(self, repository_id: int, member_login: str) -> List[str]:
-        """Get all author names associated with a member - MORE INCLUSIVE approach."""
-        # Start with the primary login name
-        author_names = {member_login.lower()}
-
-        # Find all author names from the commits table for this repo
-        query = text("""
-            SELECT DISTINCT author_name, author_email
-            FROM commits 
-            WHERE repo_id = :repo_id
-        """)
-        all_authors = self.db.execute(query, {"repo_id": repository_id}).fetchall()
-
-        # Find the primary email of the member from the collaborators table if they exist
-        primary_email_query = text("""
-            SELECT email FROM collaborators WHERE LOWER(github_username) = LOWER(:member_login)
-        """)
-        primary_email_result = self.db.execute(primary_email_query, {"member_login": member_login}).fetchone()
-        primary_email = primary_email_result[0] if primary_email_result else None
-
-        for author_name, author_email in all_authors:
-            # 1. Match by primary email (if available)
-            if primary_email and author_email and primary_email.lower() == author_email.lower():
-                author_names.add(author_name.lower())
-                continue
-
-            # 2. Match by GitHub noreply email convention
-            if author_email and '@users.noreply.github.com' in author_email:
-                if f"+{member_login.lower()}@" in author_email.lower():
-                    author_names.add(author_name.lower())
-                    continue
-            
-            # 3. Match by name similarity (as a fallback)
-            if self._are_names_similar(member_login, author_name):
-                author_names.add(author_name.lower())
-
-        return list(author_names)
+        """Get exact author name for member - NO MAPPING, NO CONSOLIDATION"""
+        # Return only the exact member_login as author name
+        # Each author_name in commits should be treated as separate contributor
+        return [member_login]
 
     def _are_names_similar(self, name1: str, name2: str) -> bool:
         """Basic name similarity check."""
@@ -503,35 +387,26 @@ class MemberAnalysisService:
         return name1.lower() in name2.lower() or name2.lower() in name1.lower()
     
     def _get_member_commits_raw(self, repository_id: int, member_login: str, limit: int = 1000, branch_name: str = None):
-        """Get raw commit data for a member"""
+        """Get raw commit data for a member - EXACT CASE-SENSITIVE MATCH"""
         
-        # Get all author names associated with this member
-        all_author_names = self._get_all_author_names_for_member(repository_id, member_login)
+        # No author name mapping - use exact member_login only
+        author_name = member_login
         
-        if not all_author_names:
-            all_author_names = [member_login]  # Fallback
-        
-        # Create IN clause for multiple author names
-        author_placeholders = ', '.join([f':author_{i}' for i in range(len(all_author_names))])
-        
-        # Query commits của member với multiple author names và branch filter
-        base_query = f"""
+        # Query commits with EXACT case-sensitive author name match
+        base_query = """
             SELECT 
                 sha, author_name, message, committer_date, 
                 insertions, deletions, files_changed, modified_files, diff_content
             FROM commits 
             WHERE repo_id = :repo_id 
-                AND LOWER(author_name) IN ({author_placeholders})
+                AND author_name = :author_name
         """
         
         params = {
             "repo_id": repository_id,
+            "author_name": author_name,
             "limit": limit
         }
-        
-        # thêm tên tác giả vào params
-        for i, author_name in enumerate(all_author_names):
-            params[f"author_{i}"] = author_name.lower()
         
         # Add branch filter if specified
         if branch_name:
