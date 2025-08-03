@@ -4,7 +4,7 @@
 # Import AsyncSession từ SQLAlchemy để làm việc với database async
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.database import database
-from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService
+from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService, MultiFusionV2Service
 from services.area_analysis_service import AreaAnalysisService
 from services.risk_analysis_service import RiskAnalysisService
 from services.han_ai_service import HANAIService
@@ -14,6 +14,7 @@ multifusion_commitanalyst_service_instance = MultifusionCommitAnalystService
 area_analysis_service_instance = AreaAnalysisService()
 risk_analysis_service_instance = RiskAnalysisService()
 han_ai_service_instance = HANAIService()
+multifusion_v2_service_instance = MultiFusionV2Service() # Add this line
 
 async def get_db() -> AsyncSession:
     async with database.session() as session:
@@ -30,3 +31,7 @@ def get_risk_analysis_service() -> RiskAnalysisService:
 
 def get_han_ai_service() -> HANAIService:
     return han_ai_service_instance
+
+# Add this function
+def get_multifusion_v2_service() -> MultiFusionV2Service:
+    return multifusion_v2_service_instance
