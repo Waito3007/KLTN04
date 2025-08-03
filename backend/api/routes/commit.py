@@ -181,20 +181,46 @@ async def get_repository_branches_with_commits(
         # Get branches with commit stats
         branches_data = await get_all_branches_with_commit_stats(repo_id)
         
+        # Deduplicate branches by name - keep the one with the most recent activity
+        unique_branches = {}
+        for branch in branches_data:
+            branch_name = branch.name
+            
+            # If this is the first occurrence or has more recent activity, keep it
+            if (branch_name not in unique_branches or 
+                (branch.latest_commit_date and 
+                 (not unique_branches[branch_name].get('latest_commit_date') or 
+                  branch.latest_commit_date > unique_branches[branch_name]['latest_commit_date'])) or
+                (branch.actual_commit_count > unique_branches[branch_name].get('actual_commit_count', 0))):
+                
+                unique_branches[branch_name] = {
+                    "id": branch.id,
+                    "name": branch.name,
+                    "is_default": branch.is_default,
+                    "is_protected": branch.is_protected,
+                    "stored_commit_count": branch.commits_count,
+                    "actual_commit_count": branch.actual_commit_count,
+                    "latest_commit_date": branch.latest_commit_date,
+                    "last_synced_commit_date": branch.last_commit_date
+                }
+        
         # Format response
         branches_list = []
-        for branch in branches_data:
-            branch_dict = {
-                "id": branch.id,
-                "name": branch.name,
-                "is_default": branch.is_default,
-                "is_protected": branch.is_protected,
-                "stored_commit_count": branch.commits_count,
-                "actual_commit_count": branch.actual_commit_count,
-                "latest_commit_date": branch.latest_commit_date.isoformat() if branch.latest_commit_date else None,
-                "last_synced_commit_date": branch.last_commit_date.isoformat() if branch.last_commit_date else None
+        for branch_dict in unique_branches.values():
+            formatted_branch = {
+                "id": branch_dict["id"],
+                "name": branch_dict["name"],
+                "is_default": branch_dict["is_default"],
+                "is_protected": branch_dict["is_protected"],
+                "stored_commit_count": branch_dict["stored_commit_count"],
+                "actual_commit_count": branch_dict["actual_commit_count"],
+                "latest_commit_date": branch_dict["latest_commit_date"].isoformat() if branch_dict["latest_commit_date"] else None,
+                "last_synced_commit_date": branch_dict["last_synced_commit_date"].isoformat() if branch_dict["last_synced_commit_date"] else None
             }
-            branches_list.append(branch_dict)
+            branches_list.append(formatted_branch)
+        
+        # Sort branches: default first, then by name
+        branches_list.sort(key=lambda x: (not x.get("is_default", False), x["name"]))
         
         return {
             "repository": f"{owner}/{repo}",
