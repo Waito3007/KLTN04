@@ -318,6 +318,9 @@ class MultifusionCommitAnalystService:
                 'date': commit.get('committer_date', None),
                 **numeric_features
             }
+            # Add missing features with defaults to prevent KeyError
+            formatted.setdefault('risk', 0)
+            formatted.setdefault('confidence_score', 1.0)
             formatted_commits.append(formatted)
         return formatted_commits
 
