@@ -29,10 +29,21 @@ const BranchCommitAnalysis = ({
   let filtered = selectedMember
     ? branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember)
     : branchAnalysis.commits;
+  
+  // Debug logging
+  console.log('🔍 BranchCommitAnalysis Debug:', {
+    totalCommits: branchAnalysis.commits?.length || 0,
+    selectedMember,
+    filteredCommits: filtered.length,
+    summary: branchAnalysis.summary
+  });
+  
   filtered.forEach(c => {
     const type = c.analysis?.type || 'other';
     typeCount[type] = (typeCount[type] || 0) + 1;
   });
+  
+  console.log('📊 Commit Type Count:', typeCount);
   const pieLabels = Object.keys(typeCount);
   const pieValues = Object.values(typeCount);
 

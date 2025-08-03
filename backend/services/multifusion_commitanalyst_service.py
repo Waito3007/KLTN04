@@ -289,7 +289,6 @@ class MultifusionCommitAnalystService:
         """
         params = {"repo_id": repo_id}
         return self._get_commits_from_db(query, params)
-        self.multifusion_v2_service = MultiFusionV2Service()
 
     def _get_commits_from_db(self, query: str, params: Dict) -> List[Dict[str, Any]]:
         """Executes a query and returns a list of dictionaries."""

@@ -2,8 +2,10 @@ from services.repo_service import fetch_repo_from_github
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import Optional
 import logging
+from collections import defaultdict
 from db.database import get_db
 from services.multifusion_commitanalyst_service import MultifusionCommitAnalystService, MultiFusionV2Service
 router = APIRouter(tags=["multifusion-commit-analysis"])
@@ -234,7 +236,7 @@ async def get_multifusion_v2_status(repo_id: int):
 @router.get("/{repo_id}/commits/all/analysis")
 async def get_all_repo_commits_analysis(
     repo_id: int,
-    limit: int = 100,
+    limit: int = 1000,  # Tăng default limit để lấy tất cả commits
     offset: int = 0,
     branch_name: Optional[str] = None,
     db: Session = Depends(get_db)

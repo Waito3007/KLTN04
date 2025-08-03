@@ -106,9 +106,9 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
     setRiskAnalysis(null);
 
     try {
-      const commitAnalysisUrl = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
-      const areaAnalysisUrl = `http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
-      const riskAnalysisUrl = `http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis?branch_name=${encodeURIComponent(selectedBranch)}`;
+      const commitAnalysisUrl = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit=1000`;
+      const areaAnalysisUrl = `http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
+      const riskAnalysisUrl = `http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
 
       const [commitRes, areaRes, riskRes] = await Promise.all([
         fetch(commitAnalysisUrl),
@@ -261,23 +261,27 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
           {areaAnalysis && (
             <AreaAnalysis
               areaAnalysis={areaAnalysis}
+              areaLoading={false}
               selectedMemberArea={selectedMemberArea}
               setSelectedMemberArea={setSelectedMemberArea}
               compareAreaMode={compareAreaMode}
               setCompareAreaMode={setCompareAreaMode}
               compareMemberArea={compareMemberArea}
               setCompareMemberArea={setCompareMemberArea}
+              selectedBranch={selectedBranch}
             />
           )}
           {riskAnalysis && (
             <RiskAnalysis
               riskAnalysis={riskAnalysis}
+              riskLoading={false}
               selectedMemberRisk={selectedMemberRisk}
               setSelectedMemberRisk={setSelectedMemberRisk}
               compareRiskMode={compareRiskMode}
               setCompareRiskMode={setCompareRiskMode}
               compareMemberRisk={compareMemberRisk}
               setCompareMemberRisk={compareMemberRisk}
+              selectedBranch={selectedBranch}
             />
           )}
         </>

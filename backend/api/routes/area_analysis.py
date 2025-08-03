@@ -38,7 +38,8 @@ async def predict_commit_area(
 @area_analysis_router.get("/repositories/{repo_id}/full-area-analysis")
 async def get_full_area_analysis(
     repo_id: int,
-    limit_per_member: int = 50, # Default limit for commits per member
+    limit_per_member: int = 1000, # Increased default limit for commits per member
+    branch_name: str = None, # Optional branch filter
     db: Session = Depends(get_db),
     area_analysis_service: AreaAnalysisService = Depends(get_area_analysis_service)
 ):
@@ -48,6 +49,7 @@ async def get_full_area_analysis(
     Args:
         repo_id: ID của repository.
         limit_per_member: Số lượng commit tối đa để phân tích cho mỗi thành viên.
+        branch_name: Tên branch để lọc commits (tùy chọn).
     
     Returns:
         Dict[str, Any]: Kết quả phân tích khu vực phát triển tổng hợp cho tất cả thành viên.
@@ -59,6 +61,7 @@ async def get_full_area_analysis(
         full_area_results = {
             "success": True,
             "repository_id": repo_id,
+            "branch_name": branch_name,
             "total_members": len(members),
             "total_commits_analyzed": 0,
             "area_distribution": {},
@@ -70,7 +73,7 @@ async def get_full_area_analysis(
         
         for member in members:
             member_login = member['login']
-            member_commits_data = member_service._get_member_commits_raw(repo_id, member_login, limit_per_member)
+            member_commits_data = member_service._get_member_commits_raw(repo_id, member_login, limit_per_member, branch_name)
             
             member_area_summary = {"total_commits": len(member_commits_data)}
             
