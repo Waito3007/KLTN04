@@ -6,6 +6,7 @@ import RepoDetails from "./pages/RepoDetails";
 import CommitTable from './components/commits/CommitTable';
 import TestPage from './pages/TestPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import RepoSyncManager from './components/repo/RepoSyncManager';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/repo-sync" element={<RepoSyncManager />} />
           <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
           <Route path="/commits" element={<CommitTable />} />
 

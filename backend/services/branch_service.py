@@ -73,9 +73,21 @@ async def get_branches_by_owner_repo(owner: str, repo_name: str):
     return await get_branches_by_repo_id(repo_id)
 
 async def delete_branches_by_repo_id(repo_id: int):
-    """Delete all branches for a repository (for cleanup/re-sync)"""
+    """Delete branches for a repository, handling foreign key constraints safely"""
+    from db.models.commits import commits
+    
+    # First, update commits to remove branch_id references
+    update_commits_query = commits.update().where(
+        commits.c.repo_id == repo_id
+    ).values(branch_id=None)
+    
+    await database.execute(update_commits_query)
+    
+    # Then delete branches
     query = delete(branches).where(branches.c.repo_id == repo_id)
     result = await database.execute(query)
+    
+    logger.info(f"Updated commits and deleted {result} branches for repo_id {repo_id}")
     return result
 
 async def sync_branches_for_repo(repo_id: int, branches_data: list, default_branch: str = "main", replace_existing: bool = False):
@@ -211,4 +223,4 @@ async def update_branch_metadata(repo_id: int, branch_name: str, metadata: dict)
     ).values(**update_data)
     
     result = await database.execute(query)
-    return result > 0
+    return result is not None and result > 0

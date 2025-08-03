@@ -528,7 +528,18 @@ const Dashboard = () => {
             title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Thao tác nhanh</SectionTitle>}
             size="small"
           >
-            <Space direction="vertical" style={{ width: '100%' }} size="small">              <Button 
+            <Space direction="vertical" style={{ width: '100%' }} size="small">
+              <Button 
+                type="primary"
+                onClick={() => navigate('/repo-sync')}
+                block
+                size="small"
+                style={{ marginBottom: '8px' }}
+              >
+                Repository Sync Manager
+              </Button>
+              
+              <Button 
                 type="default" 
                 onClick={syncAllRepositories}
                 loading={isSyncing}

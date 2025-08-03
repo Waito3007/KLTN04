@@ -190,6 +190,10 @@ class CommitAnalyzer:
         Returns:
             Size category (small, medium, large, massive)
         """
+        # Handle None or non-numeric values
+        if total_changes is None or not isinstance(total_changes, (int, float)):
+            total_changes = 0
+            
         if total_changes <= 10:
             return 'small'
         elif total_changes <= 50:
@@ -273,10 +277,10 @@ class CommitAnalyzer:
             # Analyze file changes
             file_analysis = CommitAnalyzer.analyze_file_changes(modified_files)
             
-            # Calculate statistics
-            additions = commit_data.get('stats', {}).get('additions', 0)
-            deletions = commit_data.get('stats', {}).get('deletions', 0)
-            total_changes = additions + deletions
+            # Calculate statistics - ensure None values are converted to 0
+            additions = commit_data.get('stats', {}).get('additions') or 0
+            deletions = commit_data.get('stats', {}).get('deletions') or 0
+            total_changes = (additions or 0) + (deletions or 0)
             
             # Detect change type and size
             message = commit_data.get('commit', {}).get('message', '')

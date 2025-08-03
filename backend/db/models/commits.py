@@ -11,7 +11,7 @@ commits = Table(
     'commits',
     metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('sha', String(40), nullable=False),
+    Column('sha', String(128), nullable=False),  # Increased to 128 to support all SHA types
     Column('message', Text, nullable=False),
     Column('author_user_id', Integer, ForeignKey('users.id'), nullable=True),
     Column('author_name', String(255), nullable=False),
@@ -29,7 +29,7 @@ commits = Table(
     Column('insertions', Integer, nullable=True),
     Column('deletions', Integer, nullable=True),
     Column('files_changed', Integer, nullable=True),
-    Column('parent_sha', String(40), nullable=True),
+    Column('parent_sha', String(128), nullable=True),  # Also increased to 128
     Column('is_merge', Boolean, nullable=True),
     Column('merge_from_branch', String(255), nullable=True),
     # Enhanced fields for file tracking (compatible with both PostgreSQL and SQLite)

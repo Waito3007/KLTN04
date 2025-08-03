@@ -214,3 +214,58 @@ async def get_repository_stats():
         'average_stars': float(result['avg_stars'] or 0),
         'last_updated': result['last_updated']
     }
+
+async def update_repo_sync_status(owner: str, repo_name: str, sync_status: str = "completed"):
+    """Update repository sync status and last_synced timestamp after sync completion"""
+    from sqlalchemy.sql import func
+    from datetime import datetime
+    
+    # First check if repository exists
+    check_query = select(repositories).where(
+        repositories.c.owner == owner,
+        repositories.c.name == repo_name
+    )
+    existing_repo = await database.fetch_one(check_query)
+    
+    if not existing_repo:
+        print(f"❌ Repository {owner}/{repo_name} not found in database")
+        return False
+    
+    update_query = (
+        update(repositories)
+        .where(
+            repositories.c.owner == owner,
+            repositories.c.name == repo_name
+        )
+        .values(
+            sync_status=sync_status,
+            last_synced=func.now(),  # Update last_synced to current timestamp
+            updated_at=func.now()
+        )
+    )
+    
+    result = await database.execute(update_query)
+    
+    # result is the number of affected rows (can be None with some database drivers)
+    if result is not None and result > 0:
+        print(f"✅ Updated sync status for {owner}/{repo_name}: {sync_status}")
+        return True
+    elif result is None:
+        # Some database drivers return None for successful UPDATE operations
+        # Re-check if the update was successful by querying the repository
+        updated_repo = await database.fetch_one(check_query)
+        if updated_repo and updated_repo['sync_status'] == sync_status:
+            print(f"✅ Updated sync status for {owner}/{repo_name}: {sync_status}")
+            return True
+        else:
+            print(f"❌ Failed to update sync status for {owner}/{repo_name} (update verification failed)")
+            return False
+    else:
+        print(f"❌ Failed to update sync status for {owner}/{repo_name} (no rows affected)")
+        return False
+
+async def get_all_repositories():
+    """Get all repositories from database"""
+    query = select(repositories).order_by(repositories.c.updated_at.desc())
+    result = await database.fetch_all(query)
+    return [dict(row) for row in result]
