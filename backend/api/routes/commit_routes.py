@@ -295,3 +295,169 @@ async def analyze_commits_csv(file: UploadFile = File(...)):
         if tmp_path.exists():
             tmp_path.unlink()
         raise HTTPException(status_code=500, detail=f"Lỗi xử lý file: {str(e)}")
+
+# ==================== COMMIT DIFF ENDPOINTS ====================
+
+@router.get("/{owner}/{repo}/commits/{sha}/diff")
+async def get_commit_diff_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy diff của commit cụ thể
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Diff content của commit
+    """
+    try:
+        from services.commit_service import get_commit_diff
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        diff = await get_commit_diff(owner, repo, sha, github_token)
+        
+        if diff is None:
+            raise HTTPException(status_code=404, detail="Commit diff not found")
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "diff": diff,
+            "size": len(diff),
+            "lines_count": len(diff.split('\n')) if diff else 0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving diff: {str(e)}")
+
+@router.get("/{owner}/{repo}/commits/{sha}/files")
+async def get_commit_files_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy danh sách files thay đổi trong commit
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Danh sách files thay đổi với stats
+    """
+    try:
+        from services.commit_service import get_commit_files
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        files = await get_commit_files(owner, repo, sha, github_token)
+        
+        # Calculate summary stats
+        total_additions = sum(f.get('additions', 0) for f in files)
+        total_deletions = sum(f.get('deletions', 0) for f in files)
+        total_changes = sum(f.get('changes', 0) for f in files)
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "files": files,
+            "summary": {
+                "files_count": len(files),
+                "total_additions": total_additions,
+                "total_deletions": total_deletions,
+                "total_changes": total_changes
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving files: {str(e)}")
+
+@router.get("/{owner}/{repo}/commits/{sha}/stats")
+async def get_commit_stats_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy thống kê tổng hợp của commit
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Thống kê commit bao gồm files và diff
+    """
+    try:
+        from services.commit_service import get_commit_diff, get_commit_files
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        # Get both files and diff
+        files = await get_commit_files(owner, repo, sha, github_token)
+        diff = await get_commit_diff(owner, repo, sha, github_token)
+        
+        if not files and not diff:
+            raise HTTPException(status_code=404, detail="Commit not found")
+        
+        # Calculate stats
+        total_additions = sum(f.get('additions', 0) for f in files)
+        total_deletions = sum(f.get('deletions', 0) for f in files)
+        total_changes = sum(f.get('changes', 0) for f in files)
+        
+        # File type analysis
+        file_types = {}
+        for file in files:
+            filename = file.get('filename', '')
+            if '.' in filename:
+                ext = filename.split('.')[-1].lower()
+                file_types[ext] = file_types.get(ext, 0) + 1
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "stats": {
+                "files_count": len(files),
+                "total_additions": total_additions,
+                "total_deletions": total_deletions,
+                "total_changes": total_changes,
+                "diff_size": len(diff) if diff else 0,
+                "diff_lines": len(diff.split('\n')) if diff else 0
+            },
+            "file_types": file_types,
+            "has_diff": diff is not None,
+            "has_files": len(files) > 0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving commit stats: {str(e)}")

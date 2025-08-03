@@ -20,7 +20,7 @@ repositories = Table(
     Column('is_fork', Boolean, nullable=True),
     Column('default_branch', String(100), nullable=True),
     Column('last_synced', DateTime, nullable=True),
-    Column('sync_status', String(20), nullable=True),
+    Column('sync_status', String(50), nullable=True),
     Column('user_id', Integer, ForeignKey('users.id'), nullable=True),
     Column('created_at', DateTime, nullable=True, server_default=func.now()),
     Column('updated_at', DateTime, nullable=True, server_default=func.now()),

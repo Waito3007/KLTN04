@@ -1,20 +1,75 @@
 # backend/api/routes/sync.py
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 import httpx
 import asyncio
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
+from concurrent.futures import ThreadPoolExecutor
 from services.repo_service import save_repository, get_repo_id_by_owner_and_name
 from services.branch_service import sync_branches_for_repo
-from services.commit_service import save_commit
+from services.commit_service import save_commit, save_commit_with_diff
 from services.issue_service import save_issue
+from services.pull_request_service import save_pull_request
 from services.github_service import fetch_commit_details, fetch_branch_stats
+import time
+
+# Import sync events để có thể emit events real-time
+from .sync_events import emit_sync_start, emit_sync_progress, emit_sync_complete, emit_sync_error
 
 sync_router = APIRouter()
 logger = logging.getLogger(__name__)
 
 # Constants
 GITHUB_API_BASE = "https://api.github.com"
+MAX_CONCURRENT_REQUESTS = 10  # Limit concurrent requests to avoid rate limiting
+BATCH_SIZE = 50  # Process commits in batches
+
+async def github_api_call_batch(urls: List[str], token: str, semaphore: asyncio.Semaphore) -> List[Dict[str, Any]]:
+    """
+    Gọi nhiều GitHub API URLs đồng thời với semaphore để limit concurrent requests
+    
+    Args:
+        urls: List các GitHub API URLs
+        token: Authorization token
+        semaphore: Semaphore để limit concurrent requests
+    
+    Returns:
+        List response JSON data
+    """
+    headers = {
+        "Authorization": token,
+        "Accept": "application/vnd.github+json", 
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+    
+    async def fetch_single(url: str, client: httpx.AsyncClient) -> Dict[str, Any]:
+        async with semaphore:
+            try:
+                resp = await client.get(url, headers=headers)
+                if resp.status_code == 200:
+                    return resp.json()
+                elif resp.status_code == 429:
+                    # Rate limit - wait a bit and return None
+                    await asyncio.sleep(1)
+                    return None
+                else:
+                    logger.warning(f"API call failed for {url}: {resp.status_code}")
+                    return None
+            except Exception as e:
+                logger.warning(f"Exception in API call for {url}: {e}")
+                return None
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        tasks = [fetch_single(url, client) for url in urls]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Filter out None results and exceptions
+        valid_results = []
+        for result in results:
+            if result is not None and not isinstance(result, Exception):
+                valid_results.append(result)
+        
+        return valid_results
 
 async def github_api_call(url: str, token: str, retries: int = 3) -> Dict[str, Any]:
     """
@@ -87,15 +142,66 @@ async def github_api_call(url: str, token: str, retries: int = 3) -> Dict[str, A
     
     raise HTTPException(status_code=500, detail="All retry attempts failed")
 
-# Đồng bộ toàn bộ dữ liệu
 @sync_router.post("/github/{owner}/{repo}/sync-all")
-async def sync_all(owner: str, repo: str, request: Request):
+async def sync_all_optimized(owner: str, repo: str, request: Request, background_tasks: BackgroundTasks):
+    """
+    Đồng bộ toàn bộ dữ liệu repository với tối ưu tốc độ:
+    - Repository information
+    - All branches (concurrent)
+    - All commits from all branches (batch processing) 
+    - All issues (batch processing)
+    - All pull requests (batch processing)
+    """
     token = request.headers.get("Authorization")
     if not token or not token.startswith("token "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
     
+    # Start background sync task
+    background_tasks.add_task(
+        sync_all_background_optimized,
+        owner,
+        repo, 
+        token
+    )
+    
+    return {
+        "status": "accepted",
+        "message": f"Started optimized sync for {owner}/{repo}",
+        "repository": f"{owner}/{repo}",
+        "note": "Sync is running in background. Check logs for progress."
+    }
+
+async def sync_all_background_optimized(owner: str, repo: str, token: str):
+    """
+    Background task để đồng bộ toàn bộ repository với tối ưu tốc độ
+    """
+    start_time = time.time()
+    repo_key = f"{owner}/{repo}"
+    logger.info(f"🚀 Starting optimized sync for {repo_key}")
+    
+    # Emit sync start event
+    await emit_sync_start(repo_key, "optimized")
+    
+    sync_results = {
+        "repository_synced": False,
+        "branches_synced": 0,
+        "commits_synced": 0,
+        "issues_synced": 0,
+        "pull_requests_synced": 0,
+        "errors": [],
+        "timing": {}
+    }
+    
     try:
-        # 1. Sync repository
+        # Create semaphore for rate limiting
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        
+        # 1. Sync repository (fastest)
+        await emit_sync_progress(repo_key, 1, 5, "Syncing repository metadata")
+        step_start = time.time()
+        
+        # 1. Sync repository (fastest)
+        step_start = time.time()
         repo_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}", token)
         repo_entry = {
             "github_id": repo_data["id"],
@@ -107,53 +213,354 @@ async def sync_all(owner: str, repo: str, request: Request):
             "language": repo_data["language"],
             "open_issues": repo_data["open_issues_count"],
             "url": repo_data["html_url"],
-            # Bổ sung các fields từ database model
             "full_name": repo_data.get("full_name"),
             "clone_url": repo_data.get("clone_url"),
             "is_private": repo_data.get("private", False),
             "is_fork": repo_data.get("fork", False),
             "default_branch": repo_data.get("default_branch", "main"),
-            "sync_status": "completed",        }
+            "sync_status": "sync_optimized",
+        }
         await save_repository(repo_entry)
+        sync_results["repository_synced"] = True
+        sync_results["timing"]["repository"] = time.time() - step_start
+        logger.info(f"✅ Repository synced in {sync_results['timing']['repository']:.2f}s")
         
-        # 2. Sync branches
+        # 2. Get repo_id
+        await emit_sync_progress(repo_key, 2, 5, "Getting repository ID")
         repo_id = await get_repo_id_by_owner_and_name(owner, repo)
         if not repo_id:
-            raise HTTPException(status_code=404, detail="Repository not found")
-            
-        branches_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}/branches", token)
-          # Chuẩn hóa dữ liệu branch với đầy đủ thông tin
-        default_branch = repo_data.get("default_branch", "main")
-        branches_to_save = []
+            raise Exception("Repository not found after creation")
         
+        # 3. Sync branches concurrently
+        await emit_sync_progress(repo_key, 3, 5, "Syncing branches")
+        step_start = time.time()
+        branches_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}/branches", token)
+        default_branch = repo_data.get("default_branch", "main")
+        
+        # Prepare branch data
+        branches_to_save = []
         for branch in branches_data:
             branch_info = {
                 "name": branch["name"],
                 "sha": branch.get("commit", {}).get("sha"),
                 "is_default": branch["name"] == default_branch,
                 "is_protected": branch.get("protected", False),
+                "repo_id": repo_id
             }
-            
-            # Tùy chọn: Lấy thêm thông tin commit chi tiết (có thể làm chậm API)
-            # Uncomment dòng dưới nếu muốn lấy thêm thông tin
-            # if branch_info["sha"]:
-            #     commit_details = await fetch_commit_details(branch_info["sha"], owner, repo, token)
-            #     if commit_details:
-            #         branch_info["last_commit_date"] = commit_details["date"]
-            #         branch_info["last_committer_name"] = commit_details["committer_name"]
-            
             branches_to_save.append(branch_info)
         
-        # Đồng bộ hóa hàng loạt với dữ liệu đầy đủ
         branches_synced = await sync_branches_for_repo(
             repo_id, 
             branches_to_save, 
             default_branch=default_branch,
-            replace_existing=True
+            replace_existing=False  # Don't replace to avoid foreign key issues
         )
-        return {"message": f"Đồng bộ repository {owner}/{repo} thành công!"}
+        sync_results["branches_synced"] = branches_synced
+        sync_results["timing"]["branches"] = time.time() - step_start
+        logger.info(f"✅ {branches_synced} branches synced in {sync_results['timing']['branches']:.2f}s")
+        
+        # 4. Sync commits with batch processing and concurrent diff fetching
+        await emit_sync_progress(repo_key, 4, 5, "Syncing commits")
+        step_start = time.time()
+        commits_synced = await sync_commits_batch_optimized(
+            owner, repo, repo_id, branches_data, token, semaphore
+        )
+        sync_results["commits_synced"] = commits_synced
+        sync_results["timing"]["commits"] = time.time() - step_start
+        logger.info(f"✅ {commits_synced} commits synced in {sync_results['timing']['commits']:.2f}s")
+        
+        # 5. Sync issues and PRs concurrently
+        await emit_sync_progress(repo_key, 5, 5, "Syncing issues and pull requests")
+        step_start = time.time()
+        issues_task = asyncio.create_task(
+            sync_issues_batch_optimized(owner, repo, repo_id, token, semaphore)
+        )
+        prs_task = asyncio.create_task(
+            sync_prs_batch_optimized(owner, repo, repo_id, token, semaphore)
+        )
+        
+        # Wait for both to complete
+        issues_synced, prs_synced = await asyncio.gather(issues_task, prs_task)
+        
+        sync_results["issues_synced"] = issues_synced
+        sync_results["pull_requests_synced"] = prs_synced
+        sync_results["timing"]["issues_and_prs"] = time.time() - step_start
+        logger.info(f"✅ {issues_synced} issues and {prs_synced} PRs synced in {sync_results['timing']['issues_and_prs']:.2f}s")
+        
+        try:
+            # Update final status
+            logger.debug(f"🔧 About to save repository with final status")
+            await save_repository({
+                **repo_entry,
+                "sync_status": "sync_completed"
+            })
+            logger.debug(f"✅ Repository saved with final status")
+            
+            # Update repository sync status and last_synced timestamp
+            logger.debug(f"🔧 About to update repo sync status")
+            from services.repo_service import update_repo_sync_status
+            await update_repo_sync_status(owner, repo, "completed")
+            logger.debug(f"✅ Repo sync status updated")
+            
+            total_time = time.time() - start_time
+            sync_results["timing"]["total"] = total_time
+            
+            # Emit sync complete event
+            logger.debug(f"🔧 About to emit sync complete event")
+            await emit_sync_complete(repo_key, True, sync_results)
+            logger.debug(f"✅ Sync complete event emitted")
+            
+            logger.info(f"🎉 Optimized sync completed for {repo_key} in {total_time:.2f}s")
+            logger.info(f"📊 Results: {sync_results}")
+            
+        except Exception as final_error:
+            logger.error(f"❌ Error in final sync steps for {repo_key}: {str(final_error)}")
+            logger.error(f"❌ Error type: {type(final_error).__name__}")
+            import traceback
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
+            raise final_error
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Lỗi đồng bộ {owner}/{repo}: {str(e)}")
+        logger.error(f"❌ Error in optimized sync for {repo_key}: {str(e)}")
+        sync_results["errors"].append(f"Fatal error: {str(e)}")
+        
+        # Emit sync error event
+        await emit_sync_error(repo_key, str(e), "sync_all_background")
+
+async def sync_commits_batch_optimized(
+    owner: str, 
+    repo: str, 
+    repo_id: int, 
+    branches_data: List[Dict], 
+    token: str,
+    semaphore: asyncio.Semaphore
+) -> int:
+    """
+    Đồng bộ commits với batch processing và concurrent diff fetching
+    """
+    total_commits_synced = 0
+    github_token = token.replace("token ", "") if token.startswith("token ") else None
+    
+    for branch in branches_data:
+        branch_name = branch["name"]
+        logger.info(f"🔄 Processing commits from branch: {branch_name}")
+        
+        # Get all commits for this branch first (lightweight)
+        all_commits = []
+        page = 1
+        per_page = 100
+        
+        while True:
+            commits_url = f"https://api.github.com/repos/{owner}/{repo}/commits?sha={branch_name}&per_page={per_page}&page={page}"
+            commits_data = await github_api_call(commits_url, token)
+            
+            if not commits_data:
+                break
+                
+            all_commits.extend(commits_data)
+            page += 1
+            
+            if len(commits_data) < per_page:
+                break
+        
+        logger.info(f"📝 Found {len(all_commits)} commits in branch {branch_name}")
+        
+        # Process commits in batches
+        for i in range(0, len(all_commits), BATCH_SIZE):
+            batch = all_commits[i:i + BATCH_SIZE]
+            batch_start = time.time()
+            
+            # Process batch concurrently
+            tasks = []
+            for commit in batch:
+                task = asyncio.create_task(
+                    process_single_commit_optimized(
+                        commit, owner, repo, repo_id, branch_name, github_token, semaphore
+                    )
+                )
+                tasks.append(task)
+            
+            # Wait for batch to complete
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            # Count successful commits
+            batch_success = sum(1 for r in results if r is True)
+            total_commits_synced += batch_success
+            
+            batch_time = time.time() - batch_start
+            logger.info(f"✅ Batch {i//BATCH_SIZE + 1}: {batch_success}/{len(batch)} commits in {batch_time:.2f}s")
+    
+    return total_commits_synced
+
+async def process_single_commit_optimized(
+    commit: Dict, 
+    owner: str, 
+    repo: str, 
+    repo_id: int, 
+    branch_name: str, 
+    github_token: str,
+    semaphore: asyncio.Semaphore
+) -> bool:
+    """
+    Process single commit with optimized diff fetching
+    """
+    try:
+        commit_data = {
+            "sha": commit["sha"],
+            "repo_id": repo_id,
+            "branch_name": branch_name,
+            "commit": commit.get("commit", {}),
+            "parents": commit.get("parents", [])
+        }
+        
+        # Use optimized save function
+        commit_id = await save_commit_with_diff(
+            commit_data, 
+            owner, 
+            repo, 
+            github_token, 
+            force_update=False
+        )
+        
+        return commit_id is not None
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Error processing commit {commit.get('sha', 'unknown')}: {e}")
+        return False
+
+async def sync_issues_batch_optimized(
+    owner: str, 
+    repo: str, 
+    repo_id: int, 
+    token: str,
+    semaphore: asyncio.Semaphore
+) -> int:
+    """
+    Đồng bộ issues với batch processing
+    """
+    total_issues = 0
+    page = 1
+    per_page = 100
+    
+    while True:
+        issues_url = f"https://api.github.com/repos/{owner}/{repo}/issues?state=all&per_page={per_page}&page={page}"
+        issues_data = await github_api_call(issues_url, token)
+        
+        if not issues_data:
+            break
+        
+        # Filter out pull requests
+        actual_issues = [issue for issue in issues_data if "pull_request" not in issue]
+        
+        # Process issues concurrently
+        tasks = []
+        for issue in actual_issues:
+            task = asyncio.create_task(
+                process_single_issue_optimized(issue, repo_id, semaphore)
+            )
+            tasks.append(task)
+        
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            success_count = sum(1 for r in results if r is True)
+            total_issues += success_count
+        
+        page += 1
+        if len(issues_data) < per_page:
+            break
+    
+    return total_issues
+
+async def process_single_issue_optimized(issue: Dict, repo_id: int, semaphore: asyncio.Semaphore) -> bool:
+    """
+    Process single issue
+    """
+    async with semaphore:
+        try:
+            issue_entry = {
+                "github_id": issue["id"],
+                "repo_id": repo_id,
+                "number": issue["number"],
+                "title": issue["title"],
+                "body": issue.get("body", ""),
+                "state": issue["state"],
+                "author": issue["user"]["login"],
+                "created_at": issue["created_at"],
+                "updated_at": issue["updated_at"],
+                "url": issue["html_url"]
+            }
+            await save_issue(issue_entry)
+            return True
+        except Exception as e:
+            logger.warning(f"⚠️ Error processing issue {issue.get('id', 'unknown')}: {e}")
+            return False
+
+async def sync_prs_batch_optimized(
+    owner: str, 
+    repo: str, 
+    repo_id: int, 
+    token: str,
+    semaphore: asyncio.Semaphore
+) -> int:
+    """
+    Đồng bộ pull requests với batch processing
+    """
+    total_prs = 0
+    page = 1
+    per_page = 100
+    
+    while True:
+        prs_url = f"https://api.github.com/repos/{owner}/{repo}/pulls?state=all&per_page={per_page}&page={page}"
+        prs_data = await github_api_call(prs_url, token)
+        
+        if not prs_data:
+            break
+        
+        # Process PRs concurrently
+        tasks = []
+        for pr in prs_data:
+            task = asyncio.create_task(
+                process_single_pr_optimized(pr, repo_id, semaphore)
+            )
+            tasks.append(task)
+        
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            success_count = sum(1 for r in results if r is True)
+            total_prs += success_count
+        
+        page += 1
+        if len(prs_data) < per_page:
+            break
+    
+    return total_prs
+
+async def process_single_pr_optimized(pr: Dict, repo_id: int, semaphore: asyncio.Semaphore) -> bool:
+    """
+    Process single pull request
+    """
+    async with semaphore:
+        try:
+            pr_entry = {
+                "github_id": pr["id"],
+                "repo_id": repo_id,
+                "number": pr["number"],
+                "title": pr["title"],
+                "body": pr.get("body", ""),
+                "state": pr["state"],
+                "author": pr["user"]["login"],
+                "created_at": pr["created_at"],
+                "updated_at": pr["updated_at"],
+                "merged_at": pr.get("merged_at"),
+                "url": pr["html_url"],
+                "base_branch": pr["base"]["ref"],
+                "head_branch": pr["head"]["ref"]
+            }
+            await save_pull_request(pr_entry)
+            return True
+        except Exception as e:
+            logger.warning(f"⚠️ Error processing PR {pr.get('id', 'unknown')}: {e}")
+            return False
 
 # Endpoint đồng bộ nhanh - chỉ thông tin cơ bản
 @sync_router.post("/github/{owner}/{repo}/sync-basic")
@@ -183,6 +590,10 @@ async def sync_basic(owner: str, repo: str, request: Request):
             "sync_status": "completed",
         }
         await save_repository(repo_entry)
+        
+        # Update repository sync status and last_synced timestamp
+        from services.repo_service import update_repo_sync_status
+        await update_repo_sync_status(owner, repo, "completed")
         
         return {"message": f"Đồng bộ cơ bản {owner}/{repo} thành công!"}
     except Exception as e:
@@ -290,6 +701,10 @@ async def sync_enhanced(owner: str, repo: str, request: Request):
         )
         
         logger.info(f"Enhanced sync completed for {owner}/{repo}: {branches_synced} branches synced")
+        
+        # Update repository sync status and last_synced timestamp
+        from services.repo_service import update_repo_sync_status
+        await update_repo_sync_status(owner, repo, "completed")
         
         return {
             "message": f"Đồng bộ nâng cao {owner}/{repo} thành công!",

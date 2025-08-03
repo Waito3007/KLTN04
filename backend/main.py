@@ -1,6 +1,6 @@
 # backend/main.py
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from core.lifespan import lifespan
 from core.config import setup_middlewares
@@ -9,6 +9,8 @@ from api.routes.auth import auth_router
 from api.routes.github import github_router
 from api.routes.projects import router as projects_router
 from api.routes.sync import sync_router
+from api.routes.repo_manager import repo_manager_router
+from api.routes.sync_events import sync_events_router, websocket_sync_events
 from api.routes.contributors import router as contributors_router
 from api.routes.han_commitanalyst import router as han_commit_analyst_router
 from api.routes.multifusion_commitanalyst import router as multifusion_commit_analyst_router
@@ -40,6 +42,14 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(github_router, prefix="/api")
 app.include_router(projects_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
+app.include_router(repo_manager_router, prefix="/api")
+app.include_router(sync_events_router, prefix="/api/sync-events")
+
+# Add WebSocket route directly to main app with decorator
+@app.websocket("/api/sync-events/ws")
+async def websocket_endpoint(websocket):
+    await websocket_sync_events(websocket)
+
 app.include_router(contributors_router, prefix="/api/contributors")
 app.include_router(han_commit_analyst_router, prefix="/api/han-commit-analysis")
 app.include_router(multifusion_commit_analyst_router, prefix="/api/multifusion-commit-analysis")
@@ -55,6 +65,10 @@ app.include_router(ai_status_router) # New AI status router
 @app.get("/")
 def root():
     return {"message": "TaskFlowAI backend is running "}
+
+@app.get("/api/sync-events/test")
+def test_sync_events():
+    return {"message": "Sync events endpoint is working", "websocket_url": "/api/sync-events/ws"}
 
 # --- HAN model patch for torch.load (SimpleTokenizer) ---
 import os
