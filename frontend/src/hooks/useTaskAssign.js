@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import { taskAPI } from '../services/taskAPI';
+import { taskAPI } from '../services/api';
 
 // Constants
 const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
@@ -91,7 +91,7 @@ const useTaskAssign = (selectedRepo) => {
       }
       setError(null);
 
-      const response = await taskAPI.getTasks(repoOwner, repoName);
+      const response = await taskAPI.getIntelligent(repoOwner, repoName);
       
       // Validation response
       if (!Array.isArray(response.data)) {
@@ -123,23 +123,21 @@ const useTaskAssign = (selectedRepo) => {
         ...taskData,
         title: taskData.title.trim(),
         description: taskData.description?.trim() || '',
-        repo_owner: repoOwner,
-        repo_name: repoName,
         status: taskData.status || 'TODO',
         priority: taskData.priority || 'MEDIUM'
       };
 
-      const response = await taskAPI.createTask(createData);
+      const response = await taskAPI.create(repoOwner, repoName, createData);
       
-      if (!response.data) {
+      if (!response) {
         throw new Error('Không nhận được dữ liệu task mới');
       }
 
       // Immutable update
-      setTasks(prevTasks => [...prevTasks, response.data]);
+      setTasks(prevTasks => [...prevTasks, response]);
       message.success('Tạo task thành công');
       
-      return response.data;
+      return response;
     } catch (error) {
       handleError(error, 'tạo task');
       throw error;
@@ -165,9 +163,9 @@ const useTaskAssign = (selectedRepo) => {
         description: updateData.description?.trim() || ''
       };
 
-      const response = await taskAPI.updateTask(taskId, cleanUpdateData);
+      const response = await taskAPI.update(repoOwner, repoName, taskId, cleanUpdateData);
       
-      if (!response.data) {
+      if (!response) {
         throw new Error('Không nhận được dữ liệu task đã cập nhật');
       }
 
@@ -175,20 +173,20 @@ const useTaskAssign = (selectedRepo) => {
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId 
-            ? { ...task, ...response.data }
+            ? { ...task, ...response }
             : task
         )
       );
       
       message.success('Cập nhật task thành công');
-      return response.data;
+      return response;
     } catch (error) {
       handleError(error, 'cập nhật task');
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [validateTaskData, handleError]);
+  }, [repoOwner, repoName, validateTaskData, handleError]);
 
   // Update task status
   const updateTaskStatus = useCallback(async (taskId, newStatus) => {
@@ -238,7 +236,7 @@ const useTaskAssign = (selectedRepo) => {
       setLoading(true);
       setError(null);
 
-      await taskAPI.deleteTask(taskId);
+      await taskAPI.delete(repoOwner, repoName, taskId);
       
       // Immutable update
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
@@ -249,7 +247,7 @@ const useTaskAssign = (selectedRepo) => {
     } finally {
       setLoading(false);
     }
-  }, [handleError]);
+  }, [repoOwner, repoName, handleError]);
 
   // Filter tasks
   const filteredTasks = useMemo(() => {

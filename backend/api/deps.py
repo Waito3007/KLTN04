@@ -3,13 +3,18 @@
 
 # Import AsyncSession từ SQLAlchemy để làm việc với database async
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status, Request, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import AsyncGenerator, Optional
 import os
+import httpx
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Tạo logger
+logger = logging.getLogger(__name__)
 
 # Create async engine and session maker
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -77,14 +82,14 @@ def get_task_service() -> TaskService:
     return task_service_instance
 
 async def get_current_user_dict(
-    current_user: CurrentUser = Depends(get_current_user)
+    authorization: Optional[str] = Header(None)
 ) -> dict:
     """
-    Dependency wrapper để trả về user dict cho backward compatibility
-    Sử dụng OAuth authentication system từ core.security
+    Simple authentication dependency tương tự Dashboard
+    Trả về user dict cho backward compatibility với cơ chế localStorage
     
     Args:
-        current_user: CurrentUser object từ OAuth system
+        authorization: Authorization header từ request
         
     Returns:
         dict: Thông tin user hiện tại
@@ -92,4 +97,64 @@ async def get_current_user_dict(
     Raises:
         HTTPException: Nếu token không hợp lệ hoặc user không tồn tại
     """
-    return current_user.to_dict()
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    try:
+        # Parse Authorization header (Bearer token)
+        parts = authorization.split()
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authorization header format",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        token = parts[1]
+        
+        # Verify token với GitHub API (simple approach như Dashboard)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.github.com/user",
+                headers={
+                    "Authorization": f"token {token}",
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid or expired token",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            
+            github_user = response.json()
+            
+            # Return user dict tương tự như Dashboard localStorage format
+            return {
+                "id": github_user.get("id"),
+                "github_id": github_user.get("id"),
+                "github_username": github_user.get("login"),
+                "username": github_user.get("login"),  # Alias for backward compatibility
+                "email": github_user.get("email"),
+                "display_name": github_user.get("name"),
+                "full_name": github_user.get("name"),
+                "avatar_url": github_user.get("avatar_url"),
+                "is_active": True,
+                "is_verified": True
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Authentication error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication failed",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

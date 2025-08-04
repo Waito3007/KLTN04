@@ -1,4 +1,3 @@
-# backend/core/security.py
 """
 Security module for authentication and authorization
 Handles GitHub OAuth tokens and user session management
@@ -15,11 +14,24 @@ import httpx
 import asyncio
 import logging
 from functools import lru_cache
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy import select
+import os
+from dotenv import load_dotenv
 
 from services.user_service import get_user_by_github_id
 from db.models.users import users
-from db.database import database, engine
-from sqlalchemy import select
+
+load_dotenv()
+
+# Create async engine for security module
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and not DATABASE_URL.startswith("postgresql+asyncpg://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+
+if DATABASE_URL:
+    security_engine = create_async_engine(DATABASE_URL)
+    security_session_maker = async_sessionmaker(security_engine, expire_on_commit=False)
 
 logger = logging.getLogger(__name__)
 
@@ -169,10 +181,15 @@ async def get_current_user_from_token(token: str) -> Optional[CurrentUser]:
         if not github_user:
             return None
         
-        # Get user from our database using engine connection
-        with engine.connect() as conn:
+        # Use separate database session for security
+        if not DATABASE_URL:
+            logger.error("Database URL not configured")
+            return None
+            
+        async with security_session_maker() as db:
             query = select(users).where(users.c.github_id == github_user["id"])
-            db_user = conn.execute(query).fetchone()
+            result = await db.execute(query)
+            db_user = result.first()
             
             if not db_user:
                 logger.warning(f"User {github_user['login']} not found in database")
@@ -183,8 +200,8 @@ async def get_current_user_from_token(token: str) -> Optional[CurrentUser]:
                 logger.warning(f"User {github_user['login']} is inactive")
                 return None
             
-            # Convert row to dict using _mapping
-            user_dict = dict(db_user._mapping)
+            # Convert row to dict
+            user_dict = dict(db_user._asdict())
             return CurrentUser(user_dict)
         
     except Exception as e:

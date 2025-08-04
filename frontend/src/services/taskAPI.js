@@ -7,10 +7,10 @@ import apiClient from './api';
 
 // Constants
 const API_ENDPOINTS = {
-  TASKS: '/v1/tasks',
-  TASK_BY_ID: (id) => `/v1/tasks/${id}`,
-  TASK_STATUS: (id) => `/v1/tasks/${id}/status`,
-  REPOSITORY_TASKS: (repoId) => `/v1/tasks?repository_id=${repoId}`
+  TASKS: (owner, repo) => `/projects/${owner}/${repo}/tasks`,
+  TASK_BY_ID: (owner, repo, id) => `/projects/${owner}/${repo}/tasks/${id}`,
+  TASK_STATUS: (owner, repo, id) => `/projects/${owner}/${repo}/tasks/${id}/status`,
+  REPOSITORY_TASKS: (owner, repo) => `/projects/${owner}/${repo}/tasks`
 };
 
 // Request timeout (30 seconds)
@@ -62,17 +62,19 @@ class TaskAPI {
       const cleanData = {
         title: taskData.title.trim(),
         description: taskData.description?.trim() || '',
-        repo_owner: taskData.repo_owner,
-        repo_name: taskData.repo_name,
         status: taskData.status || 'TODO',
         priority: taskData.priority || 'MEDIUM',
-        assignee_github_username: taskData.assignee_github_username?.trim() || null,
+        assignee: taskData.assignee?.trim() || null,
         due_date: taskData.due_date || null
       };
 
-      const response = await apiClient.post(API_ENDPOINTS.TASKS, cleanData, {
-        timeout: REQUEST_TIMEOUT
-      });
+      const response = await apiClient.post(
+        API_ENDPOINTS.TASKS(taskData.repo_owner, taskData.repo_name), 
+        cleanData, 
+        {
+          timeout: REQUEST_TIMEOUT
+        }
+      );
 
       if (!response.data) {
         throw new Error('Không nhận được dữ liệu task mới từ server');
@@ -101,10 +103,7 @@ class TaskAPI {
         throw new Error('Repo name không được để trống');
       }
 
-      const params = new URLSearchParams({
-        repo_owner: repoOwner,
-        repo_name: repoName
-      });
+      const params = new URLSearchParams();
 
       // Thêm filters vào params
       if (filters.status) {
@@ -114,17 +113,18 @@ class TaskAPI {
         params.append('priority', filters.priority);
       }
       if (filters.assignee) {
-        params.append('assignee_github_username', filters.assignee);
-      }
-      if (filters.search) {
-        // Backend không hỗ trợ search trực tiếp, sẽ filter ở frontend
+        params.append('assignee', filters.assignee);
       }
 
-      const response = await apiClient.get(`${API_ENDPOINTS.TASKS}?${params}`, {
+      const url = params.toString() ? 
+        `${API_ENDPOINTS.TASKS(repoOwner, repoName)}?${params}` : 
+        API_ENDPOINTS.TASKS(repoOwner, repoName);
+
+      const response = await apiClient.get(url, {
         timeout: REQUEST_TIMEOUT
       });
 
-      let tasks = response.data?.tasks || [];
+      let tasks = response.data?.tasks || response.data || [];
 
       // Filter theo search term ở frontend nếu cần
       if (filters.search) {

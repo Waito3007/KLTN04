@@ -69,7 +69,7 @@ const CreateTaskModal = ({
     description: [
       { max: 1000, message: 'Mô tả không được quá 1000 ký tự' }
     ],
-    assignee_github_username: [
+    assignee: [
       { pattern: /^[a-zA-Z0-9]([a-zA-Z0-9-])*[a-zA-Z0-9]$/, message: 'GitHub username không hợp lệ' }
     ],
     due_date: [
@@ -104,7 +104,7 @@ const CreateTaskModal = ({
         description: values.description?.trim() || '',
         status: values.status || 'TODO',
         priority: values.priority || 'MEDIUM',
-        assignee_github_username: values.assignee_github_username?.trim() || null,
+        assignee: values.assignee_github_username?.trim() || null,
         due_date: values.due_date ? dayjs(values.due_date).format('YYYY-MM-DD') : null
       };
 
@@ -229,7 +229,7 @@ const CreateTaskModal = ({
             <Form.Item
               name="assignee_github_username"
               label="Người thực hiện"
-              rules={validationRules.assignee_github_username}
+              rules={validationRules.assignee}
             >
               <Input
                 placeholder="GitHub username"
