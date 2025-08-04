@@ -30,8 +30,8 @@ apiClient.interceptors.request.use(
     console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     console.log(`🔑 Token exists: ${!!token}`);
     if (token) {
-      config.headers.Authorization = `token ${token}`;
-      console.log(`🔑 Authorization header set: token ${token.substring(0, 10)}...`);
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log(`🔑 Authorization header set: Bearer ${token.substring(0, 10)}...`);
     }
     return config;
   },
@@ -80,7 +80,7 @@ apiClientLongTimeout.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `token ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },

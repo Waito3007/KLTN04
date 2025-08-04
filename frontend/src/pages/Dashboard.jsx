@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message, Spin } from 'antd';
-import { LogoutOutlined, GithubOutlined, NotificationOutlined, TeamOutlined } from '@ant-design/icons';
+import { LogoutOutlined, GithubOutlined, NotificationOutlined, TeamOutlined, ProjectOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
 import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
 import MemberSkillProfilePanel from '../components/Dashboard/MemberSkill/MemberSkillProfilePanel';
+import TaskAssignBoard from '../components/Dashboard/TaskAssign/TaskAssignBoard';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -574,6 +575,21 @@ const Dashboard = () => {
 
         {/* Main Content bên phải */}
         <MainContent>          
+          {/* Task Assignment Board - Nằm trên cùng */}
+          <DashboardCard 
+            title={
+              <SectionTitle level={5}>
+                <ProjectOutlined />
+                Task Assignment & Management
+              </SectionTitle>
+            }
+          >
+            <TaskAssignBoard 
+              repositories={repositories}
+              repoLoading={repoLoading}
+            />
+          </DashboardCard>
+
           {/* Project Task Manager - Full Width */}
           <DashboardCard>
             {/* <ProjectTaskManager  

@@ -20,6 +20,7 @@ from api.routes.area_analysis import area_analysis_router
 from api.routes.risk_analysis import risk_analysis_router # New import
 from api.routes.skill_profile import skill_profile_router # New import
 from api.routes.ai_status import router as ai_status_router # New AI status router
+from api.routes.tasks import router as tasks_router # Task management router
 import sys
 import os
 
@@ -60,6 +61,7 @@ app.include_router(area_analysis_router)
 app.include_router(risk_analysis_router) # New router
 app.include_router(skill_profile_router) # New router
 app.include_router(ai_status_router) # New AI status router
+app.include_router(tasks_router) # Task management router
 #app.include_router(ai_router, prefix="/api/ai")
 
 @app.get("/")

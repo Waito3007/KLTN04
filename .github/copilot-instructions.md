@@ -70,7 +70,6 @@
 
 - **Quản lý Cấu hình Tập trung**: Mọi cấu hình **PHẢI** được quản lý thông qua module `core/config.py` và nạp từ biến môi trường.
 - **Custom Exceptions**: **PHẢI** định nghĩa và sử dụng các lớp exception tùy chỉnh cho logic nghiệp vụ.
-- **Phiên bản API (API Versioning)**: Tất cả API endpoint **PHẢI** được đặt dưới một tiền tố phiên bản, ví dụ: `/api/v1/...`.
 - **Quản lý Database Migrations**: Mọi thay đổi schema **PHẢI** được thực hiện thông qua `Alembic`.
 
 ---
