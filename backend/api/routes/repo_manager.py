@@ -45,12 +45,20 @@ async def get_user_repositories(request: Request, page: int = Query(1, ge=1), pe
     Lấy danh sách repositories của user từ GitHub API
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         # Get user info first
-        user_data = await github_api_call("https://api.github.com/user", token)
+        user_data = await github_api_call("https://api.github.com/user", github_token)
         if not user_data:
             raise HTTPException(status_code=401, detail="Invalid GitHub token")
         
@@ -58,7 +66,7 @@ async def get_user_repositories(request: Request, page: int = Query(1, ge=1), pe
         
         # Get user repositories
         repos_url = f"https://api.github.com/user/repos?page={page}&per_page={per_page}&sort=updated&direction=desc"
-        repos_data = await github_api_call(repos_url, token)
+        repos_data = await github_api_call(repos_url, github_token)
         
         if repos_data is None:
             raise HTTPException(status_code=500, detail="Failed to fetch repositories")
@@ -114,15 +122,23 @@ async def get_repositories_sync_status(request: Request):
     Lấy danh sách repositories đã đồng bộ trong database và so sánh với GitHub
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         # Get repositories from database
         db_repositories = await get_all_repositories()
         
         # Get user's GitHub repositories for comparison
-        user_data = await github_api_call("https://api.github.com/user", token)
+        user_data = await github_api_call("https://api.github.com/user", github_token)
         if not user_data:
             raise HTTPException(status_code=401, detail="Invalid GitHub token")
         
@@ -133,7 +149,7 @@ async def get_repositories_sync_status(request: Request):
         
         while True:
             repos_url = f"https://api.github.com/user/repos?page={page}&per_page={per_page}&sort=updated&direction=desc"
-            repos_data = await github_api_call(repos_url, token)
+            repos_data = await github_api_call(repos_url, github_token)
             
             if not repos_data or len(repos_data) == 0:
                 break
@@ -251,8 +267,16 @@ async def sync_single_repository(owner: str, repo: str, request: Request, sync_t
     Đồng bộ một repository cụ thể với các loại sync khác nhau
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     repo_key = f"{owner}/{repo}"
     

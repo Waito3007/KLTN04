@@ -21,6 +21,7 @@ from api.routes.risk_analysis import risk_analysis_router # New import
 from api.routes.skill_profile import skill_profile_router # New import
 from api.routes.ai_status import router as ai_status_router # New AI status router
 from api.routes.tasks import router as tasks_router # Task management router
+from api.routes.dashboard import router as dashboard_router # Dashboard analytics router
 import sys
 import os
 
@@ -48,7 +49,7 @@ app.include_router(sync_events_router, prefix="/api/sync-events")
 
 # Add WebSocket route directly to main app with decorator
 @app.websocket("/api/sync-events/ws")
-async def websocket_endpoint(websocket):
+async def websocket_endpoint(websocket: WebSocket):
     await websocket_sync_events(websocket)
 
 app.include_router(contributors_router, prefix="/api/contributors")
@@ -62,6 +63,7 @@ app.include_router(risk_analysis_router) # New router
 app.include_router(skill_profile_router) # New router
 app.include_router(ai_status_router) # New AI status router
 app.include_router(tasks_router) # Task management router
+app.include_router(dashboard_router, prefix="/api/dashboard") # Dashboard analytics router
 #app.include_router(ai_router, prefix="/api/ai")
 
 @app.get("/")

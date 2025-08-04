@@ -324,6 +324,18 @@ const RepoSyncManager = () => {
   const setupPollingFallback = useCallback(() => {
     console.log('📊 Setting up polling fallback');
     
+    // Kiểm tra token trước khi setup polling
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.log('⚠️ No access token found, skipping polling setup');
+      wsRef.current = { 
+        close: () => console.log('No-op polling stopped'),
+        readyState: 1,
+        isPolling: true
+      };
+      return;
+    }
+    
     notification.info({
       message: 'Chế độ offline',
       description: 'Không thể kết nối server. Sử dụng chế độ offline - sự kiện đồng bộ sẽ không được cập nhật real-time.',
@@ -340,6 +352,14 @@ const RepoSyncManager = () => {
   }, []);
 
   const connectWebSocket = useCallback(() => {
+    // Kiểm tra token trước khi kết nối WebSocket
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.log('⚠️ No access token found, skipping WebSocket connection');
+      setupPollingFallback();
+      return;
+    }
+
     // First, try to connect with WebSocket with better error handling
     console.log('🔌 Attempting WebSocket connection...');
     
@@ -451,6 +471,26 @@ const RepoSyncManager = () => {
   }, [connectWebSocket]); // Add connectWebSocket to dependencies
 
   const fetchSyncStatus = async () => {
+    // Kiểm tra token trước khi gọi API
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.log('⚠️ No access token found, skipping sync status fetch');
+      setSyncStatus({
+        summary: {
+          total_github_repos: 0,
+          unsynced_count: 0,
+          outdated_count: 0,
+          synced_count: 0
+        },
+        repositories: {
+          unsynced: [],
+          outdated: [],
+          synced: []
+        }
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await repoSyncAPI.getSyncStatus();

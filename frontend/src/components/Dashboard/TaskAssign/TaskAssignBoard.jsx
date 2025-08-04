@@ -16,7 +16,12 @@ import './TaskAssignBoard.css';
 
 const { Title, Text } = Typography;
 
-const TaskAssignBoard = ({ repositories = [], repoLoading = false }) => {
+const TaskAssignBoard = ({ 
+  repositories = [], 
+  repoLoading = false,
+  selectedRepoId = null,
+  onRepoChange = null 
+}) => {
   // State management - tuân thủ immutability
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
@@ -48,7 +53,17 @@ const TaskAssignBoard = ({ repositories = [], repoLoading = false }) => {
     return tasks.filter(task => task && typeof task === 'object' && task.id);
   }, [tasks]);
 
-  // Effect để fetch tasks khi repository thay đổi
+  // Đồng bộ selectedRepoId từ props với local selectedRepo state
+  useEffect(() => {
+    if (selectedRepoId && repositories.length > 0) {
+      const repo = repositories.find(r => r.id === selectedRepoId);
+      if (repo && repo !== selectedRepo) {
+        setSelectedRepo(repo);
+      }
+    }
+  }, [selectedRepoId, repositories, selectedRepo]);
+
+  // Effect để fetch tasks - GỌI KHI USER CHỌN REPOSITORY
   useEffect(() => {
     // Defensive programming: Đảm bảo selectedRepo hợp lệ
     if (!selectedRepo) {
@@ -72,13 +87,32 @@ const TaskAssignBoard = ({ repositories = [], repoLoading = false }) => {
     } else {
       console.log('⚠️ Missing repository data, cannot load tasks');
     }
-  }, [selectedRepo, loadTasks]);
+  }, [selectedRepo, loadTasks]); // Bỏ selectedRepoId dependency để tránh conflict
 
   // Handlers với error handling
   const handleRepositoryChange = (repo) => {
     try {
+      console.log('🔄 TaskAssignBoard: Repository changed:', repo);
       setSelectedRepo(repo);
-      // Không cần refreshTrigger, useEffect sẽ tự động load tasks
+      
+      // Gọi callback để thông báo về sự thay đổi repository
+      if (onRepoChange) {
+        console.log('📤 TaskAssignBoard: Calling onRepoChange with repo:', repo);
+        onRepoChange(repo);
+      }
+      
+      // QUAN TRỌNG: Không cần kiểm tra selectedRepoId nữa, vì user đã chọn trực tiếp
+      // Trigger load tasks ngay lập tức
+      if (repo && repo.name) {
+        const ownerName = typeof repo.owner === 'string' 
+          ? repo.owner 
+          : repo.owner?.login || repo.owner?.name;
+        
+        if (ownerName) {
+          console.log('✅ Immediately loading tasks for selected repo:', `${ownerName}/${repo.name}`);
+          // loadTasks sẽ được gọi thông qua useEffect
+        }
+      }
     } catch (error) {
       console.error('Lỗi khi thay đổi repository:', error);
     }

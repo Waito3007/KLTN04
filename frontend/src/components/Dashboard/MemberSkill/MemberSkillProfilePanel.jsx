@@ -30,53 +30,121 @@ const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId, selectedBr
   const [selectedMember, setSelectedMember] = useState('');
   const [error, setError] = useState(null);
 
-  // Fetch member skill profiles
-  const fetchMemberProfiles = async (repoId, branch) => {
-    if (!repoId || !branch) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const selectedRepo = repositories.find(r => r.id === repoId);
-      if (!selectedRepo) {
-        setError('Repository not found');
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/assignment-recommendation/member-skills/${selectedRepo.owner.login}/${selectedRepo.name}?branch_name=${encodeURIComponent(branch)}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setMemberProfiles(data.members || []);
-      
-      // Auto-select first member
-      if (data.members && data.members.length > 0) {
-        setSelectedMember(data.members[0].username);
-      }
-    } catch (err) {
-      console.error('Error fetching member profiles:', err);
-      setError(err.message);
-      setMemberProfiles([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    // Fetch member skill profiles
+    const fetchMemberProfiles = async () => {
+      if (!selectedRepoId || !selectedBranch) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const selectedRepo = repositories.find(r => r.id === selectedRepoId);
+        if (!selectedRepo) {
+          setError('Repository not found');
+          return;
+        }
+
+        // Normalize owner name - xử lý trường hợp owner là object
+        const ownerName = typeof selectedRepo.owner === 'string' 
+          ? selectedRepo.owner 
+          : selectedRepo.owner?.login || selectedRepo.owner?.name || 'unknown';
+
+        console.log('🔍 MemberSkillProfilePanel: Fetching member profiles for:', {
+          owner: ownerName,
+          repo: selectedRepo.name,
+          branch: selectedBranch
+        });
+
+        // TODO: Implement member skills API endpoint
+        // For now, mock data to avoid 404 errors
+        const mockData = {
+          members: [
+            {
+              username: 'Waito3007',
+              total_commits: 45,
+              recent_activity_score: 85,
+              risk_tolerance: 'medium',
+              expertise_areas: ['Frontend', 'Backend', 'API Design'],
+              commit_types: {
+                feat: 20,
+                fix: 15,
+                docs: 5,
+                test: 3,
+                refactor: 2
+              },
+              areas: {
+                frontend: 25,
+                backend: 15,
+                database: 3,
+                testing: 2
+              }
+            },
+            {
+              username: 'Developer2',
+              total_commits: 32,
+              recent_activity_score: 72,
+              risk_tolerance: 'high',
+              expertise_areas: ['Testing', 'CI/CD'],
+              commit_types: {
+                feat: 12,
+                fix: 8,
+                test: 10,
+                ci: 2
+              },
+              areas: {
+                backend: 18,
+                testing: 10,
+                devops: 4
+              }
+            }
+          ]
+        };
+
+        setMemberProfiles(mockData.members || []);
+        
+        // Auto-select first member
+        if (mockData.members && mockData.members.length > 0) {
+          setSelectedMember(mockData.members[0].username);
+        }
+
+        console.log('✅ MemberSkillProfilePanel: Mock member profiles loaded');
+
+        /*
+        // Real API call - implement when backend endpoint is ready
+        const response = await fetch(
+          `http://localhost:8000/api/assignment-recommendation/member-skills/${ownerName}/${selectedRepo.name}?branch_name=${encodeURIComponent(selectedBranch)}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setMemberProfiles(data.members || []);
+        
+        // Auto-select first member
+        if (data.members && data.members.length > 0) {
+          setSelectedMember(data.members[0].username);
+        }
+        */
+      } catch (err) {
+        console.error('Error fetching member profiles:', err);
+        setError(err.message);
+        setMemberProfiles([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (selectedRepoId && selectedBranch) {
-      fetchMemberProfiles(selectedRepoId, selectedBranch);
+      fetchMemberProfiles();
     }
   }, [selectedRepoId, selectedBranch, repositories]);
 

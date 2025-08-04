@@ -8,6 +8,7 @@ import SyncProgressNotification from '../components/common/SyncProgressNotificat
 import axios from 'axios';
 import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
 import MemberSkillProfilePanel from '../components/Dashboard/MemberSkill/MemberSkillProfilePanel';
+import DashboardAnalyst from '../components/Dashboard/Dashboard_Analyst/DashboardAnalyst';
 import TaskAssignBoard from '../components/Dashboard/TaskAssign/TaskAssignBoard';
 
 const { Title, Text } = Typography;
@@ -196,99 +197,92 @@ const Dashboard = () => {
   const [commitAnalysisLoading, setCommitAnalysisLoading] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(''); // New state for selected branch
 
-  // Fetch AI model statuses
-  useEffect(() => {
-    const fetchModelStatuses = async () => {
-      try {
-        // Fetch HAN model status
-        const hanStatusRes = await axios.get('http://localhost:8000/api/han-commit-analysis/1/model-status');
-        setAiModelStatus(hanStatusRes.data);
-        console.log("HAN Model Status:", hanStatusRes.data);
+  // Fetch AI model statuses - CHỈ GỌI KHI CẦN THIẾT
+  const fetchModelStatuses = async () => {
+    try {
+      // Fetch HAN model status
+      const hanStatusRes = await axios.get('http://localhost:8000/api/han-commit-analysis/1/model-status');
+      setAiModelStatus(hanStatusRes.data);
+      console.log("HAN Model Status:", hanStatusRes.data);
 
-        // Fetch MultiFusion V2 model status
-        const mfV2StatusRes = await axios.get('http://localhost:8000/api/multifusion-commit-analysis/1/ai/model-v2-status');
-        setMultiFusionV2Status(mfV2StatusRes.data);
-        console.log("MultiFusion V2 Model Status:", mfV2StatusRes.data);
+      // Fetch MultiFusion V2 model status
+      const mfV2StatusRes = await axios.get('http://localhost:8000/api/multifusion-commit-analysis/1/ai/model-v2-status');
+      setMultiFusionV2Status(mfV2StatusRes.data);
+      console.log("MultiFusion V2 Model Status:", mfV2StatusRes.data);
 
-        // Set default AI model based on availability
-        if (mfV2StatusRes.data?.model_info?.is_available) {
-          setAiModel('multifusion');
-        } else if (hanStatusRes.data?.model_loaded) {
-          setAiModel('han');
-        } else {
-          setUseAI(false); // Disable AI if no models are available
-        }
-
-      } catch (error) {
-        console.error('Error fetching AI model statuses:', error);
-        setUseAI(false); // Disable AI on error
-      }
-    };
-    fetchModelStatuses();
-  }, []);
-
-  // Fetch commit analysis data based on selectedRepoId, aiModel, and useAI
-  useEffect(() => {
-    const fetchCommitAnalysis = async () => {
-      if (!selectedRepoId || !useAI) {
-        setMemberCommits(null);
-        setAllRepoCommitAnalysis(null);
-        return;
+      // Set default AI model based on availability
+      if (mfV2StatusRes.data?.model_info?.is_available) {
+        setAiModel('multifusion');
+      } else if (hanStatusRes.data?.model_loaded) {
+        setAiModel('han');
+      } else {
+        setUseAI(false); // Disable AI if no models are available
       }
 
-      setCommitAnalysisLoading(true);
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        message.error('Vui lòng đăng nhập lại!');
-        setCommitAnalysisLoading(false);
-        return;
+    } catch (error) {
+      console.error('Error fetching AI model statuses:', error);
+      setUseAI(false); // Disable AI on error
+    }
+  };
+
+  // Fetch commit analysis data - CHỈ GỌI KHI USER CHỌN REPO VÀ BẬT AI
+  const fetchCommitAnalysis = async () => {
+    if (!selectedRepoId || !useAI) {
+      setMemberCommits(null);
+      setAllRepoCommitAnalysis(null);
+      return;
+    }
+
+    setCommitAnalysisLoading(true);
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      message.error('Vui lòng đăng nhập lại!');
+      setCommitAnalysisLoading(false);
+      return;
+    }
+
+    try {
+      let memberCommitsData = null;
+      let allRepoCommitsData = null;
+      const defaultMemberLogin = user?.username || 'octocat'; // Placeholder, replace with actual selected member
+
+      if (aiModel === 'han') {
+        // Fetch HAN analysis for a member
+        const hanMemberRes = await axios.get(`http://localhost:8000/api/han-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-han`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        memberCommitsData = hanMemberRes.data.data; // Assuming data is nested under 'data'
+
+      } else if (aiModel === 'multifusion') {
+        // Fetch MultiFusion V2 analysis for a member
+        const mfMemberRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-v2`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        memberCommitsData = mfMemberRes.data; // Assuming data is directly the response
+
+        // Fetch MultiFusion V2 analysis for all repo commits
+        const mfAllRepoRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/commits/all/analysis`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        allRepoCommitsData = mfAllRepoRes.data.analysis; // Assuming data is nested under 'analysis'
       }
 
-      try {
-        let memberCommitsData = null;
-        let allRepoCommitsData = null;
-        const defaultMemberLogin = user?.username || 'octocat'; // Placeholder, replace with actual selected member
+      setMemberCommits(memberCommitsData);
+      setAllRepoCommitAnalysis(allRepoCommitsData);
+      console.log("Fetched Member Commits:", memberCommitsData);
+      console.log("Fetched All Repo Commits:", allRepoCommitsData);
 
-        if (aiModel === 'han') {
-          // Fetch HAN analysis for a member
-          const hanMemberRes = await axios.get(`http://localhost:8000/api/han-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-han`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          memberCommitsData = hanMemberRes.data.data; // Assuming data is nested under 'data'
+    } catch (error) {
+      console.error('Error fetching commit analysis:', error);
+      message.error('Không thể tải dữ liệu phân tích commit!');
+      setMemberCommits(null);
+      setAllRepoCommitAnalysis(null);
+    } finally {
+      setCommitAnalysisLoading(false);
+    }
+  };
 
-        } else if (aiModel === 'multifusion') {
-          // Fetch MultiFusion V2 analysis for a member
-          const mfMemberRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-v2`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          memberCommitsData = mfMemberRes.data; // Assuming data is directly the response
-
-          // Fetch MultiFusion V2 analysis for all repo commits
-          const mfAllRepoRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/commits/all/analysis`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          allRepoCommitsData = mfAllRepoRes.data.analysis; // Assuming data is nested under 'analysis'
-        }
-
-        setMemberCommits(memberCommitsData);
-        setAllRepoCommitAnalysis(allRepoCommitsData);
-        console.log("Fetched Member Commits:", memberCommitsData);
-        console.log("Fetched All Repo Commits:", allRepoCommitsData);
-
-      } catch (error) {
-        console.error('Error fetching commit analysis:', error);
-        message.error('Không thể tải dữ liệu phân tích commit!');
-        setMemberCommits(null);
-        setAllRepoCommitAnalysis(null);
-      } finally {
-        setCommitAnalysisLoading(false);
-      }
-    };
-
-    fetchCommitAnalysis();
-  }, [selectedRepoId, aiModel, useAI, user]); // user dependency for defaultMemberLogin
-
-  // Pre-fetch repositories từ database ngầm trong nền
+  // Pre-fetch repositories từ database - CHỈ KHI CẦN THIẾT, KHÔNG TỰ ĐỘNG CHỌN REPO
   const preloadRepositoriesFromDB = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
@@ -301,10 +295,10 @@ const Dashboard = () => {
       
       setRepositories(response.data);
       console.log(`Pre-loaded ${response.data.length} repositories from database`);
-      // Set the first repository as selected by default if available
-      if (response.data.length > 0 && selectedRepoId === null) {
-        setSelectedRepoId(response.data[0].id);
-      }
+      // KHÔNG TỰ ĐỘNG CHỌN REPO - để user tự chọn
+      // if (response.data.length > 0 && selectedRepoId === null) {
+      //   setSelectedRepoId(response.data[0].id);
+      // }
     } catch (error) {
       console.error('Lỗi khi pre-load repositories:', error);
     } finally {
@@ -312,10 +306,13 @@ const Dashboard = () => {
     }
   };
 
-  // Pre-load repositories ngay khi vào Dashboard
+  // Pre-load repositories CHỈ KHI CẦN THIẾT - không tự động
   useEffect(() => {
-    preloadRepositoriesFromDB();
-  }, [selectedRepoId]); // Add selectedRepoId to dependencies to avoid re-setting it
+    // CHỈ load repositories một lần duy nhất khi component mount
+    if (repositories.length === 0) {
+      preloadRepositoriesFromDB();
+    }
+  }, []); // Chỉ chạy một lần duy nhất
 
   const syncAllRepositories = async () => {
     const token = localStorage.getItem('access_token');
@@ -554,23 +551,12 @@ const Dashboard = () => {
             </Space>
           </SidebarCard>
 
-          {/* Activity Summary */}
-          <SidebarCard 
-            title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Hoạt động gần đây</SectionTitle>}
-            size="small"
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="small">
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • Task "Trò game tăng độ khó" đã hoàn thành
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • 2 repositories mới được đồng bộ
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • AI phân tích 15 commits mới
-              </div>
-            </Space>
-          </SidebarCard>
+          {/* Activity Summary -> Replaced with DashboardAnalyst */}
+          <DashboardAnalyst 
+            selectedRepoId={selectedRepoId}
+            repositories={repositories}
+            onBranchChange={setSelectedBranch}
+          />
         </Sidebar>
 
         {/* Main Content bên phải */}
@@ -587,6 +573,14 @@ const Dashboard = () => {
             <TaskAssignBoard 
               repositories={repositories}
               repoLoading={repoLoading}
+              selectedRepoId={selectedRepoId}
+              onRepoChange={(repo) => {
+                console.log('📥 Dashboard: Received repo change:', repo);
+                console.log('📋 Dashboard: Current repositories array:', repositories);
+                const newRepoId = repo?.id || null;
+                console.log('🔄 Dashboard: Setting selectedRepoId to:', newRepoId);
+                setSelectedRepoId(newRepoId);
+              }}
             />
           </DashboardCard>
 

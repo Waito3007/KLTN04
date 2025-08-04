@@ -34,35 +34,29 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
       repo.name.toLowerCase().includes(searchText.toLowerCase()) ||
       (repo.owner?.login || repo.owner || '').toLowerCase().includes(searchText.toLowerCase())
   );
-
   useEffect(() => {
-    if (repoSource === 'database' && repositories.length > 0 && !repoId) {
-      setRepoId(repositories[0].id);
-      if (onRepoChange)
-        onRepoChange(repositories[0]);
-    }
-    if (repoSource === 'github' && githubRepos.length > 0 && !repoId) {
-      setRepoId(githubRepos[0].id || githubRepos[0].github_id || githubRepos[0].id);
-      if (onRepoChange)
-        onRepoChange(githubRepos[0]);
-    }
-  }, [repositories, githubRepos, repoSource, repoId, onRepoChange]);
-
-  useEffect(() => {
+    console.log('🔄 useEffect triggered - repoId changed:', repoId);
     setBranchList([]); // Clear branchList immediately on repoId change
     setSelectedBranch(''); // Clear selectedBranch immediately on repoId change
 
     if (!repoId) {
+      console.log('❌ No repoId, skipping branch fetch');
       return;
     }
     const fetchBranches = async () => {
+      console.log('🔍 Fetching branches for repoId:', repoId, 'source:', repoSource);
+      
       if (repoSource === 'github') {
         const repo = githubRepos.find(r => (r.id || r.github_id) === repoId);
-        if (!repo)
+        if (!repo) {
+          console.log('❌ GitHub repo not found for id:', repoId);
           return;
+        }
         const token = localStorage.getItem('access_token');
         const owner = repo.owner?.login || repo.owner;
         const name = repo.name;
+        console.log('🌐 GitHub API call:', { owner, name });
+        
         const res = await fetch(`http://localhost:8000/api/github/${owner}/${name}/branches`, {
           headers: { Authorization: `token ${token}` },
         });
@@ -75,20 +69,42 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
         }
       } else {
         const repo = repositories.find(r => r.id === repoId);
-        const owner = repo?.owner?.login || repo?.owner;
-        const name = repo?.name;
-        if (!owner || !name) {
+        if (!repo) {
           setBranchList([]);
           setSelectedBranch('');
           return;
         }
-        const res = await fetch(`http://localhost:8000/api/commits/${owner}/${name}/branches`);
-        const data = await res.json();
-        setBranchList(Array.isArray(data.branches) ? data.branches : []);
-        if (data.branches && data.branches.length > 0 && data.branches[0].name) // Ensure data.branches[0].name exists
-          setSelectedBranch(data.branches[0].name);
-        else {
-          setSelectedBranch(''); // Clear if no branches found
+        
+        // Handle cả trường hợp owner là string hoặc object
+        const owner = typeof repo.owner === 'string' 
+          ? repo.owner 
+          : repo.owner?.login || repo.owner?.name || repo.owner;
+        const name = repo.name;
+        
+        console.log('🔍 Fetching branches for:', { owner, name, repo });
+        
+        if (!owner || !name) {
+          console.error('❌ Missing owner or name:', { owner, name });
+          setBranchList([]);
+          setSelectedBranch('');
+          return;
+        }
+        
+        try {
+          const res = await fetch(`http://localhost:8000/api/commits/${owner}/${name}/branches`);
+          const data = await res.json();
+          console.log('✅ Branch data received:', data);
+          
+          setBranchList(Array.isArray(data.branches) ? data.branches : []);
+          if (data.branches && data.branches.length > 0 && data.branches[0].name) {
+            setSelectedBranch(data.branches[0].name);
+          } else {
+            setSelectedBranch('');
+          }
+        } catch (error) {
+          console.error('❌ Error fetching branches:', error);
+          setBranchList([]);
+          setSelectedBranch('');
         }
       }
     };
@@ -138,9 +154,11 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
   };
 
   const handleRepoSelect = id => {
+    console.log('🔄 Repository selected:', id);
     setRepoId(id);
-    if (onRepoChange) {
-      const repo = repositories.find(r => r.id === id);
+    const repo = (repoSource === 'github' ? githubRepos : repositories).find(r => (r.id || r.github_id) === id);
+    console.log('🔍 Found repository:', repo);
+    if (onRepoChange && repo) {
       onRepoChange(repo);
     }
   };
@@ -153,6 +171,14 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
   };
 
   const handleSourceToggle = async checked => {
+    // Reset các state khi chuyển nguồn dữ liệu
+    setRepoId(null);
+    setSelectedBranch('');
+    setBranchList([]);
+    setBranchAnalysis(null);
+    setAreaAnalysis(null);
+    setRiskAnalysis(null);
+    
     if (checked) {
       setRepoSource('github');
       setGithubLoading(true);
@@ -163,11 +189,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
         });
         const data = await res.json();
         setGithubRepos(Array.isArray(data) ? data : []);
-        if (data && data.length > 0) {
-          setRepoId(data[0].id || data[0].github_id || data[0].id);
-          if (onRepoChange)
-            onRepoChange(data[0]);
-        }
+        // Không tự động chọn repo đầu tiên - để user tự chọn
       } catch {
         setGithubRepos([]);
       } finally {
@@ -175,9 +197,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
       }
     } else {
       setRepoSource('database');
-      setRepoId(repositories[0]?.id || null);
-      if (onRepoChange && repositories[0])
-        onRepoChange(repositories[0]);
+      // Không tự động chọn repo đầu tiên - để user tự chọn
     }
   };
 
@@ -214,12 +234,22 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
           filterOption={false}
           loading={githubLoading}
         >
-          {filteredRepos.map(repo => (
-            <Option key={repo.id || repo.github_id} value={repo.id || repo.github_id}>
-              <Avatar src={repo.owner?.avatar_url || repo.owner_avatar_url} size={20} style={{ marginRight: 6 }} />
-              <Tag color="blue">{repo.owner?.login || repo.owner}</Tag> / <Text strong>{repo.name}</Text>
-            </Option>
-          ))}
+          {filteredRepos.map(repo => {
+            // Handle owner có thể là string hoặc object
+            const ownerName = typeof repo.owner === 'string' 
+              ? repo.owner 
+              : repo.owner?.login || repo.owner?.name || repo.owner;
+            const avatarUrl = typeof repo.owner === 'object' 
+              ? repo.owner?.avatar_url 
+              : repo.owner_avatar_url;
+            
+            return (
+              <Option key={repo.id || repo.github_id} value={repo.id || repo.github_id}>
+                <Avatar src={avatarUrl} size={20} style={{ marginRight: 6 }} />
+                <Tag color="blue">{ownerName}</Tag> / <Text strong>{repo.name}</Text>
+              </Option>
+            );
+          })}
         </Select>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Select

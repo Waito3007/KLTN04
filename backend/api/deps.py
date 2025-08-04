@@ -87,6 +87,7 @@ async def get_current_user_dict(
     """
     Simple authentication dependency tương tự Dashboard
     Trả về user dict cho backward compatibility với cơ chế localStorage
+    Hỗ trợ cả Bearer và token format
     
     Args:
         authorization: Authorization header từ request
@@ -105,18 +106,19 @@ async def get_current_user_dict(
         )
     
     try:
-        # Parse Authorization header (Bearer token)
-        parts = authorization.split()
-        if len(parts) != 2 or parts[0].lower() != "bearer":
+        # Support both "Bearer " and "token " formats
+        if authorization.startswith("Bearer "):
+            token = authorization[7:]  # Remove "Bearer " prefix
+        elif authorization.startswith("token "):
+            token = authorization[6:]  # Remove "token " prefix
+        else:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authorization header format",
+                detail="Invalid authorization header format. Expected 'Bearer <token>' or 'token <token>'",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        token = parts[1]
-        
-        # Verify token với GitHub API (simple approach như Dashboard)
+        # Verify token với GitHub API (always use token format for GitHub)
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://api.github.com/user",

@@ -18,6 +18,11 @@ const RepositorySelector = ({
   onRepositoryChange, 
   placeholder = "Chọn repository" 
 }) => {
+  console.log('🔍 RepositorySelector render:', { 
+    selectedRepo, 
+    repositoriesCount: repositories.length,
+    selectedRepoId: selectedRepo?.id 
+  });
   // Defensive programming: Validate và format dữ liệu repositories
   const validRepositories = useMemo(() => {
     if (!Array.isArray(repositories)) return [];
@@ -31,11 +36,11 @@ const RepositorySelector = ({
           : repo.owner?.login || repo.owner?.name || 'unknown';
         
         return {
-          ...repo,
-          owner: ownerName, // Normalize owner thành string
+          ...repo, // GIỮ NGUYÊN cấu trúc repo gốc
           key: `${ownerName}/${repo.name}`,
           displayName: `${ownerName}/${repo.name}`,
-          description: repo.description || 'Không có mô tả'
+          description: repo.description || 'Không có mô tả',
+          ownerName // Thêm ownerName để display, nhưng giữ nguyên repo.owner
         };
       });
   }, [repositories]);
@@ -48,7 +53,9 @@ const RepositorySelector = ({
         return;
       }
 
-      const selectedRepository = validRepositories.find(repo => repo.key === value);
+      // Tìm repository bằng ID thay vì key
+      const selectedRepository = validRepositories.find(repo => repo.id === value);
+      console.log('🔄 RepositorySelector: Selected repo by ID:', value, selectedRepository);
       if (selectedRepository) {
         onRepositoryChange?.(selectedRepository);
       }
@@ -59,7 +66,7 @@ const RepositorySelector = ({
 
   // Custom option renderer
   const renderOption = (repo) => (
-    <Option key={repo.key} value={repo.key}>
+    <Option key={repo.id} value={repo.id}>
       <div style={{ display: 'flex', alignItems: 'center', padding: '4px 0' }}>
         <Avatar
           size="small"
@@ -114,18 +121,18 @@ const RepositorySelector = ({
         </Space>
       }
       loading={loading}
-      value={selectedRepo?.key || undefined}
+      value={selectedRepo?.id || undefined}
       onChange={handleChange}
       showSearch
       filterOption={(input, option) => {
-        const repo = validRepositories.find(r => r.key === option.value);
+        const repo = validRepositories.find(r => r.id === option.value);
         if (!repo) return false;
         
         const searchText = input.toLowerCase();
         return (
           repo.displayName.toLowerCase().includes(searchText) ||
           repo.description.toLowerCase().includes(searchText) ||
-          repo.owner.toLowerCase().includes(searchText) ||
+          repo.ownerName.toLowerCase().includes(searchText) ||
           repo.name.toLowerCase().includes(searchText)
         );
       }}
@@ -159,9 +166,11 @@ RepositorySelector.propTypes = {
   })),
   loading: PropTypes.bool,
   selectedRepo: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     owner: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     name: PropTypes.string,
-    key: PropTypes.string
+    key: PropTypes.string,
+    displayName: PropTypes.string
   }),
   onRepositoryChange: PropTypes.func,
   placeholder: PropTypes.string

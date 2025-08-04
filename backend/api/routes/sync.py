@@ -153,15 +153,23 @@ async def sync_all_optimized(owner: str, repo: str, request: Request, background
     - All pull requests (batch processing)
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     # Start background sync task
     background_tasks.add_task(
         sync_all_background_optimized,
         owner,
         repo, 
-        token
+        github_token
     )
     
     return {
@@ -566,12 +574,20 @@ async def process_single_pr_optimized(pr: Dict, repo_id: int, semaphore: asyncio
 @sync_router.post("/github/{owner}/{repo}/sync-basic")
 async def sync_basic(owner: str, repo: str, request: Request):
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
 
     try:
         # Chỉ đồng bộ repository
-        repo_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}", token)
+        repo_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}", github_token)
         repo_entry = {
             "github_id": repo_data["id"],
             "name": repo_data["name"],
@@ -612,14 +628,22 @@ async def sync_enhanced(owner: str, repo: str, request: Request):
     Lưu ý: Endpoint này sẽ chậm hơn do phải gọi nhiều API calls
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         logger.info(f"Starting enhanced sync for {owner}/{repo}")
         
         # 1. Sync repository
-        repo_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}", token)
+        repo_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}", github_token)
         repo_entry = {
             "github_id": repo_data["id"],
             "name": repo_data["name"],
@@ -644,7 +668,7 @@ async def sync_enhanced(owner: str, repo: str, request: Request):
         if not repo_id:
             raise HTTPException(status_code=404, detail="Repository not found")
         
-        branches_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}/branches", token)
+        branches_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}/branches", github_token)
         
         default_branch = repo_data.get("default_branch", "main")
         branches_to_save = []
@@ -664,7 +688,7 @@ async def sync_enhanced(owner: str, repo: str, request: Request):
             if branch_info["sha"]:
                 try:
                     commit_details = await fetch_commit_details(
-                        branch_info["sha"], owner, repo, token
+                        branch_info["sha"], owner, repo, github_token
                     )
                     if commit_details:
                         branch_info.update({
@@ -677,7 +701,7 @@ async def sync_enhanced(owner: str, repo: str, request: Request):
             
             # Lấy thống kê branch (optional)
             try:
-                branch_stats = await fetch_branch_stats(owner, repo, branch["name"], token)
+                branch_stats = await fetch_branch_stats(owner, repo, branch["name"], github_token)
                 if branch_stats:
                     branch_info.update({
                         "commits_count": branch_stats.get("commits_count"),
@@ -768,8 +792,16 @@ async def list_user_repositories(request: Request, per_page: int = 30, page: int
         list: Danh sách repositories
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         # Giới hạn per_page để tránh quá tải
@@ -777,7 +809,7 @@ async def list_user_repositories(request: Request, per_page: int = 30, page: int
         page = max(page, 1)
         
         url = f"https://api.github.com/user/repos?per_page={per_page}&page={page}&sort=updated"
-        repos_data = await github_api_call(url, token)
+        repos_data = await github_api_call(url, github_token)
         
         # Trả về thông tin cơ bản của các repos
         simplified_repos = []
@@ -885,8 +917,12 @@ async def update_branch_info(owner: str, repo: str, branch_name: str, metadata: 
     
     # Optional: Kiểm tra token nếu cần authorization
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats (no need to use the token for GitHub API in this case)
+    if not (token.startswith("Bearer ") or token.startswith("token ")):
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         repo_id = await get_repo_id_by_owner_and_name(owner, repo)
@@ -919,15 +955,23 @@ async def sync_repository_branches(owner: str, repo: str, request: Request):
     Auto-creates repository if not exists
     """
     token = request.headers.get("Authorization")
-    if not token or not token.startswith("token "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
     
     try:
         # Get repository ID, create if not exists
         repo_id = await get_repo_id_by_owner_and_name(owner, repo)
         if not repo_id:
             # Auto-create repository
-            repo_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", token)
+            repo_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", github_token)
             repo_entry = {
                 "github_id": repo_data["id"],
                 "name": repo_data["name"],
@@ -945,7 +989,7 @@ async def sync_repository_branches(owner: str, repo: str, request: Request):
             repo_id = await get_repo_id_by_owner_and_name(owner, repo)
 
         # Sync branches
-        branches_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}/branches", token)
+        branches_data = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}/branches", github_token)
         
         # Enhanced branch data with commit info
         enhanced_branches = []
@@ -953,7 +997,7 @@ async def sync_repository_branches(owner: str, repo: str, request: Request):
         
         # Get repository info for default branch
         try:
-            repo_info = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", token)
+            repo_info = await github_api_call(f"{GITHUB_API_BASE}/repos/{owner}/{repo}", github_token)
             default_branch = repo_info.get("default_branch", "main")
         except:
             default_branch = "main"
@@ -963,7 +1007,7 @@ async def sync_repository_branches(owner: str, repo: str, request: Request):
                 # Get additional commit info for each branch
                 commit_data = await github_api_call(
                     f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits/{branch['commit']['sha']}", 
-                    token
+                    github_token
                 )
                 
                 enhanced_branch = {
