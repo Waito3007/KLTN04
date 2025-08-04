@@ -1,14 +1,107 @@
 import React, { useState } from 'react';
-import { Card, Space, Typography, Spin, Tag, Select, Collapse, List, Progress, Row, Col, Statistic, Alert } from 'antd';
+import { Card, Space, Typography, Spin, Tag, Select, Collapse, List, Progress, Row, Col, Statistic, Alert, Button, Drawer } from 'antd';
 import styled from 'styled-components';
 import axios from 'axios';
 import { 
   WarningOutlined, InfoCircleOutlined, BranchesOutlined, LineChartOutlined, 
-  ExperimentOutlined, TeamOutlined, UserSwitchOutlined, ClockCircleOutlined
+  ExperimentOutlined, TeamOutlined, UserSwitchOutlined, ClockCircleOutlined, ThunderboltOutlined,
+  RightOutlined, ExpandAltOutlined, CloseOutlined, RobotOutlined
 } from '@ant-design/icons';
+
+const ExpandButton = styled(Button)`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  
+  &:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #f8fafc;
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const ScrollableContent = styled.div`
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+`;
+
+const DrawerContent = styled.div`
+  .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content { 
+    padding: 12px 0; 
+  }
+  .ant-collapse-header { 
+    padding: 16px 0 !important; 
+    font-size: 16px !important;
+    font-weight: 600 !important;
+  }
+`;
+
+const AnalyzeButton = styled(Button)`
+  width: 100%;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  
+  &:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    box-shadow: none;
+    transform: none;
+  }
+`;
 
 // Styled components
 const SidebarCard = styled(Card)`
+  position: relative;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
@@ -155,23 +248,6 @@ import { useEffect } from 'react';
 
 const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
   // Tự động load danh sách nhánh khi selectedRepoId thay đổi
-  useEffect(() => {
-    if (selectedRepoId) {
-      fetchBranches();
-    } else {
-      setBranches([]);
-      setSelectedBranch('');
-    }
-  }, [selectedRepoId]);
-  const [analyticsData, setAnalyticsData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [branches, setBranches] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState('');
-  const [branchLoading, setBranchLoading] = useState(false);
-  const [daysBack, setDaysBack] = useState(30);
-
-  // Fetch branches - CHỈ GỌI KHI USER CHỌN REPO
   const fetchBranches = async () => {
     if (!selectedRepoId) {
       setBranches([]);
@@ -201,6 +277,17 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
       setBranchLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (selectedRepoId) {
+      fetchBranches();
+    } else {
+      setBranches([]);
+      setSelectedBranch('');
+      setAnalyticsData(null); // Clear analytics data when no repo selected
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRepoId]);
 
   // Fetch comprehensive analytics - CHỈ GỌI KHI USER CHỌN REPO VÀ NHẤN NÚT
   const fetchAnalytics = async () => {
@@ -245,6 +332,14 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
       setLoading(false);
     }
   };
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [branches, setBranches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [branchLoading, setBranchLoading] = useState(false);
+  const [daysBack, setDaysBack] = useState(30);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleBranchChange = (branchName) => {
     setSelectedBranch(branchName);
@@ -254,12 +349,23 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
   };
 
   const renderContent = () => {
-    if (loading) return <div style={{textAlign: 'center', padding: '20px'}}><Spin /></div>;
+    if (loading) return <div style={{textAlign: 'center', padding: '20px'}}><Spin tip="Đang phân tích dữ liệu..." /></div>;
     if (error) return <Alert message={error} type="error" showIcon />;
-    if (!analyticsData) return <Typography.Text type="secondary">Chọn một repository để xem phân tích.</Typography.Text>;
+    if (!selectedRepoId) return (
+      <div style={{textAlign: 'center', padding: '20px', color: '#64748b'}}>
+        <LineChartOutlined style={{fontSize: '24px', marginBottom: '8px'}} />
+        <Typography.Text type="secondary" style={{display: 'block'}}>Chọn repository để bắt đầu phân tích</Typography.Text>
+      </div>
+    );
+    if (!analyticsData) return (
+      <div style={{textAlign: 'center', padding: '20px', color: '#64748b'}}>
+        <ThunderboltOutlined style={{fontSize: '24px', marginBottom: '8px'}} />
+        <Typography.Text type="secondary" style={{display: 'block'}}>Nhấn "Phân tích AI" để xem kết quả phân tích</Typography.Text>
+      </div>
+    );
 
     return (
-      <div style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto', paddingRight: '8px' }}>
+      <ScrollableContent>
         <Collapse defaultActiveKey={['progress', 'risks']} ghost>
           <Collapse.Panel header={<><LineChartOutlined /> Tiến độ</>} key="progress">
             <ProgressSection data={analyticsData.progress} />
@@ -274,49 +380,109 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
             <AssignmentSection data={analyticsData.assignment_suggestions} />
           </Collapse.Panel>
         </Collapse>
-      </div>
+      </ScrollableContent>
     );
   };
 
   return (
-    <SidebarCard
-      title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Bảng phân tích AI</SectionTitle>}
-      size="small"
-    >
-      {selectedRepoId && (
-        <Space direction="vertical" style={{width: '100%', marginBottom: '12px'}}>
-          <div>
-            <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><BranchesOutlined /> Nhánh:</Typography.Text>
-            <Select
-              style={{ width: '100%' }}
-              placeholder="Chọn nhánh"
-              value={selectedBranch}
-              onChange={handleBranchChange}
-              loading={branchLoading}
+    <>
+      <SidebarCard
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <SectionTitle level={5} style={{ fontSize: '14px', margin: 0 }}>Bảng phân tích AI</SectionTitle>
+            <ExpandButton 
+              onClick={() => setDrawerOpen(true)}
+              icon={<ExpandAltOutlined />}
+              title="Mở rộng để xem đầy đủ"
               size="small"
-              disabled={!branches.length}
+            />
+          </div>
+        }
+        size="small"
+      >
+        {selectedRepoId && (
+          <Space direction="vertical" style={{width: '100%', marginBottom: '12px'}}>
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><BranchesOutlined /> Nhánh:</Typography.Text>
+              <Select
+                style={{ width: '100%' }}
+                placeholder="Chọn nhánh"
+                value={selectedBranch}
+                onChange={handleBranchChange}
+                loading={branchLoading}
+                size="small"
+                disabled={!branches.length}
+              >
+                {branches.map(branch => (
+                  <Select.Option key={branch.value} value={branch.value}>
+                    {branch.label}
+                    {branch.isDefault && <Tag size="small" color="blue" style={{ marginLeft: 4 }}>default</Tag>}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><ClockCircleOutlined /> Khoảng thời gian:</Typography.Text>
+              <Select value={daysBack} onChange={setDaysBack} style={{ width: '100%' }} size="small">
+                <Select.Option value={7}>7 ngày qua</Select.Option>
+                <Select.Option value={30}>30 ngày qua</Select.Option>
+                <Select.Option value={90}>90 ngày qua</Select.Option>
+              </Select>
+            </div>
+            <AnalyzeButton 
+              type="primary" 
+              icon={<ThunderboltOutlined />}
+              onClick={fetchAnalytics}
+              loading={loading}
+              disabled={!selectedRepoId || !selectedBranch}
             >
-              {branches.map(branch => (
-                <Select.Option key={branch.value} value={branch.value}>
-                  {branch.label}
-                  {branch.isDefault && <Tag size="small" color="blue" style={{ marginLeft: 4 }}>default</Tag>}
-                </Select.Option>
-              ))}
-            </Select>
+              {loading ? 'Đang phân tích...' : 'Phân tích AI'}
+            </AnalyzeButton>
+          </Space>
+        )}
+        
+        {renderContent()}
+      </SidebarCard>
+
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <RobotOutlined style={{ marginRight: '8px' }} />
+            AI Phân tích - Xem đầy đủ
           </div>
-          <div>
-            <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><ClockCircleOutlined /> Khoảng thời gian:</Typography.Text>
-            <Select value={daysBack} onChange={setDaysBack} style={{ width: '100%' }} size="small">
-              <Select.Option value={7}>7 ngày qua</Select.Option>
-              <Select.Option value={30}>30 ngày qua</Select.Option>
-              <Select.Option value={90}>90 ngày qua</Select.Option>
-            </Select>
-          </div>
-        </Space>
-      )}
-      
-      {renderContent()}
-    </SidebarCard>
+        }
+        placement="right"
+        width={600}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        closeIcon={<CloseOutlined />}
+      >
+        <DrawerContent>
+          {analyticsData ? (
+            <Collapse defaultActiveKey={['progress', 'risks', 'productivity', 'assignment']} ghost>
+              <Collapse.Panel header={<><LineChartOutlined /> Tiến độ</>} key="progress">
+                <ProgressSection data={analyticsData.progress} />
+              </Collapse.Panel>
+              <Collapse.Panel header={<><ExperimentOutlined /> Rủi ro</>} key="risks">
+                <RisksSection data={analyticsData.risks} />
+              </Collapse.Panel>
+              <Collapse.Panel header={<><TeamOutlined /> Năng suất</>} key="productivity">
+                <ProductivitySection data={analyticsData.productivity_metrics} />
+              </Collapse.Panel>
+              <Collapse.Panel header={<><UserSwitchOutlined /> Gợi ý phân công</>} key="assignment">
+                <AssignmentSection data={analyticsData.assignment_suggestions} />
+              </Collapse.Panel>
+            </Collapse>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+              <RobotOutlined style={{ fontSize: '48px', marginBottom: '16px' }} />
+              <p>Chưa có dữ liệu phân tích</p>
+              <p>Vui lòng chọn repository và nhấn "Phân tích AI"</p>
+            </div>
+          )}
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 
