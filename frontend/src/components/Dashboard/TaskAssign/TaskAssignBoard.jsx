@@ -50,12 +50,27 @@ const TaskAssignBoard = ({ repositories = [], repoLoading = false }) => {
 
   // Effect để fetch tasks khi repository thay đổi
   useEffect(() => {
+    // Defensive programming: Đảm bảo selectedRepo hợp lệ
+    if (!selectedRepo) {
+      console.log('🔍 No repository selected, skipping task load');
+      return;
+    }
+
     const ownerName = typeof selectedRepo?.owner === 'string' 
       ? selectedRepo.owner 
       : selectedRepo?.owner?.login || selectedRepo?.owner?.name;
     
+    console.log('🔍 Task loading check:', {
+      selectedRepo: selectedRepo?.name,
+      owner: ownerName,
+      hasValidData: !!(ownerName && selectedRepo?.name)
+    });
+
     if (ownerName && selectedRepo?.name) {
+      console.log('✅ Loading tasks for repo:', `${ownerName}/${selectedRepo.name}`);
       loadTasks();
+    } else {
+      console.log('⚠️ Missing repository data, cannot load tasks');
     }
   }, [selectedRepo, loadTasks]);
 

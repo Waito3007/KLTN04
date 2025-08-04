@@ -17,7 +17,6 @@ class TaskBase(BaseModel):
     priority: TaskPriority = Field(default=TaskPriority.MEDIUM, description="Độ ưu tiên task")
     due_date: Optional[str] = Field(None, pattern=r'^\d{4}-\d{2}-\d{2}$', description="Ngày hết hạn (YYYY-MM-DD)")
     assignee_github_username: Optional[str] = Field(None, max_length=100, description="GitHub username của người được giao")
-    assignee: Optional[str] = Field(None, max_length=100, description="Alias cho assignee_github_username (backward compatibility)")
     repo_owner: Optional[str] = Field(None, max_length=100, description="Chủ sở hữu repository")
     repo_name: Optional[str] = Field(None, max_length=100, description="Tên repository")
 

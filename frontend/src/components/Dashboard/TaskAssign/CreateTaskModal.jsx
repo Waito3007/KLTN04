@@ -104,7 +104,7 @@ const CreateTaskModal = ({
         description: values.description?.trim() || '',
         status: values.status || 'TODO',
         priority: values.priority || 'MEDIUM',
-        assignee: values.assignee_github_username?.trim() || null,
+        assignee_github_username: values.assignee_github_username?.trim() || null,
         due_date: values.due_date ? dayjs(values.due_date).format('YYYY-MM-DD') : null
       };
 

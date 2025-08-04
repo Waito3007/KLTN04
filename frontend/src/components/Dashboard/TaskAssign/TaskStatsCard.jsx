@@ -21,7 +21,7 @@ const TaskStatsCard = ({ stats, loading = false }) => {
       return {
         total: 0,
         todo: 0,
-        in_progress: 0,
+        inProgress: 0,
         done: 0,
         cancelled: 0
       };
@@ -30,7 +30,7 @@ const TaskStatsCard = ({ stats, loading = false }) => {
     return {
       total: stats.total || 0,
       todo: stats.todo || 0,
-      in_progress: stats.in_progress || 0,
+      inProgress: stats.inProgress || 0,
       done: stats.done || 0,
       cancelled: stats.cancelled || 0
     };
@@ -38,7 +38,7 @@ const TaskStatsCard = ({ stats, loading = false }) => {
 
   // Tính toán progress và tỷ lệ hoàn thành
   const progressData = useMemo(() => {
-    const { total, done, in_progress } = validStats;
+    const { total, done, inProgress } = validStats;
     
     if (total === 0) {
       return {
@@ -49,7 +49,7 @@ const TaskStatsCard = ({ stats, loading = false }) => {
     }
 
     const completionRate = (done / total) * 100;
-    const inProgressRate = (in_progress / total) * 100;
+    const inProgressRate = (inProgress / total) * 100;
     
     return {
       completionRate: Math.round(completionRate),
@@ -65,7 +65,7 @@ const TaskStatsCard = ({ stats, loading = false }) => {
       color: '#1890ff',
       title: 'Cần làm'
     },
-    in_progress: {
+    inProgress: {
       icon: PlayCircleOutlined,
       color: '#fa8c16',
       title: 'Đang làm'
@@ -144,12 +144,12 @@ const TaskStatsCard = ({ stats, loading = false }) => {
               </Col>
               <Col span={8}>
                 <Text type="secondary">
-                  Đang làm: {validStats.in_progress}/{validStats.total}
+                  Đang làm: {validStats.inProgress}/{validStats.total}
                 </Text>
               </Col>
               <Col span={8}>
                 <Text type="secondary">
-                  Còn lại: {validStats.todo + validStats.in_progress}/{validStats.total}
+                  Còn lại: {validStats.todo + validStats.inProgress}/{validStats.total}
                 </Text>
               </Col>
             </Row>

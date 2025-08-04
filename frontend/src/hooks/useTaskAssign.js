@@ -81,11 +81,13 @@ const useTaskAssign = (selectedRepo) => {
   // Load tasks từ API
   const loadTasks = useCallback(async (showLoading = true) => {
     if (!repoOwner || !repoName) {
+      console.log('⚠️ Missing repo data for task loading:', { repoOwner, repoName });
       setTasks([]);
       return;
     }
 
     try {
+      console.log(`🔍 Loading tasks for ${repoOwner}/${repoName}`);
       if (showLoading) {
         setLoading(true);
       }
@@ -95,11 +97,14 @@ const useTaskAssign = (selectedRepo) => {
       
       // Validation response
       if (!Array.isArray(response.data)) {
+        console.error('❌ Invalid response format:', response);
         throw new Error('Dữ liệu trả về không hợp lệ');
       }
 
+      console.log(`✅ Loaded ${response.data.length} tasks successfully`);
       setTasks(response.data);
     } catch (error) {
+      console.error('❌ Task loading failed:', error);
       handleError(error, 'tải danh sách task');
       setTasks([]);
     } finally {
@@ -204,10 +209,6 @@ const useTaskAssign = (selectedRepo) => {
 
       const response = await taskAPI.updateTaskStatus(taskId, newStatus);
       
-      if (!response.data) {
-        throw new Error('Không nhận được dữ liệu task đã cập nhật');
-      }
-
       // Immutable update
       setTasks(prevTasks => 
         prevTasks.map(task => 
@@ -217,7 +218,7 @@ const useTaskAssign = (selectedRepo) => {
         )
       );
       
-      return response.data;
+      return response.data || response;
     } catch (error) {
       handleError(error, 'cập nhật trạng thái task');
       throw error;

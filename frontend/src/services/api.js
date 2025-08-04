@@ -279,6 +279,14 @@ export const taskAPI = {
     return response.data;
   },
 
+  // Cập nhật trạng thái task
+  updateTaskStatus: async (taskId, newStatus) => {
+    const response = await apiClient.patch(`/tasks/${taskId}/status`, {
+      status: newStatus
+    });
+    return response;
+  },
+
   // Xóa task
   delete: async (owner, repoName, taskId) => {
     await apiClient.delete(`/projects/${owner}/${repoName}/tasks/${taskId}`);

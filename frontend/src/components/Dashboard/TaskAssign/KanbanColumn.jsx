@@ -57,10 +57,13 @@ const KanbanColumn = ({
   return (
     <Card 
       className="kanban-column"
+      data-status={status.key}
       size="small"
       style={{ 
-        borderTop: `4px solid ${status.color}`,
-        backgroundColor: status.bgColor 
+        borderLeft: `4px solid ${status.color}`,
+        backgroundColor: status.bgColor,
+        '--status-color': status.color,
+        '--status-color-light': status.color + '40'
       }}
     >
       {/* Column Header */}

@@ -1,9 +1,68 @@
 /* KanbanBoard.css - Kanban board layout and styling */
 
 .kanban-board {
-  padding: 24px;
-  background: #fafafa;
-  min-height: 500px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  min-height: calc(100vh - 120px);
+  border-radius: 12px;
+  margin: 16px;
+  border: 2px solid #e8e8e8;
+  position: relative;
+  isolation: isolate; /* Ngăn chặn ảnh hưởng từ children */
+}
+
+.kanban-columns {
+  margin: 0 -8px;
+}
+
+.kanban-board-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kanban-board {
+    padding: 12px;
+    margin: 8px;
+  }
+  
+  .kanban-columns {
+    margin: 0 -4px;
+  }
+}
+
+/* Animation - chỉ áp dụng cho nội dung, không ảnh hưởng viền ngoài */
+.kanban-board .ant-col {
+  transition: none; /* Loại bỏ transition để không ảnh hưởng layout */
+}
+
+/* Chỉ hover effect cho column content, không phải container */
+.kanban-board .kanban-column {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.kanban-board .kanban-column:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px); /* Chỉ nâng nhẹ column, không ảnh hưởng board */
+}
+
+/* Glass morphism effect - Updated for white/black theme */
+.kanban-board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  z-index: -1;
 }
 
 .kanban-board .board-header {
@@ -34,17 +93,17 @@
   align-items: start;
 }
 
-/* Desktop layout - 4 columns */
+/* Desktop layout - 3 columns */
 @media (min-width: 1200px) {
   .kanban-board .columns-container {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Tablet layout - 2 columns */
+/* Tablet layout - 3 columns */
 @media (min-width: 768px) and (max-width: 1199px) {
   .kanban-board .columns-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -164,13 +223,4 @@
 
 .kanban-board .task-card.new-task {
   animation: slideInUp 0.3s ease-out;
-}
-
-/* Column shadows */
-.kanban-board .kanban-column {
-  transition: box-shadow 0.2s ease;
-}
-
-.kanban-board .kanban-column:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

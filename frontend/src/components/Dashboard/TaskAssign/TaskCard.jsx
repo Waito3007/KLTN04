@@ -40,10 +40,10 @@ const TaskCard = ({ task, onClick }) => {
   // Get priority config
   const priorityConfig = useMemo(() => {
     const configs = {
-      LOW: { color: '#52c41a', text: 'Thấp' },
-      MEDIUM: { color: '#1890ff', text: 'Trung bình' },
-      HIGH: { color: '#fa8c16', text: 'Cao' },
-      URGENT: { color: '#ff4d4f', text: 'Khẩn cấp' }
+      LOW: { color: '#8c8c8c', text: 'Thấp' },
+      MEDIUM: { color: '#595959', text: 'Trung bình' },
+      HIGH: { color: '#262626', text: 'Cao' },
+      URGENT: { color: '#000000', text: 'Khẩn cấp' }
     };
     return configs[validTask?.priority] || configs.MEDIUM;
   }, [validTask?.priority]);
@@ -84,6 +84,8 @@ const TaskCard = ({ task, onClick }) => {
       hoverable
       onClick={handleCardClick}
       style={{ cursor: 'pointer' }}
+      data-priority={validTask.priority}
+      data-status={validTask.status}
       actions={[
         <Tooltip key="edit" title="Chỉnh sửa">
           <EditOutlined onClick={handleCardClick} />
@@ -114,61 +116,99 @@ const TaskCard = ({ task, onClick }) => {
       )}
 
       {/* Task Metadata */}
-      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+      <div className="task-card-metadata" style={{ marginTop: '8px' }}>
         {/* Priority Tag */}
-        <Tag color={priorityConfig.color} style={{ margin: 0 }}>
-          {priorityConfig.text}
-        </Tag>
+        <div style={{ marginBottom: '6px' }}>
+          <Tag color={priorityConfig.color} style={{ margin: 0 }}>
+            {priorityConfig.text}
+          </Tag>
+        </div>
 
         {/* Due Date */}
         {formattedDueDate && (
-          <Space size="small">
+          <div className="task-due-date" style={{ 
+            marginBottom: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexWrap: 'nowrap'
+          }}>
             <CalendarOutlined 
               style={{ 
                 color: isOverdue ? '#ff4d4f' : '#8c8c8c',
-                fontSize: '12px' 
+                fontSize: '12px',
+                flexShrink: 0
               }} 
             />
             <Text 
               style={{ 
                 fontSize: '11px',
-                color: isOverdue ? '#ff4d4f' : '#8c8c8c'
+                color: isOverdue ? '#ff4d4f' : '#8c8c8c',
+                whiteSpace: 'nowrap'
               }}
             >
               {formattedDueDate}
             </Text>
             {isOverdue && (
-              <Tag color="error" size="small">
+              <Tag color="error" size="small" style={{ marginLeft: '4px' }}>
                 Quá hạn
               </Tag>
             )}
-          </Space>
+          </div>
         )}
 
         {/* Assignee */}
         {validTask.assignee_github_username && (
-          <Space size="small">
+          <div className="task-assignee" style={{ 
+            marginBottom: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexWrap: 'nowrap'
+          }}>
             <Avatar 
               size="small" 
               icon={<UserOutlined />}
-              style={{ backgroundColor: '#1890ff' }}
+              style={{ backgroundColor: '#595959', flexShrink: 0 }}
             />
-            <Text style={{ fontSize: '11px', color: '#8c8c8c' }}>
+            <Text style={{ 
+              fontSize: '11px', 
+              color: '#8c8c8c',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               @{validTask.assignee_github_username}
             </Text>
-          </Space>
+          </div>
         )}
 
         {/* Created by */}
         {validTask.created_by && (
-          <Space size="small">
-            <ClockCircleOutlined style={{ fontSize: '11px', color: '#8c8c8c' }} />
-            <Text style={{ fontSize: '10px', color: '#8c8c8c' }}>
+          <div className="task-created-by" style={{ 
+            marginBottom: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexWrap: 'nowrap'
+          }}>
+            <ClockCircleOutlined style={{ 
+              fontSize: '11px', 
+              color: '#8c8c8c',
+              flexShrink: 0
+            }} />
+            <Text style={{ 
+              fontSize: '10px', 
+              color: '#8c8c8c',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               Tạo bởi {validTask.created_by}
             </Text>
-          </Space>
+          </div>
         )}
-      </Space>
+      </div>
     </Card>
   );
 };

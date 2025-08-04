@@ -17,26 +17,20 @@ const TASK_STATUSES = {
   TODO: { 
     key: 'TODO', 
     title: 'Cần làm', 
-    color: '#1890ff',
-    bgColor: '#f0f9ff'
+    color: '#595959',
+    bgColor: '#ffffff'
   },
   IN_PROGRESS: { 
     key: 'IN_PROGRESS', 
     title: 'Đang làm', 
-    color: '#fa8c16',
-    bgColor: '#fff7e6'
+    color: '#262626',
+    bgColor: '#fafafa'
   },
   DONE: { 
     key: 'DONE', 
     title: 'Hoàn thành', 
-    color: '#52c41a',
-    bgColor: '#f6ffed'
-  },
-  CANCELLED: { 
-    key: 'CANCELLED', 
-    title: 'Đã hủy', 
-    color: '#ff4d4f',
-    bgColor: '#fff1f0'
+    color: '#000000',
+    bgColor: '#f5f5f5'
   }
 };
 
@@ -153,7 +147,7 @@ const KanbanBoard = ({
     <div className="kanban-board">
       <Row gutter={[16, 16]} className="kanban-columns">
         {Object.values(TASK_STATUSES).map(status => (
-          <Col key={status.key} xs={24} sm={12} lg={6}>
+          <Col key={status.key} xs={24} sm={24} md={8} lg={8}>
             <KanbanColumn
               status={status}
               tasks={tasksByStatus[status.key] || []}
