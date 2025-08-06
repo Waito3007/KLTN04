@@ -81,7 +81,7 @@ class MultiFusionV2Service:
                 "total_changes",
                 "num_dirs_changed"
             ],
-            "num_classes": 11
+            "num_classes": 7
         }
 
     def _load_model(self):
@@ -91,7 +91,7 @@ class MultiFusionV2Service:
             print(f"1. Model directory: {model_dir}")
 
             # model_path = model_dir / "commitanalyst.pth"
-            model_path = model_dir / "ver4.3.pth"
+            model_path = model_dir / "commitAnalystV5.pth"
             scaler_path = model_dir / "scaler.pkl"
             label_map_path = model_dir / "label_map.json"
             reverse_label_map_path = model_dir / "reverse_label_map.json"
@@ -119,21 +119,15 @@ class MultiFusionV2Service:
             self.tokenizer = RobertaTokenizer.from_pretrained('microsoft/codebert-base')
             print("10. Tokenizer loaded.")
 
-
-            # SỬA: Sử dụng đúng 10 đặc trưng số học như khi train model, sắp xếp theo alphabet
+            # SỬA: Sử dụng đúng 5 đặc trưng số học như khi train model theo trainv5.py
             self.numeric_features = [
-                'confidence_score',
                 'file_count',
-                'lines_added',
+                'lines_added', 
                 'lines_removed',
-                'num_build_files',
-                'num_dirs_changed',
-                'num_doc_files',
-                'num_test_files',
-                'risk',
-                'total_changes'
+                'total_changes',
+                'num_dirs_changed'
             ]
-            print("11. Using 10 numeric features for commit analysis.")
+            print("11. Using 5 numeric features for commit analysis (matching trainv5.py).")
             print(f"12. Numeric features: {self.numeric_features}")
 
             print("13. Initializing MultiModalFusionModel...")
@@ -355,7 +349,7 @@ class MultifusionCommitAnalystService:
                     "type": commit_type,
                     "confidence": ai_data.get("confidence", 0.0),
                     "ai_powered": True,
-                    "ai_model": "MultiFusionV2"
+                    "ai_model": "MultiFusionV5"
                 }
             }
             combined.append(commit_info)
