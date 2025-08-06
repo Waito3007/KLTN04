@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, Request, HTTPException, Query, Depends
+from sqlalchemy.orm import Session
+from db.database import get_db
 import httpx
 import logging
 from typing import List, Dict, Any, Optional
@@ -262,7 +264,7 @@ async def get_repositories_sync_status(request: Request):
         raise HTTPException(status_code=500, detail=f"Error getting sync status: {str(e)}")
 
 @repo_manager_router.post("/repositories/{owner}/{repo}/sync")
-async def sync_single_repository(owner: str, repo: str, request: Request, sync_type: str = Query("basic", regex="^(basic|enhanced|optimized)$")):
+async def sync_single_repository(owner: str, repo: str, request: Request, db: Session = Depends(get_db), sync_type: str = Query("basic", regex="^(basic|enhanced|optimized)$")):
     """
     Đồng bộ một repository cụ thể với các loại sync khác nhau
     """
@@ -282,7 +284,7 @@ async def sync_single_repository(owner: str, repo: str, request: Request, sync_t
     
     try:
         # Emit sync start event
-        await emit_sync_start(repo_key, sync_type)
+        await emit_sync_start(db, repo_key, sync_type)
         
         if sync_type == "basic":
             # Import here to avoid circular imports
@@ -293,7 +295,7 @@ async def sync_single_repository(owner: str, repo: str, request: Request, sync_t
             from services.repo_service import update_repo_sync_status
             await update_repo_sync_status(owner, repo, "completed")
             
-            await emit_sync_complete(repo_key, True, {"type": "basic", "result": result})
+            await emit_sync_complete(db, repo_key, True, {"type": "basic", "result": result})
             return result
         elif sync_type == "enhanced":
             from api.routes.sync import sync_repository_enhanced
@@ -303,7 +305,7 @@ async def sync_single_repository(owner: str, repo: str, request: Request, sync_t
             from services.repo_service import update_repo_sync_status
             await update_repo_sync_status(owner, repo, "completed")
             
-            await emit_sync_complete(repo_key, True, {"type": "enhanced", "result": result})
+            await emit_sync_complete(db, repo_key, True, {"type": "enhanced", "result": result})
             return result
         elif sync_type == "optimized":
             from api.routes.sync import sync_all_optimized
@@ -312,12 +314,12 @@ async def sync_single_repository(owner: str, repo: str, request: Request, sync_t
             result = await sync_all_optimized(owner, repo, request, background_tasks)
             
             # Note: optimized sync updates status in its own background task
-            await emit_sync_complete(repo_key, True, {"type": "optimized", "result": result})
+            await emit_sync_complete(db, repo_key, True, {"type": "optimized", "result": result})
             return result
         else:
             raise HTTPException(status_code=400, detail="Invalid sync type")
             
     except Exception as e:
         logger.error(f"Error syncing repository {owner}/{repo}: {e}")
-        await emit_sync_error(repo_key, str(e), sync_type)
+        await emit_sync_error(db, repo_key, str(e), sync_type)
         raise HTTPException(status_code=500, detail=f"Error syncing repository: {str(e)}")

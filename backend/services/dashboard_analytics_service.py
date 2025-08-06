@@ -118,7 +118,7 @@ class DashboardAnalyticsService:
                 "progress": progress_analysis.__dict__,
                 "risks": risk_analysis.__dict__,
                 "assignment_suggestions": [s.__dict__ for s in assignment_suggestions],
-                "productivity_metrics": productivity_metrics,
+                "productivity_metrics": productivity_metrics,  # Đã là dict đúng format
                 "generated_at": datetime.now().isoformat()
             }
             
@@ -293,7 +293,20 @@ class DashboardAnalyticsService:
             commits_data = await self._get_commits_with_analysis(repo_id, days_back)
             
             if not commits_data:
-                return {}
+                return {
+                    "team_summary": {
+                        "total_commits": 0,
+                        "total_lines_changed": 0,
+                        "average_commit_size": 0.0,
+                        "fix_ratio": 0.0,
+                        "active_contributors": 0
+                    },
+                    "member_metrics": {},
+                    "trends": {
+                        "daily_commits": [],
+                        "weekly_velocity": 0.0
+                    }
+                }
             
             # Metrics theo thành viên
             member_metrics = defaultdict(lambda: {
@@ -308,9 +321,15 @@ class DashboardAnalyticsService:
             for commit in commits_data:
                 author = commit.get('author_name', 'unknown')
                 member_metrics[author]['commits'] += 1
-                member_metrics[author]['lines_added'] += commit.get('insertions', 0)
-                member_metrics[author]['lines_removed'] += commit.get('deletions', 0)
-                member_metrics[author]['files_changed'] += commit.get('files_changed', 0)
+                
+                # Xử lý an toàn cho các giá trị có thể None
+                lines_added = commit.get('insertions') or 0
+                lines_removed = commit.get('deletions') or 0
+                files_changed = commit.get('files_changed') or 0
+                
+                member_metrics[author]['lines_added'] += lines_added
+                member_metrics[author]['lines_removed'] += lines_removed
+                member_metrics[author]['files_changed'] += files_changed
                 member_metrics[author]['commit_types'][commit.get('commit_type', 'unknown')] += 1
                 member_metrics[author]['areas'][commit.get('dev_area', 'unknown')] += 1
             
@@ -319,9 +338,9 @@ class DashboardAnalyticsService:
                 member_metrics[member]['commit_types'] = dict(member_metrics[member]['commit_types'])
                 member_metrics[member]['areas'] = dict(member_metrics[member]['areas'])
             
-            # Team-wide metrics
+            # Team-wide metrics với xử lý an toàn
             total_commits = len(commits_data)
-            total_lines = sum(c.get('insertions', 0) + c.get('deletions', 0) for c in commits_data)
+            total_lines = sum((c.get('insertions') or 0) + (c.get('deletions') or 0) for c in commits_data)
             avg_commit_size = total_lines / total_commits if total_commits > 0 else 0
             
             # Code quality indicators
@@ -344,7 +363,21 @@ class DashboardAnalyticsService:
             
         except Exception as e:
             logger.error(f"Productivity metrics failed: {e}")
-            return {}
+            # Trả về structure đầy đủ thay vì dict rỗng
+            return {
+                "team_summary": {
+                    "total_commits": 0,
+                    "total_lines_changed": 0,
+                    "average_commit_size": 0.0,
+                    "fix_ratio": 0.0,
+                    "active_contributors": 0
+                },
+                "member_metrics": {},
+                "trends": {
+                    "daily_commits": [],
+                    "weekly_velocity": 0.0
+                }
+            }
     
     # Helper methods
     async def _get_repo_id(self, repo_owner: str, repo_name: str) -> Optional[int]:
@@ -394,13 +427,17 @@ class DashboardAnalyticsService:
     async def _get_commit_type(self, commit_data: Dict[str, Any]) -> str:
         """Lấy loại commit từ MultiFusion model"""
         try:
-            # Format data for MultiFusion model
+            # Format data for MultiFusion model với xử lý an toàn cho None values
+            lines_added = commit_data.get('insertions') or 0
+            lines_removed = commit_data.get('deletions') or 0
+            files_changed = commit_data.get('files_changed') or 0
+            
             formatted_commit = {
                 'message': commit_data.get('message', ''),
-                'file_count': commit_data.get('files_changed', 0),
-                'lines_added': commit_data.get('insertions', 0),
-                'lines_removed': commit_data.get('deletions', 0),
-                'total_changes': commit_data.get('insertions', 0) + commit_data.get('deletions', 0),
+                'file_count': files_changed,
+                'lines_added': lines_added,
+                'lines_removed': lines_removed,
+                'total_changes': lines_added + lines_removed,
                 'num_dirs_changed': 1  # Default value
             }
             
@@ -417,13 +454,18 @@ class DashboardAnalyticsService:
     async def _get_dev_area(self, commit_data: Dict[str, Any]) -> str:
         """Lấy khu vực phát triển từ Area Analysis model"""
         try:
+            # Xử lý an toàn cho các giá trị None
+            lines_added = commit_data.get('insertions') or 0
+            lines_removed = commit_data.get('deletions') or 0
+            files_changed = commit_data.get('files_changed') or 0
+            
             formatted_data = {
                 'commit_message': commit_data.get('message', ''),
                 'diff_content': commit_data.get('diff_content', ''),
-                'files_count': commit_data.get('files_changed', 0),
-                'lines_added': commit_data.get('insertions', 0),
-                'lines_removed': commit_data.get('deletions', 0),
-                'total_changes': commit_data.get('insertions', 0) + commit_data.get('deletions', 0)
+                'files_count': files_changed,
+                'lines_added': lines_added,
+                'lines_removed': lines_removed,
+                'total_changes': lines_added + lines_removed
             }
             
             return self.area_analyzer.predict_area(formatted_data)
@@ -434,13 +476,18 @@ class DashboardAnalyticsService:
     async def _get_risk_level(self, commit_data: Dict[str, Any]) -> str:
         """Lấy mức độ rủi ro từ Risk Analysis model"""
         try:
+            # Xử lý an toàn cho các giá trị None
+            lines_added = commit_data.get('insertions') or 0
+            lines_removed = commit_data.get('deletions') or 0
+            files_changed = commit_data.get('files_changed') or 0
+            
             formatted_data = {
                 'commit_message': commit_data.get('message', ''),
                 'diff_content': commit_data.get('diff_content', ''),
-                'files_count': commit_data.get('files_changed', 0),
-                'lines_added': commit_data.get('insertions', 0),
-                'lines_removed': commit_data.get('deletions', 0),
-                'total_changes': commit_data.get('insertions', 0) + commit_data.get('deletions', 0)
+                'files_count': files_changed,
+                'lines_added': lines_added,
+                'lines_removed': lines_removed,
+                'total_changes': lines_added + lines_removed
             }
             
             return self.risk_analyzer.predict_risk(formatted_data)
@@ -455,7 +502,14 @@ class DashboardAnalyticsService:
         
         # Factors: commit frequency, code quality, diversity
         total_commits = len(commits_data)
-        total_changes = sum(c.get('insertions', 0) + c.get('deletions', 0) for c in commits_data)
+        
+        # Xử lý an toàn cho tính tổng changes
+        total_changes = 0
+        for c in commits_data:
+            insertions = c.get('insertions') or 0
+            deletions = c.get('deletions') or 0
+            total_changes += insertions + deletions
+            
         avg_commit_size = total_changes / total_commits if total_commits > 0 else 0
         
         # Penalize too large or too small commits
@@ -715,14 +769,21 @@ class DashboardAnalyticsService:
                 except:
                     file_types_data = {}
             
-            for file_type in file_types_data.keys():
-                file_types.append(file_type.lstrip('.'))
+            if isinstance(file_types_data, dict):
+                for file_type in file_types_data.keys():
+                    file_types.append(file_type.lstrip('.'))
         
         type_counts = Counter(file_types)
         specializations = [ft for ft, count in type_counts.most_common(3) if count > 2]
         
-        # Estimate skill level based on commit patterns
-        avg_commit_size = mean([c.get('insertions', 0) + c.get('deletions', 0) for c in commits])
+        # Estimate skill level based on commit patterns - xử lý an toàn cho None values
+        commit_sizes = []
+        for c in commits:
+            insertions = c.get('insertions') or 0
+            deletions = c.get('deletions') or 0
+            commit_sizes.append(insertions + deletions)
+            
+        avg_commit_size = mean(commit_sizes) if commit_sizes else 0
         commit_frequency = len(commits) / days_back if days_back > 0 else 0
         
         skill_level = 'junior'
@@ -732,7 +793,8 @@ class DashboardAnalyticsService:
             skill_level = 'mid'
         
         # Lấy ngày commit cuối cùng
-        last_commit_date = max(c.get('committer_date') for c in commits if c.get('committer_date'))
+        commit_dates = [c.get('committer_date') for c in commits if c.get('committer_date')]
+        last_commit_date = max(commit_dates) if commit_dates else None
 
         return {
             'expertise_areas': expertise_areas,
@@ -891,7 +953,11 @@ class DashboardAnalyticsService:
                     commit_date = datetime.fromisoformat(commit_date.replace('Z', '+00:00'))
                 date_key = commit_date.date().isoformat()
                 daily_stats[date_key]['commits'] += 1
-                daily_stats[date_key]['lines'] += commit.get('insertions', 0) + commit.get('deletions', 0)
+                
+                # Xử lý an toàn cho None values
+                insertions = commit.get('insertions') or 0
+                deletions = commit.get('deletions') or 0
+                daily_stats[date_key]['lines'] += insertions + deletions
         
         trends = []
         for i in range(days_back):  # Use full days_back period

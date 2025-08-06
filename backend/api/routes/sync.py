@@ -1,5 +1,7 @@
 # backend/api/routes/sync.py
-from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks, Depends
+from sqlalchemy.orm import Session
+from db.database import get_db
 import httpx
 import asyncio
 import logging
@@ -169,7 +171,8 @@ async def sync_all_optimized(owner: str, repo: str, request: Request, background
         sync_all_background_optimized,
         owner,
         repo, 
-        github_token
+        github_token,
+        db=next(get_db())  # Get a new DB session for the background task
     )
     
     return {
@@ -179,7 +182,7 @@ async def sync_all_optimized(owner: str, repo: str, request: Request, background
         "note": "Sync is running in background. Check logs for progress."
     }
 
-async def sync_all_background_optimized(owner: str, repo: str, token: str):
+async def sync_all_background_optimized(owner: str, repo: str, token: str, db: Session):
     """
     Background task để đồng bộ toàn bộ repository với tối ưu tốc độ
     """
@@ -188,7 +191,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
     logger.info(f"🚀 Starting optimized sync for {repo_key}")
     
     # Emit sync start event
-    await emit_sync_start(repo_key, "optimized")
+    await emit_sync_start(db, repo_key, "optimized")
     
     sync_results = {
         "repository_synced": False,
@@ -205,7 +208,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
         semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
         
         # 1. Sync repository (fastest)
-        await emit_sync_progress(repo_key, 1, 5, "Syncing repository metadata")
+        await emit_sync_progress(db, repo_key, 1, 5, "Syncing repository metadata")
         step_start = time.time()
         
         # 1. Sync repository (fastest)
@@ -234,13 +237,13 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
         logger.info(f"✅ Repository synced in {sync_results['timing']['repository']:.2f}s")
         
         # 2. Get repo_id
-        await emit_sync_progress(repo_key, 2, 5, "Getting repository ID")
+        await emit_sync_progress(db, repo_key, 2, 5, "Getting repository ID")
         repo_id = await get_repo_id_by_owner_and_name(owner, repo)
         if not repo_id:
             raise Exception("Repository not found after creation")
         
         # 3. Sync branches concurrently
-        await emit_sync_progress(repo_key, 3, 5, "Syncing branches")
+        await emit_sync_progress(db, repo_key, 3, 5, "Syncing branches")
         step_start = time.time()
         branches_data = await github_api_call(f"https://api.github.com/repos/{owner}/{repo}/branches", token)
         default_branch = repo_data.get("default_branch", "main")
@@ -268,7 +271,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
         logger.info(f"✅ {branches_synced} branches synced in {sync_results['timing']['branches']:.2f}s")
         
         # 4. Sync commits with batch processing and concurrent diff fetching
-        await emit_sync_progress(repo_key, 4, 5, "Syncing commits")
+        await emit_sync_progress(db, repo_key, 4, 5, "Syncing commits")
         step_start = time.time()
         commits_synced = await sync_commits_batch_optimized(
             owner, repo, repo_id, branches_data, token, semaphore
@@ -278,7 +281,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
         logger.info(f"✅ {commits_synced} commits synced in {sync_results['timing']['commits']:.2f}s")
         
         # 5. Sync issues and PRs concurrently
-        await emit_sync_progress(repo_key, 5, 5, "Syncing issues and pull requests")
+        await emit_sync_progress(db, repo_key, 5, 5, "Syncing issues and pull requests")
         step_start = time.time()
         issues_task = asyncio.create_task(
             sync_issues_batch_optimized(owner, repo, repo_id, token, semaphore)
@@ -315,7 +318,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
             
             # Emit sync complete event
             logger.debug(f"🔧 About to emit sync complete event")
-            await emit_sync_complete(repo_key, True, sync_results)
+            await emit_sync_complete(db, repo_key, True, sync_results)
             logger.debug(f"✅ Sync complete event emitted")
             
             logger.info(f"🎉 Optimized sync completed for {repo_key} in {total_time:.2f}s")
@@ -333,7 +336,7 @@ async def sync_all_background_optimized(owner: str, repo: str, token: str):
         sync_results["errors"].append(f"Fatal error: {str(e)}")
         
         # Emit sync error event
-        await emit_sync_error(repo_key, str(e), "sync_all_background")
+        await emit_sync_error(db, repo_key, str(e), "sync_all_background")
 
 async def sync_commits_batch_optimized(
     owner: str, 

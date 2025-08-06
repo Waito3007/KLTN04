@@ -47,10 +47,7 @@ app.include_router(sync_router, prefix="/api")
 app.include_router(repo_manager_router, prefix="/api")
 app.include_router(sync_events_router, prefix="/api/sync-events")
 
-# Add WebSocket route directly to main app with decorator
-@app.websocket("/api/sync-events/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket_sync_events(websocket)
+
 
 app.include_router(contributors_router, prefix="/api/contributors")
 app.include_router(han_commit_analyst_router, prefix="/api/han-commit-analysis")
