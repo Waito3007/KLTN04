@@ -20,7 +20,7 @@ router = APIRouter()
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
-    assignee: str
+    assignee_github_username: Optional[str] = None
     priority: str = "MEDIUM"  # LOW, MEDIUM, HIGH, URGENT
     status: str = "TODO"  # TODO, IN_PROGRESS, DONE, CANCELLED
     due_date: Optional[str] = None
@@ -94,6 +94,11 @@ async def create_project_task(
 ):
     """Tạo task mới cho repository"""
     try:
+        # Debug logging
+        print(f"🔍 DEBUG: Received task data: {task.dict()}")
+        print(f"🔍 DEBUG: Task assignee: {getattr(task, 'assignee', None)}")
+        print(f"🔍 DEBUG: Task assignee_github_username: {getattr(task, 'assignee_github_username', None)}")
+        
         # Insert task into database
         with engine.connect() as conn:            # Validate priority and status
             priority_enum = TaskPriority.MEDIUM
@@ -121,14 +126,15 @@ async def create_project_task(
                     print(f"Date parsing error: {e}")
                     due_date_value = None
             
-            # Resolve IDs
-            assignee_user_id = get_user_id_by_github_username(conn, task.assignee)
+            # Resolve IDs - handle both assignee and assignee_github_username
+            assignee_username = getattr(task, 'assignee_github_username', None) or getattr(task, 'assignee', None)
+            assignee_user_id = get_user_id_by_github_username(conn, assignee_username)
             repository_id = get_repository_id(conn, owner, repo)
             
             insert_stmt = insert(project_tasks).values(
                 title=task.title,
                 description=task.description,
-                assignee_github_username=task.assignee,  # Use correct field name
+                assignee_github_username=assignee_username,  # Use mapped field name
                 assignee_user_id=assignee_user_id,  # Resolved user ID
                 priority=priority_enum.value,  # Convert enum to string
                 status=status_enum.value,  # Convert enum to string
@@ -201,7 +207,7 @@ async def update_project_task(
                 status_enum = TaskStatus.IN_PROGRESS
             elif task_update.status == "DONE":
                 status_enum = TaskStatus.DONE            # Resolve assignee user ID if assignee changed
-            assignee_user_id = get_user_id_by_github_username(conn, task_update.assignee)
+            assignee_user_id = get_user_id_by_github_username(conn, task_update.assignee_github_username)
             
             # Update task
             update_stmt = update(project_tasks).where(
@@ -209,7 +215,7 @@ async def update_project_task(
             ).values(
                 title=task_update.title,
                 description=task_update.description,
-                assignee_github_username=task_update.assignee,  # Use correct field name
+                assignee_github_username=task_update.assignee_github_username,  # Use correct field name
                 assignee_user_id=assignee_user_id,  # Resolved user ID
                 priority=priority_enum.value,  # Convert enum to string
                 status=status_enum.value,  # Convert enum to string

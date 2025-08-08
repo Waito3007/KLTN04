@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination } from "antd";
+import { useEffect, useState, useCallback } from "react";
+import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination, Select, Empty } from "antd";
 import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
-import axios from "axios";
 import styled from "styled-components";
 import { buildApiUrl } from '../../config/api';
 
@@ -48,54 +47,87 @@ const CommitMeta = styled.div`
 
 const PaginationContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 20px;
+  padding: 0 16px;
 `;
 
-const CommitList = ({ owner, repo, branch }) => {
-  const [commits, setCommits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+const PageSizeSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const CommitList = ({
+  memberCommits,
+  selectedMember,
+  selectedBranch,
+  commitTypeFilter,
+  setCommitTypeFilter,
+  techAreaFilter,
+  setTechAreaFilter,
+  currentPage,
+  setCurrentPage,
+  pageSize,
+  allRepoCommits // NEW PROP
+}) => {
+  const [loading, setLoading] = useState(false); // Loading state is now managed by parent
+  const [paginatedCommits, setPaginatedCommits] = useState([]);
+  const [totalCommits, setTotalCommits] = useState(0);
 
   useEffect(() => {
-    if (!branch) return;
+    let commitsToFilter = [];
 
-    const token = localStorage.getItem("access_token");
-    if (!token) return;    const fetchCommits = async () => {
-      try {        const response = await axios.get(
-          buildApiUrl(`/github/${owner}/${repo}/branches/${encodeURIComponent(branch)}/commits`),
-          {
-            headers: {
-              Authorization: `token ${token}`,
-            },
-          }
-        );
-        
-        // Backend trả về object với commits array trong property "commits"
-        const commitsData = response.data.commits || response.data;
-        setCommits(Array.isArray(commitsData) ? commitsData : []);
-      } catch (err) {
-        console.error(err);
-        message.error("Lỗi khi lấy danh sách commit");
-      } finally {
-        setLoading(false);
+    if (selectedMember) {
+      // Member-specific commits
+      if (memberCommits && memberCommits.commits) {
+        commitsToFilter = memberCommits.commits;
       }
-    };
+    } else if (allRepoCommits) {
+      // All repo commits
+      commitsToFilter = allRepoCommits;
+    }
 
-    setLoading(true);
-    fetchCommits();
-  }, [owner, repo, branch]);
+    const filteredCommits = commitsToFilter.filter(commit => {
+      const matchesType = commitTypeFilter === 'all' || 
+                            (commit.analysis && commit.analysis.type === commitTypeFilter);
+      const matchesTechArea = techAreaFilter === 'all' || 
+                              (commit.analysis && commit.analysis.tech_area === techAreaFilter);
+      return matchesType && matchesTechArea;
+    });
+
+    setTotalCommits(filteredCommits.length);
+    setPaginatedCommits(filteredCommits.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    ));
+  }, [memberCommits, currentPage, pageSize, commitTypeFilter, techAreaFilter, selectedMember, allRepoCommits]);
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
   };
-  // Tính toán dữ liệu hiển thị theo trang hiện tại
-  const paginatedCommits = Array.isArray(commits) ? commits.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  ) : [];
+  // Xử lý thay đổi trang - chỉ thay đổi currentPage (client-side pagination)
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Xử lý thay đổi số lượng commits trên trang
+  const handlePageSizeChange = (newPageSize) => {
+    // pageSize is now a prop, so we need to call setPageSize from parent
+    // This function might not be needed here if pageSize is controlled by parent
+    // For now, we'll just update currentPage
+    setCurrentPage(1);
+  };
+
+  if (!selectedMember && (!allRepoCommits || allRepoCommits.length === 0)) {
+    return (
+      <Card>
+        <Empty description="Không có commit nào được tìm thấy cho repository này." />
+      </Card>
+    );
+  }
 
   if (loading) {
     return (
@@ -108,17 +140,45 @@ const CommitList = ({ owner, repo, branch }) => {
     );
   }
 
+  const commitsToDisplay = selectedMember ? (memberCommits?.commits || []) : (allRepoCommits || []);
+
+  if (commitsToDisplay.length === 0) {
+    return (
+      <Card>
+        <Empty description="Không có commit nào được tìm thấy." />
+      </Card>
+    );
+  }
+
+  const displayTitle = selectedMember 
+    ? `Commit của ${selectedMember.login} trên nhánh: ${selectedBranch || "Tất cả"}`
+    : `Tất cả Commit trên nhánh: ${selectedBranch || "Tất cả"}`;
+
   return (
-    <div style={{ padding: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <Title level={4} style={{ margin: 0 }}>
+    <div style={{ padding: '16px' }}>      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>        <Title level={4} style={{ margin: 0, flex: 1 }}>
           <BranchesOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
-          Commit trên branch: <Tag color="blue">{branch}</Tag>
-          <Tag style={{ marginLeft: '8px' }}>{commits.length} commits</Tag>
+          {displayTitle}
+          <Tag style={{ marginLeft: '8px' }}>{totalCommits} commits</Tag>
         </Title>
+        
+        <PageSizeSelector>
+          <Text>Hiển thị:</Text>
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            style={{ width: 80 }}
+            options={[
+              { value: 10, label: '10' },
+              { value: 20, label: '20' },
+              { value: 30, label: '30' },
+              { value: 50, label: '50' },
+              { value: 100, label: '100' }
+            ]}
+          />
+          <Text>commits</Text>
+        </PageSizeSelector>
       </div>
-      
-      <List
+        <List
         itemLayout="vertical"
         dataSource={paginatedCommits}
         renderItem={(item) => (
@@ -132,8 +192,8 @@ const CommitList = ({ owner, repo, branch }) => {
                 </Tooltip>
               </CommitHeader>
                 <CommitMessage>
-                <Tooltip title={item.message || item.commit?.message} placement="topLeft">
-                  {(item.message || item.commit?.message || '').split('\n')[0]}
+                <Tooltip title={item.message} placement="topLeft">
+                  {(item.message || '').split('\n')[0]}
                 </Tooltip>
               </CommitMessage>
               
@@ -145,26 +205,35 @@ const CommitList = ({ owner, repo, branch }) => {
                     icon={<UserOutlined />}
                     style={{ marginRight: '8px' }}
                   />
-                  <Text>{item.author_name || item.commit?.author?.name || 'Unknown'}</Text>
+                  <Text>{item.author_name || 'Unknown'}</Text>
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <ClockCircleOutlined style={{ marginRight: '4px' }} />
-                  <Text>{formatDate(item.author_date || item.commit?.author?.date)}</Text>
+                  <Text>{formatDate(item.date)}</Text>
                 </div>
               </CommitMeta>
             </CommitCard>
           </List.Item>
         )}
       />      <PaginationContainer>
+        <div>
+          <Text type="secondary">
+            Hiển thị {paginatedCommits.length} trong tổng số {totalCommits} commits
+            (Trang {currentPage} / {Math.ceil(totalCommits / pageSize)})
+          </Text>
+        </div>
+        
         <Pagination
           current={currentPage}
           pageSize={pageSize}
-          total={Array.isArray(commits) ? commits.length : 0}
-          onChange={(page) => setCurrentPage(page)}
+          total={totalCommits}
+          onChange={handlePageChange}
           showSizeChanger={false}
           showQuickJumper
-          style={{ marginTop: '20px' }}
+          showTotal={(total, range) => 
+            `${range[0]}-${range[1]} của ${total} commits`
+          }
         />
       </PaginationContainer>
     </div>

@@ -1,11 +1,11 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, func, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, DateTime, func, ForeignKey, BigInteger
 from db.metadata import metadata
 
 pull_requests = Table(
     'pull_requests',
     metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('github_id', Integer, nullable=True),
+    Column('github_id', BigInteger, nullable=True),  # Use BigInteger for GitHub IDs
     Column('title', String(255), nullable=False),
     Column('description', String(255), nullable=True),
     Column('state', String(50), nullable=True),

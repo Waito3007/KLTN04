@@ -1,4 +1,9 @@
 .env
+# GitHub tokens and sensitive data
+test_diff_sync.py
+tokens.txt
+*token*.txt
+
 # Python
 __pycache__/
 *.py[cod]
@@ -21,7 +26,14 @@ __pycache__/
 *.sqlite3
 
 # Large training data files (>50MB)
+backend/ai/models/multifusion/commitanalyst/train.jsonl
+backend/ai/models/multifusion/areaAnalyst/train.jsonl
+backend/ai/models/multifusion/areaAnalyst/train.py
+backend/ai/models/multifusion/areaAnalyst/best_area_classifier.pt
+backend/ai/models/multifusion/riskAnalyst/risk_model.pt
+backend/ai/models/multifusion/riskAnalyst/train.jsonl
 backend/ai/training_data/kaggle_github_commit_messages_dataset_*.json
+backend/ai/multimodal_fusion_network/data/parallel_commits/temp_commits
 backend/ai/training_data/*_large.json
 backend/ai/training_data/*.csv
 backend/ai/training_data/improved_100k_multimodal_training.json
@@ -37,7 +49,6 @@ backend/ai/kaggle_data/**/*.csv
 backend/ai/kaggle_data/**/*.json
 
 # Model files (>50MB)
-backend/ai/models/
 backend/ai/trained_models/
 backend/ai/deployment_packages/
 *.pth
@@ -83,3 +94,22 @@ backend/ai/kaggle_data/oneline.csv
 backend/ai/training_data/improved_100k_multimodal_training.json
 backend/ai/deployment_packages/multimodal_fusion_*/
 backend/ai/trained_models/multimodal_fusion/best_multimodal_fusion_model.pth
+backend/ai/multimodal_fusion_network/data/tokens.txt
+backend/ai/multimodal_fusion_network/data/all_labeled_commits.json
+backend/ai/multimodal_fusion_network/data/all_labeled_commits_with_features.json
+
+backend/ai/multimodal_fusion_network/data/processed/text_processor.json
+backend/ai/multimodal_fusion_network/data/processed/metadata_processor.json
+
+backend/ai/multimodal_fusion_network/data/all_labeled_commits_with_features_encode.json
+backend/ai/multimodal_fusion_network/data/all_labeled_commits_with_features_encode.json.label_map.json
+
+backend/ai/multimodal_fusion_network/data/processed/val.json
+backend/ai/multimodal_fusion_network/data/processed/train.json
+backend/ai/multimodal_fusion_network/data/processed/test.json
+backend/ai/multimodal_fusion_network/data/all_labeled_commits_with_features_optimize.json
+backend/ai/multimodal_fusion_network/data/processed/train.json
+backend/ai/multimodal_fusion_network/data/processed/test.json
+backend/ai/multimodal_fusion_network/data/processed/train.json
+backend/ai/multimodal_fusion_network/data/processed/val.json
+backend/ai/multimodal_fusion_network/all_labeled_commits_with_features_optimize.json

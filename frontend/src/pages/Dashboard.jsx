@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Avatar, Card, Grid, Space, Divider, Badge, message, Spin } from 'antd';
-import { LogoutOutlined, GithubOutlined, NotificationOutlined } from '@ant-design/icons';
+import { LogoutOutlined, GithubOutlined, NotificationOutlined, TeamOutlined, ProjectOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import RepoList from '../components/repo/RepoList';
-import OverviewCard from '../components/Dashboard/OverviewCard';
-import AIInsightWidget from '../components/Dashboard/AIInsightWidget';
-import ProjectTaskManager from '../components/Dashboard/ProjectTaskManager';
-import RepoListFilter from '../components/Dashboard/RepoListFilter';
-import { buildApiUrl } from '../config/api';
-import TaskBoard from '../components/Dashboard/TaskBoard';
 import SyncProgressNotification from '../components/common/SyncProgressNotification';
 import axios from 'axios';
+import RepoDiagnosisPanel from '../components/Dashboard/components/RepoDiagnosisPanel';
+import MemberSkillProfilePanel from '../components/Dashboard/MemberSkill/MemberSkillProfilePanel';
+import DashboardAnalyst from '../components/Dashboard/Dashboard_Analyst/DashboardAnalyst';
+import TaskAssignBoard from '../components/Dashboard/TaskAssign/TaskAssignBoard';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -186,7 +184,105 @@ const Dashboard = () => {
   const [repositories, setRepositories] = useState([]);
   const [repoLoading, setRepoLoading] = useState(true);
 
-  // Pre-fetch repositories từ database ngầm trong nền
+  // AI Model States
+  const [aiModel, setAiModel] = useState('multifusion'); // Default to multifusion
+  const [useAI, setUseAI] = useState(true); // Whether to use AI analysis
+  const [aiModelStatus, setAiModelStatus] = useState(null); // For HAN model status
+  const [multiFusionV2Status, setMultiFusionV2Status] = useState(null); // For MultiFusion V2 model status
+
+  // Commit Analysis States
+  const [selectedRepoId, setSelectedRepoId] = useState(null); // Currently selected repository for analysis
+  const [memberCommits, setMemberCommits] = useState(null); // Analysis for a specific member's commits
+  const [allRepoCommitAnalysis, setAllRepoCommitAnalysis] = useState(null); // Analysis for all repo commits
+  const [commitAnalysisLoading, setCommitAnalysisLoading] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(''); // New state for selected branch
+
+  // Fetch AI model statuses - CHỈ GỌI KHI CẦN THIẾT
+  const fetchModelStatuses = async () => {
+    try {
+      // Fetch HAN model status
+      const hanStatusRes = await axios.get('http://localhost:8000/api/han-commit-analysis/1/model-status');
+      setAiModelStatus(hanStatusRes.data);
+      console.log("HAN Model Status:", hanStatusRes.data);
+
+      // Fetch MultiFusion V2 model status
+      const mfV2StatusRes = await axios.get('http://localhost:8000/api/multifusion-commit-analysis/1/ai/model-v2-status');
+      setMultiFusionV2Status(mfV2StatusRes.data);
+      console.log("MultiFusion V2 Model Status:", mfV2StatusRes.data);
+
+      // Set default AI model based on availability
+      if (mfV2StatusRes.data?.model_info?.is_available) {
+        setAiModel('multifusion');
+      } else if (hanStatusRes.data?.model_loaded) {
+        setAiModel('han');
+      } else {
+        setUseAI(false); // Disable AI if no models are available
+      }
+
+    } catch (error) {
+      console.error('Error fetching AI model statuses:', error);
+      setUseAI(false); // Disable AI on error
+    }
+  };
+
+  // Fetch commit analysis data - CHỈ GỌI KHI USER CHỌN REPO VÀ BẬT AI
+  const fetchCommitAnalysis = async () => {
+    if (!selectedRepoId || !useAI) {
+      setMemberCommits(null);
+      setAllRepoCommitAnalysis(null);
+      return;
+    }
+
+    setCommitAnalysisLoading(true);
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      message.error('Vui lòng đăng nhập lại!');
+      setCommitAnalysisLoading(false);
+      return;
+    }
+
+    try {
+      let memberCommitsData = null;
+      let allRepoCommitsData = null;
+      const defaultMemberLogin = user?.username || 'octocat'; // Placeholder, replace with actual selected member
+
+      if (aiModel === 'han') {
+        // Fetch HAN analysis for a member
+        const hanMemberRes = await axios.get(`http://localhost:8000/api/han-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-han`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        memberCommitsData = hanMemberRes.data.data; // Assuming data is nested under 'data'
+
+      } else if (aiModel === 'multifusion') {
+        // Fetch MultiFusion V2 analysis for a member
+        const mfMemberRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/members/${defaultMemberLogin}/commits-v2`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        memberCommitsData = mfMemberRes.data; // Assuming data is directly the response
+
+        // Fetch MultiFusion V2 analysis for all repo commits
+        const mfAllRepoRes = await axios.get(`http://localhost:8000/api/multifusion-commit-analysis/${selectedRepoId}/commits/all/analysis`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        allRepoCommitsData = mfAllRepoRes.data.analysis; // Assuming data is nested under 'analysis'
+      }
+
+      setMemberCommits(memberCommitsData);
+      setAllRepoCommitAnalysis(allRepoCommitsData);
+      console.log("Fetched Member Commits:", memberCommitsData);
+      console.log("Fetched All Repo Commits:", allRepoCommitsData);
+
+    } catch (error) {
+      console.error('Error fetching commit analysis:', error);
+      message.error('Không thể tải dữ liệu phân tích commit!');
+      setMemberCommits(null);
+      setAllRepoCommitAnalysis(null);
+    } finally {
+      setCommitAnalysisLoading(false);
+    }
+  };
+
+  // Pre-fetch repositories từ database - CHỈ KHI CẦN THIẾT, KHÔNG TỰ ĐỘNG CHỌN REPO
   const preloadRepositoriesFromDB = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
@@ -198,6 +294,10 @@ const Dashboard = () => {
       
       setRepositories(response.data);
       console.log(`Pre-loaded ${response.data.length} repositories from database`);
+      // KHÔNG TỰ ĐỘNG CHỌN REPO - để user tự chọn
+      // if (response.data.length > 0 && selectedRepoId === null) {
+      //   setSelectedRepoId(response.data[0].id);
+      // }
     } catch (error) {
       console.error('Lỗi khi pre-load repositories:', error);
     } finally {
@@ -205,10 +305,13 @@ const Dashboard = () => {
     }
   };
 
-  // Pre-load repositories ngay khi vào Dashboard
+  // Pre-load repositories CHỈ KHI CẦN THIẾT - không tự động
   useEffect(() => {
-    preloadRepositoriesFromDB();
-  }, []);
+    // CHỈ load repositories một lần duy nhất khi component mount
+    if (repositories.length === 0) {
+      preloadRepositoriesFromDB();
+    }
+  }, []); // Chỉ chạy một lần duy nhất
 
   const syncAllRepositories = async () => {
     const token = localStorage.getItem('access_token');
@@ -413,14 +516,25 @@ const Dashboard = () => {
       <MainLayout>        {/* Sidebar bên trái */}
         <Sidebar>
           {/* Overview Metrics trong Sidebar */}
-          <OverviewCard sidebar={true} />
+          {/* <OverviewCard sidebar={true} /> */}
           
           {/* Quick Actions */}
           <SidebarCard 
             title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Thao tác nhanh</SectionTitle>}
             size="small"
           >
-            <Space direction="vertical" style={{ width: '100%' }} size="small">              <Button 
+            <Space direction="vertical" style={{ width: '100%' }} size="small">
+              <Button 
+                type="primary"
+                onClick={() => navigate('/repo-sync')}
+                block
+                size="small"
+                style={{ marginBottom: '8px' }}
+              >
+                Repository Sync Manager
+              </Button>
+              
+              <Button 
                 type="default" 
                 onClick={syncAllRepositories}
                 loading={isSyncing}
@@ -434,32 +548,45 @@ const Dashboard = () => {
             </Space>
           </SidebarCard>
 
-          {/* Activity Summary */}
-          <SidebarCard 
-            title={<SectionTitle level={5} style={{ fontSize: '14px' }}>Hoạt động gần đây</SectionTitle>}
-            size="small"
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="small">
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • Task "Trò game tăng độ khó" đã hoàn thành
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • 2 repositories mới được đồng bộ
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                • AI phân tích 15 commits mới
-              </div>
-            </Space>
-          </SidebarCard>
+          {/* Activity Summary -> Replaced with DashboardAnalyst */}
+          <DashboardAnalyst 
+            selectedRepoId={selectedRepoId}
+            repositories={repositories}
+            onBranchChange={setSelectedBranch}
+          />
         </Sidebar>
 
         {/* Main Content bên phải */}
-        <MainContent>          {/* Project Task Manager - Full Width */}
-          <DashboardCard>
-            <ProjectTaskManager 
+        <MainContent>          
+          {/* Task Assignment Board - Nằm trên cùng */}
+          <DashboardCard 
+            title={
+              <SectionTitle level={5}>
+                <ProjectOutlined />
+                Task Assignment & Management
+              </SectionTitle>
+            }
+          >
+            <TaskAssignBoard 
               repositories={repositories}
               repoLoading={repoLoading}
+              selectedRepoId={selectedRepoId}
+              onRepoChange={(repo) => {
+                console.log('📥 Dashboard: Received repo change:', repo);
+                console.log('📋 Dashboard: Current repositories array:', repositories);
+                const newRepoId = repo?.id || null;
+                console.log('🔄 Dashboard: Setting selectedRepoId to:', newRepoId);
+                setSelectedRepoId(newRepoId);
+              }}
             />
+          </DashboardCard>
+
+          {/* Project Task Manager - Full Width */}
+          <DashboardCard>
+            {/* <ProjectTaskManager  
+              repositories={repositories}
+              repoLoading={repoLoading}
+            /> */}
           </DashboardCard>
 
           {/* Repository Analysis */}
@@ -471,15 +598,34 @@ const Dashboard = () => {
               </SectionTitle>
             }
           >
-            <AIInsightWidget />
+            {/* RepoDiagnosisPanel: Manual diagnosis for selected repo */}
+            <RepoDiagnosisPanel 
+              repositories={repositories}
+              selectedRepoId={selectedRepoId}
+              onRepoChange={repo => setSelectedRepoId(repo?.id)}
+              onBranchChange={setSelectedBranch}
+            />
           </DashboardCard>
 
-          {/* Filters Section */}
+          {/* Member Skill Profiles */}
           <DashboardCard 
-            title={<SectionTitle level={5}>Filters & Settings</SectionTitle>}
+            title={
+              <SectionTitle level={5}>
+                <TeamOutlined />
+                Member Skill Profiles
+              </SectionTitle>
+            }
           >
-            <RepoListFilter onFilterChange={handleFilterChange} />
+            <MemberSkillProfilePanel 
+              repositories={repositories}
+              selectedRepoId={selectedRepoId}
+              selectedBranch={selectedBranch}
+            />
           </DashboardCard>
+
+          
+
+          
 
           {/* Main Content Sections */}
           <ContentSection>
@@ -496,11 +642,7 @@ const Dashboard = () => {
               <RepoList />
             </DashboardCard>
 
-            <DashboardCard 
-              title={<SectionTitle level={5}>Project Tasks</SectionTitle>}
-            >
-              <TaskBoard onStatusChange={handleStatusChange} />
-            </DashboardCard>
+            
           </ContentSection>
         </MainContent>
       </MainLayout>

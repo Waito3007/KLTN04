@@ -30,8 +30,8 @@ apiClient.interceptors.request.use(
     console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     console.log(`🔑 Token exists: ${!!token}`);
     if (token) {
-      config.headers.Authorization = `token ${token}`;
-      console.log(`🔑 Authorization header set: token ${token.substring(0, 10)}...`);
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log(`🔑 Authorization header set: Bearer ${token.substring(0, 10)}...`);
     }
     return config;
   },
@@ -48,15 +48,23 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error(`❌ API Error:`, {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      message: error.message
-    });
-    
+    // Log chi tiết lỗi API
+    if (error.response) {
+      console.error(`❌ API Error:`, {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      // Log thêm chi tiết nếu có
+      if (error.response.data) {
+        console.error('❌ API Error Data:', error.response.data);
+      }
+    } else {
+      console.error('❌ API Error:', error.message || error);
+    }
     if (error.response?.status === 401) {
       message.error('Phiên đăng nhập đã hết hạn');
       // Có thể redirect đến login page
@@ -72,7 +80,7 @@ apiClientLongTimeout.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `token ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -91,6 +99,87 @@ apiClientLongTimeout.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// ==================== SYNC API ====================
+export const syncAPI = {
+  // 🔄 Đồng bộ toàn bộ repository (repo, branches, commits, issues, PRs)
+  syncAll: async (owner, repoName) => {
+    console.log(`🔄 Starting complete sync for ${owner}/${repoName}`);
+    try {
+      const response = await apiClientLongTimeout.post(`/github/${owner}/${repoName}/sync-all`);
+      console.log('✅ Complete sync response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Complete sync error:', error);
+      throw error;
+    }
+  },
+
+  // 🔄 Đồng bộ cơ bản (chỉ repository info)
+  syncBasic: async (owner, repoName) => {
+    console.log(`🔄 Starting basic sync for ${owner}/${repoName}`);
+    try {
+      const response = await apiClientLongTimeout.post(`/github/${owner}/${repoName}/sync-basic`);
+      console.log('✅ Basic sync response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Basic sync error:', error);
+      throw error;
+    }
+  },
+
+  // 🔄 Đồng bộ nâng cao (repo + branches với thông tin chi tiết)
+  syncEnhanced: async (owner, repoName) => {
+    console.log(`🔄 Starting enhanced sync for ${owner}/${repoName}`);
+    try {
+      const response = await apiClientLongTimeout.post(`/github/${owner}/${repoName}/sync-enhanced`);
+      console.log('✅ Enhanced sync response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Enhanced sync error:', error);
+      throw error;
+    }
+  },
+
+  // 📊 Kiểm tra trạng thái GitHub API
+  checkGitHubStatus: async () => {
+    console.log('🔍 Checking GitHub API status');
+    try {
+      const response = await apiClient.get('/github/status');
+      console.log('📊 GitHub status response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ GitHub status check error:', error);
+      throw error;
+    }
+  },
+
+  // 📋 Lấy danh sách repositories
+  getRepositories: async (perPage = 30, page = 1) => {
+    console.log('📋 Getting user repositories from GitHub');
+    try {
+      const response = await apiClient.get(`/github/repositories?per_page=${perPage}&page=${page}`);
+      console.log('📋 Repositories response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Get repositories error:', error);
+      throw error;
+    }
+  },
+
+  // 📊 Lấy thống kê repository
+  getRepositoryStats: async (owner, repoName) => {
+    console.log(`📊 Getting repository stats for ${owner}/${repoName}`);
+    try {
+      const response = await apiClient.get(`/github/${owner}/${repoName}/stats`);
+      console.log('📊 Repository stats response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Repository stats error:', error);
+      throw error;
+    }
+  }
+};
 
 // ==================== REPOSITORY API ====================
 export const repositoryAPI = {  // Lấy repos từ database (requires authentication to filter by user)
@@ -190,6 +279,14 @@ export const taskAPI = {
     return response.data;
   },
 
+  // Cập nhật trạng thái task
+  updateTaskStatus: async (taskId, newStatus) => {
+    const response = await apiClient.patch(`/tasks/${taskId}/status`, {
+      status: newStatus
+    });
+    return response;
+  },
+
   // Xóa task
   delete: async (owner, repoName, taskId) => {
     await apiClient.delete(`/projects/${owner}/${repoName}/tasks/${taskId}`);
@@ -237,6 +334,131 @@ export const branchAPI = {  // 🌿 Lấy branches từ database
     console.log(`🔄 Syncing branches for ${owner}/${repoName}`);
     const response = await apiClientLongTimeout.post(`/github/${owner}/${repoName}/sync-branches`);
     console.log('✅ Branch sync response:', response.data);
+    return response.data;
+  }
+};
+
+// ==================== ASSIGNMENT RECOMMENDATION API ====================
+export const assignmentRecommendationAPI = {
+  // 🎯 Lấy kỹ năng của các thành viên (simplified endpoint)
+  getMemberSkills: async (owner, repoName) => {
+    console.log(`🔍 Getting member skills for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/member-skills-simple/${owner}/${repoName}`);
+    console.log('🎯 Member skills response:', response.data);
+    return response.data;
+  },
+
+  // 🤖 Lấy gợi ý phân công cho task
+  getRecommendations: async (owner, repoName, taskDescription, requiredSkills = [], maxRecommendations = 3) => {
+    console.log(`🤖 Getting recommendations for task: "${taskDescription}"`);
+    const response = await apiClient.post(`/assignment-recommendation/recommend/${owner}/${repoName}`, {
+      task_description: taskDescription,
+      required_skills: requiredSkills,
+      max_recommendations: maxRecommendations
+    });
+    console.log('🤖 Recommendations response:', response.data);
+    return response.data;
+  },
+
+  // ⚖️ Phân công thông minh với cân bằng workload (simplified endpoint)
+  getSmartAssignment: async (owner, repoName, taskDescription, requiredSkills = [], considerWorkload = true) => {
+    console.log(`⚖️ Getting smart assignment for task: "${taskDescription}"`);
+    const response = await apiClient.post(`/assignment-recommendation/smart-assign-simple/${owner}/${repoName}`, {
+      task_description: taskDescription,
+      required_skills: requiredSkills,
+      consider_workload: considerWorkload
+    });
+    console.log('⚖️ Smart assignment response:', response.data);
+    return response.data;
+  },
+
+  // 📊 Lấy insights về team
+  getTeamInsights: async (owner, repoName) => {
+    console.log(`📊 Getting team insights for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/team-insights/${owner}/${repoName}`);
+    console.log('📊 Team insights response:', response.data);
+    return response.data;
+  },
+
+  // 📈 Lấy phân tích workload
+  getWorkloadAnalysis: async (owner, repoName) => {
+    console.log(`📈 Getting workload analysis for ${owner}/${repoName}`);
+    const response = await apiClient.get(`/assignment-recommendation/workload-analysis/${owner}/${repoName}`);
+    console.log('📈 Workload analysis response:', response.data);
+    return response.data;
+  },
+
+  // 🔍 Lấy chi tiết kỹ năng của một thành viên
+  getMemberSkillDetails: async (owner, repoName, username) => {
+    console.log(`🔍 Getting skill details for member: ${username}`);
+    const response = await apiClient.get(`/assignment-recommendation/member-skills/${owner}/${repoName}/${username}`);
+    console.log('🔍 Member skill details response:', response.data);
+    return response.data;
+  }
+};
+
+// Repository Sync Manager API
+export const repoSyncAPI = {
+  // Get sync status for all repositories
+  getSyncStatus: async () => {
+    console.log('📊 Getting repositories sync status');
+    const response = await apiClient.get('/repositories/sync-status');
+    console.log('📊 Sync status response:', response.data);
+    return response.data;
+  },
+
+  // Get user repositories from GitHub
+  getUserRepositories: async (page = 1, perPage = 30) => {
+    console.log(`📚 Getting user repositories (page ${page})`);
+    const response = await apiClient.get(`/github/user/repositories?page=${page}&per_page=${perPage}`);
+    console.log('📚 User repositories response:', response.data);
+    return response.data;
+  },
+
+  // Sync single repository
+  syncRepository: async (owner, repo, syncType = 'optimized') => {
+    console.log(`🔄 Syncing repository ${owner}/${repo} with type ${syncType}`);
+    // Map sync types to actual backend endpoints
+    let endpoint;
+    switch (syncType) {
+      case 'basic':
+        endpoint = `/github/${owner}/${repo}/sync-basic`;
+        break;
+      case 'enhanced':
+        endpoint = `/github/${owner}/${repo}/sync-enhanced`;
+        break;
+      case 'optimized':
+      default:
+        endpoint = `/github/${owner}/${repo}/sync-all`;
+        break;
+    }
+    
+    const response = await apiClientLongTimeout.post(endpoint);
+    console.log('🔄 Sync response:', response.data);
+    return response.data;
+  },
+
+  // Get sync events for a repository
+  getRepoEvents: async (owner, repo) => {
+    console.log(`📈 Getting sync events for ${owner}/${repo}`);
+    const response = await apiClient.get(`/sync-events/repositories/${owner}/${repo}/events`);
+    console.log('📈 Repo events response:', response.data);
+    return response.data;
+  },
+
+  // Get all sync events
+  getAllSyncEvents: async () => {
+    console.log('📈 Getting all sync events');
+    const response = await apiClient.get('/sync-events/sync-events');
+    console.log('📈 All sync events response:', response.data);
+    return response.data;
+  },
+
+  // Clear sync events for a repository
+  clearRepoEvents: async (owner, repo) => {
+    console.log(`🗑️ Clearing sync events for ${owner}/${repo}`);
+    const response = await apiClient.delete(`/sync-events/repositories/${owner}/${repo}/events`);
+    console.log('🗑️ Clear events response:', response.data);
     return response.data;
   }
 };

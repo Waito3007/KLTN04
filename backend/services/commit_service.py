@@ -3,55 +3,364 @@ from db.database import database
 from sqlalchemy import select, insert, update, and_
 from datetime import datetime, timezone
 import logging
+from typing import Dict, List, Optional, Any
+from utils.commit_analyzer import CommitAnalyzer
+from utils.datetime_utils import normalize_github_datetime, normalize_datetime
+import httpx
+import asyncio
 
 logger = logging.getLogger(__name__)
 
+# Backward compatibility - deprecated functions
 def parse_github_datetime(date_str):
     """Convert GitHub API datetime string to Python datetime object (timezone-naive UTC)"""
-    if not date_str:
+    logger.warning("parse_github_datetime is deprecated, use normalize_github_datetime instead")
+    return normalize_github_datetime(date_str)
+
+async def get_commit_diff(owner: str, repo: str, sha: str, github_token: str = None) -> Optional[str]:
+    """
+    Lấy diff của commit từ GitHub API với retry mechanism
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        github_token: GitHub token để authentication
+        
+    Returns:
+        Diff content dạng string hoặc None nếu thất bại
+    """
+    # Validate SHA length
+    if not sha or len(sha) < 7:
+        logger.error(f"Invalid SHA: {sha} (too short)")
         return None
     
+    if len(sha) > 64:
+        logger.error(f"Invalid SHA: {sha} (too long)")
+        return None
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            headers = {
+                "Accept": "application/vnd.github.v3.diff",
+                "User-Agent": "GitSync-App/1.0"
+            }
+            if github_token:
+                headers["Authorization"] = f"token {github_token}"
+
+            url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+            logger.debug(f"Requesting diff from: {url}")
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(url, headers=headers)
+                
+                if response.status_code == 200:
+                    diff_content = response.text
+                    logger.info(f"Successfully retrieved diff for commit {sha} ({len(diff_content)} chars)")
+                    return diff_content
+                elif response.status_code == 404:
+                    logger.warning(f"Commit {sha} not found")
+                    return None
+                elif response.status_code == 403:
+                    logger.warning(f"Access denied for commit {sha} (rate limit or permissions)")
+                    if attempt < max_retries - 1:
+                        wait_time = 2 ** attempt  # Exponential backoff
+                        logger.info(f"Retrying in {wait_time} seconds (attempt {attempt + 1}/{max_retries})")
+                        await asyncio.sleep(wait_time)
+                        continue
+                    return None
+                else:
+                    logger.warning(f"Failed to get diff for commit {sha}: HTTP {response.status_code} - {response.text[:200]}")
+                    return None
+                    
+        except httpx.TimeoutException as e:
+            logger.error(f"Timeout getting diff for commit {sha} (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(2)
+                continue
+            return None
+        except httpx.HTTPError as e:
+            logger.error(f"HTTP error getting diff for commit {sha} (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(2)
+                continue
+            return None
+        except Exception as e:
+            logger.error(f"Error getting diff for commit {sha}: {e}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Exception details: {str(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+    
+    return None
+
+async def get_commit_files(owner: str, repo: str, sha: str, github_token: str = None) -> List[Dict]:
+    """
+    Lấy danh sách files thay đổi trong commit
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        github_token: GitHub token để authentication
+        
+    Returns:
+        List các file changes hoặc empty list nếu thất bại
+    """
     try:
-        # GitHub datetime format: 2021-03-06T14:28:54Z
-        if date_str.endswith('Z'):
-            date_str = date_str[:-1] + '+00:00'  # Replace Z with +00:00 for proper parsing
-        
-        # Parse as timezone-aware datetime first
-        dt_aware = datetime.fromisoformat(date_str)
-        
-        # Convert to UTC and make timezone-naive for database storage
-        dt_utc = dt_aware.astimezone(timezone.utc)
-        return dt_utc.replace(tzinfo=None)
-        
-    except (ValueError, AttributeError) as e:
-        logger.warning(f"Failed to parse datetime '{date_str}': {e}")
-        return None
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "GitSync-App/1.0"
+        }
+        if github_token:
+            headers["Authorization"] = f"token {github_token}"
 
-def normalize_datetime(dt):
-    """Normalize datetime to timezone-naive UTC for consistent database storage"""
-    if dt is None:
-        return None
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                files = data.get('files', [])
+                logger.info(f"Successfully retrieved {len(files)} files for commit {sha}")
+                return files
+            elif response.status_code == 404:
+                logger.warning(f"Commit {sha} not found")
+                return []
+            elif response.status_code == 403:
+                logger.warning(f"Access denied for commit {sha} (rate limit or permissions)")
+                return []
+            else:
+                logger.warning(f"Failed to get files for commit {sha}: HTTP {response.status_code}")
+                return []
+                
+    except Exception as e:
+        logger.error(f"Error getting files for commit {sha}: {e}")
+        return []
+
+async def save_commit_with_diff(commit_data: dict, owner: str, repo: str, github_token: str = None, force_update: bool = False) -> Optional[int]:
+    """
+    Lưu commit kèm theo diff và file changes
     
-    if dt.tzinfo is not None:
-        # Convert timezone-aware to UTC and make timezone-naive
-        return dt.astimezone(timezone.utc).replace(tzinfo=None)
-    else:
-        # Already timezone-naive, assume it's UTC
-        return dt
+    Args:
+        commit_data: Commit data từ GitHub API
+        owner: Owner của repository
+        repo: Tên repository 
+        github_token: GitHub token để lấy diff
+        force_update: Có update commit đã tồn tại không
+        
+    Returns:
+        Commit ID hoặc None nếu thất bại
+    """
+    try:
+        commit_sha = commit_data.get("sha", "")
+        if not commit_sha:
+            logger.error("Missing commit SHA")
+            return None
+            
+        # Kiểm tra commit đã tồn tại chưa
+        query = select(commits).where(commits.c.sha == commit_sha)
+        existing_commit = await database.fetch_one(query)
+        
+        # Quyết định có cần cập nhật không dựa trên:
+        # 1. force_update = True -> luôn cập nhật
+        # 2. commit chưa có diff_content -> cập nhật để lấy diff_content
+        should_update = force_update or (existing_commit and not existing_commit.diff_content)
+        
+        if existing_commit and not should_update:
+            logger.info(f"Commit {commit_sha} already exists with diff_content, skipping")
+            return existing_commit.id
+        
+        # Lấy diff content và files từ GitHub API
+        diff_content = None
+        files_data = []
+        
+        if github_token:  # Chỉ lấy diff nếu có token
+            try:
+                diff_content = await get_commit_diff(owner, repo, commit_sha, github_token)
+                files_data = await get_commit_files(owner, repo, commit_sha, github_token)
+                
+                # Rate limiting để tránh spam GitHub API
+                await asyncio.sleep(0.1)
+                
+            except Exception as e:
+                logger.warning(f"Failed to get diff/files for commit {commit_sha}: {e}")
+        
+        # Extract commit info
+        commit_info = commit_data.get("commit", {}) or commit_data
+        author_info = commit_info.get("author", {})
+        committer_info = commit_info.get("committer", {})
+        
+        # Normalize datetime fields
+        author_date = normalize_github_datetime(author_info.get("date"))
+        committer_date = normalize_github_datetime(committer_info.get("date"))
+        
+        # Calculate stats từ files_data nếu có, không thì dùng từ commit_data
+        additions = 0
+        deletions = 0
+        total_changes = 0
+        files_changed_count = 0
+        modified_files_list = []
+        file_types_dict = {}
+        modified_directories_dict = {}
+        
+        if files_data:
+            # Ensure all values are numeric, convert None to 0
+            additions = sum((f.get('additions') or 0) for f in files_data)
+            deletions = sum((f.get('deletions') or 0) for f in files_data)
+            total_changes = sum((f.get('changes') or 0) for f in files_data)
+            files_changed_count = len(files_data)
+            
+            # Extract modified files list
+            modified_files_list = [f.get('filename', '') for f in files_data if f.get('filename')]
+            
+            # Extract file types
+            for file in files_data:
+                filename = file.get('filename', '')
+                if '.' in filename:
+                    ext = filename.split('.')[-1].lower()
+                    file_types_dict[ext] = file_types_dict.get(ext, 0) + 1
+            
+            # Extract modified directories
+            for file in files_data:
+                filename = file.get('filename', '')
+                if '/' in filename:
+                    directory = '/'.join(filename.split('/')[:-1])
+                    modified_directories_dict[directory] = modified_directories_dict.get(directory, 0) + 1
+        else:
+            # Fallback to commit_data
+            stats = commit_data.get("stats", {})
+            additions = stats.get("additions", 0) or 0
+            deletions = stats.get("deletions", 0) or 0
+            total_changes = stats.get("total", additions + deletions) or (additions + deletions)
+            files_changed_count = len(commit_data.get("files", []))
+        
+        # Ensure values are not None
+        additions = additions or 0
+        deletions = deletions or 0
+        total_changes = total_changes or 0
+        files_changed_count = files_changed_count or 0
+        
+        # Analyze commit message for change type (using existing field)
+        message = commit_info.get("message", "")
+        change_type = "unknown"
+        if any(word in message.lower() for word in ["feat", "feature", "add"]):
+            change_type = "feature"
+        elif any(word in message.lower() for word in ["fix", "bug", "patch"]):
+            change_type = "bugfix"
+        elif any(word in message.lower() for word in ["refactor", "refact", "clean"]):
+            change_type = "refactor"
+        elif any(word in message.lower() for word in ["docs", "doc", "readme"]):
+            change_type = "docs"
+        elif any(word in message.lower() for word in ["test", "spec"]):
+            change_type = "test"
+        
+        # Categorize commit size (using existing field)
+        commit_size = "small"
+        # Ensure total_changes is not None and is a valid number
+        if total_changes is not None and isinstance(total_changes, (int, float)) and total_changes > 100:
+            commit_size = "large"
+        elif total_changes is not None and isinstance(total_changes, (int, float)) and total_changes > 20:
+            commit_size = "medium"
+        
+        # Prepare commit entry using only existing model fields
+        commit_entry = {
+            "sha": commit_sha,
+            "message": message,
+            "author_name": author_info.get("name", ""),
+            "author_email": author_info.get("email", ""),
+            "committer_name": committer_info.get("name", ""),
+            "committer_email": committer_info.get("email", ""),
+            "repo_id": commit_data.get("repo_id"),
+            "branch_name": commit_data.get("branch_name"),
+            "date": author_date,
+            "committer_date": committer_date,
+            "insertions": additions,
+            "deletions": deletions,
+            "files_changed": files_changed_count,
+            "total_changes": total_changes,
+            "change_type": change_type,
+            "commit_size": commit_size,
+            "modified_files": modified_files_list,
+            "file_types": file_types_dict,
+            "modified_directories": modified_directories_dict,
+            "diff_content": diff_content,
+            "parent_sha": ",".join([p.get("sha", "") for p in commit_data.get("parents", [])])
+        }
+        
+        if existing_commit:
+            # Update existing commit (khi force_update=True hoặc chưa có diff_content)
+            update_query = (
+                update(commits)
+                .where(commits.c.sha == commit_sha)
+                .values(commit_entry)
+            )
+            await database.execute(update_query)
+            
+            if not existing_commit.diff_content and diff_content:
+                logger.info(f"Updated commit {commit_sha} to add missing diff_content ({len(diff_content)} chars)")
+            else:
+                logger.info(f"Updated commit {commit_sha} with diff ({len(diff_content or '')} chars)")
+            
+            return existing_commit.id
+        else:
+            # Insert new commit
+            insert_query = insert(commits).values(commit_entry)
+            commit_id = await database.execute(insert_query)
+            logger.info(f"Saved new commit {commit_sha} with diff ({len(diff_content or '')} chars)")
+            return commit_id
+            
+    except Exception as e:
+        logger.error(f"Error saving commit {commit_data.get('sha', 'Unknown')}: {e}")
+        return None
 
-async def save_commit(commit_data):
-    """Save commit with full data model support including new fields"""
+# lưu commit 
+async def save_commit(commit_data, force_update=False):
+    """
+    Save commit with full data model support including enhanced analysis
+    
+    Args:
+        commit_data: Commit data to save
+        force_update: If True, update existing commit with new data
+    
+    Returns:
+        int: Commit ID
+    """
     try:
         # Kiểm tra commit đã tồn tại chưa
         query = select(commits).where(commits.c.sha == commit_data["sha"])
         existing_commit = await database.fetch_one(query)
 
-        if existing_commit:
-            logger.info(f"Commit {commit_data['sha']} already exists, skipping")
-            return existing_commit.id        # Prepare full commit entry with all model fields
+        # Extract enhanced metadata using analyzer
+        enhanced_metadata = {}
+        if commit_data.get("files") or commit_data.get("stats"):
+            enhanced_metadata = CommitAnalyzer.extract_commit_metadata(commit_data)
+        
+        # Use GitHub API data if available, otherwise use analyzer
+        additions = commit_data.get("additions") or commit_data.get("stats", {}).get("additions", 0)
+        deletions = commit_data.get("deletions") or commit_data.get("stats", {}).get("deletions", 0)
+        total_changes = commit_data.get("total_changes") or (additions + deletions)
+        files_changed = commit_data.get("files_changed") or enhanced_metadata.get("files_changed", 0)
+        
+        # Use GitHub API metadata if available
+        modified_files = commit_data.get("modified_files") or enhanced_metadata.get("modified_files", [])
+        file_types = commit_data.get("file_types") or enhanced_metadata.get("file_types", {})
+        modified_directories = commit_data.get("modified_directories") or enhanced_metadata.get("modified_directories", {})
+        is_merge = commit_data.get("is_merge", False)
+        
+        # Analyze commit message for change type
+        message = commit_data.get("message", "")
+        change_type = CommitAnalyzer.detect_change_type(message)
+        # Ensure total_changes is valid before passing to categorize_commit_size
+        commit_size = CommitAnalyzer.categorize_commit_size(total_changes if total_changes is not None else 0)
+
+        # Prepare full commit entry with all model fields including enhanced fields
         commit_entry = {
             "sha": commit_data["sha"],
-            "message": commit_data.get("message", ""),
+            "message": message,
             "author_name": commit_data.get("author_name", ""),
             "author_email": commit_data.get("author_email", ""),
             "committer_name": commit_data.get("committer_name"),
@@ -61,18 +370,43 @@ async def save_commit(commit_data):
             "branch_name": commit_data.get("branch_name"),
             "author_role_at_commit": commit_data.get("author_role_at_commit"),
             "author_permissions_at_commit": commit_data.get("author_permissions_at_commit"),
-            "date": normalize_datetime(parse_github_datetime(commit_data.get("date"))),
-            "committer_date": normalize_datetime(parse_github_datetime(commit_data.get("committer_date"))),
-            "insertions": commit_data.get("insertions"),
-            "deletions": commit_data.get("deletions"),
-            "files_changed": commit_data.get("files_changed"),
+            "date": normalize_github_datetime(commit_data.get("date")),
+            "committer_date": normalize_github_datetime(commit_data.get("committer_date")),
+            "insertions": additions,
+            "deletions": deletions,
+            "files_changed": files_changed,
             "parent_sha": commit_data.get("parent_sha"),
-            "is_merge": commit_data.get("is_merge", False),
+            "is_merge": is_merge,
             "merge_from_branch": commit_data.get("merge_from_branch"),
-            # author_user_id và committer_user_id sẽ được resolve sau nếu có user mapping
+            # Enhanced fields from GitHub API
+            "modified_files": modified_files,
+            "file_types": file_types,
+            "modified_directories": modified_directories,
+            "total_changes": total_changes,
+            "change_type": change_type,
+            "commit_size": commit_size,
+            # User IDs sẽ được resolve sau nếu có user mapping
             "author_user_id": commit_data.get("author_user_id"),
             "committer_user_id": commit_data.get("committer_user_id"),
+            "diff_content": commit_data.get("diff_content"),
         }
+
+        if existing_commit:
+            if force_update:
+                # Update existing commit with new enhanced metadata
+                # Add last_synced timestamp
+                commit_entry["last_synced"] = datetime.utcnow()
+                
+                update_query = update(commits).where(
+                    commits.c.sha == commit_data["sha"]
+                ).values(commit_entry)
+                
+                await database.execute(update_query)
+                logger.info(f"Updated existing commit: {commit_data['sha']} with enhanced metadata")
+                return existing_commit.id
+            else:
+                logger.info(f"Commit {commit_data['sha']} already exists, skipping")
+                return existing_commit.id
 
         # Chèn commit mới
         query = insert(commits).values(commit_entry)
@@ -84,7 +418,7 @@ async def save_commit(commit_data):
         logger.error(f"Error saving commit {commit_data.get('sha')}: {e}")
         raise e
 
-async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: str = None, branch_id: int = None):
+async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: str = None, branch_id: int = None, force_update: bool = False):
     """
     Batch save multiple commits efficiently
     
@@ -93,28 +427,36 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
         repo_id: Repository ID
         branch_name: Branch name (optional)
         branch_id: Branch ID (optional)
+        force_update: If True, update existing commits with new data
     
     Returns:
-        int: Number of commits saved
+        int: Number of commits saved or updated
     """
     if not commits_data:
         return 0
     
     # Prepare batch data
-    batch_data = []
-    existing_shas = set()
+    new_commits = []
+    existing_commits = {}
+    update_count = 0
     
-    # Check existing commits to avoid duplicates
+    # Get all SHAs from the data
     shas = [commit.get("sha") for commit in commits_data if commit.get("sha")]
-    if shas:
-        query = select(commits.c.sha).where(commits.c.sha.in_(shas))
-        existing_results = await database.fetch_all(query)
-        existing_shas = {row.sha for row in existing_results}
+    if not shas:
+        return 0
+    
+    # Check existing commits
+    query = select(commits).where(commits.c.sha.in_(shas))
+    existing_results = await database.fetch_all(query)
+    
+    # Map existing commits by SHA for quick lookup
+    for row in existing_results:
+        existing_commits[row.sha] = row
     
     # Process commits data
     for commit_data in commits_data:
         sha = commit_data.get("sha")
-        if not sha or sha in existing_shas:
+        if not sha:
             continue
         
         # Extract commit info from GitHub API response
@@ -122,14 +464,31 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
         author_info = commit_info.get("author", {})
         committer_info = commit_info.get("committer", {})
         stats = commit_data.get("stats", {})
-          # Check if this is a merge commit
+        
+        # Enhanced analysis for each commit
+        enhanced_metadata = {}
+        if commit_data.get("files") or stats:
+            enhanced_metadata = CommitAnalyzer.extract_commit_metadata(commit_data)
+        
+        # Calculate enhanced statistics
+        additions = stats.get("additions", 0)
+        deletions = stats.get("deletions", 0)
+        total_changes = additions + deletions
+        
+        # Analyze commit message
+        message = commit_info.get("message", "")
+        change_type = CommitAnalyzer.detect_change_type(message)
+        # Ensure total_changes is valid before passing to categorize_commit_size
+        commit_size = CommitAnalyzer.categorize_commit_size(total_changes if total_changes is not None else 0)
+        
+        # Check if this is a merge commit
         parents = commit_data.get("parents", [])
         is_merge = len(parents) > 1
         parent_sha = parents[0].get("sha") if parents else None
         
         commit_entry = {
             "sha": sha,
-            "message": commit_info.get("message", ""),
+            "message": message,
             "author_name": author_info.get("name", ""),
             "author_email": author_info.get("email", ""),
             "committer_name": committer_info.get("name"),
@@ -139,23 +498,48 @@ async def save_multiple_commits(commits_data: list, repo_id: int, branch_name: s
             "branch_name": branch_name,
             "date": normalize_datetime(parse_github_datetime(author_info.get("date"))),
             "committer_date": normalize_datetime(parse_github_datetime(committer_info.get("date"))),
-            "insertions": stats.get("additions"),
-            "deletions": stats.get("deletions"),
-            "files_changed": len(commit_data.get("files", [])) if commit_data.get("files") else None,
+            "insertions": additions,
+            "deletions": deletions,
+            "files_changed": enhanced_metadata.get("files_changed") or len(commit_data.get("files", [])) if commit_data.get("files") else None,
             "parent_sha": parent_sha,
             "is_merge": is_merge,
+            # Enhanced fields
+            "modified_files": enhanced_metadata.get("modified_files"),
+            "file_types": enhanced_metadata.get("file_types"),
+            "modified_directories": enhanced_metadata.get("modified_directories"),
+            "total_changes": total_changes,
+            "change_type": change_type,
+            "commit_size": commit_size,
+            "last_synced": datetime.utcnow(),
+            "diff_content": commit_data.get("diff_content"),
             # User IDs và permissions sẽ được resolve sau nếu có user service
         }
         
-        batch_data.append(commit_entry)
+        if sha in existing_commits:
+            if force_update:
+                # Update existing commit
+                update_query = update(commits).where(
+                    commits.c.sha == sha
+                ).values(commit_entry)
+                await database.execute(update_query)
+                update_count += 1
+                logger.info(f"Updated existing commit: {sha} with enhanced metadata")
+            else:
+                logger.debug(f"Commit {sha} already exists, skipping")
+        else:
+            # Add to new commits batch
+            new_commits.append(commit_entry)
     
-    # Batch insert
-    if batch_data:
+    # Batch insert new commits
+    if new_commits:
         query = commits.insert()
-        await database.execute_many(query, batch_data)
-        logger.info(f"Batch saved {len(batch_data)} commits for repo_id {repo_id}")
+        await database.execute_many(query, new_commits)
+        logger.info(f"Batch saved {len(new_commits)} new commits for repo_id {repo_id}")
     
-    return len(batch_data)
+    # Return total number of inserts and updates
+    total_processed = len(new_commits) + update_count
+    logger.info(f"Total processed: {total_processed} ({len(new_commits)} new, {update_count} updated)")
+    return total_processed
 
 async def get_commits_by_repo_id(repo_id: int, limit: int = 100, offset: int = 0):
     """Get commits by repository ID with pagination"""
@@ -233,7 +617,7 @@ async def update_commit_user_mapping(sha: str, author_user_id: int = None, commi
     if update_data:
         query = update(commits).where(commits.c.sha == sha).values(**update_data)
         result = await database.execute(query)
-        return result > 0
+        return result is not None and result > 0
     
     return False
 
@@ -429,3 +813,219 @@ async def validate_and_fix_commit_branch_consistency(repo_id: int):
     except Exception as e:
         logger.error(f"❌ Error validating commit-branch consistency: {e}")
         return 0
+
+async def get_enhanced_commit_statistics(repo_id: int, branch_name: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Get enhanced commit statistics including file type distributions and change analysis
+    
+    Args:
+        repo_id: Repository ID
+        branch_name: Optional branch name filter
+        
+    Returns:
+        Dictionary with comprehensive commit statistics
+    """
+    try:
+        from sqlalchemy import func, desc
+        
+        # Base query
+        base_query = select(commits).where(commits.c.repo_id == repo_id)
+        if branch_name:
+            base_query = base_query.where(commits.c.branch_name == branch_name)
+        
+        # Get all commits for analysis
+        all_commits = await database.fetch_all(base_query)
+        
+        if not all_commits:
+            return {
+                "total_commits": 0,
+                "message": "No commits found"
+            }
+        
+        # Calculate basic statistics
+        total_commits = len(all_commits)
+        total_additions = sum(c.insertions or 0 for c in all_commits)
+        total_deletions = sum(c.deletions or 0 for c in all_commits)
+        total_files_changed = sum(c.files_changed or 0 for c in all_commits)
+        
+        # Aggregate enhanced statistics
+        file_type_distribution = {}
+        directory_distribution = {}
+        commit_size_distribution = {}
+        change_type_distribution = {}
+        language_distribution = {}
+        
+        for commit in all_commits:
+            # File types
+            if commit.file_types:
+                for file_type, count in commit.file_types.items():
+                    file_type_distribution[file_type] = file_type_distribution.get(file_type, 0) + count
+            
+            # Directories
+            if commit.modified_directories:
+                for directory, count in commit.modified_directories.items():
+                    directory_distribution[directory] = directory_distribution.get(directory, 0) + count
+            
+            # Commit sizes
+            if commit.commit_size:
+                commit_size_distribution[commit.commit_size] = commit_size_distribution.get(commit.commit_size, 0) + 1
+            
+            # Change types
+            if commit.change_type:
+                change_type_distribution[commit.change_type] = change_type_distribution.get(commit.change_type, 0) + 1
+        
+        # Calculate averages
+        avg_additions = total_additions / total_commits if total_commits > 0 else 0
+        avg_deletions = total_deletions / total_commits if total_commits > 0 else 0
+        avg_files_changed = total_files_changed / total_commits if total_commits > 0 else 0
+        
+        # Get top contributors
+        contributor_stats = {}
+        for commit in all_commits:
+            author = commit.author_name
+            if author:
+                if author not in contributor_stats:
+                    contributor_stats[author] = {
+                        "commits": 0,
+                        "additions": 0,
+                        "deletions": 0,
+                        "files_changed": 0
+                    }
+                contributor_stats[author]["commits"] += 1
+                contributor_stats[author]["additions"] += commit.insertions or 0
+                contributor_stats[author]["deletions"] += commit.deletions or 0
+                contributor_stats[author]["files_changed"] += commit.files_changed or 0
+        
+        # Sort contributors by commit count
+        top_contributors = sorted(
+            contributor_stats.items(),
+            key=lambda x: x[1]["commits"],
+            reverse=True
+        )[:10]
+        
+        return {
+            "repository_id": repo_id,
+            "branch_name": branch_name,
+            "total_commits": total_commits,
+            "code_statistics": {
+                "total_additions": total_additions,
+                "total_deletions": total_deletions,
+                "total_files_changed": total_files_changed,
+                "average_additions_per_commit": round(avg_additions, 2),
+                "average_deletions_per_commit": round(avg_deletions, 2),
+                "average_files_changed_per_commit": round(avg_files_changed, 2)
+            },
+            "distributions": {
+                "file_types": dict(sorted(file_type_distribution.items(), key=lambda x: x[1], reverse=True)),
+                "directories": dict(sorted(directory_distribution.items(), key=lambda x: x[1], reverse=True)),
+                "commit_sizes": commit_size_distribution,
+                "change_types": change_type_distribution
+            },
+            "top_contributors": [
+                {
+                    "name": name,
+                    "stats": stats
+                }
+                for name, stats in top_contributors
+            ],
+            "analysis_metadata": {
+                "analyzed_at": datetime.utcnow().isoformat(),
+                "total_records_analyzed": total_commits
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced commit statistics: {e}")
+        raise e
+
+async def analyze_commit_trends(repo_id: int, days: int = 30) -> Dict[str, Any]:
+    """
+    Analyze commit trends over time
+    
+    Args:
+        repo_id: Repository ID
+        days: Number of days to analyze
+        
+    Returns:
+        Dictionary with trend analysis
+    """
+    try:
+        from sqlalchemy import func
+        from datetime import timedelta
+        
+        # Calculate date range
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=days)
+        
+        # Get commits in date range
+        query = select(commits).where(
+            and_(
+                commits.c.repo_id == repo_id,
+                commits.c.date >= start_date,
+                commits.c.date <= end_date
+            )
+        ).order_by(commits.c.date.desc())
+        
+        recent_commits = await database.fetch_all(query)
+        
+        if not recent_commits:
+            return {
+                "period_days": days,
+                "commits_found": 0,
+                "message": "No commits found in the specified period"
+            }
+        
+        # Group by day
+        daily_stats = {}
+        for commit in recent_commits:
+            day_key = commit.date.date().isoformat()
+            
+            if day_key not in daily_stats:
+                daily_stats[day_key] = {
+                    "commit_count": 0,
+                    "additions": 0,
+                    "deletions": 0,
+                    "files_changed": 0,
+                    "contributors": set()
+                }
+            
+            daily_stats[day_key]["commit_count"] += 1
+            daily_stats[day_key]["additions"] += commit.insertions or 0
+            daily_stats[day_key]["deletions"] += commit.deletions or 0
+            daily_stats[day_key]["files_changed"] += commit.files_changed or 0
+            daily_stats[day_key]["contributors"].add(commit.author_name)
+        
+        # Convert sets to counts and sort by date
+        formatted_daily_stats = {}
+        for day, stats in daily_stats.items():
+            formatted_daily_stats[day] = {
+                **stats,
+                "unique_contributors": len(stats["contributors"])
+            }
+            del formatted_daily_stats[day]["contributors"]
+        
+        # Sort by date
+        sorted_daily_stats = dict(sorted(formatted_daily_stats.items()))
+        
+        # Calculate trends
+        total_commits_period = len(recent_commits)
+        avg_commits_per_day = total_commits_period / days
+        
+        return {
+            "period_days": days,
+            "date_range": {
+                "start": start_date.isoformat(),
+                "end": end_date.isoformat()
+            },
+            "summary": {
+                "total_commits": total_commits_period,
+                "average_commits_per_day": round(avg_commits_per_day, 2),
+                "active_days": len(daily_stats),
+                "total_contributors": len(set(c.author_name for c in recent_commits))
+            },
+            "daily_breakdown": sorted_daily_stats
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing commit trends: {e}")
+        raise e

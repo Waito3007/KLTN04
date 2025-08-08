@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, List, Tag, Typography, Button, Space, message, Spin, Empty, Modal } from 'antd';
+import { Card, List, Tag, Typography, Button, Space, message, Spin, Empty, Modal, Select, Badge, Tooltip, Progress } from 'antd';
 import { 
   GitlabOutlined, 
   UserOutlined, 
@@ -9,7 +9,11 @@ import {
   BranchesOutlined,
   PlusOutlined,
   MinusOutlined,
-  FileOutlined
+  FileOutlined,
+  RobotOutlined,
+  ThunderboltOutlined,
+  BarChartOutlined,
+  TagOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import styled from 'styled-components';
@@ -73,18 +77,75 @@ const StatTag = styled(Tag)`
   gap: 4px;
 `;
 
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 0 16px;
+`;
+
+const PageSizeSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const AIAnalysisContainer = styled.div`
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  border: 1px solid #e6f7ff;
+`;
+
+const AIBadge = styled(Badge)`
+  .ant-badge-count {
+    background: linear-gradient(45deg, #1890ff, #096dd9);
+    border-radius: 10px;
+    font-size: 10px;
+    height: 18px;
+    line-height: 18px;
+    min-width: 18px;
+  }
+`;
+
+const ConfidenceBar = styled.div`
+  background: #f0f0f0;
+  border-radius: 3px;
+  height: 4px;
+  overflow: hidden;
+  width: 40px;
+  display: inline-block;
+  margin-left: 4px;
+  
+  .confidence-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+`;
+
+const getConfidenceColor = (confidence) => {
+  if (confidence >= 0.8) return '#52c41a';
+  if (confidence >= 0.6) return '#faad14';
+  return '#ff4d4f';
+};
+
 const BranchCommitList = ({ owner, repo, selectedBranch }) => {
   const [commits, setCommits] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 25, total: 0 }); // Đổi thành 25
   const [selectedCommit, setSelectedCommit] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+
   useEffect(() => {
     if (selectedBranch) {
       fetchCommits();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBranch, pagination.current]);
+  }, [selectedBranch, pagination.current, pagination.pageSize]); // Thêm pageSize vào dependency
 
   const fetchCommits = async () => {
     if (!selectedBranch) return;
@@ -93,12 +154,13 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
     if (!token) {
       message.error("Vui lòng đăng nhập lại!");
       return;
-    }
-
-    setLoading(true);
+    }    setLoading(true);
     try {
-      const offset = (pagination.current - 1) * pagination.pageSize;      const response = await axios.get(
-        buildApiUrl(`/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=${pagination.pageSize}&offset=${offset}`),
+      const offset = (pagination.current - 1) * pagination.pageSize;
+      console.log(`Fetching commits from DB: page=${pagination.current}, pageSize=${pagination.pageSize}, offset=${offset}`); // Debug log
+      
+      const response = await axios.get(
+        `http://localhost:8000/api/commits/${owner}/${repo}/branches/${selectedBranch}/commits?limit=${pagination.pageSize}&offset=${offset}`,
         {
           headers: {
             Authorization: `token ${token}`,
@@ -106,10 +168,14 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
         }
       );
 
-      setCommits(response.data.commits || []);
+      const commitsData = response.data.commits || [];
+      setCommits(commitsData);
+      
+      console.log(`Received ${commitsData.length} commits from database`); // Debug log
+      
       setPagination(prev => ({
         ...prev,
-        total: response.data.total_found || response.data.count || 0
+        total: response.data.total_found || response.data.count || commitsData.length
       }));
 
     } catch (error) {
@@ -149,17 +215,31 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
     } else if (lowerMessage.startsWith('test:')) {
       return { type: 'test', color: 'cyan' };
     } else {
-      return { type: 'other', color: 'default' };
-    }
+      return { type: 'other', color: 'default' };    }
   };
+
+  // Xử lý thay đổi trang
+  const handlePageChange = (page, size) => {
+    console.log(`Page changed to: ${page}, size: ${size}`);
+    setPagination(prev => ({
+      ...prev,
+      current: page,
+      pageSize: size || prev.pageSize
+    }));
+  };
+
+  // Xử lý thay đổi page size
+  const handlePageSizeChange = (newPageSize) => {
+    console.log(`Page size changed to: ${newPageSize}`);
+    setPagination(prev => ({
+      ...prev,
+      current: 1, // Reset về trang 1
+      pageSize: newPageSize
+    }));  };
 
   const showCommitDetails = (commit) => {
     setSelectedCommit(commit);
     setModalVisible(true);
-  };
-
-  const handlePageChange = (page) => {
-    setPagination(prev => ({ ...prev, current: page }));
   };
 
   if (!selectedBranch) {
@@ -174,14 +254,31 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
   }
 
   return (
-    <>
-      <Card 
+    <>      <Card 
         title={
-          <Space>
-            <GitlabOutlined style={{ color: '#1890ff' }} />
-            <span>Commits - Branch: {selectedBranch}</span>
-            <Tag color="blue">{commits.length} commits</Tag>
-          </Space>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Space>
+              <GitlabOutlined style={{ color: '#1890ff' }} />
+              <span>Commits từ Database - Branch: {selectedBranch}</span>
+              <Tag color="green">{pagination.total} total</Tag>
+            </Space>
+            
+            <PageSizeSelector>
+              <Text>Hiển thị:</Text>
+              <Select
+                value={pagination.pageSize}
+                onChange={handlePageSizeChange}
+                style={{ width: 70 }}
+                size="small"
+                options={[
+                  { value: 10, label: '10' },
+                  { value: 25, label: '25' },
+                  { value: 50, label: '50' },
+                  { value: 100, label: '100' }
+                ]}
+              />
+            </PageSizeSelector>
+          </div>
         }
         extra={
           <Button 
@@ -203,16 +300,17 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
           ) : (
             <List
               itemLayout="vertical"
-              dataSource={commits}
-              pagination={{
+              dataSource={commits}              pagination={{
                 current: pagination.current,
                 pageSize: pagination.pageSize,
                 total: pagination.total,
                 onChange: handlePageChange,
-                showSizeChanger: false,
+                showSizeChanger: true,
                 showQuickJumper: true,
                 showTotal: (total, range) => 
-                  `${range[0]}-${range[1]} của ${total} commits`,
+                  `${range[0]}-${range[1]} của ${total} commits từ database`,
+                pageSizeOptions: ['10', '25', '50', '100'],
+                onShowSizeChange: handlePageChange,
               }}
               renderItem={(commit) => {
                 const commitType = getCommitType(commit.message);

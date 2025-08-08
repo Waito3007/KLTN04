@@ -3,23 +3,15 @@ from sqlalchemy import select, insert, update, func
 from db.database import database
 from datetime import datetime
 import logging
+from utils.datetime_utils import normalize_github_datetime
 
 logger = logging.getLogger(__name__)
 
+# Backward compatibility - deprecated function
 def parse_github_datetime(date_str):
     """Convert GitHub API datetime string to Python datetime object"""
-    if not date_str:
-        return None
-    
-    try:
-        # GitHub datetime format: 2021-03-06T14:28:54Z
-        if date_str.endswith('Z'):
-            date_str = date_str[:-1] + '+00:00'  # Replace Z with +00:00 for proper parsing
-        
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-    except (ValueError, AttributeError) as e:
-        logger.warning(f"Failed to parse datetime '{date_str}': {e}")
-        return None
+    logger.warning("parse_github_datetime is deprecated, use normalize_github_datetime instead")
+    return normalize_github_datetime(date_str)
 
 async def get_pull_request_by_github_id(github_id: int):
     """Lấy pull request từ github_id"""
@@ -64,8 +56,8 @@ async def save_pull_request(pr_data):
                 description=pr_data.get("description"),
                 state=pr_data.get("state"),
                 repo_id=pr_data["repo_id"],
-                created_at=parse_github_datetime(pr_data.get("created_at")),
-                updated_at=parse_github_datetime(pr_data.get("updated_at"))
+                created_at=normalize_github_datetime(pr_data.get("created_at")),
+                updated_at=normalize_github_datetime(pr_data.get("updated_at"))
             )
             
             result = await database.execute(query)

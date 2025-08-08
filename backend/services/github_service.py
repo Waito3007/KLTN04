@@ -48,10 +48,12 @@ async def fetch_commits(
     name: str, 
     branch: str, 
     since: Optional[str] = None, 
-    until: Optional[str] = None
+    until: Optional[str] = None,
+    per_page: int = 100,
+    include_details: bool = False
 ) -> List[Dict[str, Any]]:
     """
-    Lấy danh sách commit từ repository GitHub
+    Lấy danh sách commit từ repository GitHub với enhanced metadata
     
     Args:
         token (str): GitHub access token
@@ -60,9 +62,11 @@ async def fetch_commits(
         branch (str): Tên branch
         since (Optional[str]): Lọc commit từ thời gian này (ISO format)
         until (Optional[str]): Lọc commit đến thời gian này (ISO format)
+        per_page (int): Số commits per page (max 100)
+        include_details (bool): Có lấy chi tiết files và stats không
     
     Returns:
-        list: Danh sách commit
+        list: Danh sách commit với enhanced metadata
     
     Raises:
         HTTPError: Nếu request lỗi
@@ -70,7 +74,7 @@ async def fetch_commits(
     url = f"/repos/{owner}/{name}/commits"
     
     # Parameters cho request
-    params = {"sha": branch}
+    params = {"sha": branch, "per_page": min(per_page, 100)}
     
     # Thêm tham số lọc thời gian nếu có
     if since:
@@ -83,11 +87,29 @@ async def fetch_commits(
         full_url = f"{BASE_URL}{url}"
         response = await client.get(full_url, headers=get_headers(token), params=params)
         response.raise_for_status()
-        return response.json()
+        commits_data = response.json()
+        
+        if not include_details:
+            return commits_data
+        
+        # Fetch detailed information for each commit
+        enhanced_commits = []
+        for commit in commits_data:
+            commit_sha = commit.get("sha")
+            if commit_sha:
+                detailed_commit = await fetch_commit_details(commit_sha, owner, name, token)
+                if detailed_commit:
+                    enhanced_commits.append(detailed_commit)
+                else:
+                    # Fallback to basic commit data with extracted metadata
+                    enhanced_commit = extract_basic_commit_metadata(commit)
+                    enhanced_commits.append(enhanced_commit)
+            
+        return enhanced_commits
 
 async def fetch_commit_details(commit_sha: str, owner: str, repo: str, token: str = None) -> Optional[Dict[str, Any]]:
     """
-    Lấy thông tin chi tiết của một commit
+    Lấy thông tin chi tiết của một commit với enhanced metadata
     
     Args:
         commit_sha (str): SHA hash của commit
@@ -96,7 +118,7 @@ async def fetch_commit_details(commit_sha: str, owner: str, repo: str, token: st
         token (str): GitHub token (optional)
     
     Returns:
-        dict: Thông tin chi tiết commit hoặc None nếu lỗi
+        dict: Thông tin chi tiết commit với enhanced metadata hoặc None nếu lỗi
     """
     try:
         url = f"/repos/{owner}/{repo}/commits/{commit_sha}"
@@ -107,20 +129,72 @@ async def fetch_commit_details(commit_sha: str, owner: str, repo: str, token: st
             
             if response.status_code == 200:
                 commit_data = response.json()
+                
+                # Extract basic commit info
+                commit_info = commit_data.get("commit", {})
+                author_info = commit_info.get("author", {})
+                committer_info = commit_info.get("committer", {})
+                stats = commit_data.get("stats", {})
+                
+                # Extract files information
+                files = commit_data.get("files", [])
+                modified_files = []
+                file_types = {}
+                modified_directories = {}
+                
+                for file_info in files:
+                    filename = file_info.get("filename", "")
+                    if filename:
+                        modified_files.append(filename)
+                        
+                        # Extract file extension
+                        if "." in filename:
+                            ext = "." + filename.split(".")[-1].lower()
+                            file_types[ext] = file_types.get(ext, 0) + 1
+                        
+                        # Extract directory
+                        if "/" in filename:
+                            directory = "/".join(filename.split("/")[:-1])
+                            modified_directories[directory] = modified_directories.get(directory, 0) + 1
+                        else:
+                            modified_directories["root"] = modified_directories.get("root", 0) + 1
+                
+                # Check if this is a merge commit
+                parents = commit_data.get("parents", [])
+                is_merge = len(parents) > 1
+                
+                # Calculate enhanced metadata
+                additions = stats.get("additions", 0)
+                deletions = stats.get("deletions", 0)
+                total_changes = additions + deletions
+                files_changed = len(files)
+                
                 return {
                     "sha": commit_data.get("sha"),
-                    "date": commit_data.get("commit", {}).get("committer", {}).get("date"),
-                    "author_name": commit_data.get("commit", {}).get("author", {}).get("name"),
-                    "author_email": commit_data.get("commit", {}).get("author", {}).get("email"),
-                    "committer_name": commit_data.get("commit", {}).get("committer", {}).get("name"),
-                    "committer_email": commit_data.get("commit", {}).get("committer", {}).get("email"),
-                    "message": commit_data.get("commit", {}).get("message"),
+                    "date": author_info.get("date"),
+                    "committer_date": committer_info.get("date"),
+                    "author_name": author_info.get("name"),
+                    "author_email": author_info.get("email"),
+                    "committer_name": committer_info.get("name"),
+                    "committer_email": committer_info.get("email"),
+                    "message": commit_info.get("message"),
                     "url": commit_data.get("html_url"),
+                    "parents": parents,
+                    # Enhanced metadata
                     "stats": {
-                        "additions": commit_data.get("stats", {}).get("additions", 0),
-                        "deletions": commit_data.get("stats", {}).get("deletions", 0),
-                        "total": commit_data.get("stats", {}).get("total", 0)
-                    }
+                        "additions": additions,
+                        "deletions": deletions,
+                        "total": stats.get("total", 0)
+                    },
+                    "files_changed": files_changed,
+                    "additions": additions,
+                    "deletions": deletions,
+                    "total_changes": total_changes,
+                    "is_merge": is_merge,
+                    "modified_files": modified_files,
+                    "file_types": file_types,
+                    "modified_directories": modified_directories,
+                    "files": files  # Raw file data for further processing
                 }
             return None
             
@@ -351,18 +425,96 @@ async def fetch_enhanced_commits(
         print(f"Error fetching enhanced commits: {e}")
         return []
 
-async def fetch_commit_files(commit_sha: str, owner: str, repo: str, token: str = None) -> List[Dict[str, Any]]:
+async def fetch_enhanced_commits_batch(
+    owner: str, 
+    repo: str, 
+    branch: str = "main",
+    token: str = None,
+    since: str = None,
+    until: str = None,
+    max_commits: int = 100
+) -> List[Dict[str, Any]]:
     """
-    Lấy danh sách files thay đổi trong một commit
+    Lấy commits với thông tin chi tiết bao gồm enhanced metadata trong batch
     
     Args:
-        commit_sha (str): SHA của commit
         owner (str): Chủ sở hữu repo
         repo (str): Tên repository
+        branch (str): Tên branch
         token (str): GitHub token
+        since (str): ISO datetime string
+        until (str): ISO datetime string
+        max_commits (int): Số commits tối đa
     
     Returns:
-        list: Danh sách files với thông tin thay đổi
+        list: Danh sách commits với enhanced metadata
+    """
+    try:
+        # Get basic commits list first
+        commits = await fetch_commits(
+            token=token,
+            owner=owner,
+            name=repo,
+            branch=branch,
+            since=since,
+            until=until,
+            per_page=min(max_commits, 100),
+            include_details=False
+        )
+        
+        enhanced_commits = []
+        
+        # Process commits in smaller batches to avoid rate limits
+        batch_size = 10
+        for i in range(0, min(len(commits), max_commits), batch_size):
+            batch = commits[i:i + batch_size]
+            
+            # Create tasks for concurrent fetching
+            import asyncio
+            tasks = []
+            for commit in batch:
+                commit_sha = commit.get("sha")
+                if commit_sha:
+                    task = fetch_commit_details(commit_sha, owner, repo, token)
+                    tasks.append(task)
+            
+            # Execute batch concurrently
+            if tasks:
+                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                
+                for result in batch_results:
+                    if isinstance(result, Exception):
+                        print(f"Error in batch processing: {result}")
+                        continue
+                    if result:
+                        enhanced_commits.append(result)
+            
+            # Small delay to respect rate limits
+            await asyncio.sleep(0.1)
+        
+        return enhanced_commits
+        
+    except Exception as e:
+        print(f"Error fetching enhanced commits batch: {e}")
+        return []
+
+async def fetch_commit_files_metadata(
+    owner: str,
+    repo: str, 
+    commit_sha: str,
+    token: str = None
+) -> Dict[str, Any]:
+    """
+    Lấy metadata chi tiết về files trong một commit
+    
+    Args:
+        owner (str): Chủ sở hữu repo
+        repo (str): Tên repository
+        commit_sha (str): SHA của commit
+        token (str): GitHub token
+        
+    Returns:
+        dict: Metadata về files changed
     """
     try:
         url = f"/repos/{owner}/{repo}/commits/{commit_sha}"
@@ -374,166 +526,137 @@ async def fetch_commit_files(commit_sha: str, owner: str, repo: str, token: str 
                 commit_data = response.json()
                 files = commit_data.get("files", [])
                 
-                # Process file information
-                processed_files = []
-                for file in files:
-                    processed_files.append({
-                        "filename": file.get("filename"),
-                        "status": file.get("status"),  # added, modified, removed, renamed
-                        "additions": file.get("additions", 0),
-                        "deletions": file.get("deletions", 0),
-                        "changes": file.get("changes", 0),
-                        "patch": file.get("patch"),  # Actual diff content
-                        "previous_filename": file.get("previous_filename"),  # For renamed files
-                        "blob_url": file.get("blob_url"),
-                        "raw_url": file.get("raw_url")
-                    })
+                # Analyze files
+                file_analysis = {
+                    "files_changed": len(files),
+                    "modified_files": [],
+                    "file_types": {},
+                    "modified_directories": {},
+                    "file_categories": {
+                        "added": 0,
+                        "modified": 0,
+                        "deleted": 0,
+                        "renamed": 0
+                    },
+                    "language_changes": {},
+                    "size_changes": {
+                        "additions": 0,
+                        "deletions": 0,
+                        "total": 0
+                    }
+                }
                 
-                return processed_files
-            
-            return []
-            
+                for file_info in files:
+                    filename = file_info.get("filename", "")
+                    status = file_info.get("status", "")
+                    additions = file_info.get("additions", 0)
+                    deletions = file_info.get("deletions", 0)
+                    
+                    if filename:
+                        file_analysis["modified_files"].append({
+                            "filename": filename,
+                            "status": status,
+                            "additions": additions,
+                            "deletions": deletions,
+                            "changes": additions + deletions
+                        })
+                        
+                        # File extension analysis
+                        if "." in filename:
+                            ext = "." + filename.split(".")[-1].lower()
+                            if ext not in file_analysis["file_types"]:
+                                file_analysis["file_types"][ext] = {
+                                    "count": 0,
+                                    "additions": 0,
+                                    "deletions": 0
+                                }
+                            file_analysis["file_types"][ext]["count"] += 1
+                            file_analysis["file_types"][ext]["additions"] += additions
+                            file_analysis["file_types"][ext]["deletions"] += deletions
+                        
+                        # Directory analysis
+                        if "/" in filename:
+                            directory = "/".join(filename.split("/")[:-1])
+                        else:
+                            directory = "root"
+                            
+                        if directory not in file_analysis["modified_directories"]:
+                            file_analysis["modified_directories"][directory] = {
+                                "files": 0,
+                                "additions": 0,
+                                "deletions": 0
+                            }
+                        file_analysis["modified_directories"][directory]["files"] += 1
+                        file_analysis["modified_directories"][directory]["additions"] += additions
+                        file_analysis["modified_directories"][directory]["deletions"] += deletions
+                        
+                        # Status category
+                        if status in file_analysis["file_categories"]:
+                            file_analysis["file_categories"][status] += 1
+                        
+                        # Total size changes
+                        file_analysis["size_changes"]["additions"] += additions
+                        file_analysis["size_changes"]["deletions"] += deletions
+                        file_analysis["size_changes"]["total"] += additions + deletions
+                
+                return file_analysis
+                
     except Exception as e:
-        print(f"Error fetching commit files for {commit_sha}: {e}")
-        return []
+        print(f"Error fetching commit files metadata: {e}")
+        
+    return {
+        "files_changed": 0,
+        "modified_files": [],
+        "file_types": {},
+        "modified_directories": {},
+        "file_categories": {},
+        "size_changes": {"additions": 0, "deletions": 0, "total": 0}
+    }
 
-async def fetch_commit_author_info(commit_sha: str, owner: str, repo: str, token: str = None) -> Optional[Dict[str, Any]]:
+async def get_commit_comparison(
+    owner: str,
+    repo: str,
+    base_sha: str,
+    head_sha: str,
+    token: str = None
+) -> Dict[str, Any]:
     """
-    Lấy thông tin chi tiết về author của commit (bao gồm GitHub user info nếu có)
+    So sánh 2 commits để lấy thông tin thay đổi
     
     Args:
-        commit_sha (str): SHA của commit
         owner (str): Chủ sở hữu repo
         repo (str): Tên repository
+        base_sha (str): SHA của commit gốc
+        head_sha (str): SHA của commit đích
         token (str): GitHub token
-    
+        
     Returns:
-        dict: Thông tin author chi tiết
+        dict: Thông tin so sánh giữa 2 commits
     """
     try:
-        url = f"/repos/{owner}/{repo}/commits/{commit_sha}"
+        url = f"/repos/{owner}/{repo}/compare/{base_sha}...{head_sha}"
         
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BASE_URL}{url}", headers=get_headers(token))
             
             if response.status_code == 200:
-                commit_data = response.json()
+                comparison_data = response.json()
                 
-                # Extract author information
-                author_info = {
-                    "git_author": commit_data.get("commit", {}).get("author", {}),
-                    "git_committer": commit_data.get("commit", {}).get("committer", {}),
-                    "github_author": commit_data.get("author"),  # GitHub user info
-                    "github_committer": commit_data.get("committer")  # GitHub user info
+                return {
+                    "status": comparison_data.get("status"),
+                    "ahead_by": comparison_data.get("ahead_by"),
+                    "behind_by": comparison_data.get("behind_by"),
+                    "total_commits": comparison_data.get("total_commits"),
+                    "commits": comparison_data.get("commits", []),
+                    "files": comparison_data.get("files", []),
+                    "stats": {
+                        "additions": comparison_data.get("stats", {}).get("additions", 0),
+                        "deletions": comparison_data.get("stats", {}).get("deletions", 0),
+                        "total": comparison_data.get("stats", {}).get("total", 0)
+                    }
                 }
                 
-                return author_info
-            
-            return None
-            
     except Exception as e:
-        print(f"Error fetching author info for {commit_sha}: {e}")
-        return None
-
-async def analyze_commit_type(message: str, files: List[Dict] = None) -> Dict[str, Any]:
-    """
-    Phân tích loại commit dựa trên message và files thay đổi
-    
-    Args:
-        message (str): Commit message
-        files (list): Danh sách files thay đổi
-    
-    Returns:
-        dict: Thông tin phân loại commit
-    """
-    import re
-    
-    analysis = {
-        "type": "other",
-        "is_feature": False,
-        "is_bugfix": False,
-        "is_refactor": False,
-        "is_documentation": False,
-        "is_test": False,
-        "is_merge": False,
-        "conventional_commit": False,
-        "breaking_change": False,
-        "scope": None
-    }
-    
-    message_lower = message.lower()
-    
-    # Check for merge commits
-    if message.startswith("Merge") or "merge" in message_lower:
-        analysis["is_merge"] = True
-        analysis["type"] = "merge"
-    
-    # Check for conventional commits (feat:, fix:, docs:, etc.)
-    conventional_pattern = r"^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?\!?:"
-    match = re.match(conventional_pattern, message)
-    if match:
-        analysis["conventional_commit"] = True
-        commit_type = match.group(1)
-        scope = match.group(2)
+        print(f"Error comparing commits: {e}")
         
-        analysis["type"] = commit_type
-        if scope:
-            analysis["scope"] = scope.strip("()")
-        
-        # Check for breaking changes
-        if "!" in match.group(0) or "BREAKING CHANGE" in message:
-            analysis["breaking_change"] = True
-        
-        # Set specific flags
-        analysis["is_feature"] = commit_type == "feat"
-        analysis["is_bugfix"] = commit_type == "fix"
-        analysis["is_refactor"] = commit_type == "refactor"
-        analysis["is_documentation"] = commit_type == "docs"
-        analysis["is_test"] = commit_type == "test"
-    
-    else:
-        # Fallback analysis based on keywords
-        if any(keyword in message_lower for keyword in ["add", "implement", "feature", "new"]):
-            analysis["is_feature"] = True
-            analysis["type"] = "feature"
-        elif any(keyword in message_lower for keyword in ["fix", "bug", "issue", "error"]):
-            analysis["is_bugfix"] = True
-            analysis["type"] = "bugfix"
-        elif any(keyword in message_lower for keyword in ["refactor", "restructure", "improve"]):
-            analysis["is_refactor"] = True
-            analysis["type"] = "refactor"
-        elif any(keyword in message_lower for keyword in ["doc", "readme", "comment"]):
-            analysis["is_documentation"] = True
-            analysis["type"] = "documentation"
-        elif any(keyword in message_lower for keyword in ["test", "spec", "coverage"]):
-            analysis["is_test"] = True
-            analysis["type"] = "test"
-    
-    # Analyze files if provided
-    if files:
-        file_types = []
-        for file in files:
-            filename = file.get("filename", "")
-            if filename.endswith((".md", ".txt", ".rst")):
-                file_types.append("documentation")
-            elif filename.endswith((".test.", ".spec.", "_test.", "_spec.")):
-                file_types.append("test")
-            elif filename.endswith((".py", ".js", ".ts", ".java", ".cpp", ".c")):
-                file_types.append("code")
-            elif filename.endswith((".css", ".scss", ".less")):
-                file_types.append("style")
-            elif filename.endswith((".json", ".yml", ".yaml", ".toml", ".ini")):
-                file_types.append("config")
-        
-        # Update analysis based on file types
-        if "documentation" in file_types and len(set(file_types)) == 1:
-            analysis["is_documentation"] = True
-            if analysis["type"] == "other":
-                analysis["type"] = "documentation"
-        
-        if "test" in file_types and len(set(file_types)) == 1:
-            analysis["is_test"] = True
-            if analysis["type"] == "other":
-                analysis["type"] = "test"
-    
-    return analysis
+    return {}

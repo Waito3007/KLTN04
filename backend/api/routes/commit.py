@@ -28,19 +28,22 @@ USAGE GUIDELINES:
 - Use SYNC endpoints to populate/update database from GitHub
 - Use ANALYTICS endpoints for insights and statistics
 """
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, BackgroundTasks, status, Request
+from fastapi.responses import JSONResponse
 import httpx
 import asyncio
 import logging
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
+from datetime import datetime
 from services.commit_service import (
-    save_commit, save_multiple_commits, get_commits_by_repo_id, 
-    get_commit_by_sha, get_commit_statistics
+    get_commit_by_sha, save_commit, get_commits_by_branch_safe, 
+    get_commits_by_repo_id, get_commit_statistics, save_multiple_commits, 
+    get_enhanced_commit_statistics, analyze_commit_trends
 )
+from core.security import security # Import security dependency
 from services.repo_service import get_repo_id_by_owner_and_name, get_repository
 from services.branch_service import get_branches_by_repo_id
 from services.github_service import fetch_commits, fetch_commit_details
-from datetime import datetime
 
 commit_router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -65,6 +68,27 @@ async def github_api_call(url: str, token: str, params: dict = None):
             )
         
         return response.json()
+
+async def fetch_raw_github_content(url: str, token: str):
+    """Helper function to fetch raw content (e.g., diffs) from GitHub API."""
+    headers = {
+        "Authorization": token,
+        "Accept": "application/vnd.github.v3.diff", # Yêu cầu định dạng diff
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.get(url, headers=headers)
+        
+        if response.status_code == 429:
+            raise HTTPException(status_code=429, detail="GitHub API rate limit exceeded")
+        elif response.status_code != 200:
+            logger.error(f"GitHub API error fetching raw content from {url}. Status: {response.status_code}, Detail: {response.text}")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"GitHub API error fetching raw content: {response.text}"
+            )
+        
+        return response.text # Trả về văn bản thuần túy
 
 # ==================== NEW BRANCH-SPECIFIC COMMIT ENDPOINTS ====================
 
@@ -112,10 +136,12 @@ async def get_branch_commits(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
+                "modified_files": commit.modified_files,
                 "is_merge": commit.is_merge,
                 "merge_from_branch": commit.merge_from_branch,
                 "branch_name": commit.branch_name,
-                "author_role_at_commit": commit.author_role_at_commit
+                "author_role_at_commit": commit.author_role_at_commit,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -155,20 +181,46 @@ async def get_repository_branches_with_commits(
         # Get branches with commit stats
         branches_data = await get_all_branches_with_commit_stats(repo_id)
         
+        # Deduplicate branches by name - keep the one with the most recent activity
+        unique_branches = {}
+        for branch in branches_data:
+            branch_name = branch.name
+            
+            # If this is the first occurrence or has more recent activity, keep it
+            if (branch_name not in unique_branches or 
+                (branch.latest_commit_date and 
+                 (not unique_branches[branch_name].get('latest_commit_date') or 
+                  branch.latest_commit_date > unique_branches[branch_name]['latest_commit_date'])) or
+                (branch.actual_commit_count > unique_branches[branch_name].get('actual_commit_count', 0))):
+                
+                unique_branches[branch_name] = {
+                    "id": branch.id,
+                    "name": branch.name,
+                    "is_default": branch.is_default,
+                    "is_protected": branch.is_protected,
+                    "stored_commit_count": branch.commits_count,
+                    "actual_commit_count": branch.actual_commit_count,
+                    "latest_commit_date": branch.latest_commit_date,
+                    "last_synced_commit_date": branch.last_commit_date
+                }
+        
         # Format response
         branches_list = []
-        for branch in branches_data:
-            branch_dict = {
-                "id": branch.id,
-                "name": branch.name,
-                "is_default": branch.is_default,
-                "is_protected": branch.is_protected,
-                "stored_commit_count": branch.commits_count,
-                "actual_commit_count": branch.actual_commit_count,
-                "latest_commit_date": branch.latest_commit_date.isoformat() if branch.latest_commit_date else None,
-                "last_synced_commit_date": branch.last_commit_date.isoformat() if branch.last_commit_date else None
+        for branch_dict in unique_branches.values():
+            formatted_branch = {
+                "id": branch_dict["id"],
+                "name": branch_dict["name"],
+                "is_default": branch_dict["is_default"],
+                "is_protected": branch_dict["is_protected"],
+                "stored_commit_count": branch_dict["stored_commit_count"],
+                "actual_commit_count": branch_dict["actual_commit_count"],
+                "latest_commit_date": branch_dict["latest_commit_date"].isoformat() if branch_dict["latest_commit_date"] else None,
+                "last_synced_commit_date": branch_dict["last_synced_commit_date"].isoformat() if branch_dict["last_synced_commit_date"] else None
             }
-            branches_list.append(branch_dict)
+            branches_list.append(formatted_branch)
+        
+        # Sort branches: default first, then by name
+        branches_list.sort(key=lambda x: (not x.get("is_default", False), x["name"]))
         
         return {
             "repository": f"{owner}/{repo}",
@@ -217,7 +269,8 @@ async def compare_branch_commits(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
-                "is_merge": commit.is_merge
+                "is_merge": commit.is_merge,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -280,7 +333,8 @@ async def sync_commits(
     until: Optional[str] = Query(None, description="Only commits before this date (ISO format)"),
     per_page: int = Query(100, ge=1, le=100, description="Number of commits per page"),
     max_pages: int = Query(10, ge=1, le=50, description="Maximum pages to fetch"),
-    include_stats: bool = Query(False, description="Include commit statistics (slower)")
+    include_stats: bool = Query(False, description="Include commit statistics (slower)"),
+    force_update: bool = Query(True, description="Force update existing commits with new data")
 ):
     """
     Đồng bộ commits từ GitHub với full model support
@@ -375,19 +429,17 @@ async def sync_commits(
             commits_data=all_commits,
             repo_id=repo_id,
             branch_name=branch,
-            branch_id=branch_id        )
-        
-        logger.info(f"Successfully saved {saved_count} new commits")
+            branch_id=branch_id,
+            force_update=force_update
+        )
         
         return {
-            "message": f"Successfully synced {saved_count} commits",
+            "message": f"Synced {saved_count} commits from GitHub",
             "repository": f"{owner}/{repo}",
             "branch": branch,
-            "total_fetched": len(all_commits),
-            "new_commits_saved": saved_count,
-            "pages_processed": min(page, max_pages),
-            "enhanced_with_stats": include_stats,
-            "branch_id": branch_id
+            "commits_fetched": len(all_commits),
+            "commits_processed": saved_count,
+            "force_update": force_update
         }
         
     except HTTPException:
@@ -404,7 +456,8 @@ async def sync_all_branches_commits(
     request: Request,
     since: Optional[str] = Query(None, description="Only commits after this date"),
     per_page: int = Query(50, ge=1, le=100),
-    max_pages_per_branch: int = Query(5, ge=1, le=20)
+    max_pages_per_branch: int = Query(5, ge=1, le=20),
+    force_update: bool = Query(True, description="Force update existing commits with new data")
 ):
     """
     Đồng bộ commits cho tất cả branches của repository
@@ -464,14 +517,16 @@ async def sync_all_branches_commits(
                     commits_data=all_commits,
                     repo_id=repo_id,
                     branch_name=branch_name,
-                    branch_id=branch['id']
+                    branch_id=branch['id'],
+                    force_update=force_update
                 )
                 
                 total_saved += saved_count
                 branch_results.append({
                     "branch": branch_name,
                     "commits_fetched": len(all_commits),
-                    "commits_saved": saved_count
+                    "commits_processed": saved_count,
+                    "force_update": force_update
                 })
                 
             except Exception as e:
@@ -484,8 +539,9 @@ async def sync_all_branches_commits(
         return {
             "message": f"Synced commits for {len(branches)} branches",
             "repository": f"{owner}/{repo}",
-            "total_commits_saved": total_saved,
-            "branch_results": branch_results
+            "total_commits_processed": total_saved,
+            "branch_results": branch_results,
+            "force_update": force_update
         }
         
     except HTTPException:
@@ -598,7 +654,8 @@ async def get_repository_commits_from_database(
                 "insertions": commit.insertions,
                 "deletions": commit.deletions,
                 "files_changed": commit.files_changed,
-                "is_merge": commit.is_merge
+                "is_merge": commit.is_merge,
+                "diff_content": commit.diff_content
             }
             commits_list.append(commit_dict)
         
@@ -849,7 +906,9 @@ async def sync_branch_commits_enhanced(
     force_refresh: bool = Query(False, description="Force refresh all commits even if they exist"),
     per_page: int = Query(100, ge=1, le=100, description="Number of commits per page"),
     max_pages: int = Query(10, ge=1, le=50, description="Maximum pages to fetch"),
-    include_stats: bool = Query(True, description="Include detailed commit statistics")
+    include_stats: bool = Query(True, description="Include detailed commit statistics"),
+    include_diff: bool = Query(False, description="Include commit diff content (slower)"),
+    force_update: bool = Query(True, description="Force update existing commits with new data")
 ):
     """
     Đồng bộ commits cho một branch cụ thể với enhanced features
@@ -935,8 +994,8 @@ async def sync_branch_commits_enhanced(
                 break
             
             # Enhance commits with detailed stats if requested
-            if include_stats:
-                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats...")
+            if include_stats or include_diff:
+                logger.info(f"Enhancing {len(commits_data)} commits with detailed stats/diff...")
                 for commit in commits_data:
                     sha = commit.get("sha")
                     if sha:
@@ -946,8 +1005,59 @@ async def sync_branch_commits_enhanced(
                             detailed_commit = await github_api_call(detail_url, token)
                             
                             if detailed_commit:
-                                commit["stats"] = detailed_commit.get("stats", {})
-                                commit["files"] = detailed_commit.get("files", [])
+                                if include_stats:
+                                    commit["stats"] = detailed_commit.get("stats", {})
+                                    commit["files"] = detailed_commit.get("files", [])
+                                
+                                if include_diff:
+                                    full_diff_content = None
+                                    # Ưu tiên: Lấy diff bằng GitHub Compare API (so sánh với commit cha)
+                                    parents = commit.get("parents")
+                                    parent_sha = parents[0].get("sha") if parents and len(parents) > 0 else None
+
+                                    if parent_sha:
+                                        compare_url = f"https://api.github.com/repos/{owner}/{repo}/compare/{parent_sha}...{sha}"
+                                        try:
+                                            compare_response = await github_api_call(compare_url, token)
+                                            # Compare API trả về JSON, trường 'patch' chứa diff
+                                            if compare_response and compare_response.get("files"):
+                                                compare_diff_lines = []
+                                                for file_data in compare_response["files"]:
+                                                    if file_data.get("patch"):
+                                                        compare_diff_lines.append(file_data["patch"])
+                                                full_diff_content = "\n".join(compare_diff_lines)
+                                                logger.debug(f"Successfully fetched diff via Compare API for {sha}. Length: {len(full_diff_content) if full_diff_content else 0}")
+                                            else:
+                                                logger.debug(f"Compare API returned no files or patch for {sha}")
+                                        except Exception as compare_e:
+                                            logger.warning(f"Could not fetch diff via Compare API for {sha}: {compare_e}. Falling back to detailed_commit patch.")
+                                    else:
+                                        logger.debug(f"Commit {sha} has no parent. Skipping Compare API call.")
+
+                                    # Dự phòng: Nếu Compare API không thành công hoặc không có diff, sử dụng patch từ detailed_commit
+                                    if not full_diff_content and detailed_commit and detailed_commit.get("files"):
+                                        patch_content_lines = []
+                                        for file_diff in detailed_commit["files"]:
+                                            if file_diff.get("patch"):
+                                                patch_content_lines.append(file_diff["patch"])
+                                        full_diff_content = "\n".join(patch_content_lines)
+                                        logger.debug(f"Used fallback patch content from detailed_commit for {sha}. Length: {len(full_diff_content) if full_diff_content else 0}")
+                                        logger.debug(f"Detailed commit files for fallback: {[(f.get('filename'), len(f.get('patch', ''))) for f in detailed_commit.get('files', [])]}")
+                                    elif not full_diff_content:
+                                        logger.debug(f"No diff content available for {sha} after all attempts.")
+
+                                    if full_diff_content:
+                                        # Lọc bỏ các dòng tiêu đề Git không mong muốn (diff --git, index, ---, +++)
+                                        filtered_diff_lines = []
+                                        for line in full_diff_content.splitlines():
+                                            if not (line.startswith("diff --git") or \
+                                                    line.startswith("index ") or \
+                                                    line.startswith("--- a/") or \
+                                                    line.startswith("+++ b/")):
+                                                filtered_diff_lines.append(line)
+                                        commit["diff_content"] = "\n".join(filtered_diff_lines)
+                                    else:
+                                        commit["diff_content"] = ""
                                 
                         except Exception as e:
                             logger.warning(f"Could not fetch details for commit {sha}: {e}")
@@ -970,13 +1080,14 @@ async def sync_branch_commits_enhanced(
             commits_data=all_commits,
             repo_id=repo_id,
             branch_name=branch_name,
-            branch_id=branch_id
+            branch_id=branch_id,
+            force_update=force_update
         )
         
-        logger.info(f"Successfully saved {saved_count} new commits for branch {branch_name}")
+        logger.info(f"Successfully processed {saved_count} commits for branch {branch_name}")
         
         # 6. Get final stats
-        total_commits_in_db = existing_count + saved_count
+        total_commits_in_db = existing_count + (saved_count if not force_update else len(all_commits))
         
         return {
             "success": True,
@@ -986,12 +1097,13 @@ async def sync_branch_commits_enhanced(
             "branch_id": branch_id,
             "stats": {
                 "total_fetched_from_github": len(all_commits),
-                "new_commits_saved": saved_count,
+                "commits_processed": saved_count,
                 "existing_commits_before_sync": existing_count,
                 "total_commits_in_database": total_commits_in_db,
                 "pages_processed": min(page, max_pages),
                 "enhanced_with_stats": include_stats,
-                "force_refresh_enabled": force_refresh
+                "force_refresh_enabled": force_refresh,
+                "force_update_enabled": force_update
             },
             "next_actions": {
                 "view_commits": f"/api/commits/{owner}/{repo}/branches/{branch_name}/commits",
@@ -1006,3 +1118,402 @@ async def sync_branch_commits_enhanced(
         raise HTTPException(status_code=500, detail=f"Branch commit sync failed: {str(e)}")
 
 # ==================== END BRANCH-SPECIFIC SYNC ENDPOINT ====================
+
+# Enhanced commit analysis endpoints
+@commit_router.get("/commits/{owner}/{repo}/statistics/enhanced")
+async def get_enhanced_statistics(
+    owner: str,
+    repo: str,
+    branch_name: Optional[str] = Query(None, description="Branch name filter"),
+    request: Request = None
+):
+    """
+    Get enhanced commit statistics with detailed analysis
+    """
+    try:
+        from services.commit_service import get_enhanced_commit_statistics, get_repo_id_by_owner_and_name
+        
+        # Get repository ID
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Get enhanced statistics
+        stats = await get_enhanced_commit_statistics(repo_id, branch_name)
+        
+        return {
+            "success": True,
+            "repository": f"{owner}/{repo}",
+            "statistics": stats
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced statistics for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get statistics: {str(e)}")
+
+@commit_router.get("/commits/{owner}/{repo}/trends")
+async def analyze_commit_trends_endpoint(
+    owner: str,
+    repo: str,
+    days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
+    request: Request = None
+):
+    """
+    Analyze commit trends over specified time period
+    """
+    try:
+        from services.commit_service import analyze_commit_trends, get_repo_id_by_owner_and_name
+        
+        # Get repository ID
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Analyze trends
+        trends = await analyze_commit_trends(repo_id, days)
+        
+        return {
+            "success": True,
+            "repository": f"{owner}/{repo}",
+            "trends": trends
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing trends for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze trends: {str(e)}")
+
+@commit_router.post("/commits/{owner}/{repo}/analyze")
+async def analyze_single_commit(
+    owner: str,
+    repo: str,
+    sha: str = Query(..., description="Commit SHA to analyze"),
+    request: Request = None
+):
+    """
+    Analyze a single commit in detail
+    """
+    try:
+        from services.commit_service import get_commit_by_sha
+        from utils.commit_analyzer import CommitAnalyzer
+        
+        # Get commit from database
+        commit = await get_commit_by_sha(sha)
+        if not commit:
+            raise HTTPException(status_code=404, detail=f"Commit {sha} not found")
+        
+        # Additional analysis
+        pattern_analysis = CommitAnalyzer.analyze_commit_pattern(commit.message)
+        
+        # Compile recommendations
+        recommendations = []
+        
+        if commit.commit_size == "massive":
+            recommendations.append("Consider breaking down large commits into smaller, focused changes")
+        
+        if not pattern_analysis["has_conventional_format"]:
+            recommendations.append("Consider using conventional commit format (feat:, fix:, etc.)")
+        
+        if commit.files_changed and commit.files_changed > 20:
+            recommendations.append("This commit touches many files - ensure changes are related")
+        
+        if pattern_analysis["urgency"] == "high":
+            recommendations.append("High priority commit - ensure thorough testing")
+        
+        return {
+            "success": True,
+            "commit": {
+                "sha": commit.sha,
+                "message": commit.message,
+                "author": commit.author_name,
+                "date": commit.date.isoformat() if commit.date else None,
+                "statistics": {
+                    "insertions": commit.insertions,
+                    "deletions": commit.deletions,
+                    "files_changed": commit.files_changed,
+                    "total_changes": commit.total_changes,
+                    "commit_size": commit.commit_size,
+                    "change_type": commit.change_type
+                },
+                "file_analysis": {
+                    "modified_files": commit.modified_files,
+                    "file_types": commit.file_types,
+                    "modified_directories": commit.modified_directories
+                },
+                "diff_content": commit.diff_content
+            },
+            "analysis": {
+                "pattern_analysis": pattern_analysis,
+                "commit_quality_score": _calculate_commit_quality_score(commit, pattern_analysis)
+            },
+            "recommendations": recommendations
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error analyzing commit {sha}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze commit: {str(e)}")
+
+def _calculate_commit_quality_score(commit, pattern_analysis) -> Dict[str, Any]:
+    """
+    Calculate a quality score for a commit based on various factors
+    """
+    score = 100
+    factors = []
+    
+    # Deduct points for issues
+    if commit.commit_size == "massive":
+        score -= 20
+        factors.append("Large commit size (-20)")
+    elif commit.commit_size == "large":
+        score -= 10
+        factors.append("Large commit size (-10)")
+    
+    if not pattern_analysis["has_conventional_format"]:
+        score -= 15
+        factors.append("No conventional commit format (-15)")
+    
+    if commit.files_changed and commit.files_changed > 20:
+        score -= 15
+        factors.append("Too many files changed (-15)")
+    
+    # Add points for good practices
+    if pattern_analysis["has_conventional_format"]:
+        score += 10
+        factors.append("Conventional commit format (+10)")
+    
+    if commit.commit_size == "small":
+        score += 5
+        factors.append("Good commit size (+5)")
+    
+    if pattern_analysis["scope"]:
+        score += 5
+        factors.append("Has scope definition (+5)")
+    
+    # Ensure score is between 0 and 100
+    score = max(0, min(100, score))
+    
+    return {
+        "score": score,
+        "grade": _get_grade(score),
+        "factors": factors
+    }
+
+def _get_grade(score: int) -> str:
+    """Convert numeric score to letter grade"""
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    else:
+        return "F"
+
+# Enhanced GitHub data fetching endpoints
+@commit_router.get("/github/{owner}/{repo}/commits/enhanced")
+async def fetch_enhanced_commits_from_github(
+    owner: str,
+    repo: str,
+    branch: str = Query("main", description="Branch name"),
+    since: Optional[str] = Query(None, description="ISO datetime string"),
+    until: Optional[str] = Query(None, description="ISO datetime string"),
+    max_commits: int = Query(50, ge=1, le=100, description="Maximum commits to fetch"),
+    request: Request = None
+):
+    """
+    Fetch commits with enhanced metadata directly from GitHub API
+    Including: files_changed, additions, deletions, total_changes, is_merge, 
+              modified_files, file_types, modified_directories
+    """
+    try:
+        from services.github_service import fetch_enhanced_commits_batch
+        from core.security import get_current_user_optional
+        
+        # Get user token if available
+        user = await get_current_user_optional(request)
+        token = None
+        if user and hasattr(request, 'headers'):
+            auth_header = request.headers.get("Authorization", "")
+            if auth_header.startswith(("Bearer ", "token ")):
+                token = auth_header.split(" ", 1)[1]
+        
+        # Fetch enhanced commits from GitHub
+        enhanced_commits = await fetch_enhanced_commits_batch(
+            owner=owner,
+            repo=repo,
+            branch=branch,
+            token=token,
+            since=since,
+            until=until,
+            max_commits=max_commits
+        )
+        
+        return {
+            "success": True,
+            "repository": f"{owner}/{repo}",
+            "branch": branch,
+            "commits_count": len(enhanced_commits),
+            "commits": enhanced_commits,
+            "metadata": {
+                "fetched_at": datetime.utcnow().isoformat(),
+                "source": "github_api",
+                "enhanced_fields": [
+                    "files_changed", "additions", "deletions", "total_changes",
+                    "is_merge", "modified_files", "file_types", "modified_directories"
+                ]
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching enhanced commits from GitHub for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch enhanced commits: {str(e)}")
+
+@commit_router.get("/github/{owner}/{repo}/commits/{sha}/files")
+async def get_commit_files_metadata(
+    owner: str,
+    repo: str,
+    sha: str,
+    request: Request = None
+):
+    """
+    Get detailed file metadata for a specific commit from GitHub API
+    """
+    try:
+        from services.github_service import fetch_commit_files_metadata
+        
+        # Get user token if available
+        token = None
+        if hasattr(request, 'headers'):
+            auth_header = request.headers.get("Authorization", "")
+            if auth_header.startswith(("Bearer ", "token ")):
+                token = auth_header.split(" ", 1)[1]
+        
+        # Fetch file metadata
+        file_metadata = await fetch_commit_files_metadata(owner, repo, sha, token)
+        
+        return {
+            "success": True,
+            "repository": f"{owner}/{repo}",
+            "commit_sha": sha,
+            "file_metadata": file_metadata
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching commit files metadata for {sha}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch file metadata: {str(e)}")
+
+@commit_router.post("/github/{owner}/{repo}/sync-enhanced")
+async def sync_enhanced_commits_from_github(
+    owner: str,
+    repo: str,
+    branch: str = Query("main", description="Branch name"),
+    max_commits: int = Query(100, ge=1, le=500, description="Maximum commits to sync"),
+    force_update: bool = Query(True, description="Force update existing commits"),
+    request: Request = None
+):
+    """
+    Sync commits from GitHub with enhanced metadata to database
+    """
+    try:
+        from services.github_service import fetch_enhanced_commits_batch
+        from services.commit_service import save_multiple_commits, get_repo_id_by_owner_and_name
+        from services.branch_service import get_or_create_branch
+        
+        # Get repository ID
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found")
+        
+        # Get user token
+        token = None
+        if hasattr(request, 'headers'):
+            auth_header = request.headers.get("Authorization", "")
+            if auth_header.startswith(("Bearer ", "token ")):
+                token = auth_header.split(" ", 1)[1]
+        
+        # Fetch enhanced commits from GitHub
+        enhanced_commits = await fetch_enhanced_commits_batch(
+            owner=owner,
+            repo=repo,
+            branch=branch,
+            token=token,
+            max_commits=max_commits
+        )
+        
+        if not enhanced_commits:
+            return {
+                "success": True,
+                "message": "No commits found to sync",
+                "synced_count": 0
+            }
+        
+        # Get or create branch
+        branch_info = await get_or_create_branch(repo_id, branch)
+        branch_id = branch_info.get("id") if branch_info else None
+        
+        # Prepare commits for saving with enhanced metadata
+        commits_to_save = []
+        for commit in enhanced_commits:
+            commit_data = {
+                **commit,
+                "repo_id": repo_id,
+                "branch_id": branch_id,
+                "branch_name": branch
+            }
+            commits_to_save.append(commit_data)
+        
+        # Save commits to database with force_update
+        processed_count = await save_multiple_commits(
+            commits_data=commits_to_save, 
+            repo_id=repo_id, 
+            branch_name=branch, 
+            branch_id=branch_id,
+            force_update=force_update
+        )
+        
+        return {
+            "success": True,
+            "repository": f"{owner}/{repo}",
+            "branch": branch,
+            "commits_processed": processed_count,
+            "total_fetched": len(enhanced_commits),
+            "force_update": force_update,
+            "enhanced_metadata": {
+                "files_changed": True,
+                "file_analysis": True,
+                "directory_tracking": True,
+                "merge_detection": True,
+                "change_statistics": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error syncing enhanced commits for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync enhanced commits: {str(e)}")
+
+@commit_router.get("/github/{owner}/{repo}/compare/{base}...{head}")
+async def compare_commits_github(
+    owner: str,
+    repo: str,
+    base: str,
+    head: str,
+    token: str = Depends(security)
+):
+    """
+    Compare two commits using GitHub API to get detailed change information
+    """
+    try:
+        from services.github_service import get_commit_comparison
+        comparison_data = await get_commit_comparison(owner, repo, base, head, token)
+        return comparison_data
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Error comparing commits {base}...{head} for {owner}/{repo}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to compare commits: {str(e)}")
+
+
+

@@ -1,64 +1,62 @@
 {
   "metadata": {
-    "total_samples": 86136,
-    "created_at": "2025-06-10T20:45:11.646868",
+    "total_samples": 885,
+    "created_at": "2025-06-22T18:58:37.608653",
     "source_dataset": "mrisdal/github-commit-messages",
     "message_column": "message",
     "statistics": {
       "commit_type": {
-        "docs": 3507,
-        "test": 4917,
-        "fix": 20395,
-        "other": 24893,
-        "feat": 14131,
-        "chore": 14614,
-        "perf": 609,
-        "style": 1063,
-        "refactor": 1788,
-        "security": 219
+        "other": 271,
+        "feat": 134,
+        "fix": 204,
+        "docs": 44,
+        "chore": 151,
+        "perf": 8,
+        "test": 46,
+        "refactor": 16,
+        "style": 11
       },
       "purpose": {
-        "Documentation Update": 3330,
-        "Test Update": 4872,
-        "Bug Fix": 19360,
-        "Other": 38887,
-        "Feature Implementation": 15246,
-        "Refactoring": 2464,
-        "Code Style/Formatting": 416,
-        "Build/CI/CD Script Update": 1261,
-        "Security Patch": 300
+        "Other": 425,
+        "Feature Implementation": 149,
+        "Bug Fix": 193,
+        "Documentation Update": 40,
+        "Test Update": 44,
+        "Refactoring": 21,
+        "Build/CI/CD Script Update": 9,
+        "Security Patch": 1,
+        "Code Style/Formatting": 3
       },
       "sentiment": {
-        "positive": 17047,
-        "negative": 27913,
-        "neutral": 40998,
-        "urgent": 178
+        "neutral": 447,
+        "positive": 155,
+        "negative": 282,
+        "urgent": 1
       },
       "tech_tag": {
-        "general": 45932,
-        "testing": 6099,
-        "performance": 1081,
-        "python": 1457,
-        "css": 262,
-        "html": 305,
-        "database": 185,
-        "api": 4407,
-        "git": 21803,
-        "security": 370,
-        "ui": 320,
-        "docker": 1398,
-        "java": 5,
-        "javascript": 2512
+        "general": 474,
+        "testing": 53,
+        "api": 53,
+        "performance": 10,
+        "css": 3,
+        "python": 9,
+        "git": 238,
+        "html": 4,
+        "database": 5,
+        "docker": 13,
+        "javascript": 20,
+        "security": 1,
+        "ui": 2
       }
     }
   },
   "data": [
     {
-      "text": "DOC: Improved the docstring of Series.str.findall (#19982)",
+      "text": "DEPR: is_copy arg of take (#30615)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "positive",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -67,12 +65,12 @@
       }
     },
     {
-      "text": "TST: tests for needs-test issues #12857 #12689 (#30327)",
+      "text": "simplify json get_values (#32731)",
       "labels": {
-        "commit_type": "test",
-        "purpose": "Test Update",
-        "sentiment": "negative",
-        "tech_tag": "testing"
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -80,11 +78,11 @@
       }
     },
     {
-      "text": "BUG: value_counts can handle the case even with empty groups (#28479) (#28634)",
+      "text": "Re-use iloc, loc instead of set_labels, set_values (#33643)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -93,11 +91,11 @@
       }
     },
     {
-      "text": "BUG: Coerce to object for mixed concat with extension arrays (#20799)",
+      "text": "TST: GH30999 Add match=msg to all but two pytest.raises in tests/io (#38724)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -106,7 +104,7 @@
       }
     },
     {
-      "text": "REF: Make QuarterOffset a cdef class (#34282)",
+      "text": "TST, TYP: _use_dynamic_x (#34487)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -119,12 +117,12 @@
       }
     },
     {
-      "text": "TEST: Add test for #22541 to ensure that error does not occur again (#33096)",
+      "text": "add Tick, BaseOffset to tslibs namespace (#34963)",
       "labels": {
         "commit_type": "feat",
         "purpose": "Feature Implementation",
-        "sentiment": "negative",
-        "tech_tag": "testing"
+        "sentiment": "positive",
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -132,11 +130,11 @@
       }
     },
     {
-      "text": "BUG: name retention in Index.intersection (#38111)",
+      "text": "Surface NumPy FutureWarning about comparisons (#26966)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -145,10 +143,10 @@
       }
     },
     {
-      "text": "TST: Fixed version comparison (#20469)\n    \n    * TST: Fixed version comparison\n    \n    This failed to skip for 3.5.x because the micro component made it False.\n    \n    * Use pandas.compat\n    \n    * More pandas compat",
+      "text": "BUG: don't plot colorbar if c is column containing colors (#34344)",
       "labels": {
-        "commit_type": "chore",
-        "purpose": "Other",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
         "sentiment": "negative",
         "tech_tag": "general"
       },
@@ -158,7 +156,7 @@
       }
     },
     {
-      "text": "ENH/BUG: consistently cast strs to datetimelike for searchsorted (#36346)",
+      "text": "BUG: Always cast to Categorical in lexsort_indexer (#36385)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -171,11 +169,11 @@
       }
     },
     {
-      "text": "DOC: start 1.0.5 (#34481)",
+      "text": "TST: xfail gbq & feather tests for new version incompat (#23281)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "neutral",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -184,20 +182,7 @@
       }
     },
     {
-      "text": "BUG: Fix groupby with MultiIndex Series corner case (#25704) (#25743)",
-      "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
-        "tech_tag": "general"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 10
-      }
-    },
-    {
-      "text": "REF: move attribute setting towards the constructor (#29979)",
+      "text": "CLN: avoid bare except in tslib and tslibs.parsing (#28345)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -206,14 +191,27 @@
       },
       "metadata": {
         "source": "github-commit-messages",
+        "original_index": 10
+      }
+    },
+    {
+      "text": "TST: add regression test for all-none-groupby (#29067)\n    \n    Closes #21624",
+      "labels": {
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "positive",
+        "tech_tag": "testing"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
         "original_index": 11
       }
     },
     {
-      "text": "misplaced scatter/hexbin subplot colorbars (#21728)",
+      "text": "DOC: correct Series.searchsorted example (#19784)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -223,11 +221,11 @@
       }
     },
     {
-      "text": "DOC: fixed PR06 in pandas.Timedeltas (#34574)",
+      "text": "REF: Remove many Panel tests (#25191)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -236,11 +234,11 @@
       }
     },
     {
-      "text": "BUG: pd.crosstab not working when margin and normalize are set together (#27663)",
+      "text": "DOC: 1.2.0 release date (#38678)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -249,11 +247,11 @@
       }
     },
     {
-      "text": "BUG: Fix wrong khash method definition (#20966)",
+      "text": "ENH: update pandas-gbq to 0.8.0, adds credentials arg (#23662)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "chore",
+        "purpose": "Other",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -262,10 +260,10 @@
       }
     },
     {
-      "text": "ASV: excel asv occasional failure (#19811)\n    \n    closes #19779",
+      "text": "BUG: support skew function for custom BaseIndexer rolling windows (#33745)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
         "sentiment": "negative",
         "tech_tag": "general"
       },
@@ -275,7 +273,7 @@
       }
     },
     {
-      "text": "TST: method-specific files for DataFrame assign, interpolate  (#32110)",
+      "text": "TYP: Index.reindex (#40950)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -288,12 +286,12 @@
       }
     },
     {
-      "text": "Refactored GroupBy ASVs (#20043)",
+      "text": "Move API changes to appropriate sections (#35273)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
         "sentiment": "neutral",
-        "tech_tag": "general"
+        "tech_tag": "api"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -301,9 +299,9 @@
       }
     },
     {
-      "text": "REF: test_to_latex (#36528)",
+      "text": "BLD: Increase minimum version of Cython to 0.29.16 (#33334)",
       "labels": {
-        "commit_type": "other",
+        "commit_type": "chore",
         "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
@@ -314,7 +312,7 @@
       }
     },
     {
-      "text": "TST: bare pytest raises in tests/scalar (#32929)",
+      "text": "CLN: remove uses of compat.lrange, part I (#26281)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -327,59 +325,7 @@
       }
     },
     {
-      "text": "BUG: Don't multiply sets during construction (#32594)",
-      "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
-        "tech_tag": "general"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 21
-      }
-    },
-    {
-      "text": "DOC: minor cleanup of 1.2.1 release notes (#39112)",
-      "labels": {
-        "commit_type": "docs",
-        "purpose": "Refactoring",
-        "sentiment": "positive",
-        "tech_tag": "general"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 22
-      }
-    },
-    {
-      "text": "REF/TST: Finish pytest idiom in parser tests (#23863)\n    \n    Adds more idiom to the following:\n    \n    * parser/common --> parser/test_common\n    * parser/quoting --> parser/test_quoting\n    * parser/usecols --> parser/test_usecols\n    * parser/python_parser_only -->\n    parser/test_python_parser_only\n    \n    Also:\n    \n    * Finally delete parser/test_parsers!\n    * Bug in capture_stdout decorator in which\n    we were forgetting to use compat.wraps.\n    \n    Builds off of gh-23712.",
-      "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
-        "tech_tag": "general"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 23
-      }
-    },
-    {
-      "text": "PERF: Improve RollingGroupby.count (#36872)",
-      "labels": {
-        "commit_type": "perf",
-        "purpose": "Refactoring",
-        "sentiment": "positive",
-        "tech_tag": "performance"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 24
-      }
-    },
-    {
-      "text": "TST: Continue collecting arithmetic tests (#22559)",
+      "text": "Allow merging on object / non-object column (#21681)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -388,24 +334,37 @@
       },
       "metadata": {
         "source": "github-commit-messages",
-        "original_index": 25
+        "original_index": 21
       }
     },
     {
-      "text": "DOC: add black badge (#34154)",
+      "text": "TST: parametrize and de-duplicate arith tests (#27950)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
-        "original_index": 26
+        "original_index": 22
       }
     },
     {
-      "text": "BUG: Fix json_normalize throwing TypeError when record_path has a sequence of dicts #22706 (#22804)",
+      "text": "DOC: Final reorganization of documentation pages (#24890)\n    \n    * DOC: Final reorganization of documentation pages\n    \n    * Move ecosystem to top level",
+      "labels": {
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
+        "sentiment": "neutral",
+        "tech_tag": "general"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
+        "original_index": 23
+      }
+    },
+    {
+      "text": "BUG/REF: unstack with EA dtypes (#33356)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -414,14 +373,53 @@
       },
       "metadata": {
         "source": "github-commit-messages",
+        "original_index": 24
+      }
+    },
+    {
+      "text": "PERF: define is_all_dates to shortcut inadvertent copy when slicing an IntervalIndex (#23591)",
+      "labels": {
+        "commit_type": "perf",
+        "purpose": "Other",
+        "sentiment": "neutral",
+        "tech_tag": "performance"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
+        "original_index": 25
+      }
+    },
+    {
+      "text": "Deprecate joining over a different number of levels (#40993)",
+      "labels": {
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
+        "tech_tag": "general"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
+        "original_index": 26
+      }
+    },
+    {
+      "text": "TST: add NaN tests for all data types (#12535) (#27378)",
+      "labels": {
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "positive",
+        "tech_tag": "general"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
         "original_index": 27
       }
     },
     {
-      "text": "DOC: some 0.24.0 whatsnew clean-up (#24911)",
+      "text": "TST: Add message checks to tests/arrays/categorical/ (#30242)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
         "sentiment": "positive",
         "tech_tag": "general"
       },
@@ -431,12 +429,12 @@
       }
     },
     {
-      "text": "BUG: fix StringArray/PandasArray setitem with slice (#31773)",
+      "text": "solve test failure on 32bit systems (#22908)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
+        "commit_type": "test",
+        "purpose": "Test Update",
         "sentiment": "negative",
-        "tech_tag": "general"
+        "tech_tag": "testing"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -444,7 +442,7 @@
       }
     },
     {
-      "text": "Remove TestData in frame tests in multiple files - part 3 (#29226)",
+      "text": "TST: #31922 assert no segmentation fault with numpy.array.__contains__ (#36283)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -457,11 +455,11 @@
       }
     },
     {
-      "text": "TYP: update setup.cfg (#35628)",
+      "text": "Fix Memory Leak in to_json with Numeric Values (#26239)",
       "labels": {
-        "commit_type": "chore",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -470,20 +468,7 @@
       }
     },
     {
-      "text": "BUG: fix+test op(NaT, ndarray), also simplify (#27807)",
-      "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
-        "tech_tag": "testing"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 32
-      }
-    },
-    {
-      "text": "DOC: Fix renaming categories section (#21264)\n    \n    The categories were not correctly saved so that the renaming using the\n    dict-like object had no effect.",
+      "text": "BUG: Duplicated returns boolean dataframe (#25234)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -492,14 +477,27 @@
       },
       "metadata": {
         "source": "github-commit-messages",
+        "original_index": 32
+      }
+    },
+    {
+      "text": "use range in RangeIndex instead of _start etc. (#26581)",
+      "labels": {
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
+        "tech_tag": "general"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
         "original_index": 33
       }
     },
     {
-      "text": "MAINT: Remove console_encode comments (#20645)\n    \n    Closes gh-20616",
+      "text": "REF: implement _wrap_reduction_result (#37660)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -509,12 +507,12 @@
       }
     },
     {
-      "text": "ENH: Implement Kleene logic for BooleanArray (#29842)",
+      "text": "PERF avoid object-dtype comparisons (#24792)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
+        "commit_type": "perf",
+        "purpose": "Other",
         "sentiment": "neutral",
-        "tech_tag": "general"
+        "tech_tag": "performance"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -522,7 +520,7 @@
       }
     },
     {
-      "text": "BUG: Fixing memory leaks in read_csv (#23072)\n    \n    * Move allocation of na_hashset down to avoid a leak on continue\n    * Delete na_hashset if there is an exception\n    * Clean up table before raising an exception\n    \n    Closes gh-21353.",
+      "text": "BUG: incorrectly accepting datetime64(nat) for dt64tz (#39769)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -535,12 +533,12 @@
       }
     },
     {
-      "text": "CLN: use f-strings in core.categorical.py (#29748)",
+      "text": "TST: strict xfail (#38960)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "neutral",
-        "tech_tag": "python"
+        "sentiment": "negative",
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -548,11 +546,11 @@
       }
     },
     {
-      "text": "BUG: TDI/DTI _shallow_copy creating invalid arrays (#30764)",
+      "text": "DOC: update PeriodArray docstring (#37251)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -561,11 +559,11 @@
       }
     },
     {
-      "text": "DOC: Improved the docstring of str.extract() (Delhi) (#20141)",
+      "text": "DOC: df.astype example using dictionary (#26994)\n    \n    * DOC: df.astype example using dictionary (#26990)",
       "labels": {
         "commit_type": "docs",
         "purpose": "Documentation Update",
-        "sentiment": "positive",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -574,11 +572,11 @@
       }
     },
     {
-      "text": "DOC: small clean-up of 0.24.1 whatsnew (#25096)",
+      "text": "REF: use _validate_foo pattern in Categorical (#36181)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "positive",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -587,12 +585,12 @@
       }
     },
     {
-      "text": "TST: fix fixture for numpy dtypes (#23983)",
+      "text": "CLN: Styler Types for CSS variables on `ctx` object.  (#39660)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
-        "tech_tag": "general"
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
+        "tech_tag": "css"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -600,10 +598,10 @@
       }
     },
     {
-      "text": "TYP: DataFrame.to_gbq, DataFrame.to_html (easy: copy-paste from format module) (#38461)",
+      "text": "Correct type inference for UInt64Index during access (#29420)",
       "labels": {
-        "commit_type": "style",
-        "purpose": "Code Style/Formatting",
+        "commit_type": "other",
+        "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -613,7 +611,7 @@
       }
     },
     {
-      "text": "BUG: Infer compression by default in read_fwf() (#22200)\n    \n    Closes gh-22199.",
+      "text": "DOC: Fix minor typo in docstring (#25285)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -626,12 +624,12 @@
       }
     },
     {
-      "text": "REF: simplify IntervalIndex/IntervalArray _shallow_copy (#32247)",
+      "text": "TST: Adding map test for dict with np.nan key [Ref 17648] (#29367)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
-        "tech_tag": "general"
+        "commit_type": "test",
+        "purpose": "Test Update",
+        "sentiment": "positive",
+        "tech_tag": "testing"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -639,9 +637,9 @@
       }
     },
     {
-      "text": "CLN: Remove run_with_env.cmd (#26357)\n    \n    Was used for AppVeyor, which we dropped.",
+      "text": "COMPAT: update for latest flake8 (#23363)",
       "labels": {
-        "commit_type": "other",
+        "commit_type": "chore",
         "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
@@ -652,10 +650,10 @@
       }
     },
     {
-      "text": "REF: Implement NDArrayBackedExtensionArray (#33660)",
+      "text": "Replaced open with Context Mgrs in Parser Tests (#21105)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
+        "commit_type": "other",
+        "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -665,7 +663,7 @@
       }
     },
     {
-      "text": "De-privatize names (#33227)",
+      "text": "CLN: Remove PY2 compat code (#32677)\n    \n    Co-authored-by: MomIsBestFriend <>",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -678,11 +676,11 @@
       }
     },
     {
-      "text": "DOC: Fix pandas.index.copy summary documentation (#32006)",
+      "text": "TST: add test_series_any_timedelta for GH17667 (#28942)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -691,11 +689,11 @@
       }
     },
     {
-      "text": "DOC: Partial fix SA04 errors in docstrings #28792 (#33117)",
+      "text": "BLD: remove spellcheck from Makefile (#25111)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -704,12 +702,12 @@
       }
     },
     {
-      "text": "PERF/CLN: restrict _isna_ndarraylike to actual ndarray/EA (#40254)",
+      "text": "REF: use fused types in algos_rank_helper (#29044)",
       "labels": {
-        "commit_type": "perf",
+        "commit_type": "other",
         "purpose": "Other",
         "sentiment": "neutral",
-        "tech_tag": "performance"
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -717,7 +715,7 @@
       }
     },
     {
-      "text": "MAINT: Remove weird pd file\n    \n    Remnant of gh-20249.",
+      "text": "ENH: support 'infer' compression in _get_handle() (#17900)\n    \n    xref gh-15008\n    xref gh-17262",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -730,11 +728,11 @@
       }
     },
     {
-      "text": "TST: strict xfail (#38960)",
+      "text": "CLN: remove unused axis keyword from Block.where (#40561)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "negative",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -743,11 +741,11 @@
       }
     },
     {
-      "text": "Allow drop bins when using the cut function (#20947)",
+      "text": "DOC: avoid SparseArray.take error (#23637)\n    \n    Closes https://github.com/pandas-dev/pandas/issues/22215\n    \n    SparseArray.take not accepting scalars is already in 0.24.0.txt",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -756,12 +754,12 @@
       }
     },
     {
-      "text": "TYP: groupby.pyi (#40716)",
+      "text": "Fix type annotation for pandas.core.generic.py (#25909)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
-        "tech_tag": "general"
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
+        "tech_tag": "python"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -769,11 +767,11 @@
       }
     },
     {
-      "text": "DOC: update the pandas.Series.dt.is_month_end docstring (#20181)",
+      "text": "CLN: fix typo in asv benchmark of non_unique_sorted, which was not sorted (#24917)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -782,10 +780,10 @@
       }
     },
     {
-      "text": "TST/REF: collect tests by method (#37573)\n    \n    * TST/REF: collect tests by method\n    \n    * use round_trip_pickle",
+      "text": "DOC: update the pandas.Series.dt.is_quarter_end docstring (#20279)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -795,20 +793,7 @@
       }
     },
     {
-      "text": "TST: Avoid bare pytest.raises in multiple files (#32816)",
-      "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
-        "tech_tag": "general"
-      },
-      "metadata": {
-        "source": "github-commit-messages",
-        "original_index": 57
-      }
-    },
-    {
-      "text": "ASV: Added seek to buffer to fix xlwt asv failure (#19926)\n    \n    * Added seek to buffer to fix xlwt asv failure\n    \n    * Added conditional to check for seek on xlrd object",
+      "text": "IO: Fix S3 Error Handling (#33645)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -817,15 +802,28 @@
       },
       "metadata": {
         "source": "github-commit-messages",
+        "original_index": 57
+      }
+    },
+    {
+      "text": "CLN: Assorted cleanups (#27632)",
+      "labels": {
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "positive",
+        "tech_tag": "general"
+      },
+      "metadata": {
+        "source": "github-commit-messages",
         "original_index": 58
       }
     },
     {
-      "text": "DOC: update the Period.days_in_month docstring (#20297)\n    \n    * Add doctring for Period.days_in_month\n    \n    * Update added docstring for Period.days_in_month\n    \n    * Update added docstring for Period.days_in_month",
+      "text": "BUG: reindexing empty CategoricalIndex would fail if target had duplicates (#39046)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
-        "sentiment": "positive",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -834,7 +832,7 @@
       }
     },
     {
-      "text": "DOC: Fix whatsnew dates [ci skip] (#21759)",
+      "text": "BUG: DTA/TDA/PA iadd/isub should actually be inplace (#30505)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -847,11 +845,11 @@
       }
     },
     {
-      "text": "REF: de-duplicate DTA/TDA validators by standardizing exception messages (#37293)",
+      "text": "BUG: handle multi-dimensional grouping better (#36605)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -860,10 +858,10 @@
       }
     },
     {
-      "text": "REF: extract_array earlier in block construction (#40026)",
+      "text": "DOC: Make doc decorator a class and replace Appender by doc (#33160)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -873,11 +871,11 @@
       }
     },
     {
-      "text": "Typo fix (#36844)\n    \n    Noticed a minor typo when using the docs",
+      "text": "CLN: remove Categorical.put (#32554)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -886,10 +884,10 @@
       }
     },
     {
-      "text": "TST: inline empty_frame = DataFrame({}) fixture (#24886)",
+      "text": "Bug groupby quantile listlike q and int columns (#30485)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
         "sentiment": "negative",
         "tech_tag": "general"
       },
@@ -899,10 +897,10 @@
       }
     },
     {
-      "text": "REF: numeric index test_indexing (#33387)",
+      "text": "DOC: Updating pandas.Interval docstring (#20057)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -912,11 +910,11 @@
       }
     },
     {
-      "text": "REF: _cython_operation handle values.ndim==1 case up-front (#40672)",
+      "text": "DOC: Rephrased doc for Series.asof. Added examples (#21034)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -925,10 +923,10 @@
       }
     },
     {
-      "text": "Fix SS06 formatting errors  (#29295)",
+      "text": "CLN: remove unnecessary non-scalar code in maybe_upcast_putmask (#33641)\n    \n    * CLN: dtypes.cast cleanup following scalar restriction\n    \n    * un-xfail windows for kicks",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
+        "commit_type": "refactor",
+        "purpose": "Refactoring",
         "sentiment": "negative",
         "tech_tag": "general"
       },
@@ -938,11 +936,11 @@
       }
     },
     {
-      "text": "CI/CLN: Fix linting in datetimes (#20351)",
+      "text": "ENH: Add xlsb auto detection to read_excel and respect default options (#38710)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -951,11 +949,11 @@
       }
     },
     {
-      "text": "BUG: Fix incorrect _is_scalar_access check in iloc (#32085)",
+      "text": "DEPR: DataFrame GroupBy indexing with single items DeprecationWarning (#30546)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -964,7 +962,7 @@
       }
     },
     {
-      "text": "assert that dtype arg is an integer type (#37089)",
+      "text": "ENH: `Styler.highlight_null` can accepts `subset` argument (#31350)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -977,7 +975,7 @@
       }
     },
     {
-      "text": "REF: define concat classmethods in the appropriate places (#27727)",
+      "text": "remove coding=utf-8 (#26196)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -990,11 +988,11 @@
       }
     },
     {
-      "text": "REF: de-duplicate _wrap_joined_index (#36282)",
+      "text": "BUG: Bug in quantile() and median() returned wrong result for non monotonic window borders (#37166)\n    \n    * BUG: Bug in quantile() and median() returned wrong result for non monotonic window borders\n    \n    * Adjust whatsnew\n    \n    * Use is monotonic instead\n    \n    * Remove unncecessary code\n    \n    * Remove unncecessary code\n    \n    * Rename function after related pr was merged",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1003,7 +1001,7 @@
       }
     },
     {
-      "text": "TST/REF: consolidate hist tests (#38618)",
+      "text": "TYP: __getitem__ method of EA (#37898)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -1016,7 +1014,7 @@
       }
     },
     {
-      "text": "TST/REF: collect index tests (#39485)",
+      "text": "pin numpy (#35312)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -1029,11 +1027,11 @@
       }
     },
     {
-      "text": "BUG/ENH: Handle AmbiguousTimeError in date rounding (#22647)",
+      "text": "Refactor string methods for StringArray + return IntegerArray for numeric results (#29640)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "refactor",
+        "purpose": "Refactoring",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1042,12 +1040,12 @@
       }
     },
     {
-      "text": "BUG: Index.get_slice_bounds does not accept datetime.date or tz naive datetime.datetimes (#35848)",
+      "text": "BUG: Raise when casting NaT to int (#28492)\n    \n    * BUG: Raise when casting NaT to int\n    \n    * Add release note\n    \n    * Add PR number\n    \n    * Use isna\n    \n    * Parametrize test\n    \n    * Check all integer dtypes\n    \n    * Fix merge\n    \n    * Edit release note\n    \n    * Check for np.int64\n    \n    * Handle timedelta64\n    \n    * Add astype_nansafe datetime tests\n    \n    * Add test for NaT object casting",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
         "sentiment": "negative",
-        "tech_tag": "general"
+        "tech_tag": "git"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1055,7 +1053,7 @@
       }
     },
     {
-      "text": "CLN: remove ABCPeriod (#34218)",
+      "text": "REF: simplify _sanitize_column (#38459)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -1068,11 +1066,11 @@
       }
     },
     {
-      "text": "Fixed Metadata Propogation in DataFrame (#37381)",
+      "text": "CLN: avoid hasattr check in Timestamp.__richcmp__ (#34143)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "negative",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1081,12 +1079,12 @@
       }
     },
     {
-      "text": "TST: Added dataframe constructor tests confirming order is preserved with standard Python dicts (#38033) (#38206)",
+      "text": "REF: de-duplicate listlike validation in DTA._validate_foo (#33908)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "positive",
-        "tech_tag": "python"
+        "sentiment": "neutral",
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1094,12 +1092,12 @@
       }
     },
     {
-      "text": "DOC: update warning on py 2.7 support",
+      "text": "CLN: Use ABCs in set_index (#25128)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
+        "commit_type": "other",
+        "purpose": "Other",
         "sentiment": "neutral",
-        "tech_tag": "python"
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1107,11 +1105,11 @@
       }
     },
     {
-      "text": "Add missing spacing before or after a param name in docstrings (#23738)",
+      "text": "DOC: fixed PR06 in pandas.Timedeltas (#34574)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
-        "sentiment": "positive",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1120,10 +1118,10 @@
       }
     },
     {
-      "text": "DOC: update the pandas.Series.sort_index docstring (#20248)",
+      "text": "BENCH: collect low-dependency asvs (#39917)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
+        "commit_type": "other",
+        "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -1133,11 +1131,11 @@
       }
     },
     {
-      "text": "REV: move unique, _get_unique_index to ExtensionIndex (#30786)",
+      "text": "TST: stricten xfails (#38927)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "neutral",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1146,12 +1144,12 @@
       }
     },
     {
-      "text": "TST: Fix failing test from #37027 (#37048)",
+      "text": "BUG: Fix timedelta64+Timestamp, closes #24775 (#26916)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
         "sentiment": "negative",
-        "tech_tag": "testing"
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1159,11 +1157,11 @@
       }
     },
     {
-      "text": "Groupby crash on a single level (#30229)",
+      "text": "CI: troubleshoot s3fs failures (#28614)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "chore",
+        "purpose": "Build/CI/CD Script Update",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1172,9 +1170,9 @@
       }
     },
     {
-      "text": "DEPS: Bump pyarrow min version to 0.9.0 (#24854)\n    \n    Closes gh-24767",
+      "text": "CLN: remove algorithms.match (#29249)",
       "labels": {
-        "commit_type": "chore",
+        "commit_type": "other",
         "purpose": "Other",
         "sentiment": "neutral",
         "tech_tag": "general"
@@ -1185,11 +1183,11 @@
       }
     },
     {
-      "text": "CLN: Use new hashtables in libindex to avoid casting (#37994)",
+      "text": "CLN: annotate and de-nest write_array (#30012)",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
-        "sentiment": "positive",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1198,12 +1196,12 @@
       }
     },
     {
-      "text": "TST/CI: disable hypothesis deadline for test_tick_add_sub in test_ticks.py (#24654)",
+      "text": "Revert #21394 (#24289)\n    \n    * Revert #21394\n    \n    * Typo fixup",
       "labels": {
-        "commit_type": "chore",
-        "purpose": "Build/CI/CD Script Update",
-        "sentiment": "positive",
-        "tech_tag": "python"
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "negative",
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1211,7 +1209,7 @@
       }
     },
     {
-      "text": "BUG: fix AttributeError raised in libreduction (#29100)",
+      "text": "DOC: fix a small typo (#37291)",
       "labels": {
         "commit_type": "fix",
         "purpose": "Bug Fix",
@@ -1224,11 +1222,11 @@
       }
     },
     {
-      "text": "DOC: clarify see also for DataFrame.iterrows() (#27893)",
+      "text": "Changed kind parameter from integer to int, Added example (#32361)",
       "labels": {
-        "commit_type": "docs",
-        "purpose": "Documentation Update",
-        "sentiment": "neutral",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "positive",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1237,7 +1235,7 @@
       }
     },
     {
-      "text": "REF: separate method-pinning functions (#27811)",
+      "text": "REF: re-use _maybe_promote for _is_convertible_to_index_for_join (#36416)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
@@ -1250,10 +1248,10 @@
       }
     },
     {
-      "text": "REF: eliminate eval_kwargs (#29611)",
+      "text": "DOC: update the pandas.core.window.x.mean docstring (#20265)",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "neutral",
         "tech_tag": "general"
       },
@@ -1263,11 +1261,11 @@
       }
     },
     {
-      "text": "CLN: assorted cleanups (#30575)",
+      "text": "ENH: Use IntergerArray to avoid forced conversion from integer to float (#27335)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
-        "sentiment": "positive",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1276,12 +1274,12 @@
       }
     },
     {
-      "text": "CLN: moments/test_moments_rolling.py for apply (#36676)",
+      "text": "D202 No blank lines allowed after function docstring (#31895)",
       "labels": {
         "commit_type": "other",
         "purpose": "Other",
         "sentiment": "neutral",
-        "tech_tag": "python"
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1289,11 +1287,11 @@
       }
     },
     {
-      "text": "TST: xfail excel styler tests, xref GH25351 (#25352)\n    \n    * TST: xfail excel styler tests, xref GH25351\n    \n    * CI: cleanup .c files for cpplint>1.4",
+      "text": "use stdlib for whitespace check (#30061)",
       "labels": {
-        "commit_type": "refactor",
-        "purpose": "Refactoring",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1302,11 +1300,11 @@
       }
     },
     {
-      "text": "BUG: RollingGroupby MultiIndex levels dropped (#40701)",
+      "text": "REF: .get tests (#33164)",
       "labels": {
-        "commit_type": "fix",
-        "purpose": "Bug Fix",
-        "sentiment": "negative",
+        "commit_type": "other",
+        "purpose": "Other",
+        "sentiment": "neutral",
         "tech_tag": "general"
       },
       "metadata": {
@@ -1315,12 +1313,12 @@
       }
     },
     {
-      "text": "ENH: accept a dictionary in plot colors (#31071)",
+      "text": "CLN: Implement multiindex handling for get_op_result_name (#38323)\n    \n    * CLN: Implement multiindex handling for get_op_result_name\n    \n    * Change import order\n    \n    * Override method\n    \n    * Move import\n    \n    * Remove import\n    \n    * Fix merge issue\n    \n    * Move methods",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
-        "tech_tag": "general"
+        "commit_type": "feat",
+        "purpose": "Feature Implementation",
+        "sentiment": "negative",
+        "tech_tag": "git"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1328,12 +1326,12 @@
       }
     },
     {
-      "text": "CLN: Use new-style classes instead of old-style classes (#20563)",
+      "text": "DOC: whatsnew typos",
       "labels": {
-        "commit_type": "feat",
-        "purpose": "Feature Implementation",
+        "commit_type": "docs",
+        "purpose": "Documentation Update",
         "sentiment": "positive",
-        "tech_tag": "css"
+        "tech_tag": "general"
       },
       "metadata": {
         "source": "github-commit-messages",
@@ -1341,11 +1339,11 @@
       }
     },
     {
-      "text": "REGR: allow merging on object boolean columns (#21310)",
+      "text": "BUG: correctly tokenize local variable references",
       "labels": {
-        "commit_type": "other",
-        "purpose": "Other",
-        "sentiment": "neutral",
+        "commit_type": "fix",
+        "purpose": "Bug Fix",
+        "sentiment": "negative",
         "tech_tag": "general"
       },
       "metadata": {

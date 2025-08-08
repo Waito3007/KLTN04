@@ -1,0 +1,226 @@
+/* KanbanBoard.css - Kanban board layout and styling */
+
+.kanban-board {
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  min-height: calc(100vh - 120px);
+  border-radius: 12px;
+  margin: 16px;
+  border: 2px solid #e8e8e8;
+  position: relative;
+  isolation: isolate; /* Ngăn chặn ảnh hưởng từ children */
+}
+
+.kanban-columns {
+  margin: 0 -8px;
+}
+
+.kanban-board-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kanban-board {
+    padding: 12px;
+    margin: 8px;
+  }
+  
+  .kanban-columns {
+    margin: 0 -4px;
+  }
+}
+
+/* Animation - chỉ áp dụng cho nội dung, không ảnh hưởng viền ngoài */
+.kanban-board .ant-col {
+  transition: none; /* Loại bỏ transition để không ảnh hưởng layout */
+}
+
+/* Chỉ hover effect cho column content, không phải container */
+.kanban-board .kanban-column {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.kanban-board .kanban-column:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px); /* Chỉ nâng nhẹ column, không ảnh hưởng board */
+}
+
+/* Glass morphism effect - Updated for white/black theme */
+.kanban-board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  z-index: -1;
+}
+
+.kanban-board .board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.kanban-board .board-title {
+  margin: 0;
+  color: #262626;
+  font-weight: 600;
+}
+
+.kanban-board .board-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.kanban-board .columns-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* Desktop layout - 3 columns */
+@media (min-width: 1200px) {
+  .kanban-board .columns-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tablet layout - 3 columns */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .kanban-board .columns-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile layout - 1 column */
+@media (max-width: 767px) {
+  .kanban-board {
+    padding: 16px;
+  }
+  
+  .kanban-board .board-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .kanban-board .board-actions {
+    justify-content: center;
+  }
+  
+  .kanban-board .columns-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Loading state */
+.kanban-board .loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  grid-column: 1 / -1;
+}
+
+/* Empty state */
+.kanban-board .empty-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  grid-column: 1 / -1;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #d9d9d9;
+}
+
+.kanban-board .empty-container .ant-empty-description {
+  color: #8c8c8c;
+  margin-top: 16px;
+}
+
+/* Drag and drop hints */
+.kanban-board.drag-active {
+  background: #f0f8ff;
+}
+
+.kanban-board.drag-active .kanban-column {
+  transition: all 0.2s ease;
+}
+
+.kanban-board.drag-active .kanban-column.drag-over {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+}
+
+/* Action buttons styling */
+.kanban-board .board-actions .ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  height: 36px;
+  padding: 0 16px;
+}
+
+.kanban-board .board-actions .ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+}
+
+.kanban-board .board-actions .ant-btn-primary:hover {
+  background: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.kanban-board .board-actions .ant-btn:not(.ant-btn-primary) {
+  color: #595959;
+  border-color: #d9d9d9;
+}
+
+.kanban-board .board-actions .ant-btn:not(.ant-btn-primary):hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+/* Task count badge */
+.kanban-board .task-count-badge {
+  background: #f0f0f0;
+  color: #595959;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+/* Animation for new tasks */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kanban-board .task-card.new-task {
+  animation: slideInUp 0.3s ease-out;
+}

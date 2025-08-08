@@ -1,4 +1,3 @@
-# backend/core/security.py
 """
 Security module for authentication and authorization
 Handles GitHub OAuth tokens and user session management
@@ -12,13 +11,27 @@ from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 from starlette.requests import Request
 from typing import Optional, Dict, Any
 import httpx
+import asyncio
 import logging
 from functools import lru_cache
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy import select
+import os
+from dotenv import load_dotenv
 
 from services.user_service import get_user_by_github_id
 from db.models.users import users
-from db.database import database, engine
-from sqlalchemy import select
+
+load_dotenv()
+
+# Create async engine for security module
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and not DATABASE_URL.startswith("postgresql+asyncpg://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+
+if DATABASE_URL:
+    security_engine = create_async_engine(DATABASE_URL)
+    security_session_maker = async_sessionmaker(security_engine, expire_on_commit=False)
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +41,9 @@ class GitHubTokenBearer(SecurityBase):
     """
     def __init__(self, auto_error: bool = True):
         self.auto_error = auto_error
+        # Add the model attribute required by FastAPI OpenAPI generation
+        self.model = HTTPBearerModel()
+        self.scheme_name = "GitHubTokenBearer"
 
     async def __call__(self, request: Request) -> Optional[str]:
         authorization = request.headers.get("Authorization")
@@ -93,28 +109,63 @@ class CurrentUser:
 
 async def verify_github_token(token: str) -> Optional[Dict[str, Any]]:
     """
-    Verify GitHub token and get user info
-    Note: LRU cache removed as it doesn't work with async functions
+    Verify GitHub token and get user info with enhanced error handling
     """
     try:
-        async with httpx.AsyncClient() as client:
+        # Validate token format
+        if not token or len(token) < 20:
+            logger.warning("Invalid token format provided")
+            return None
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
             headers = {
                 "Authorization": f"token {token}",
-                "Accept": "application/vnd.github.v3+json"
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "KLTN04-Backend/1.0"
             }
             
-            # Get user info from GitHub API
-            response = await client.get("https://api.github.com/user", headers=headers)
-            
-            if response.status_code == 200:
-                github_user = response.json()
-                return github_user
-            elif response.status_code == 401:
-                logger.warning("Invalid GitHub token provided")
-                return None
-            else:
-                logger.error(f"GitHub API error: {response.status_code}")
-                return None
+            # Get user info from GitHub API with retry logic
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    response = await client.get("https://api.github.com/user", headers=headers)
+                    
+                    if response.status_code == 200:
+                        github_user = response.json()
+                        # Validate required fields
+                        if not github_user.get("id") or not github_user.get("login"):
+                            logger.error("Invalid user data from GitHub API")
+                            return None
+                        return github_user
+                    elif response.status_code == 401:
+                        logger.warning("Invalid GitHub token provided")
+                        return None
+                    elif response.status_code == 403:
+                        logger.warning("GitHub API rate limit exceeded or token lacks permissions")
+                        return None
+                    elif response.status_code == 429:
+                        # Rate limit - wait and retry
+                        if attempt < max_retries - 1:
+                            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                            continue
+                        logger.error("GitHub API rate limit exceeded after retries")
+                        return None
+                    else:
+                        logger.error(f"GitHub API error: {response.status_code} - {response.text}")
+                        return None
+                        
+                except httpx.ConnectError:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                        continue
+                    logger.error("Failed to connect to GitHub API")
+                    return None
+                except httpx.TimeoutException:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                        continue
+                    logger.error("GitHub API request timeout")
+                    return None
                 
     except Exception as e:
         logger.error(f"Error verifying GitHub token: {e}")
@@ -130,10 +181,15 @@ async def get_current_user_from_token(token: str) -> Optional[CurrentUser]:
         if not github_user:
             return None
         
-        # Get user from our database using engine connection
-        with engine.connect() as conn:
+        # Use separate database session for security
+        if not DATABASE_URL:
+            logger.error("Database URL not configured")
+            return None
+            
+        async with security_session_maker() as db:
             query = select(users).where(users.c.github_id == github_user["id"])
-            db_user = conn.execute(query).fetchone()
+            result = await db.execute(query)
+            db_user = result.first()
             
             if not db_user:
                 logger.warning(f"User {github_user['login']} not found in database")
@@ -144,8 +200,8 @@ async def get_current_user_from_token(token: str) -> Optional[CurrentUser]:
                 logger.warning(f"User {github_user['login']} is inactive")
                 return None
             
-            # Convert row to dict using _mapping
-            user_dict = dict(db_user._mapping)
+            # Convert row to dict
+            user_dict = dict(db_user._asdict())
             return CurrentUser(user_dict)
         
     except Exception as e:

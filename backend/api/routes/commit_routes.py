@@ -1,12 +1,13 @@
-# File: backend/api/routes/commit_routes.py
-from fastapi import APIRouter, HTTPException, UploadFile, File, Header
+from fastapi import APIRouter, HTTPException, UploadFile, File, Header, Depends
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 import pandas as pd
-from services.model_loader import predict_commit
 from pathlib import Path
 import tempfile
 import httpx
+import asyncio
+from datetime import datetime
+from api.routes.commit import fetch_raw_github_content
 
 router = APIRouter(prefix="/api/commits", tags=["Commit Analysis"])
 
@@ -17,7 +18,8 @@ async def analyze_github_commits(
     authorization: str = Header(..., alias="Authorization"),
     per_page: int = 30,
     since: Optional[str] = None,
-    until: Optional[str] = None
+    until: Optional[str] = None,
+    include_diff: bool = False  # New parameter
 ):
     """
     Phân tích commit từ repository GitHub
@@ -29,6 +31,7 @@ async def analyze_github_commits(
         per_page: Số commit tối đa cần phân tích (1-100)
         since: Lọc commit từ ngày (YYYY-MM-DDTHH:MM:SSZ)
         until: Lọc commit đến ngày (YYYY-MM-DDTHH:MM:SSZ)
+        include_diff: Có bao gồm nội dung diff đầy đủ của mỗi commit hay không (mặc định: False)
     
     Returns:
         {
@@ -47,6 +50,11 @@ async def analyze_github_commits(
                 status_code=400,
                 detail="per_page must be between 1 and 100"
             )
+
+        # Extract token from Authorization header
+        token = authorization.replace("Bearer ", "")
+        if not token:
+            raise HTTPException(status_code=401, detail="Missing or invalid GitHub token")
 
         # Configure GitHub API request
         headers = {
@@ -79,15 +87,31 @@ async def analyze_github_commits(
             commits_data = response.json()
 
         # Prepare analysis data
-        commits_for_analysis = [
-            {
-                "id": commit["sha"],
-                "message": commit["commit"]["message"],
-                "date": commit["commit"]["committer"]["date"] if commit["commit"]["committer"] else None
-            }
-            for commit in commits_data
-            if commit.get("sha") and commit.get("commit", {}).get("message")
-        ]
+        commits_for_analysis = []
+        for commit_data in commits_data:
+            commit_sha = commit_data.get("sha")
+            commit_message = commit_data.get("commit", {}).get("message")
+            commit_date = commit_data.get("commit", {}).get("committer", {}).get("date")
+
+            if commit_sha and commit_message:
+                commit_info = {
+                    "id": commit_sha,
+                    "message": commit_message,
+                    "date": commit_date
+                }
+                
+                if include_diff:
+                    try:
+                        # Fetch full diff content for the commit
+                        diff_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}"
+                        full_commit_details = await fetch_raw_github_content(diff_url, token)
+                        commit_info["diff_content"] = full_commit_details
+                    except Exception as e:
+                        # Log error but don't fail the whole request
+                        print(f"Warning: Could not fetch diff for commit {commit_sha}: {e}")
+                        commit_info["diff_content"] = "Error fetching diff"
+                
+                commits_for_analysis.append(commit_info)
 
         # Analyze commits
         results = {
@@ -104,12 +128,16 @@ async def analyze_github_commits(
             if is_critical:
                 results["critical"] += 1
             
-            results["details"].append({
+            detail_entry = {
                 "id": commit["id"],
                 "is_critical": is_critical,
                 "message_preview": commit['message'][:100] + "..." if len(commit['message']) > 100 else commit['message'],
                 "date": commit["date"]
-            })
+            }
+            if include_diff:
+                detail_entry["diff_content"] = commit.get("diff_content", "")
+            
+            results["details"].append(detail_entry)
 
         # Calculate percentage
         if results["total"] > 0:
@@ -135,18 +163,43 @@ async def analyze_github_commits(
             status_code=500,
             detail=f"Error analyzing GitHub commits: {str(e)}"
         )
-@router.post("/analyze-text")
+@router.get("/analyze-text")
 async def analyze_commit_text(message: str):
     """
     Phân tích một commit message dạng text
     
     Args:
-        message: Nội dung commit message
+        message: Nội dung commit message (query parameter)
     
     Returns:
         {"is_critical": 0|1, "message": string}
     """
     try:
+        is_critical = predict_commit(message)
+        return {
+            "is_critical": is_critical,
+            "message": "Phân tích thành công",
+            "input_sample": message[:100] + "..." if len(message) > 100 else message
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi phân tích: {str(e)}")
+
+@router.post("/analyze-text-post")
+async def analyze_commit_text_post(request_data: dict):
+    """
+    Phân tích một commit message dạng text (POST method)
+    
+    Args:
+        request_data: {"message": "commit message text"}
+    
+    Returns:
+        {"is_critical": 0|1, "message": string}
+    """
+    try:
+        message = request_data.get("message", "")
+        if not message:
+            raise HTTPException(status_code=400, detail="Missing 'message' field")
+            
         is_critical = predict_commit(message)
         return {
             "is_critical": is_critical,
@@ -242,3 +295,169 @@ async def analyze_commits_csv(file: UploadFile = File(...)):
         if tmp_path.exists():
             tmp_path.unlink()
         raise HTTPException(status_code=500, detail=f"Lỗi xử lý file: {str(e)}")
+
+# ==================== COMMIT DIFF ENDPOINTS ====================
+
+@router.get("/{owner}/{repo}/commits/{sha}/diff")
+async def get_commit_diff_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy diff của commit cụ thể
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Diff content của commit
+    """
+    try:
+        from services.commit_service import get_commit_diff
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        diff = await get_commit_diff(owner, repo, sha, github_token)
+        
+        if diff is None:
+            raise HTTPException(status_code=404, detail="Commit diff not found")
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "diff": diff,
+            "size": len(diff),
+            "lines_count": len(diff.split('\n')) if diff else 0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving diff: {str(e)}")
+
+@router.get("/{owner}/{repo}/commits/{sha}/files")
+async def get_commit_files_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy danh sách files thay đổi trong commit
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Danh sách files thay đổi với stats
+    """
+    try:
+        from services.commit_service import get_commit_files
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        files = await get_commit_files(owner, repo, sha, github_token)
+        
+        # Calculate summary stats
+        total_additions = sum(f.get('additions', 0) for f in files)
+        total_deletions = sum(f.get('deletions', 0) for f in files)
+        total_changes = sum(f.get('changes', 0) for f in files)
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "files": files,
+            "summary": {
+                "files_count": len(files),
+                "total_additions": total_additions,
+                "total_deletions": total_deletions,
+                "total_changes": total_changes
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving files: {str(e)}")
+
+@router.get("/{owner}/{repo}/commits/{sha}/stats")
+async def get_commit_stats_endpoint(
+    owner: str, 
+    repo: str, 
+    sha: str,
+    authorization: str = Header(..., alias="Authorization")
+):
+    """
+    Lấy thống kê tổng hợp của commit
+    
+    Args:
+        owner: Owner của repository
+        repo: Tên repository
+        sha: SHA của commit
+        authorization: GitHub token
+        
+    Returns:
+        Thống kê commit bao gồm files và diff
+    """
+    try:
+        from services.commit_service import get_commit_diff, get_commit_files
+        
+        # Extract token from authorization header
+        github_token = None
+        if authorization.startswith("Bearer "):
+            github_token = authorization.replace("Bearer ", "")
+        elif authorization.startswith("token "):
+            github_token = authorization.replace("token ", "")
+        
+        # Get both files and diff
+        files = await get_commit_files(owner, repo, sha, github_token)
+        diff = await get_commit_diff(owner, repo, sha, github_token)
+        
+        if not files and not diff:
+            raise HTTPException(status_code=404, detail="Commit not found")
+        
+        # Calculate stats
+        total_additions = sum(f.get('additions', 0) for f in files)
+        total_deletions = sum(f.get('deletions', 0) for f in files)
+        total_changes = sum(f.get('changes', 0) for f in files)
+        
+        # File type analysis
+        file_types = {}
+        for file in files:
+            filename = file.get('filename', '')
+            if '.' in filename:
+                ext = filename.split('.')[-1].lower()
+                file_types[ext] = file_types.get(ext, 0) + 1
+        
+        return {
+            "sha": sha,
+            "repository": f"{owner}/{repo}",
+            "stats": {
+                "files_count": len(files),
+                "total_additions": total_additions,
+                "total_deletions": total_deletions,
+                "total_changes": total_changes,
+                "diff_size": len(diff) if diff else 0,
+                "diff_lines": len(diff.split('\n')) if diff else 0
+            },
+            "file_types": file_types,
+            "has_diff": diff is not None,
+            "has_files": len(files) > 0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving commit stats: {str(e)}")

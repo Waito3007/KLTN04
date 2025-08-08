@@ -1,11 +1,17 @@
-from sqlalchemy import Table, Column, Integer, String, Boolean, Text, DateTime, func, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Boolean, Text, DateTime, func, ForeignKey, JSON
+from sqlalchemy.dialects import postgresql, sqlite
 from db.metadata import metadata
+
+# Define JSON type that works with both PostgreSQL and SQLite
+def JSONType():
+    """Return appropriate JSON type based on database dialect"""
+    return JSON().with_variant(Text(), "sqlite")
 
 commits = Table(
     'commits',
     metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('sha', String(40), nullable=False),
+    Column('sha', String(128), nullable=False),  # Increased to 128 to support all SHA types
     Column('message', Text, nullable=False),
     Column('author_user_id', Integer, ForeignKey('users.id'), nullable=True),
     Column('author_name', String(255), nullable=False),
@@ -23,9 +29,17 @@ commits = Table(
     Column('insertions', Integer, nullable=True),
     Column('deletions', Integer, nullable=True),
     Column('files_changed', Integer, nullable=True),
-    Column('parent_sha', String(40), nullable=True),
+    Column('parent_sha', String(128), nullable=True),  # Also increased to 128
     Column('is_merge', Boolean, nullable=True),
     Column('merge_from_branch', String(255), nullable=True),
+    # Enhanced fields for file tracking (compatible with both PostgreSQL and SQLite)
+    Column('modified_files', JSONType(), nullable=True, comment='List of modified file paths'),
+    Column('file_types', JSONType(), nullable=True, comment='Dictionary of file extensions and their counts'),
+    Column('modified_directories', JSONType(), nullable=True, comment='Dictionary of directories and their change counts'),
+    Column('total_changes', Integer, nullable=True, comment='Total number of changes (additions + deletions)'),
+    Column('change_type', String(50), nullable=True, comment='Type of change: feature, bugfix, refactor, etc.'),
+    Column('commit_size', String(20), nullable=True, comment='Size category: small, medium, large'),
     Column('created_at', DateTime, nullable=True, server_default=func.now()),
     Column('last_synced', DateTime, nullable=True, server_default=func.now()),
+    Column('diff_content', Text, nullable=True, comment='Raw diff content for the commit'),
 )
