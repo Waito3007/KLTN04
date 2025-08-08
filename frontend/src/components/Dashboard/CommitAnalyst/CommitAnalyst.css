@@ -1,0 +1,124 @@
+/* Animation cho CommitDetailModal */
+.commit-modal-enter {
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+}
+
+.commit-modal-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.commit-modal-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.commit-modal-exit-active {
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+  transition: all 0.2s ease-in;
+}
+
+/* Animation cho CommitList items */
+.commit-item {
+  transition: all 0.3s ease;
+}
+
+.commit-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Gradient button effect */
+.commit-detail-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.commit-detail-button:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Filter card styling */
+.filter-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Commit type tags với màu sắc đặc biệt */
+.commit-type-feat { background-color: #52c41a !important; }
+.commit-type-fix { background-color: #ff4d4f !important; }
+.commit-type-docs { background-color: #1890ff !important; }
+.commit-type-style { background-color: #722ed1 !important; }
+.commit-type-refactor { background-color: #fa8c16 !important; }
+.commit-type-test { background-color: #13c2c2 !important; }
+.commit-type-chore { background-color: #8c8c8c !important; }
+.commit-type-perf { background-color: #fadb14 !important; }
+.commit-type-ci { background-color: #2f54eb !important; }
+.commit-type-build { background-color: #fa541c !important; }
+
+/* Loading spinner custom */
+.commit-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background: linear-gradient(145deg, #f8f9fa, #ffffff);
+  border-radius: 8px;
+}
+
+/* Diff content styling */
+.diff-content {
+  font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+.diff-content pre {
+  margin: 0;
+  padding: 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .commit-item {
+    margin-bottom: 12px;
+  }
+  
+  .filter-card .ant-row {
+    gap: 8px;
+  }
+  
+  .commit-detail-button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* Smooth scrolling */
+.commit-list-container {
+  scroll-behavior: smooth;
+}
+
+/* Tag hover effects */
+.ant-tag {
+  transition: all 0.2s ease;
+}
+
+.ant-tag:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}

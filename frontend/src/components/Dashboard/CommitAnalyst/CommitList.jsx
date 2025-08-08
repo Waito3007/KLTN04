@@ -1,26 +1,49 @@
 
 import React, { useState } from 'react';
 import { List, Card, Tag, Input, Select, Button, Typography } from 'antd';
+import CommitDetailModal from './CommitDetailModal';
 
 const { Text } = Typography;
+
+const COMMIT_TYPES = [
+  { value: '', label: 'Tất cả loại' },
+  { value: 'feat', label: 'feat' },
+  { value: 'fix', label: 'fix' },
+  { value: 'docs', label: 'docs' },
+  { value: 'chore', label: 'chore' },
+  { value: 'style', label: 'style' },
+  { value: 'refactor', label: 'refactor' },
+  { value: 'test', label: 'test' },
+];
 
 const CommitList = ({ commits }) => {
   const [commitSearch, setCommitSearch] = useState('');
   const [commitPage, setCommitPage] = useState(1);
   const [commitPageSize, setCommitPageSize] = useState(10);
+  const [commitType, setCommitType] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCommit, setSelectedCommit] = useState(null);
 
   const filterCommits = commits => {
-    if (!commitSearch)
-      return commits;
-    return commits.filter(
-      item =>
-        (item.message || item.commit?.message || '').toLowerCase().includes(commitSearch.toLowerCase()) ||
-        (item.author_name || item.commit?.author?.name || '').toLowerCase().includes(commitSearch.toLowerCase())
-    );
+    let result = commits;
+    if (commitSearch) {
+      result = result.filter(
+        item =>
+          (item.message || item.commit?.message || '').toLowerCase().includes(commitSearch.toLowerCase()) ||
+          (item.author_name || item.commit?.author?.name || '').toLowerCase().includes(commitSearch.toLowerCase())
+      );
+    }
+    if (commitType) {
+      result = result.filter(
+        item => (item.analysis?.type || '').toLowerCase() === commitType
+      );
+    }
+    return result;
   };
 
   const handleShowDetail = commit => {
-    window.alert(`Chi tiết commit: ${commit.message || commit.commit?.message}`);
+    setSelectedCommit(commit);
+    setModalVisible(true);
   };
 
   const filtered = filterCommits(commits);
@@ -38,6 +61,15 @@ const CommitList = ({ commits }) => {
           }}
           style={{ width: 220 }}
           allowClear
+        />
+        <Select
+          value={commitType}
+          style={{ width: 140 }}
+          onChange={type => {
+            setCommitType(type);
+            setCommitPage(1);
+          }}
+          options={COMMIT_TYPES}
         />
         <Select
           defaultValue={commitPageSize}
@@ -78,10 +110,6 @@ const CommitList = ({ commits }) => {
                 )}
               </div>
               <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-                <Button danger onClick={() => window.alert('Xóa commit này!')}>
-                  Xóa
-                </Button>
-                <Button onClick={() => window.alert('Đánh dấu commit!')}>Đánh dấu</Button>
                 <Button type="primary" onClick={() => handleShowDetail(item)}>
                   Chi tiết
                 </Button>
@@ -96,6 +124,11 @@ const CommitList = ({ commits }) => {
           onChange: page => setCommitPage(page),
           showSizeChanger: false,
         }}
+      />
+      <CommitDetailModal
+        visible={modalVisible}
+        commit={selectedCommit}
+        onClose={() => setModalVisible(false)}
       />
     </>
   );

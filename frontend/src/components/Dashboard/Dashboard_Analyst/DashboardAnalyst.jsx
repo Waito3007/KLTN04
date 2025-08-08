@@ -5,7 +5,7 @@ import axios from 'axios';
 import { 
   WarningOutlined, InfoCircleOutlined, BranchesOutlined, LineChartOutlined, 
   ExperimentOutlined, TeamOutlined, UserSwitchOutlined, ClockCircleOutlined, ThunderboltOutlined,
-  RightOutlined, ExpandAltOutlined, CloseOutlined, RobotOutlined
+  RightOutlined, ExpandAltOutlined, CloseOutlined, RobotOutlined, SyncOutlined
 } from '@ant-design/icons';
 
 const ExpandButton = styled(Button)`
@@ -189,10 +189,10 @@ const RisksSection = ({ data }) => {
   );
 };
 
-const ProductivitySection = ({ data }) => {
+const ProductivitySection = ({ data, onDeveloperClick }) => {
   if (!data || !data.team_summary) return <Typography.Text type="secondary">Không có dữ liệu năng suất.</Typography.Text>;
   const summary = data.team_summary;
-  const memberMetrics = data.member_metrics ? Object.entries(data.member_metrics).sort(([, a], [, b]) => b.commits - a.commits).slice(0, 3) : [];
+  const memberMetrics = data.member_metrics ? Object.entries(data.member_metrics).sort(([, a], [, b]) => b.commits - a.commits) : [];
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
@@ -206,13 +206,16 @@ const ProductivitySection = ({ data }) => {
       </Row>
       {memberMetrics.length > 0 && (
         <div>
-          <Typography.Text strong style={{ fontSize: '12px' }}>Top Contributors:</Typography.Text>
+          <Typography.Text strong style={{ fontSize: '12px' }}>Top Contributors (click to view DNA):</Typography.Text>
           <List
             size="small"
             dataSource={memberMetrics}
             renderItem={([name, metrics]) => (
-              <List.Item style={{padding: '2px 0', fontSize: '12px', border: 'none' }}>
-                {name}: {metrics.commits} commits, {metrics.lines_added + metrics.lines_removed} lines
+              <List.Item 
+                style={{padding: '2px 0', fontSize: '12px', border: 'none', cursor: 'pointer' }}
+                onClick={() => onDeveloperClick(name)}
+              >
+                <Typography.Link>{name}: {metrics.commits} commits, {metrics.lines_added + metrics.lines_removed} lines</Typography.Link>
               </List.Item>
             )}
           />
@@ -238,6 +241,57 @@ const AssignmentSection = ({ data }) => {
         </List.Item>
       )}
     />
+  );
+};
+
+const DnaProfileDisplay = ({ dna, loading }) => {
+  if (loading) return <Spin tip="Analyzing DNA..." />;
+  if (!dna) return <p>Select a developer to see their DNA profile.</p>;
+  if (dna.message) return <Alert message={dna.message} type="info" />;
+
+  const { work_rhythm, contribution_style, tech_expertise, risk_profile } = dna;
+
+  const getPrimaryStyleTag = (style) => {
+    const styles = {
+      feature: { color: 'success', name: 'Builder' },
+      fix: { color: 'error', name: 'Stabilizer' },
+      refactor: { color: 'processing', name: 'Refiner' },
+      docs: { color: 'default', name: 'Documenter' },
+      test: { color: 'warning', name: 'Tester' },
+    };
+    return <Tag color={styles[style]?.color || 'default'}>{styles[style]?.name || style}</Tag>;
+  };
+
+  return (
+    <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <Card title="Work Pattern & Rhythm">
+        <Statistic title="Primary Style" valueRender={() => getPrimaryStyleTag(contribution_style.primary_style)} />
+        <Statistic title="Commit Frequency" value={work_rhythm.commit_frequency} suffix="commits/day" />
+        <Statistic title="Avg. Commit Size" value={risk_profile.avg_commit_size} precision={0} suffix="lines" />
+      </Card>
+      <Card title="Contribution Style">
+        {Object.entries(contribution_style.distribution).map(([type, count]) => (
+          <div key={type} style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>{type}</span>
+            <Tag>{count}</Tag>
+          </div>
+        ))}
+      </Card>
+      <Card title="Technical Expertise">
+        <Typography.Text strong>Areas:</Typography.Text>
+        <div style={{ margin: '8px 0' }}>
+          {Object.keys(tech_expertise.areas).map(area => <Tag key={area} color="blue">{area}</Tag>)}
+        </div>
+        <Typography.Text strong>Languages:</Typography.Text>
+        <div style={{ marginTop: '8px' }}>
+          {Object.keys(tech_expertise.languages).map(lang => <Tag key={lang} color="geekblue">{lang}</Tag>)}
+        </div>
+      </Card>
+      <Card title="Risk Profile">
+        <Progress percent={risk_profile.high_risk_percentage} steps={5} strokeColor={['#52c41a', '#faad14', '#f5222d']} />
+        <Statistic title="High Risk Commits" value={`${risk_profile.high_risk_percentage}%`} />
+      </Card>
+    </Space>
   );
 };
 
@@ -340,6 +394,41 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
   const [branchLoading, setBranchLoading] = useState(false);
   const [daysBack, setDaysBack] = useState(30);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dnaDrawerOpen, setDnaDrawerOpen] = useState(false);
+  const [selectedDeveloper, setSelectedDeveloper] = useState(null);
+  const [dnaData, setDnaData] = useState(null);
+  const [dnaLoading, setDnaLoading] = useState(false);
+
+  const handleDeveloperClick = async (authorName, forceRefresh = false) => {
+    setSelectedDeveloper(authorName);
+    setDnaDrawerOpen(true);
+    setDnaLoading(true);
+
+    const token = localStorage.getItem('access_token');
+    const selectedRepo = repositories.find(repo => repo.id === selectedRepoId);
+    if (!token || !selectedRepo) return;
+
+    const ownerName = typeof selectedRepo.owner === 'string' ? selectedRepo.owner : selectedRepo.owner?.name || selectedRepo.owner?.login;
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/dashboard/dna/${ownerName}/${selectedRepo.name}/${authorName}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { 
+            days_back: 90, // Use a longer period for DNA analysis
+            force_refresh: forceRefresh
+          }
+        }
+      );
+      setDnaData(response.data);
+    } catch (err) {
+      console.error("Lỗi khi tải DNA developer:", err);
+      setDnaData({ message: `Không thể tải dữ liệu cho ${authorName}.` });
+    } finally {
+      setDnaLoading(false);
+    }
+  };
 
   const handleBranchChange = (branchName) => {
     setSelectedBranch(branchName);
@@ -374,7 +463,7 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
             <RisksSection data={analyticsData.risks} />
           </Collapse.Panel>
           <Collapse.Panel header={<><TeamOutlined /> Năng suất</>} key="productivity">
-            <ProductivitySection data={analyticsData.productivity_metrics} />
+            <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
           </Collapse.Panel>
           <Collapse.Panel header={<><UserSwitchOutlined /> Gợi ý phân công</>} key="assignment">
             <AssignmentSection data={analyticsData.assignment_suggestions} />
@@ -467,7 +556,7 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
                 <RisksSection data={analyticsData.risks} />
               </Collapse.Panel>
               <Collapse.Panel header={<><TeamOutlined /> Năng suất</>} key="productivity">
-                <ProductivitySection data={analyticsData.productivity_metrics} />
+                <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
               </Collapse.Panel>
               <Collapse.Panel header={<><UserSwitchOutlined /> Gợi ý phân công</>} key="assignment">
                 <AssignmentSection data={analyticsData.assignment_suggestions} />
@@ -481,6 +570,27 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
             </div>
           )}
         </DrawerContent>
+      </Drawer>
+
+      <Drawer
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{`Developer DNA: ${selectedDeveloper}`}</span>
+            <Button 
+              icon={<SyncOutlined />} 
+              onClick={() => handleDeveloperClick(selectedDeveloper, true)}
+              loading={dnaLoading}
+            >
+              Refresh
+            </Button>
+          </div>
+        }
+        placement="right"
+        width={400}
+        open={dnaDrawerOpen}
+        onClose={() => setDnaDrawerOpen(false)}
+      >
+        <DnaProfileDisplay dna={dnaData} loading={dnaLoading} />
       </Drawer>
     </>
   );

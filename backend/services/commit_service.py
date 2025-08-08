@@ -165,8 +165,13 @@ async def save_commit_with_diff(commit_data: dict, owner: str, repo: str, github
         query = select(commits).where(commits.c.sha == commit_sha)
         existing_commit = await database.fetch_one(query)
         
-        if existing_commit and not force_update:
-            logger.info(f"Commit {commit_sha} already exists, skipping")
+        # Quyết định có cần cập nhật không dựa trên:
+        # 1. force_update = True -> luôn cập nhật
+        # 2. commit chưa có diff_content -> cập nhật để lấy diff_content
+        should_update = force_update or (existing_commit and not existing_commit.diff_content)
+        
+        if existing_commit and not should_update:
+            logger.info(f"Commit {commit_sha} already exists with diff_content, skipping")
             return existing_commit.id
         
         # Lấy diff content và files từ GitHub API
@@ -287,14 +292,19 @@ async def save_commit_with_diff(commit_data: dict, owner: str, repo: str, github
         }
         
         if existing_commit:
-            # Update existing commit
+            # Update existing commit (khi force_update=True hoặc chưa có diff_content)
             update_query = (
                 update(commits)
                 .where(commits.c.sha == commit_sha)
                 .values(commit_entry)
             )
             await database.execute(update_query)
-            logger.info(f"Updated commit {commit_sha} with diff ({len(diff_content or '')} chars)")
+            
+            if not existing_commit.diff_content and diff_content:
+                logger.info(f"Updated commit {commit_sha} to add missing diff_content ({len(diff_content)} chars)")
+            else:
+                logger.info(f"Updated commit {commit_sha} with diff ({len(diff_content or '')} chars)")
+            
             return existing_commit.id
         else:
             # Insert new commit

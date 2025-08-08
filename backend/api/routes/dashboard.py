@@ -356,3 +356,42 @@ def _generate_quick_alerts(
         })
     
     return alerts
+
+@router.get(
+    "/dna/{repo_owner}/{repo_name}/{author_name}",
+    summary="Lấy hồ sơ DNA của Developer",
+    description="Phân tích sâu về phong cách làm việc, chuyên môn và hành vi của một developer."
+)
+async def get_developer_dna(
+    repo_owner: str,
+    repo_name: str,
+    author_name: str, # Tên tác giả từ commit
+    days_back: int = Query(default=90, ge=7, le=365, description="Số ngày phân tích (7-365)"),
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> Dict[str, Any]:
+    """Lấy hồ sơ DNA chi tiết của một developer."""
+    try:
+        logger.info(f"Getting Developer DNA for {author_name} in {repo_owner}/{repo_name}")
+        
+        await _validate_repo_access(repo_owner, repo_name, current_user, db)
+        
+        analytics_service = DashboardAnalyticsService(db)
+        
+        repo_id = await analytics_service._get_repo_id(repo_owner, repo_name)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail="Repository không tồn tại")
+        
+        dna_profile = await analytics_service.get_developer_dna(repo_id, author_name, days_back)
+        
+        if "message" in dna_profile:
+            raise HTTPException(status_code=404, detail=dna_profile["message"])
+
+        logger.info(f"Successfully generated DNA profile for {author_name}")
+        return dna_profile
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get developer DNA: {e}")
+        raise HTTPException(status_code=500, detail="Lỗi internal khi tạo hồ sơ DNA")

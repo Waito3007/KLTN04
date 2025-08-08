@@ -430,15 +430,26 @@ class DashboardAnalyticsService:
             # Format data for MultiFusion model với xử lý an toàn cho None values
             lines_added = commit_data.get('insertions') or 0
             lines_removed = commit_data.get('deletions') or 0
-            files_changed = commit_data.get('files_changed') or 0
+            
+            # Xử lý files_changed: từ string JSON sang list, sau đó lấy len
+            files_changed_list = []
+            if isinstance(commit_data.get('files_changed'), str):
+                try:
+                    files_changed_list = json.loads(commit_data['files_changed'])
+                except json.JSONDecodeError:
+                    logger.warning(f"Could not decode files_changed JSON: {commit_data['files_changed']}")
+            elif isinstance(commit_data.get('files_changed'), list):
+                files_changed_list = commit_data['files_changed']
+            
+            num_files_changed = len(files_changed_list)
             
             formatted_commit = {
                 'message': commit_data.get('message', ''),
-                'file_count': files_changed,
+                'file_count': num_files_changed,
                 'lines_added': lines_added,
                 'lines_removed': lines_removed,
                 'total_changes': lines_added + lines_removed,
-                'num_dirs_changed': 1  # Default value
+                'num_dirs_changed': 1  # Default value, có thể cải tiến sau
             }
             
             if self.commit_analyzer.is_model_available():
@@ -457,12 +468,23 @@ class DashboardAnalyticsService:
             # Xử lý an toàn cho các giá trị None
             lines_added = commit_data.get('insertions') or 0
             lines_removed = commit_data.get('deletions') or 0
-            files_changed = commit_data.get('files_changed') or 0
+            
+            # Xử lý files_changed: từ string JSON sang list, sau đó lấy len
+            files_changed_list = []
+            if isinstance(commit_data.get('files_changed'), str):
+                try:
+                    files_changed_list = json.loads(commit_data['files_changed'])
+                except json.JSONDecodeError:
+                    logger.warning(f"Could not decode files_changed JSON for dev_area: {commit_data['files_changed']}")
+            elif isinstance(commit_data.get('files_changed'), list):
+                files_changed_list = commit_data['files_changed']
+            
+            num_files_changed = len(files_changed_list)
             
             formatted_data = {
                 'commit_message': commit_data.get('message', ''),
                 'diff_content': commit_data.get('diff_content', ''),
-                'files_count': files_changed,
+                'files_count': num_files_changed,
                 'lines_added': lines_added,
                 'lines_removed': lines_removed,
                 'total_changes': lines_added + lines_removed
@@ -479,12 +501,23 @@ class DashboardAnalyticsService:
             # Xử lý an toàn cho các giá trị None
             lines_added = commit_data.get('insertions') or 0
             lines_removed = commit_data.get('deletions') or 0
-            files_changed = commit_data.get('files_changed') or 0
+            
+            # Xử lý files_changed: từ string JSON sang list, sau đó lấy len
+            files_changed_list = []
+            if isinstance(commit_data.get('files_changed'), str):
+                try:
+                    files_changed_list = json.loads(commit_data['files_changed'])
+                except json.JSONDecodeError:
+                    logger.warning(f"Could not decode files_changed JSON for risk_level: {commit_data['files_changed']}")
+            elif isinstance(commit_data.get('files_changed'), list):
+                files_changed_list = commit_data['files_changed']
+            
+            num_files_changed = len(files_changed_list)
             
             formatted_data = {
                 'commit_message': commit_data.get('message', ''),
                 'diff_content': commit_data.get('diff_content', ''),
-                'files_count': files_changed,
+                'files_count': num_files_changed,
                 'lines_added': lines_added,
                 'lines_removed': lines_removed,
                 'total_changes': lines_added + lines_removed
@@ -992,3 +1025,105 @@ class DashboardAnalyticsService:
             return 0.0
         
         return mean(weekly_commits.values())
+
+    async def get_developer_dna(self, repo_id: int, author_name: str, days_back: int, force_refresh: bool = False) -> Dict[str, Any]:
+        """
+        Phân tích và xây dựng hồ sơ DNA của một developer.
+        Luôn gọi trực tiếp các model AI để có output chuẩn đoán.
+        """
+        # 1. Lấy commits của author (chỉ các cột cơ bản)
+        query = """
+            SELECT id, sha, message, author_name, committer_date, insertions, deletions, 
+                   files_changed, modified_files, file_types, diff_content
+            FROM commits 
+            WHERE repo_id = :repo_id 
+            AND author_name = :author_name
+            AND committer_date >= :start_date
+        """
+        start_date = datetime.now() - timedelta(days=days_back)
+        result = await self.db.execute(text(query), {
+            "repo_id": repo_id,
+            "author_name": author_name,
+            "start_date": start_date
+        })
+        author_commits = [dict(row._mapping) for row in result.fetchall()]
+
+        if not author_commits:
+            return {"message": "Không có đủ dữ liệu cho developer này."}
+
+        # Chuyển đổi committer_date sang datetime object nếu cần và chạy AI analysis
+        analyzed_commits = []
+        for commit in author_commits:
+            # Chuyển đổi committer_date
+            if isinstance(commit['committer_date'], str):
+                try:
+                    commit['committer_date'] = datetime.fromisoformat(commit['committer_date'].replace('Z', '+00:00'))
+                except ValueError:
+                    logger.warning(f"Could not parse committer_date string: {commit['committer_date']}")
+                    continue # Bỏ qua commit này nếu ngày không hợp lệ
+            
+            # Luôn chạy AI analysis cho mỗi commit
+            commit['commit_type'] = await self._get_commit_type(commit)
+            commit['dev_area'] = await self._get_dev_area(commit)
+            commit['risk_level'] = await self._get_risk_level(commit)
+            analyzed_commits.append(commit)
+
+        # Lọc ra các commit hợp lệ sau khi xử lý ngày
+        valid_analyzed_commits = [c for c in analyzed_commits if isinstance(c['committer_date'], datetime)]
+
+        # 4. Phân tích các "Gen"
+        # Gen 1: Nhịp độ & Mẫu hình làm việc
+        hours = [c['committer_date'].hour for c in valid_analyzed_commits]
+        weekdays = [c['committer_date'].weekday() for c in valid_analyzed_commits]
+        work_rhythm = {
+            "active_hours": dict(Counter(hours).most_common(5)),
+            "active_days": dict(Counter(weekdays).most_common(3)),
+            "total_commits": len(valid_analyzed_commits),
+            "commit_frequency": round(len(valid_analyzed_commits) / days_back, 2) if days_back > 0 else 0
+        }
+
+        # Gen 2: Phong cách đóng góp
+        commit_types = Counter(c.get('commit_type', 'unknown') for c in valid_analyzed_commits)
+        contribution_style = {
+            "distribution": dict(commit_types),
+            "primary_style": commit_types.most_common(1)[0][0] if commit_types else 'unknown'
+        }
+
+        # Gen 3: Chuyên môn kỹ thuật
+        tech_expertise = {
+            "areas": Counter(c.get('dev_area', 'unknown') for c in valid_analyzed_commits),
+            "languages": Counter()
+        }
+        for c in valid_analyzed_commits:
+            try:
+                file_types = json.loads(c.get('file_types', '{}')) if isinstance(c.get('file_types'), str) else c.get('file_types', {})
+                if file_types:
+                    tech_expertise["languages"].update(file_types)
+            except (json.JSONDecodeError, TypeError):
+                continue
+        
+        tech_expertise["areas"] = dict(tech_expertise["areas"].most_common(3))
+        tech_expertise["languages"] = dict(tech_expertise["languages"].most_common(5))
+
+        # Gen 4: Hồ sơ rủi ro và chất lượng
+        risk_levels = Counter(c.get('risk_level', 'lowrisk') for c in valid_analyzed_commits)
+        total_risk_commits = sum(risk_levels.values())
+        high_risk_pct = (risk_levels.get('highrisk', 0) / total_risk_commits * 100) if total_risk_commits > 0 else 0
+        
+        commit_sizes = [(c.get('insertions',0) or 0) + (c.get('deletions',0) or 0) for c in valid_analyzed_commits]
+        
+        risk_profile = {
+            "distribution": dict(risk_levels),
+            "high_risk_percentage": round(high_risk_pct, 2),
+            "avg_commit_size": round(mean(commit_sizes) if commit_sizes else 0, 2),
+            "max_commit_size": max(commit_sizes) if commit_sizes else 0,
+        }
+
+        return {
+            "author_name": author_name,
+            "analysis_period_days": days_back,
+            "work_rhythm": work_rhythm,
+            "contribution_style": contribution_style,
+            "tech_expertise": tech_expertise,
+            "risk_profile": risk_profile
+        }

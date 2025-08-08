@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, Typography, Spin, Empty, Tag, List, Select } from 'antd';
 import { Pie } from 'react-chartjs-2';
+import CommitList from './CommitList';
 
 const { Text } = Typography;
 
@@ -11,7 +12,6 @@ const BranchCommitAnalysis = ({
   branchAnalysisError,
   selectedMember,
   setSelectedMember,
-  renderCommitList,
 }) => {
   if (branchAnalysisLoading) {
     return <Spin />;
@@ -137,10 +137,10 @@ const BranchCommitAnalysis = ({
         </div>
       </div>
       <div style={{ marginTop: 32, padding: '0 24px' }}>
-        <Text strong style={{ fontSize: 16 }}>
+        <Text strong style={{ fontSize: 16, marginBottom: 16, display: 'block' }}>
           Danh sách commit:
         </Text>
-        {renderCommitList(filtered)}
+        <CommitList commits={filtered} />
       </div>
     </Card>
   );
