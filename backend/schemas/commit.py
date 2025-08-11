@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from pydantic import ConfigDict
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
@@ -39,9 +40,8 @@ class CommitOut(CommitCreate):
     created_at: Optional[datetime] = None
     last_synced: Optional[datetime] = None
     diff_content: Optional[str] = None
-
-    class Config:
-        from_attributes = True  # For Pydantic V2
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommitStats(BaseModel):

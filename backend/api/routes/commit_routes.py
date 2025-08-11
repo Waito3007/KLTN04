@@ -8,6 +8,25 @@ import httpx
 import asyncio
 from datetime import datetime
 from api.routes.commit import fetch_raw_github_content
+from services.model_loader import predict_commit as _model_predict_commit
+
+# Wrapper chuẩn hoá kết quả dự đoán về kiểu int 0/1
+def predict_commit(message: str) -> int:
+    """Dự đoán commit critical (0|1) dựa trên model_loader.predict_commit.
+
+    model_loader.predict_commit trả về dict {prediction, confidence, error}.
+    Hàm này chuẩn hoá để các endpoint dùng an toàn.
+    """
+    try:
+        result = _model_predict_commit(message)
+        # Trường hợp model_loader trả về dict chuẩn
+        if isinstance(result, dict):
+            pred = result.get("prediction", 0)
+            return 1 if int(pred) == 1 else 0
+        # Trường hợp khác (phòng thủ)
+        return 1 if int(result) == 1 else 0
+    except Exception:
+        return 0
 
 router = APIRouter(prefix="/api/commits", tags=["Commit Analysis"])
 
