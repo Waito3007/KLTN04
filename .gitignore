@@ -113,3 +113,4 @@ backend/ai/multimodal_fusion_network/data/processed/test.json
 backend/ai/multimodal_fusion_network/data/processed/train.json
 backend/ai/multimodal_fusion_network/data/processed/val.json
 backend/ai/multimodal_fusion_network/all_labeled_commits_with_features_optimize.json
+node_modules
