@@ -6,6 +6,7 @@ Sử dụng Pydantic để validation dữ liệu input/output
 from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field, validator
+from pydantic import ConfigDict
 from db.models.project_tasks import TaskStatus, TaskPriority
 
 
@@ -105,8 +106,7 @@ class TaskResponse(BaseModel):
     created_by_user_id: Optional[int] = None
     created_by: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskFilter(BaseModel):
@@ -128,8 +128,7 @@ class TaskListResponse(BaseModel):
     page_size: int
     total_pages: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Constants cho business logic

@@ -1,6 +1,7 @@
 # backend/main.py
 
 from fastapi import FastAPI, WebSocket
+from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.lifespan import lifespan
 from core.config import setup_middlewares
@@ -33,7 +34,7 @@ from api.routes.repositories import router as repositories_router
 
 setup_logger()  # Bật logger trước khi chạy app
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
 
 # PI(lifespan=lifespan)
 
