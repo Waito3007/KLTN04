@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, List, Tag, Typography, Button, Space, message, Spin, Empty, Modal, Select, Badge, Tooltip, Progress } from 'antd';
+import { List, Tag, Typography, Button, Space, Empty, Modal, Select, Badge, Tooltip, Progress } from 'antd';
 import { 
   GitlabOutlined, 
   UserOutlined, 
@@ -17,7 +17,9 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import styled from 'styled-components';
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
+import { Loading, Toast } from '@components/common';
+import Card from "@components/common/Card";
 
 const { Text, Paragraph } = Typography;
 
@@ -152,7 +154,7 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
 
     const token = localStorage.getItem("access_token");
     if (!token) {
-      message.error("Vui lòng đăng nhập lại!");
+      Toast.error("Vui lòng đăng nhập lại!");
       return;
     }    setLoading(true);
     try {
@@ -181,10 +183,10 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
     } catch (error) {
       console.error("Error fetching commits:", error);
       if (error.response?.status === 404) {
-        message.warning(`Chưa có commits nào trong database cho branch "${selectedBranch}". Hãy đồng bộ dữ liệu trước!`);
+        Toast.warning(`Chưa có commits nào trong database cho branch "${selectedBranch}". Hãy đồng bộ dữ liệu trước!`);
         setCommits([]);
       } else {
-        message.error("Không thể lấy danh sách commits!");
+        Toast.error("Không thể lấy danh sách commits!");
       }
     } finally {
       setLoading(false);
@@ -291,16 +293,18 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
           </Button>
         }
       >
-        <Spin spinning={loading}>
-          {commits.length === 0 && !loading ? (
-            <Empty 
-              description={`Chưa có commits nào cho branch "${selectedBranch}"`}
-              image={<GitlabOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />}
-            />
-          ) : (
-            <List
-              itemLayout="vertical"
-              dataSource={commits}              pagination={{
+        {loading ? (
+          <Loading variant="modern" text="Đang tải commits..." size="large" />
+        ) : commits.length === 0 ? (
+          <Empty 
+            description={`Chưa có commits nào cho branch "${selectedBranch}"`}
+            image={<GitlabOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />}
+          />
+        ) : (
+          <List
+            itemLayout="vertical"
+            dataSource={commits}
+            pagination={{
                 current: pagination.current,
                 pageSize: pagination.pageSize,
                 total: pagination.total,
@@ -386,7 +390,6 @@ const BranchCommitList = ({ owner, repo, selectedBranch }) => {
               }}
             />
           )}
-        </Spin>
       </Card>
 
       <Modal

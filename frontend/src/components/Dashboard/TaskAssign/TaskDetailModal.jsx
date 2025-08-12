@@ -30,6 +30,7 @@ import {
 import dayjs from 'dayjs';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import Card from "@components/common/Card";
 
 const { TextArea } = Input;
 const { Option } = Select;

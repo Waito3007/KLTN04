@@ -4,13 +4,14 @@
  */
 
 import React, { useMemo } from 'react';
-import { Card, Row, Col, Statistic, Progress, Space, Typography } from 'antd';
+import { Row, Col, Statistic, Progress, Space, Typography } from 'antd';
 import { 
   CheckCircleOutlined, 
   ClockCircleOutlined, 
   PlayCircleOutlined,
   StopOutlined 
 } from '@ant-design/icons';
+import Card from "@components/common/Card";
 
 const { Text } = Typography;
 

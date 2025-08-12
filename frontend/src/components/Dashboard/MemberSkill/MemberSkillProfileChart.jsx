@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Spin, Empty, Select, Alert } from 'antd';
+import { Card, Typography, Empty, Select, Alert } from 'antd';
 import { Radar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { Loading } from '@components/common';
 
 // Register Chart.js components
 ChartJS.register(
@@ -145,8 +146,7 @@ const MemberSkillProfileChart = ({ repositories = [], selectedRepoId }) => {
     return (
       <Card>
         <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Spin size="large" />
-          <div style={{ marginTop: 16 }}>Loading member skill profiles...</div>
+          <Loading variant="circle" size="large" message="Loading member skill profiles..." />
         </div>
       </Card>
     );

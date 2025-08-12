@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Button, Badge, Popover, List, Typography, Divider, Spin, Tag, Alert, Tooltip, Modal } from 'antd';
+import { Button, Badge, Popover, List, Typography, Divider, Tag, Alert, Tooltip, Modal } from 'antd';
 import { ExclamationCircleFilled, CheckCircleFilled, InfoCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
+import { Loading } from '@components/common';
 
 const { Text, Title } = Typography;
 
@@ -107,10 +108,7 @@ const AnalyzeGitHubCommits = ({ repo }) => {
     if (loading) {
       return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
-          <Spin size="small" />
-          <div style={{ marginTop: 8 }}>
-            <Text type="secondary">Analyzing commits...</Text>
-          </div>
+          <Loading variant="circle" size="small" message="Analyzing commits..." />
         </div>
       );
     }
@@ -250,7 +248,7 @@ const AnalyzeGitHubCommits = ({ repo }) => {
         footer={null}
         width={800}
         style={{ top: 20 }}
-        bodyStyle={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}
+        styles={{ body: { maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' } }}
       >
         <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
           {currentDiff}

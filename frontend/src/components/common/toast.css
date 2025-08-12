@@ -1,0 +1,155 @@
+/* Toast Overlay Styling - Đảm bảo hiển thị đúng overlay */
+
+/* Message Toast Styling */
+.custom-message {
+  z-index: 9999 !important;
+}
+
+.custom-message .ant-message-notice {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.custom-message-success .ant-message-notice-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.15) !important;
+  border: 1px solid rgba(82, 196, 26, 0.2) !important;
+}
+
+.custom-message-error .ant-message-notice-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.15) !important;
+  border: 1px solid rgba(255, 77, 79, 0.2) !important;
+}
+
+.custom-message-warning .ant-message-notice-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(250, 173, 20, 0.15) !important;
+  border: 1px solid rgba(250, 173, 20, 0.2) !important;
+}
+
+.custom-message-info .ant-message-notice-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15) !important;
+  border: 1px solid rgba(24, 144, 255, 0.2) !important;
+}
+
+.custom-message-loading .ant-message-notice-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Notification Toast Styling */
+.custom-notification {
+  z-index: 9999 !important;
+}
+
+.custom-notification .ant-notification-notice {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.custom-notification-success .ant-notification-notice {
+  border-color: rgba(82, 196, 26, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(82, 196, 26, 0.12) !important;
+}
+
+.custom-notification-error .ant-notification-notice {
+  border-color: rgba(255, 77, 79, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(255, 77, 79, 0.12) !important;
+}
+
+.custom-notification-warning .ant-notification-notice {
+  border-color: rgba(250, 173, 20, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(250, 173, 20, 0.12) !important;
+}
+
+.custom-notification-info .ant-notification-notice {
+  border-color: rgba(24, 144, 255, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.12) !important;
+}
+
+/* Đảm bảo overlay hiển thị đúng trên toàn màn hình */
+.ant-message {
+  position: fixed !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+.ant-notification {
+  position: fixed !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+.ant-notification-topRight {
+  top: 24px !important;
+  right: 24px !important;
+}
+
+/* Animation cho toast */
+.ant-message-notice {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.ant-notification-notice {
+  animation: notificationSlideIn 0.3s ease-out;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .ant-notification-topRight {
+    right: 16px !important;
+    left: 16px !important;
+    top: 16px !important;
+  }
+  
+  .ant-message {
+    top: 16px !important;
+  }
+}

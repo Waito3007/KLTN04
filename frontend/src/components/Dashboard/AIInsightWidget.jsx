@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Space, Typography, Button, Tag } from 'antd';
 import { BulbOutlined, WarningOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
+import Widget from '@components/common/Widget';
 
 const { Title, Text } = Typography;
 

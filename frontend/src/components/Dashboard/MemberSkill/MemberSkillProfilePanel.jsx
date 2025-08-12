@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Spin, Empty, Select, Alert, Row, Col, Tag, Avatar } from 'antd';
+import { Card, Typography, Empty, Select, Alert, Row, Col, Tag, Avatar } from 'antd';
 import { UserOutlined, TrophyOutlined, RocketOutlined, SafetyOutlined } from '@ant-design/icons';
 import { Radar } from 'react-chartjs-2';
 import {
@@ -11,6 +11,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import Widget from "@components/common/Widget";
+import { Loading } from '@components/common';
 
 ChartJS.register(
   RadialLinearScale,
@@ -24,7 +26,7 @@ ChartJS.register(
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId, selectedBranch }) => {
+const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId, selectedBranch, hideRepoSelector = false }) => {
   const [loading, setLoading] = useState(false);
   const [memberProfiles, setMemberProfiles] = useState([]);
   const [selectedMember, setSelectedMember] = useState('');
@@ -235,8 +237,7 @@ const MemberSkillProfilePanel = ({ repositories = [], selectedRepoId, selectedBr
     return (
       <Card>
         <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Spin size="large" />
-          <div style={{ marginTop: 16 }}>Loading member skill profiles...</div>
+          <Loading variant="circle" size="large" message="Loading member skill profiles..." />
         </div>
       </Card>
     );

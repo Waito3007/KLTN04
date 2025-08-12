@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Space, Typography, Spin, Tag, Select, Collapse, List, Progress, Row, Col, Statistic, Alert, Button, Drawer } from 'antd';
+import React, { useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { Card, Space, Typography, Tag, Select, Collapse, List, Progress, Row, Col, Statistic, Alert, Button, Drawer } from 'antd';
 import styled from 'styled-components';
 import axios from 'axios';
 import { 
@@ -7,6 +7,8 @@ import {
   ExperimentOutlined, TeamOutlined, UserSwitchOutlined, ClockCircleOutlined, ThunderboltOutlined,
   RightOutlined, ExpandAltOutlined, CloseOutlined, RobotOutlined, SyncOutlined
 } from '@ant-design/icons';
+import Widget from "@components/common/Widget";
+import { Loading } from '@components/common';
 
 const ExpandButton = styled(Button)`
   position: absolute;
@@ -245,7 +247,7 @@ const AssignmentSection = ({ data }) => {
 };
 
 const DnaProfileDisplay = ({ dna, loading }) => {
-  if (loading) return <Spin tip="Analyzing DNA..." />;
+  if (loading) return <Loading variant="circle" size="small" message="Analyzing DNA..." />;
   if (!dna) return <p>Select a developer to see their DNA profile.</p>;
   if (dna.message) return <Alert message={dna.message} type="info" />;
 
@@ -300,7 +302,21 @@ const DnaProfileDisplay = ({ dna, loading }) => {
 
 import { useEffect } from 'react';
 
-const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
+const DashboardAnalyst = forwardRef(({ selectedRepoId, repositories, onBranchChange, /* hideRepoSelector = false, */ fullWidth = false }, ref) => {
+  // State declarations - PHẢI ĐẶT TRƯỚC TẤT CẢ HOOKS KHÁC
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [branches, setBranches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [branchLoading, setBranchLoading] = useState(false);
+  const [daysBack, setDaysBack] = useState(30);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dnaDrawerOpen, setDnaDrawerOpen] = useState(false);
+  const [selectedDeveloper, setSelectedDeveloper] = useState(null);
+  const [dnaLoading, setDnaLoading] = useState(false);
+  const [dnaData, setDnaData] = useState(null);
+
   // Tự động load danh sách nhánh khi selectedRepoId thay đổi
   const fetchBranches = async () => {
     if (!selectedRepoId) {
@@ -344,7 +360,7 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
   }, [selectedRepoId]);
 
   // Fetch comprehensive analytics - CHỈ GỌI KHI USER CHỌN REPO VÀ NHẤN NÚT
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     if (!selectedRepoId) {
       setAnalyticsData(null);
       return;
@@ -385,19 +401,12 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
     } finally {
       setLoading(false);
     }
-  };
-  const [analyticsData, setAnalyticsData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [branches, setBranches] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState('');
-  const [branchLoading, setBranchLoading] = useState(false);
-  const [daysBack, setDaysBack] = useState(30);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [dnaDrawerOpen, setDnaDrawerOpen] = useState(false);
-  const [selectedDeveloper, setSelectedDeveloper] = useState(null);
-  const [dnaData, setDnaData] = useState(null);
-  const [dnaLoading, setDnaLoading] = useState(false);
+  }, [selectedRepoId, repositories, daysBack]);
+
+  // Expose fetchAnalytics method via ref
+  useImperativeHandle(ref, () => ({
+    fetchAnalytics
+  }), [fetchAnalytics]);
 
   const handleDeveloperClick = async (authorName, forceRefresh = false) => {
     setSelectedDeveloper(authorName);
@@ -438,7 +447,7 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
   };
 
   const renderContent = () => {
-    if (loading) return <div style={{textAlign: 'center', padding: '20px'}}><Spin tip="Đang phân tích dữ liệu..." /></div>;
+    if (loading) return <div style={{textAlign: 'center', padding: '20px'}}><Loading variant="circle" size="large" message="Đang phân tích dữ liệu..." /></div>;
     if (error) return <Alert message={error} type="error" showIcon />;
     if (!selectedRepoId) return (
       <div style={{textAlign: 'center', padding: '20px', color: '#64748b'}}>
@@ -455,83 +464,160 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
 
     return (
       <ScrollableContent>
-        <Collapse defaultActiveKey={['progress', 'risks']} ghost>
-          <Collapse.Panel header={<><LineChartOutlined /> Tiến độ</>} key="progress">
-            <ProgressSection data={analyticsData.progress} />
-          </Collapse.Panel>
-          <Collapse.Panel header={<><ExperimentOutlined /> Rủi ro</>} key="risks">
-            <RisksSection data={analyticsData.risks} />
-          </Collapse.Panel>
-          <Collapse.Panel header={<><TeamOutlined /> Năng suất</>} key="productivity">
-            <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
-          </Collapse.Panel>
-          <Collapse.Panel header={<><UserSwitchOutlined /> Gợi ý phân công</>} key="assignment">
-            <AssignmentSection data={analyticsData.assignment_suggestions} />
-          </Collapse.Panel>
-        </Collapse>
+        <Collapse 
+          defaultActiveKey={['progress', 'risks']} 
+          ghost
+          items={[
+            {
+              key: 'progress',
+              label: <><LineChartOutlined /> Tiến độ</>,
+              children: <ProgressSection data={analyticsData.progress} />
+            },
+            {
+              key: 'risks',
+              label: <><ExperimentOutlined /> Rủi ro</>,
+              children: <RisksSection data={analyticsData.risks} />
+            },
+            {
+              key: 'productivity',
+              label: <><TeamOutlined /> Năng suất</>,
+              children: <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
+            },
+            {
+              key: 'assignment',
+              label: <><UserSwitchOutlined /> Gợi ý phân công</>,
+              children: <AssignmentSection data={analyticsData.assignment_suggestions} />
+            }
+          ]}
+        />
       </ScrollableContent>
     );
   };
 
   return (
     <>
-      <SidebarCard
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <SectionTitle level={5} style={{ fontSize: '14px', margin: 0 }}>Bảng phân tích AI</SectionTitle>
-            <ExpandButton 
-              onClick={() => setDrawerOpen(true)}
-              icon={<ExpandAltOutlined />}
-              title="Mở rộng để xem đầy đủ"
-              size="small"
-            />
-          </div>
-        }
-        size="small"
-      >
-        {selectedRepoId && (
-          <Space direction="vertical" style={{width: '100%', marginBottom: '12px'}}>
-            <div>
-              <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><BranchesOutlined /> Nhánh:</Typography.Text>
-              <Select
-                style={{ width: '100%' }}
-                placeholder="Chọn nhánh"
-                value={selectedBranch}
-                onChange={handleBranchChange}
-                loading={branchLoading}
+      {fullWidth ? (
+        // Full-width layout for dedicated page
+        <div style={{ width: '100%' }}>
+          {!selectedRepoId ? (
+            <div style={{textAlign: 'center', padding: '60px 20px', color: '#64748b'}}>
+              <LineChartOutlined style={{fontSize: '48px', marginBottom: '16px'}} />
+              <Typography.Title level={4} type="secondary">Chọn repository để bắt đầu phân tích</Typography.Title>
+              <Typography.Text type="secondary">Sử dụng dropdown ở phía trên để chọn repository cần phân tích</Typography.Text>
+            </div>
+          ) : !analyticsData ? (
+            <div style={{textAlign: 'center', padding: '60px 20px', color: '#64748b'}}>
+              <ThunderboltOutlined style={{fontSize: '48px', marginBottom: '16px'}} />
+              <Typography.Title level={4} type="secondary">Sẵn sàng phân tích AI</Typography.Title>
+              <Typography.Text type="secondary">Nhấn nút "Chạy phân tích AI" để bắt đầu phân tích repository</Typography.Text>
+            </div>
+          ) : (
+            <div style={{ width: '100%' }}>
+              <Collapse 
+                defaultActiveKey={['progress', 'risks', 'productivity', 'assignment']} 
+                size="large"
+                items={[
+                  {
+                    key: 'progress',
+                    label: (
+                      <div style={{ fontSize: '16px', fontWeight: 500 }}>
+                        <LineChartOutlined /> Tiến độ dự án
+                      </div>
+                    ),
+                    children: <ProgressSection data={analyticsData.progress} />
+                  },
+                  {
+                    key: 'risks',
+                    label: (
+                      <div style={{ fontSize: '16px', fontWeight: 500 }}>
+                        <ExperimentOutlined /> Phân tích rủi ro
+                      </div>
+                    ),
+                    children: <RisksSection data={analyticsData.risks} />
+                  },
+                  {
+                    key: 'productivity',
+                    label: (
+                      <div style={{ fontSize: '16px', fontWeight: 500 }}>
+                        <TeamOutlined /> Năng suất thành viên
+                      </div>
+                    ),
+                    children: <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
+                  },
+                  {
+                    key: 'assignment',
+                    label: (
+                      <div style={{ fontSize: '16px', fontWeight: 500 }}>
+                        <UserSwitchOutlined /> Gợi ý phân công
+                      </div>
+                    ),
+                    children: <AssignmentSection data={analyticsData.assignment_suggestions} />
+                  }
+                ]}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        // Original sidebar widget layout
+        <SidebarCard
+          title={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <SectionTitle level={5} style={{ fontSize: '14px', margin: 0 }}>Bảng phân tích AI</SectionTitle>
+              <ExpandButton 
+                onClick={() => setDrawerOpen(true)}
+                icon={<ExpandAltOutlined />}
+                title="Mở rộng để xem đầy đủ"
                 size="small"
-                disabled={!branches.length}
+              />
+            </div>
+          }
+          size="small"
+        >
+          {selectedRepoId && (
+            <Space direction="vertical" style={{width: '100%', marginBottom: '12px'}}>
+              <div>
+                <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><BranchesOutlined /> Nhánh:</Typography.Text>
+                <Select
+                  style={{ width: '100%' }}
+                  placeholder="Chọn nhánh"
+                  value={selectedBranch}
+                  onChange={handleBranchChange}
+                  loading={branchLoading}
+                  size="small"
+                  disabled={!branches.length}
+                >
+                  {branches.map(branch => (
+                    <Select.Option key={branch.value} value={branch.value}>
+                      {branch.label}
+                      {branch.isDefault && <Tag size="small" color="blue" style={{ marginLeft: 4 }}>default</Tag>}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><ClockCircleOutlined /> Khoảng thời gian:</Typography.Text>
+                <Select value={daysBack} onChange={setDaysBack} style={{ width: '100%' }} size="small">
+                  <Select.Option value={7}>7 ngày qua</Select.Option>
+                  <Select.Option value={30}>30 ngày qua</Select.Option>
+                  <Select.Option value={90}>90 ngày qua</Select.Option>
+                </Select>
+              </div>
+              <AnalyzeButton 
+                type="primary" 
+                icon={<ThunderboltOutlined />}
+                onClick={fetchAnalytics}
+                loading={loading}
+                disabled={!selectedRepoId || !selectedBranch}
               >
-                {branches.map(branch => (
-                  <Select.Option key={branch.value} value={branch.value}>
-                    {branch.label}
-                    {branch.isDefault && <Tag size="small" color="blue" style={{ marginLeft: 4 }}>default</Tag>}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <Typography.Text type="secondary" style={{ fontSize: '12px', marginBottom: '4px', display: 'block' }}><ClockCircleOutlined /> Khoảng thời gian:</Typography.Text>
-              <Select value={daysBack} onChange={setDaysBack} style={{ width: '100%' }} size="small">
-                <Select.Option value={7}>7 ngày qua</Select.Option>
-                <Select.Option value={30}>30 ngày qua</Select.Option>
-                <Select.Option value={90}>90 ngày qua</Select.Option>
-              </Select>
-            </div>
-            <AnalyzeButton 
-              type="primary" 
-              icon={<ThunderboltOutlined />}
-              onClick={fetchAnalytics}
-              loading={loading}
-              disabled={!selectedRepoId || !selectedBranch}
-            >
-              {loading ? 'Đang phân tích...' : 'Phân tích AI'}
-            </AnalyzeButton>
-          </Space>
-        )}
-        
-        {renderContent()}
-      </SidebarCard>
+                {loading ? 'Đang phân tích...' : 'Phân tích AI'}
+              </AnalyzeButton>
+            </Space>
+          )}
+          
+          {renderContent()}
+        </SidebarCard>
+      )}
 
       <Drawer
         title={
@@ -548,20 +634,32 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
       >
         <DrawerContent>
           {analyticsData ? (
-            <Collapse defaultActiveKey={['progress', 'risks', 'productivity', 'assignment']} ghost>
-              <Collapse.Panel header={<><LineChartOutlined /> Tiến độ</>} key="progress">
-                <ProgressSection data={analyticsData.progress} />
-              </Collapse.Panel>
-              <Collapse.Panel header={<><ExperimentOutlined /> Rủi ro</>} key="risks">
-                <RisksSection data={analyticsData.risks} />
-              </Collapse.Panel>
-              <Collapse.Panel header={<><TeamOutlined /> Năng suất</>} key="productivity">
-                <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
-              </Collapse.Panel>
-              <Collapse.Panel header={<><UserSwitchOutlined /> Gợi ý phân công</>} key="assignment">
-                <AssignmentSection data={analyticsData.assignment_suggestions} />
-              </Collapse.Panel>
-            </Collapse>
+            <Collapse 
+              defaultActiveKey={['progress', 'risks', 'productivity', 'assignment']} 
+              ghost
+              items={[
+                {
+                  key: 'progress',
+                  label: <><LineChartOutlined /> Tiến độ</>,
+                  children: <ProgressSection data={analyticsData.progress} />
+                },
+                {
+                  key: 'risks',
+                  label: <><ExperimentOutlined /> Rủi ro</>,
+                  children: <RisksSection data={analyticsData.risks} />
+                },
+                {
+                  key: 'productivity',
+                  label: <><TeamOutlined /> Năng suất</>,
+                  children: <ProductivitySection data={analyticsData.productivity_metrics} onDeveloperClick={handleDeveloperClick} />
+                },
+                {
+                  key: 'assignment',
+                  label: <><UserSwitchOutlined /> Gợi ý phân công</>,
+                  children: <AssignmentSection data={analyticsData.assignment_suggestions} />
+                }
+              ]}
+            />
           ) : (
             <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
               <RobotOutlined style={{ fontSize: '48px', marginBottom: '16px' }} />
@@ -594,6 +692,6 @@ const DashboardAnalyst = ({ selectedRepoId, repositories, onBranchChange }) => {
       </Drawer>
     </>
   );
-};
+});
 
 export default DashboardAnalyst;

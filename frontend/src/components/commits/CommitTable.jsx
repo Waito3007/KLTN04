@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Table } from 'antd';
 import axios from 'axios';
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
 
 const CommitTable = () => {
   const [commits, setCommits] = useState([]);

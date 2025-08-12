@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Modal, Tabs, Descriptions, Typography, Tag, Divider, Empty } from 'antd';
+import Card from "@components/common/Card";
 
 const { Text, Paragraph } = Typography;
 
@@ -11,7 +12,7 @@ const { Text, Paragraph } = Typography;
  * - onClose: () => void (đóng modal)
  */
 function CommitDetailModal({ visible, commit, onClose }) {
-	const data = commit || {};
+	const data = useMemo(() => commit || {}, [commit]);
 
 	const analysisTags = useMemo(() => {
 		const tags = [];

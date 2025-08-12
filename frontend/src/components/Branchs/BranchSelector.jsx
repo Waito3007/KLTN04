@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { Select, Spin, message, Tag, Typography, Button, Space, Tooltip } from "antd";
+import { Select, Tag, Typography, Button, Space, Tooltip } from "antd";
 import { GithubOutlined, BranchesOutlined, SyncOutlined, DatabaseOutlined } from '@ant-design/icons';
 import axios from "axios";
 import styled from "styled-components";
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
+import { Loading, Toast } from '@components/common';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -154,7 +155,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
         }
       } catch (err) {
         console.error(err);
-        message.error("Không lấy được danh sách branch");
+        Toast.error("Không lấy được danh sách branch");
       } finally {
         setLoading(false);
       }
@@ -175,13 +176,13 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
 
   const syncCommitsForBranch = async () => {
     if (!selectedBranch) {
-      message.warning("Vui lòng chọn branch trước!");
+      Toast.warning("Vui lòng chọn branch trước!");
       return;
     }
 
     const token = localStorage.getItem("access_token");
     if (!token) {
-      message.error("Vui lòng đăng nhập lại!");
+      Toast.error("Vui lòng đăng nhập lại!");
       return;
     }
 
@@ -198,7 +199,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
       );
       
       const { stats } = response.data;
-      message.success(
+      Toast.success(
         `Đồng bộ thành công! ${stats.commits_processed} commits được xử lý cho branch "${selectedBranch}"`
       );
       
@@ -217,7 +218,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
     } catch (error) {
       console.error("Lỗi khi đồng bộ commits:", error);
       const errorMessage = error.response?.data?.detail || "Không thể đồng bộ commits!";
-      message.error(errorMessage);
+      Toast.error(errorMessage);
     } finally {
       setSyncLoading(false);
     }
@@ -225,13 +226,13 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
 
   const viewCommitsInDB = async () => {
     if (!selectedBranch) {
-      message.warning("Vui lòng chọn branch trước!");
+      Toast.warning("Vui lòng chọn branch trước!");
       return;
     }
 
     const token = localStorage.getItem("access_token");
     if (!token) {
-      message.error("Vui lòng đăng nhập lại!");
+      Toast.error("Vui lòng đăng nhập lại!");
       return;
     }
 
@@ -246,7 +247,7 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
       
       const { commits, count } = response.data;
       if (count > 0) {
-        message.success(`Tìm thấy ${count} commits trong database cho branch "${selectedBranch}"`);
+        Toast.success(`Tìm thấy ${count} commits trong database cho branch "${selectedBranch}"`);
         console.log("Commits in database:", commits);
         
         // Trigger parent refresh if callback available
@@ -254,18 +255,18 @@ const BranchSelector = ({ owner, repo, onBranchChange }) => {
           onBranchChange(selectedBranch, { refresh: true });
         }
       } else {
-        message.info(`Chưa có commits nào trong database cho branch "${selectedBranch}". Hãy đồng bộ trước!`);
+        Toast.info(`Chưa có commits nào trong database cho branch "${selectedBranch}". Hãy đồng bộ trước!`);
       }
       
     } catch (error) {
       console.error("Lỗi khi xem commits:", error);
-      message.error("Không thể lấy danh sách commits!");
+      Toast.error("Không thể lấy danh sách commits!");
     }
   };
 
   if (loading) {
     console.log('BranchSelector: Loading...');
-    return <Spin size="small" />;
+    return <Loading variant="inline" size="small" />;
   }
 
   if (!branches || branches.length === 0) {
