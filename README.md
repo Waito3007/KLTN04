@@ -1,5 +1,7 @@
 # Khóa luận tốt nghiệp: Ứng dụng AI hỗ trợ quản lý tiến độ và phân công công việc trong dự án lập trình
 
+[English Version](README_EN.md)
+
 Dự án này là một hệ thống thông minh sử dụng Trí tuệ nhân tạo (AI) để phân tích dữ liệu từ các kho chứa mã nguồn Git, nhằm hỗ trợ các nhà quản lý dự án trong việc theo dõi tiến độ, đánh giá rủi ro và đưa ra các gợi ý phân công công việc một cách hiệu quả.
 
 ---
