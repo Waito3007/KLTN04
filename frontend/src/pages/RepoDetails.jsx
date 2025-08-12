@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { message, Button, Card, Typography, Alert, Progress, Row, Col } from "antd";
-import { SyncOutlined, SaveOutlined, GithubOutlined } from "@ant-design/icons";
-import BranchSelector from "../components/Branchs/BranchSelector";
-import BranchCommitList from "../components/Branchs/BranchCommitList";
-import CommitList from "../components/commits/CommitList";
+// Thêm 'Card' vào import từ antd
+import { Button, Typography, Alert, Progress, Row, Col, Card } from "antd";
+import { SyncOutlined, GithubOutlined } from "@ant-design/icons";
+// Lưu ý: Kiểm tra lại đường dẫn 'Branchs' có thể là 'Branches'
+import BranchSelector from "@components/Branchs/BranchSelector";
+import BranchCommitList from "@components/Branchs/BranchCommitList";
+import CommitList from "@components/commits/CommitList";
 import axios from "axios";
-import { buildApiUrl } from "../config/api";
+import { buildApiUrl } from "@config/api";
+import { Card as CustomCard, Button as CustomButton, Toast } from '@components/common';
 
 const { Title, Text } = Typography;
 
@@ -36,17 +39,19 @@ const RepoDetails = () => {
       setSyncProgress(0);
       
       // Hiển thị thông báo bắt đầu sync
-      message.info(`Đang đồng bộ repository ${repo} trong background...`, 2);
+      Toast.info(`Đang đồng bộ repository ${repo} trong background...`);
       
       // Sync cơ bản trước (nhanh)
-      setSyncProgress(30);      await axios.post(
+      setSyncProgress(30);
+      await axios.post(
         buildApiUrl(`/github/${owner}/${repo}/sync-basic`),
         {},
         {
           headers: { Authorization: `token ${token}` },
         }
       );
-        // Sync đầy đủ
+      
+      // Sync đầy đủ
       setSyncProgress(70);
       await axios.post(
         buildApiUrl(`/github/${owner}/${repo}/sync-all`),
@@ -57,11 +62,11 @@ const RepoDetails = () => {
       );
       
       setSyncProgress(100);
-      message.success(`Đồng bộ repository ${repo} thành công!`);
+      Toast.success(`Đồng bộ repository ${repo} thành công!`);
       
     } catch (error) {
       console.error("Lỗi khi đồng bộ repository:", error);
-      message.error("Đồng bộ repository thất bại!");
+      Toast.error("Đồng bộ repository thất bại!");
     } finally {
       setSyncing(false);
       setTimeout(() => setSyncProgress(0), 2000);
@@ -73,7 +78,8 @@ const RepoDetails = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    try {      // Kiểm tra xem repo đã có dữ liệu chưa
+    try {
+      // Kiểm tra xem repo đã có dữ liệu chưa
       const checkResponse = await axios.get(
         buildApiUrl(`/github/${owner}/${repo}/branches`),
         {
@@ -104,11 +110,12 @@ const RepoDetails = () => {
   const manualSync = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      message.error("Vui lòng đăng nhập lại!");
+      Toast.error("Vui lòng đăng nhập lại!");
       return;
     }
 
-    try {      setLoading(true);
+    try {
+      setLoading(true);
       await axios.post(
         buildApiUrl(`/github/${owner}/${repo}/sync-all`),
         {},
@@ -116,46 +123,14 @@ const RepoDetails = () => {
           headers: { Authorization: `token ${token}` },
         }
       );
-      message.success("Đồng bộ dữ liệu thành công!");
+      Toast.success("Đồng bộ dữ liệu thành công!");
     } catch (error) {
       console.error("Lỗi khi đồng bộ dữ liệu:", error);
-      message.error("Không thể đồng bộ dữ liệu!");
+      Toast.error("Không thể đồng bộ dữ liệu!");
     } finally {
       setLoading(false);
     }
   };
-  // const saveCommits = async () => {
-  //   const token = localStorage.getItem("access_token");
-  //   if (!token) {
-  //     message.error("Vui lòng đăng nhập lại!");
-  //     return;
-  //   }
-
-  //   if (!branch) {
-  //     message.error("Vui lòng chọn branch trước!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:8000/api/github/${owner}/${repo}/branches/${branch}/sync-commits?include_stats=true&per_page=100&max_pages=5`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `token ${token}`,
-  //         },
-  //       }
-  //     );
-      
-  //     const { stats } = response.data;
-  //     message.success(
-  //       `Đồng bộ thành công! ${stats.new_commits_saved} commits mới được lưu cho branch "${branch}"`
-  //     );
-  //   } catch (error) {
-  //     console.error("Lỗi khi lưu commit:", error);
-  //     message.error("Không thể lưu commit!");
-  //   }
-  // };
 
   // Hiển thị trang ngay lập tức, không đợi sync
   return (
@@ -187,18 +162,10 @@ const RepoDetails = () => {
             >
               Đồng bộ thủ công
             </Button>
-            
-            {/* <Button 
-              type="primary" 
-              icon={<SaveOutlined />} 
-              onClick={saveCommits}
-              disabled={!branch}
-            >
-              Lưu Commit
-            </Button> */}
           </div>
         </div>
 
+        {/* SỬA LỖI CÚ PHÁP JSX Ở ĐÂY */}
         {syncing && (
           <Alert
             message="Đang đồng bộ dữ liệu trong background"
@@ -206,7 +173,10 @@ const RepoDetails = () => {
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
-          />        )}        <BranchSelector owner={owner} repo={repo} onBranchChange={handleBranchChange} />
+          />
+        )}
+        
+        <BranchSelector owner={owner} repo={repo} onBranchChange={handleBranchChange} />
       </Card>
 
       <Row gutter={16} style={{ marginTop: 16 }}>
@@ -229,7 +199,11 @@ const RepoDetails = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Không cần renderSyncProgress ở đây nữa vì đã tích hợp ở trên */}
+      {/* {renderSyncProgress()} */}
     </div>
+    // Bỏ thẻ </div> bị thừa
   );
 };
 

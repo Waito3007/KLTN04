@@ -1,12 +1,14 @@
 // frontend/src/pages/SyncPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Input, Button, Space, Typography, Alert, Spin } from 'antd';
+import { Row, Col, Input, Button, Space, Typography, Alert } from 'antd';
 import { GithubOutlined, DatabaseOutlined } from '@ant-design/icons';
-import RepositorySync from '../components/RepositorySync';
-import { useSync } from '../hooks/useSync';
+import RepositorySync from '@components/RepositorySync';
+import { useSync } from "@hooks/useSync";
+import Navbar from "@components/common/Navbar";
+import { Card as CustomCard, Button as CustomButton } from "@components/common";
 
 const { Title, Text } = Typography;
-const { Search } = Input;
+const { Search } = Input; // Lưu ý: Search được import nhưng không được sử dụng.
 
 const SyncPage = () => {
   const [owner, setOwner] = useState('Waito3007');
@@ -16,6 +18,15 @@ const SyncPage = () => {
   const [checkingStatus, setCheckingStatus] = useState(false);
 
   const { checkGitHubStatus } = useSync();
+
+  // Placeholder user data
+  const user = { username: 'User', avatar_url: '', email: 'user@example.com' };
+  // Placeholder syncing state
+  const isSyncing = false;
+  // Placeholder sync function
+  const syncAllRepositories = () => console.log('Syncing repositories...');
+  // Placeholder logout function
+  const handleLogout = () => console.log('Logging out...');
 
   // Check GitHub status on component mount
   useEffect(() => {
@@ -60,9 +71,9 @@ const SyncPage = () => {
   const renderGitHubStatus = () => {
     if (checkingStatus) {
       return (
-        <Card title="Trạng thái GitHub API" loading>
+        <CustomCard title="Trạng thái GitHub API" loading>
           <Text>Đang kiểm tra...</Text>
-        </Card>
+        </CustomCard>
       );
     }
 
@@ -71,7 +82,7 @@ const SyncPage = () => {
     const { github_api_accessible, token_valid, rate_limit, token_provided } = gitHubStatus;
 
     return (
-      <Card 
+      <CustomCard 
         title={
           <Space>
             <GithubOutlined />
@@ -79,9 +90,9 @@ const SyncPage = () => {
           </Space>
         }
         extra={
-          <Button size="small" onClick={handleCheckGitHubStatus}>
+          <CustomButton size="small" onClick={handleCheckGitHubStatus}>
             Kiểm tra lại
-          </Button>
+          </CustomButton>
         }
       >
         <Space direction="vertical" style={{ width: '100%' }}>
@@ -119,18 +130,24 @@ const SyncPage = () => {
             </div>
           )}
         </Space>
-      </Card>
+      </CustomCard>
     );
   };
 
   return (
-    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: '24px', minHeight: '100vh' }}>
+      <Navbar 
+        user={user} 
+        isSyncing={isSyncing} 
+        syncAllRepositories={syncAllRepositories} 
+        handleLogout={handleLogout} 
+      />
       <Row justify="center">
         <Col xs={24} sm={20} md={16} lg={12} xl={10}>
           <Space direction="vertical" style={{ width: '100%' }} size="large">
             
             {/* Header */}
-            <Card>
+            <CustomCard>
               <div style={{ textAlign: 'center' }}>
                 <Title level={2}>
                   <DatabaseOutlined /> Repository Sync Tool
@@ -139,13 +156,13 @@ const SyncPage = () => {
                   Công cụ đồng bộ dữ liệu repository từ GitHub vào hệ thống
                 </Text>
               </div>
-            </Card>
+            </CustomCard>
 
             {/* GitHub Status */}
             {renderGitHubStatus()}
 
             {/* Repository Input */}
-            <Card title="Chọn Repository">
+            <CustomCard title="Chọn Repository">
               <Space direction="vertical" style={{ width: '100%' }}>
                 <div>
                   <Text strong>Owner:</Text>
@@ -178,7 +195,7 @@ const SyncPage = () => {
                   Chọn Repository
                 </Button>
               </Space>
-            </Card>
+            </CustomCard>
 
             {/* Sync Component */}
             {showSync && (
@@ -190,7 +207,7 @@ const SyncPage = () => {
             )}
 
             {/* Instructions */}
-            <Card title="Hướng dẫn sử dụng">
+            <CustomCard title="Hướng dẫn sử dụng">
               <Space direction="vertical">
                 <div>
                   <Text strong>1. Đồng bộ toàn bộ:</Text>
@@ -216,7 +233,7 @@ const SyncPage = () => {
                   </Text>
                 </div>
               </Space>
-            </Card>
+            </CustomCard>
 
             {/* Note */}
             <Alert

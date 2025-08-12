@@ -4,15 +4,17 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Row, Col, Alert, Spin, Button, Space, Typography } from 'antd';
+import { Card, Row, Col, Alert, Button, Space, Typography } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import RepositorySelector from './RepositorySelector';
 import KanbanBoard from './KanbanBoard';
 import CreateTaskModal from './CreateTaskModal';
 import TaskStatsCard from './TaskStatsCard';
-import useTaskAssign from '../../../hooks/useTaskAssign';
-import { getTaskStats } from '../../../utils/taskUtils';
+import useTaskAssign from "@hooks/useTaskAssign";
+import { getTaskStats } from "@utils/taskUtils";
+import { Loading } from '@components/common';
 import './TaskAssignBoard.css';
+import Widget from "@components/common/Widget";
 
 const { Title, Text } = Typography;
 
@@ -250,16 +252,16 @@ const TaskAssignBoard = ({
             </Text>
           </div>
         </Card>
+      ) : loading ? (
+        <Loading variant="circle" size="large" message="Đang tải tasks..." />
       ) : (
-        <Spin spinning={loading} tip="Đang tải tasks...">
-          <KanbanBoard
-            tasks={validTasks}
-            onTaskUpdate={handleTaskUpdate}
-            onTaskDelete={handleTaskDelete}
-            onStatusChange={handleStatusChange}
-            selectedRepo={selectedRepo}
-          />
-        </Spin>
+        <KanbanBoard
+          tasks={validTasks}
+          onTaskUpdate={handleTaskUpdate}
+          onTaskDelete={handleTaskDelete}
+          onStatusChange={handleStatusChange}
+          selectedRepo={selectedRepo}
+        />
       )}
 
       {/* Create Task Modal */}

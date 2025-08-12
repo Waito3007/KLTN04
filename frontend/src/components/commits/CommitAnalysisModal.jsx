@@ -1,5 +1,6 @@
 // components/CommitAnalysisModal.jsx
-import { Modal, List, Typography, Tag, Divider, Spin, Tabs, Progress, Alert } from 'antd';
+import { Modal, List, Typography, Tag, Divider, Tabs, Progress, Alert } from 'antd';
+import { Loading } from '@components/common';
 import { 
   ExclamationCircleOutlined, 
   CheckCircleOutlined,
@@ -8,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
 
 const { Title, Text } = Typography;
 
@@ -68,7 +69,7 @@ const CommitAnalysisModal = ({ repo, visible, onCancel }) => {
       footer={null}
       width={800}
     >
-      {loading && <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />}
+      {loading && <Loading variant="modern" text="Đang phân tích commit..." size="large" />}
       
       {error && (
         <Alert 

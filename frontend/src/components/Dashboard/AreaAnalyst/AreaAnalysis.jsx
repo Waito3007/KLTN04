@@ -1,8 +1,9 @@
-
 import React from 'react';
-import { Card, Typography, Spin, Empty, Tag, List, Select, Switch } from 'antd';
+import { Card, Typography, Empty, Tag, List, Select, Switch } from 'antd';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import Widget from "@components/common/Widget";
+import { Loading } from '@components/common';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,8 +23,7 @@ const AreaAnalysis = ({
   if (areaLoading) {
     return (
       <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <Spin />
-        <div style={{ marginTop: 8, color: '#666' }}>Đang tải phân tích lĩnh vực...</div>
+        <Loading variant="circle" size="small" message="Đang tải phân tích lĩnh vực..." />
       </div>
     );
   }

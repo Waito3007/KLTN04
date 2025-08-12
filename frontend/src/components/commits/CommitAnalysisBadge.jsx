@@ -1,9 +1,10 @@
 // components/CommitAnalysisBadge.jsx
-import { Tag, Tooltip, Popover, List, Typography, Divider, Badge, Spin } from 'antd';
+import { Tag, Tooltip, Popover, List, Typography, Divider, Badge } from 'antd';
 import { ExclamationCircleFilled, CheckCircleFilled } from '@ant-design/icons';
 import { useState } from 'react';
 import axios from 'axios';
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
+import { Loading } from '@components/common';
 
 const { Text } = Typography;
 
@@ -67,7 +68,7 @@ const CommitAnalysisBadge = ({ repo }) => {
 
   const content = (
     <div style={{ maxWidth: 300 }}>
-      {loading && <Spin size="small" />}
+      {loading && <Loading variant="circle" size="small" />}
       {error && <Text type="danger">{error}</Text>}
       {analysis && (
         <>

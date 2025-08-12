@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { List, Card, Tag, Input, Select, Button, Typography } from 'antd';
-import CommitDetailModal from './CommitDetailModal';
+import CommitDetailModal from '@components/Dashboard/CommitAnalyst/CommitDetailModal';
 
 const { Text } = Typography;
 

@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Card, Typography, Spin, Empty, Tag, List, Select } from 'antd';
+import { Card, Typography, Empty, Tag, List, Select } from 'antd';
 import { Pie } from 'react-chartjs-2';
 import CommitList from './CommitList';
+import { Loading } from '@components/common';
 
 const { Text } = Typography;
 
@@ -14,7 +15,7 @@ const BranchCommitAnalysis = ({
   setSelectedMember,
 }) => {
   if (branchAnalysisLoading) {
-    return <Spin />;
+    return <Loading variant="circle" size="small" />;
   }
 
   if (branchAnalysisError) {

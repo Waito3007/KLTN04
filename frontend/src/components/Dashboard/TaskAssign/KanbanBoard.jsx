@@ -6,8 +6,8 @@
 import React, { useMemo, useState } from 'react';
 import { Row, Col, Card, Empty, Button, Space, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import KanbanColumn from './KanbanColumn';
-import TaskDetailModal from './TaskDetailModal';
+import KanbanColumn from "@components/Dashboard/TaskAssign/KanbanColumn";
+import TaskDetailModal from "@components/Dashboard/TaskAssign/TaskDetailModal";
 import './KanbanBoard.css';
 
 const { Title } = Typography;

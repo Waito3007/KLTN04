@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { List, Avatar, Typography, Spin, message, Tooltip, Card, Tag, Pagination, Select, Empty } from "antd";
+import { List, Avatar, Typography, Tooltip, Card, Tag, Pagination, Select, Empty } from "antd";
 import { GithubOutlined, BranchesOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
 import styled from "styled-components";
-import { buildApiUrl } from '../../config/api';
+import { buildApiUrl } from "@config/api";
+import { Loading, Toast } from '@components/common';
 
 const { Title, Text } = Typography;
 
@@ -132,10 +133,7 @@ const CommitList = ({
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
-        <Spin size="large" />
-        <div style={{ marginTop: 16 }}>
-          <Text>Đang tải commit...</Text>
-        </div>
+        <Loading variant="circle" size="large" message="Đang tải commit..." />
       </div>
     );
   }

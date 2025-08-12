@@ -323,3 +323,129 @@ async def sync_single_repository(owner: str, repo: str, request: Request, db: Se
         logger.error(f"Error syncing repository {owner}/{repo}: {e}")
         await emit_sync_error(db, repo_key, str(e), sync_type)
         raise HTTPException(status_code=500, detail=f"Error syncing repository: {str(e)}")
+
+
+@repo_manager_router.post("/repositories/sync-all")
+async def sync_all_repositories(request: Request, db: Session = Depends(get_db)):
+    """
+    Đồng bộ tất cả repositories của user từ GitHub
+    """
+    token = request.headers.get("Authorization")
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+    
+    # Support both "Bearer " and "token " formats
+    if token.startswith("Bearer "):
+        github_token = f"token {token[7:]}"  # Convert Bearer to token format for GitHub API
+    elif token.startswith("token "):
+        github_token = token
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'Bearer <token>' or 'token <token>'")
+    
+    try:
+        # Get current user
+        from core.security import get_current_user_from_token
+        current_user = await get_current_user_from_token(token[7:] if token.startswith("Bearer ") else token[6:])
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        
+        # Import github_api_call function from sync
+        from api.routes.sync import github_api_call
+        
+        # Get all user's repositories from GitHub (all pages)
+        all_repos = []
+        page = 1
+        per_page = 100  # Maximum per page
+        
+        while True:
+            url = f"https://api.github.com/user/repos?per_page={per_page}&page={page}&sort=updated"
+            repos_data = await github_api_call(url, github_token)
+            
+            if not repos_data:
+                break
+                
+            all_repos.extend(repos_data)
+            
+            # If we got less than per_page results, we're done
+            if len(repos_data) < per_page:
+                break
+                
+            page += 1
+        
+        if not all_repos:
+            return {
+                "status": "error",
+                "message": "Không thể lấy danh sách repositories từ GitHub"
+            }
+        
+        synced_count = 0
+        errors = []
+        total_repos = len(all_repos)
+        
+        # Import repository service
+        from services.repo_service import save_repository
+        
+        for repo_data in all_repos:
+            try:
+                # Convert GitHub repo data to our database format
+                repo_entry = {
+                    "github_id": repo_data["id"],
+                    "name": repo_data["name"],
+                    "owner": repo_data["owner"]["login"],
+                    "description": repo_data.get("description"),
+                    "stars": repo_data["stargazers_count"],
+                    "forks": repo_data["forks_count"],
+                    "language": repo_data.get("language"),
+                    "open_issues": repo_data.get("open_issues_count", 0),
+                    "url": repo_data["html_url"],
+                    "full_name": repo_data["full_name"],
+                    "clone_url": repo_data.get("clone_url"),
+                    "is_private": repo_data["private"],
+                    "is_fork": repo_data["fork"],
+                    "default_branch": repo_data.get("default_branch", "main"),
+                    "sync_status": "completed"
+                }
+                
+                # Sync repository to database
+                await save_repository(repo_entry)
+                synced_count += 1
+                
+                # Log progress
+                logger.info(f"Synced repository {repo_data.get('full_name', 'unknown')}")
+                
+            except Exception as repo_error:
+                error_msg = f"Error syncing {repo_data.get('full_name', 'unknown')}: {str(repo_error)}"
+                errors.append(error_msg)
+                logger.error(error_msg)
+                continue
+        
+        # Return result
+        if synced_count == total_repos:
+            return {
+                "status": "success",
+                "message": f"Đã đồng bộ thành công {synced_count} repositories",
+                "synced_count": synced_count,
+                "total_repos": total_repos,
+                "errors": errors
+            }
+        elif synced_count > 0:
+            return {
+                "status": "partial_success", 
+                "message": f"Đã đồng bộ {synced_count}/{total_repos} repositories",
+                "synced_count": synced_count,
+                "total_repos": total_repos,
+                "errors": errors
+            }
+        else:
+            return {
+                "status": "error",
+                "message": "Không thể đồng bộ repository nào",
+                "synced_count": 0,
+                "total_repos": total_repos,
+                "errors": errors
+            }
+            
+    except Exception as e:
+        logger.error(f"Error syncing all repositories: {e}")
+        raise HTTPException(status_code=500, detail=f"Error syncing repositories: {str(e)}")

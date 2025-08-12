@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { Avatar, Typography, Spin, message, Card, Tag, Pagination } from "antd";
+import { useState } from "react";
+import { Avatar, Typography, Tag, Pagination } from "antd";
 import { useNavigate } from "react-router-dom";
 import { GithubOutlined, StarFilled, EyeFilled, ForkOutlined, CalendarOutlined } from "@ant-design/icons";
 import styled from "styled-components";
-import axios from "axios";
-import { buildApiUrl } from '../../config/api';
+import { Loading, Toast, Card } from "@components/common";
 
 const { Title, Text } = Typography;
 
@@ -12,20 +11,6 @@ const RepoContainer = styled.div`
   max-width: 900px;
   margin: 0 auto;
   padding: 24px;
-`;
-
-const RepoCard = styled(Card)`
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
-  border: none;
-  
-  &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    transform: translateY(-5px);
-  }
 `;
 
 const RepoHeader = styled.div`
@@ -94,42 +79,15 @@ const HighlightTag = styled(Tag)`
   padding: 0 10px;
 `;
 
-const RepoList = () => {
-  const [repos, setRepos] = useState([]);
-  const [loading, setLoading] = useState(true);
+const RepoList = ({ repositories = [], onRepoClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRepos, setTotalRepos] = useState(0);
   const navigate = useNavigate();
   const pageSize = 8;
 
-  useEffect(() => {
-    const fetchRepos = async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) return message.error("Vui lòng đăng nhập lại!");
-
-      try {
-        setLoading(true);        const response = await axios.get(buildApiUrl("/github/repos"), {
-          headers: { Authorization: `token ${token}` },
-          params: { sort: 'updated', direction: 'desc' } // Sắp xếp theo mới nhất
-        });
-        
-        // Sắp xếp lại để đảm bảo mới nhất lên đầu
-        const sortedRepos = response.data.sort((a, b) => 
-          new Date(b.updated_at) - new Date(a.updated_at)
-        );
-        
-        setRepos(sortedRepos);
-        setTotalRepos(sortedRepos.length);
-      } catch (error) {
-        message.error("Không thể tải danh sách repository!");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRepos();
-  }, []);
+  // Use provided repositories instead of fetching
+  const repos = repositories;
+  const totalRepos = repositories.length;
+  const loading = false;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -145,12 +103,11 @@ const RepoList = () => {
   );
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '100px' }}>
-        <Spin size="large" />
-        <div style={{ marginLeft: 16 }}>
-          <Text>Đang tải dữ liệu...</Text>
-        </div>
-      </div>
+      <Loading 
+        variant="modern"
+        text="Đang tải dữ liệu repository..."
+        size="large"
+      />
     );
   }
 
@@ -167,9 +124,21 @@ const RepoList = () => {
       </div>
 
       {paginatedRepos.map((repo) => (
-        <RepoCard 
+        <Card 
           key={repo.id} 
-          onClick={() => navigate(`/repo/${repo.owner.login}/${repo.name}`)}
+          variant="modern"
+          hoverable={true}
+          style={{ 
+            marginBottom: '20px',
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            if (onRepoClick) {
+              onRepoClick(repo);
+            } else {
+              navigate(`/repo/${repo.owner.login}/${repo.name}`);
+            }
+          }}
         >
           <RepoHeader>
             <Avatar 
@@ -234,7 +203,7 @@ const RepoList = () => {
               <Text>Cập nhật: {formatDate(repo.updated_at)}</Text>
             </MetaItem>
           </RepoMeta>
-        </RepoCard>
+        </Card>
       ))}
 
       <StyledPagination

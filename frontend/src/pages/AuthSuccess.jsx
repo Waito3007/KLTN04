@@ -1,7 +1,8 @@
 // src/pages/AuthSuccess.jsx
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { message } from "antd";
+import { Toast } from '@components/common';
+import MainLayout from '@components/layout/MainLayout';
 
 const AuthSuccess = () => {
   const navigate = useNavigate();
@@ -19,11 +20,15 @@ const AuthSuccess = () => {
         username,
         email,
         avatar_url: params.get("avatar_url"),
-      };      localStorage.setItem("github_profile", JSON.stringify(profile));
+      };
+      
+      // Lưu dữ liệu với cả hai key để tương thích với cả Dashboard cũ và mới
+      localStorage.setItem("github_profile", JSON.stringify(profile));
+      localStorage.setItem("user", JSON.stringify(profile));
       localStorage.setItem("access_token", token);
 
       // Chuyển hướng ngay lập tức, để Dashboard xử lý đồng bộ
-      message.success("Đăng nhập thành công!");
+      Toast.success("Đăng nhập thành công!");
       navigate("/dashboard");
     } else {
       navigate("/login");
@@ -31,9 +36,67 @@ const AuthSuccess = () => {
   }, [location, navigate]);
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <p className="text-xl">Đang đồng bộ dữ liệu...</p>
-    </div>
+    <MainLayout variant="glass" centered={true}>
+      <div style={{
+        textAlign: 'center',
+        padding: '40px',
+        background: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: '20px',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
+      }}>
+        <div style={{
+          fontSize: '48px',
+          marginBottom: '20px',
+          background: 'linear-gradient(45deg, #1890ff, #52c41a)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          ✨
+        </div>
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          color: '#262626',
+          marginBottom: '16px'
+        }}>
+          Đang đồng bộ dữ liệu...
+        </h2>
+        <p style={{
+          fontSize: '16px',
+          color: '#595959',
+          margin: 0
+        }}>
+          Vui lòng chờ trong giây lát
+        </p>
+        <div style={{
+          marginTop: '24px',
+          width: '200px',
+          height: '4px',
+          background: '#f0f0f0',
+          borderRadius: '2px',
+          overflow: 'hidden',
+          margin: '24px auto 0'
+        }}>
+          <div style={{
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(45deg, #1890ff, #52c41a)',
+            animation: 'loading 2s infinite'
+          }} />
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `
+      }} />
+    </MainLayout>
   );
 };
 

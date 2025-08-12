@@ -1,8 +1,9 @@
 // frontend/src/components/RepositorySync.jsx
 import React, { useState } from 'react';
-import { Button, Card, Progress, message, Alert, Descriptions, Spin, Space, Typography } from 'antd';
-import { SyncOutlined, DatabaseOutlined, GithubOutlined, BranchesOutlined, CodeOutlined, IssuesCloseOutlined, GitPullRequestOutlined } from '@ant-design/icons';
-import { syncAPI } from '../services/api';
+import { Button, Card, Progress, Alert, Descriptions, Space, Typography } from 'antd';
+import { SyncOutlined, DatabaseOutlined, GithubOutlined, BranchesOutlined, CodeOutlined, IssuesCloseOutlined, PullRequestOutlined } from '@ant-design/icons';
+import { syncAPI } from "@services/api";
+import { Loading, Toast } from '@components/common';
 
 const { Title, Text } = Typography;
 
@@ -19,11 +20,11 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     setSyncType('complete');
 
     try {
-      message.info('Bắt đầu đồng bộ toàn bộ repository...');
+      Toast.info('Bắt đầu đồng bộ toàn bộ repository...');
       const result = await syncAPI.syncAll(owner, repoName);
       
       setSyncResults(result);
-      message.success('Đồng bộ toàn bộ hoàn tất!');
+      Toast.success('Đồng bộ toàn bộ hoàn tất!');
       
       if (onSyncComplete) {
         onSyncComplete(result);
@@ -31,7 +32,7 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     } catch (error) {
       console.error('Sync error:', error);
       setError(error.response?.data?.detail || error.message);
-      message.error('Có lỗi xảy ra khi đồng bộ');
+      Toast.error('Có lỗi xảy ra khi đồng bộ');
     } finally {
       setLoading(false);
     }
@@ -44,11 +45,11 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     setSyncType('basic');
 
     try {
-      message.info('Bắt đầu đồng bộ cơ bản...');
+      Toast.info('Bắt đầu đồng bộ cơ bản...');
       const result = await syncAPI.syncBasic(owner, repoName);
       
       setSyncResults(result);
-      message.success('Đồng bộ cơ bản hoàn tất!');
+      Toast.success('Đồng bộ cơ bản hoàn tất!');
       
       if (onSyncComplete) {
         onSyncComplete(result);
@@ -56,7 +57,7 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     } catch (error) {
       console.error('Basic sync error:', error);
       setError(error.response?.data?.detail || error.message);
-      message.error('Có lỗi xảy ra khi đồng bộ cơ bản');
+      Toast.error('Có lỗi xảy ra khi đồng bộ cơ bản');
     } finally {
       setLoading(false);
     }
@@ -69,11 +70,11 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     setSyncType('enhanced');
 
     try {
-      message.info('Bắt đầu đồng bộ nâng cao...');
+      Toast.info('Bắt đầu đồng bộ nâng cao...');
       const result = await syncAPI.syncEnhanced(owner, repoName);
       
       setSyncResults(result);
-      message.success('Đồng bộ nâng cao hoàn tất!');
+      Toast.success('Đồng bộ nâng cao hoàn tất!');
       
       if (onSyncComplete) {
         onSyncComplete(result);
@@ -81,7 +82,7 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
     } catch (error) {
       console.error('Enhanced sync error:', error);
       setError(error.response?.data?.detail || error.message);
-      message.error('Có lỗi xảy ra khi đồng bộ nâng cao');
+      Toast.error('Có lỗi xảy ra khi đồng bộ nâng cao');
     } finally {
       setLoading(false);
     }
@@ -139,7 +140,7 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
             </Descriptions.Item>
             
             <Descriptions.Item 
-              label={<Space><GitPullRequestOutlined />Pull Requests</Space>}
+              label={<Space><PullRequestOutlined />Pull Requests</Space>}
             >
               <Text type="success">{sync_results.pull_requests_synced || 0} PRs</Text>
             </Descriptions.Item>
@@ -272,12 +273,7 @@ const RepositorySync = ({ owner, repoName, onSyncComplete }) => {
 
       {loading && (
         <div style={{ textAlign: 'center', marginTop: 16 }}>
-          <Spin size="large" />
-          <div style={{ marginTop: 8 }}>
-            <Text type="secondary">
-              Đang đồng bộ dữ liệu, vui lòng đợi...
-            </Text>
-          </div>
+          <Loading variant="circle" size="large" message="Đang đồng bộ dữ liệu, vui lòng đợi..." />
         </div>
       )}
 

@@ -10,12 +10,10 @@ import {
   Col,
   Statistic,
   Tabs,
-  message,
   Tooltip,
   Progress,
   Modal,
   Select,
-  Spin,
   Avatar,
   Badge,
   List,
@@ -23,6 +21,7 @@ import {
   Drawer,
   notification
 } from 'antd';
+import { Toast, Loading } from '@components/common';
 import {
   SyncOutlined,
   GithubOutlined,
@@ -37,7 +36,7 @@ import {
   BellOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
-import { repoSyncAPI } from '../../services/api';
+import { repoSyncAPI } from "@services/api";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -517,11 +516,11 @@ const RepoSyncManager = () => {
       console.error('Fetch sync status error:', error);
       
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        message.error('Server không phản hồi. Vui lòng kiểm tra backend server.');
+        Toast.error('Server không phản hồi. Vui lòng kiểm tra backend server.');
       } else if (error.response?.status === 401) {
-        message.error('Lỗi xác thực. Vui lòng đăng nhập lại.');
+        Toast.error('Lỗi xác thực. Vui lòng đăng nhập lại.');
       } else {
-        message.error('Lỗi khi tải danh sách repositories');
+        Toast.error('Lỗi khi tải danh sách repositories');
       }
       
       // Set empty data to prevent UI crash
@@ -551,7 +550,7 @@ const RepoSyncManager = () => {
       setSelectedRepoEvents(data);
       setEventsDrawerVisible(true);
     } catch (err) {
-      message.error('Lỗi khi tải sự kiện đồng bộ');
+      Toast.error('Lỗi khi tải sự kiện đồng bộ');
       console.error('Get repo events error:', err);
     }
   };
@@ -561,7 +560,7 @@ const RepoSyncManager = () => {
     
     // Check if we have sync status data (server is reachable)
     if (!syncStatus || !syncStatus.summary) {
-      message.warning('Server không khả dụng. Vui lòng kiểm tra kết nối backend.');
+      Toast.warning('Server không khả dụng. Vui lòng kiểm tra kết nối backend.');
       return;
     }
     
@@ -571,9 +570,9 @@ const RepoSyncManager = () => {
       await repoSyncAPI.syncRepository(repo.owner, repo.name, type);
       
       if (type === 'optimized') {
-        message.success(`Đã bắt đầu đồng bộ background cho ${repo.full_name || repo.name}`);
+        Toast.success(`Đã bắt đầu đồng bộ background cho ${repo.full_name || repo.name}`);
       } else {
-        message.success(`Đồng bộ ${repo.full_name || repo.name} thành công`);
+        Toast.success(`Đồng bộ ${repo.full_name || repo.name} thành công`);
       }
       
       // No need to call fetchSyncStatus() anymore since we have real-time updates
@@ -589,7 +588,7 @@ const RepoSyncManager = () => {
         errorMessage += `: ${error.message}`;
       }
       
-      message.error(errorMessage);
+      Toast.error(errorMessage);
       console.error('Sync error:', error);
       setSyncing(prev => ({ ...prev, [repoKey]: false }));
     }
@@ -597,7 +596,7 @@ const RepoSyncManager = () => {
 
   const handleSyncAllRepos = async () => {
     if (!syncStatus?.repositories) {
-      message.warning('Không có dữ liệu repositories để đồng bộ');
+      Toast.warning('Không có dữ liệu repositories để đồng bộ');
       return;
     }
 
@@ -607,7 +606,7 @@ const RepoSyncManager = () => {
     ];
 
     if (allRepos.length === 0) {
-      message.info('Tất cả repositories đã được đồng bộ');
+      Toast.info('Tất cả repositories đã được đồng bộ');
       return;
     }
 
@@ -656,7 +655,7 @@ const RepoSyncManager = () => {
         }
       }
 
-      message.info(`Đã bắt đầu đồng bộ ${allRepos.length} repositories`);
+      Toast.info(`Đã bắt đầu đồng bộ ${allRepos.length} repositories`);
       
       // Hide global progress after a delay
       setTimeout(() => {
@@ -665,7 +664,7 @@ const RepoSyncManager = () => {
       
     } catch (error) {
       console.error('Sync all repos error:', error);
-      message.error('Lỗi khi đồng bộ tất cả repositories');
+      Toast.error('Lỗi khi đồng bộ tất cả repositories');
       setGlobalSyncProgress(prev => ({ ...prev, visible: false }));
     }
   };
@@ -1030,10 +1029,7 @@ const RepoSyncManager = () => {
     return (
       <Container>
         <div style={{ textAlign: 'center', padding: '50px' }}>
-          <Spin size="large" />
-          <div style={{ marginTop: 16 }}>
-            <Text>Đang tải danh sách repositories...</Text>
-          </div>
+          <Loading variant="circle" size="large" message="Đang tải danh sách repositories..." />
         </div>
       </Container>
     );
