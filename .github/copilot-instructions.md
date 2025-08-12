@@ -22,6 +22,7 @@
   - Các endpoint `PUT`, `PATCH`, và `DELETE` phải được thiết kế để có tính idempotent.
 - **Hạn chế "Escape Hatches"**:
   - Hạn chế tối đa việc sử dụng `typing.Any` (Python) hoặc `any` (TypeScript).
+- **Bao quát toàn hệ thống**: Mỗi lần code, cần kiểm tra và đảm bảo rằng các thay đổi không gây lỗi cho các phần khác của hệ thống. Điều này bao gồm việc kiểm tra các module liên quan, các service, và các API endpoint.
 
 ---
 
