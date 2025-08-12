@@ -165,6 +165,12 @@ const NotificationBadge = styled(Badge)`
   }
 `;
 
+// Hàm buildApiUrl để xây dựng URL API
+const buildApiUrl = (endpoint) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'; // Thêm /api vào base URL
+  return `${baseUrl}${endpoint}`;
+};
+
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading] = useState(false);

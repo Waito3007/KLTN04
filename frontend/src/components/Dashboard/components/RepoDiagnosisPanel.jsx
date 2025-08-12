@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Spin, Empty, Tag, Divider, Select, Input, Avatar, Button, Switch } from 'antd';
+import { Card, Typography, Spin, Empty, Tag, Divider, Select, Input, Avatar, Button, Switch, Tabs } from 'antd';
 import BranchCommitAnalysis from '../CommitAnalyst/BranchCommitAnalysis';
 import CommitList from '../CommitAnalyst/CommitList';
 import AreaAnalysis from '../AreaAnalyst/AreaAnalysis';
@@ -7,6 +7,7 @@ import RiskAnalysis from '../RiskAnalyst/RiskAnalysis';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange }) => {
   const [selectedMemberArea, setSelectedMemberArea] = useState('');
@@ -14,7 +15,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
   const [compareMemberArea, setCompareMemberArea] = useState('');
   const [selectedMemberRisk, setSelectedMemberRisk] = useState('');
   const [compareRiskMode, setCompareRiskMode] = useState(false);
-  const [compareMemberRisk] = useState('');
+  const [compareMemberRisk, setCompareMemberRisk] = useState('');
   const [selectedMember, setSelectedMember] = useState('');
   const [error, setError] = useState(null);
   const [areaAnalysis, setAreaAnalysis] = useState(null);
@@ -28,6 +29,7 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
   const [selectedBranch, setSelectedBranch] = useState('');
   const [branchAnalysis, setBranchAnalysis] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState('1'); // Quản lý tab đang hoạt động
 
   const filteredRepos = (repoSource === 'github' ? githubRepos : repositories).filter(
     repo =>
@@ -111,41 +113,68 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
     fetchBranches();
   }, [repoId, repoSource, githubRepos, repositories]);
 
-  const handleAnalyze = async () => {
-    if (!repoId || !selectedBranch)
-      return;
+  const handleCommitAnalysis = async () => {
+    if (!repoId || !selectedBranch) return;
 
     setAnalysisLoading(true);
     setError(null);
     setBranchAnalysis(null);
-    setAreaAnalysis(null);
-    setRiskAnalysis(null);
 
     try {
       const commitAnalysisUrl = `http://localhost:8000/api/multifusion-commit-analysis/${repoId}/commits/all/analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit=1000`;
-      const areaAnalysisUrl = `http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
-      const riskAnalysisUrl = `http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
+      const commitRes = await fetch(commitAnalysisUrl);
 
-      const [commitRes, areaRes, riskRes] = await Promise.all([
-        fetch(commitAnalysisUrl),
-        fetch(areaAnalysisUrl),
-        fetch(riskAnalysisUrl),
-      ]);
-
-      if (!commitRes.ok)
-        throw new Error('Lỗi khi phân tích commit cho nhánh này.');
-      if (!areaRes.ok)
-        throw new Error('Lỗi khi tải dữ liệu phân tích lĩnh vực.');
-      if (!riskRes.ok)
-        throw new new Error('Lỗi khi tải dữ liệu phân tích rủi ro.');
+      if (!commitRes.ok) throw new Error('Lỗi khi phân tích commit cho nhánh này.');
 
       const commitData = await commitRes.json();
-      const areaData = await areaRes.json();
-      const riskData = await riskRes.json();
-
       setBranchAnalysis(commitData);
+      setActiveTabKey('1'); // Chuyển sang tab Phân tích Commit
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
+  const handleAreaAnalysis = async () => {
+    if (!repoId || !selectedBranch) return;
+
+    setAnalysisLoading(true);
+    setError(null);
+    setAreaAnalysis(null);
+
+    try {
+      const areaAnalysisUrl = `http://localhost:8000/api/area-analysis/repositories/${repoId}/full-area-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
+      const areaRes = await fetch(areaAnalysisUrl);
+
+      if (!areaRes.ok) throw new Error('Lỗi khi tải dữ liệu phân tích lĩnh vực.');
+
+      const areaData = await areaRes.json();
       setAreaAnalysis(areaData);
+      setActiveTabKey('2'); // Chuyển sang tab Phân tích Phạm vi
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
+  const handleRiskAnalysis = async () => {
+    if (!repoId || !selectedBranch) return;
+
+    setAnalysisLoading(true);
+    setError(null);
+    setRiskAnalysis(null);
+
+    try {
+      const riskAnalysisUrl = `http://localhost:8000/api/risk-analysis/repositories/${repoId}/full-risk-analysis?branch_name=${encodeURIComponent(selectedBranch)}&limit_per_member=1000`;
+      const riskRes = await fetch(riskAnalysisUrl);
+
+      if (!riskRes.ok) throw new Error('Lỗi khi tải dữ liệu phân tích rủi ro.');
+
+      const riskData = await riskRes.json();
       setRiskAnalysis(riskData);
+      setActiveTabKey('3'); // Chuyển sang tab Phân tích Rủi ro
     } catch (err) {
       setError(err.message);
     } finally {
@@ -205,55 +234,73 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
     <Card
       title={<Title level={4}>🩺 Chuẩn đoán tổng hợp kho lưu trữ</Title>}
       style={{ marginBottom: 24 }}
-      styles={{ body: { padding: 24 } }}
+      bodyStyle={{ padding: 24 }}
     >
-      <div style={{ marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
-        <Switch
-          checked={repoSource === 'github'}
-          onChange={handleSourceToggle}
-          checkedChildren="GitHub API"
-          unCheckedChildren="Database"
-          disabled={githubLoading}
-        />
-        <span style={{ fontWeight: 500, color: repoSource === 'github' ? '#3b82f6' : '#64748b' }}>
-          {repoSource === 'github' ? 'Đang lấy từ GitHub API' : 'Đang lấy từ Database'}
-        </span>
-        <Input
-          placeholder="Tìm kiếm repository..."
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          style={{ width: 220 }}
-          disabled={githubLoading}
-        />
-        <Select
-          showSearch
-          style={{ minWidth: 260 }}
-          placeholder={githubLoading ? 'Đang tải danh sách...' : 'Chọn repository'}
-          value={repoId}
-          onChange={handleRepoSelect}
-          filterOption={false}
-          loading={githubLoading}
-        >
-          {filteredRepos.map(repo => {
-            // Handle owner có thể là string hoặc object
-            const ownerName = typeof repo.owner === 'string' 
-              ? repo.owner 
-              : repo.owner?.login || repo.owner?.name || repo.owner;
-            const avatarUrl = typeof repo.owner === 'object' 
-              ? repo.owner?.avatar_url 
-              : repo.owner_avatar_url;
-            
-            return (
-              <Option key={repo.id || repo.github_id} value={repo.id || repo.github_id}>
-                <Avatar src={avatarUrl} size={20} style={{ marginRight: 6 }} />
-                <Tag color="blue">{ownerName}</Tag> / <Text strong>{repo.name}</Text>
-              </Option>
-            );
-          })}
-        </Select>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 16,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Switch
+            checked={repoSource === 'github'}
+            onChange={handleSourceToggle}
+            checkedChildren="GitHub API"
+            unCheckedChildren="Database"
+            disabled={githubLoading}
+          />
+          <span
+            style={{
+              fontWeight: 500,
+              color: repoSource === 'github' ? '#3b82f6' : '#64748b',
+            }}
+          >
+            {repoSource === 'github' ? 'Đang lấy từ GitHub API' : 'Đang lấy từ Database'}
+          </span>
+          <Input
+            placeholder="Tìm kiếm repository..."
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            style={{ width: '100%', maxWidth: 220 }}
+            disabled={githubLoading}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           <Select
-            style={{ minWidth: 180 }}
+            showSearch
+            style={{ minWidth: 260, maxWidth: '100%' }}
+            placeholder={githubLoading ? 'Đang tải danh sách...' : 'Chọn repository'}
+            value={repoId}
+            onChange={handleRepoSelect}
+            filterOption={false}
+            loading={githubLoading}
+          >
+            {filteredRepos.map(repo => {
+              const ownerName =
+                typeof repo.owner === 'string'
+                  ? repo.owner
+                  : repo.owner?.login || repo.owner?.name || repo.owner;
+              const avatarUrl =
+                typeof repo.owner === 'object'
+                  ? repo.owner?.avatar_url
+                  : repo.owner_avatar_url;
+
+              return (
+                <Option key={repo.id || repo.github_id} value={repo.id || repo.github_id}>
+                  <Avatar src={avatarUrl} size={20} style={{ marginRight: 6 }} />
+                  <Tag color="blue">{ownerName}</Tag> / <Text strong>{repo.name}</Text>
+                </Option>
+              );
+            })}
+          </Select>
+
+          <Select
+            style={{ minWidth: 180, maxWidth: '100%' }}
             placeholder={branchList.length === 0 ? 'Không có branch' : 'Chọn branch'}
             value={selectedBranch}
             onChange={handleBranchChange}
@@ -265,56 +312,96 @@ const RepoDiagnosisPanel = ({ repositories = [], onRepoChange, onBranchChange })
               </Option>
             ))}
           </Select>
-          <Button type="primary" onClick={handleAnalyze} disabled={!selectedBranch || analysisLoading} loading={analysisLoading}>
-            Phân tích
+        </div>
+
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Button
+            type="primary"
+            onClick={handleCommitAnalysis}
+            disabled={!selectedBranch || analysisLoading}
+            loading={analysisLoading}
+          >
+            Phân tích Commit
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleAreaAnalysis}
+            disabled={!selectedBranch || analysisLoading}
+            loading={analysisLoading}
+          >
+            Phân tích Phạm vi
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleRiskAnalysis}
+            disabled={!selectedBranch || analysisLoading}
+            loading={analysisLoading}
+          >
+            Phân tích Rủi ro
           </Button>
         </div>
       </div>
+
       <Divider />
+
       {analysisLoading && (
         <div style={{ width: '100%', marginBottom: 16, textAlign: 'center' }}>
           <Spin />
           <div style={{ marginTop: 8, color: '#666' }}>Đang tải dữ liệu phân tích...</div>
         </div>
       )}
+
       {error && <Empty description={error} />}
+
       {!analysisLoading && !error && repoId && (
-        <>
-          {branchAnalysis && (
-            <BranchCommitAnalysis
-              branchAnalysis={branchAnalysis}
-              selectedMember={selectedMember}
-              setSelectedMember={setSelectedMember}
-              renderCommitList={commits => <CommitList commits={commits} />}
-            />
-          )}
-          {areaAnalysis && (
-            <AreaAnalysis
-              areaAnalysis={areaAnalysis}
-              areaLoading={false}
-              selectedMemberArea={selectedMemberArea}
-              setSelectedMemberArea={setSelectedMemberArea}
-              compareAreaMode={compareAreaMode}
-              setCompareAreaMode={setCompareAreaMode}
-              compareMemberArea={compareMemberArea}
-              setCompareMemberArea={setCompareMemberArea}
-              selectedBranch={selectedBranch}
-            />
-          )}
-          {riskAnalysis && (
-            <RiskAnalysis
-              riskAnalysis={riskAnalysis}
-              riskLoading={false}
-              selectedMemberRisk={selectedMemberRisk}
-              setSelectedMemberRisk={setSelectedMemberRisk}
-              compareRiskMode={compareRiskMode}
-              setCompareRiskMode={setCompareRiskMode}
-              compareMemberRisk={compareMemberRisk}
-              setCompareMemberRisk={compareMemberRisk}
-              selectedBranch={selectedBranch}
-            />
-          )}
-        </>
+        <Tabs activeKey={activeTabKey} onChange={setActiveTabKey}>
+          <TabPane tab="Phân tích Commit" key="1">
+            {branchAnalysis ? (
+              <BranchCommitAnalysis
+                branchAnalysis={branchAnalysis}
+                selectedMember={selectedMember}
+                setSelectedMember={setSelectedMember}
+                renderCommitList={commits => <CommitList commits={commits} />}
+              />
+            ) : (
+              <Empty description="Chưa có dữ liệu phân tích Commit. Vui lòng thực hiện phân tích." />
+            )}
+          </TabPane>
+          <TabPane tab="Phân tích Phạm vi" key="2">
+            {areaAnalysis ? (
+              <AreaAnalysis
+                areaAnalysis={areaAnalysis}
+                areaLoading={false}
+                selectedMemberArea={selectedMemberArea}
+                setSelectedMemberArea={setSelectedMemberArea}
+                compareAreaMode={compareAreaMode}
+                setCompareAreaMode={setCompareAreaMode}
+                compareMemberArea={compareMemberArea}
+                setCompareMemberArea={setCompareMemberArea}
+                selectedBranch={selectedBranch}
+              />
+            ) : (
+              <Empty description="Chưa có dữ liệu phân tích Phạm vi. Vui lòng thực hiện phân tích." />
+            )}
+          </TabPane>
+          <TabPane tab="Phân tích Rủi ro" key="3">
+            {riskAnalysis ? (
+              <RiskAnalysis
+                riskAnalysis={riskAnalysis}
+                riskLoading={false}
+                selectedMemberRisk={selectedMemberRisk}
+                setSelectedMemberRisk={setSelectedMemberRisk}
+                compareRiskMode={compareRiskMode}
+                setCompareRiskMode={setCompareRiskMode}
+                compareMemberRisk={compareMemberRisk}
+                setCompareMemberRisk={setCompareMemberRisk}
+                selectedBranch={selectedBranch}
+              />
+            ) : (
+              <Empty description="Chưa có dữ liệu phân tích Rủi ro. Vui lòng thực hiện phân tích." />
+            )}
+          </TabPane>
+        </Tabs>
       )}
     </Card>
   );
