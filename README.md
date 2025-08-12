@@ -2,13 +2,17 @@
 
 Dự án này là một hệ thống thông minh sử dụng Trí tuệ nhân tạo (AI) để phân tích dữ liệu từ các kho chứa mã nguồn Git, nhằm hỗ trợ các nhà quản lý dự án trong việc theo dõi tiến độ, đánh giá rủi ro và đưa ra các gợi ý phân công công việc một cách hiệu quả.
 
+---
+
 ## 🎯 Giới thiệu
 
 Trong các dự án phát triển phần mềm, việc quản lý và phân công công việc một cách tối ưu là yếu tố then chốt dẫn đến thành công. Hệ thống này được xây dựng để giải quyết các thách thức đó bằng cách:
 
-- Tự động hóa việc phân tích các commit và hoạt động trên kho mã nguồn.
-- Cung cấp các số liệu trực quan về hiệu suất, đóng góp và các lĩnh vực chuyên môn của từng thành viên.
-- Sử dụng các mô hình AI để phân loại commit, đánh giá mức độ phức tạp và rủi ro, từ đó gợi ý người thực hiện phù hợp cho các công việc (task/issue).
+- **Tự động hóa** việc phân tích các commit và hoạt động trên kho mã nguồn.
+- **Cung cấp số liệu trực quan** về hiệu suất, đóng góp và các lĩnh vực chuyên môn của từng thành viên.
+- **Sử dụng mô hình AI** để phân loại commit, đánh giá mức độ phức tạp và rủi ro, từ đó gợi ý người thực hiện phù hợp cho các công việc (task/issue).
+
+---
 
 ## ✨ Tính năng chính
 
@@ -19,6 +23,8 @@ Trong các dự án phát triển phần mềm, việc quản lý và phân côn
 - **Đánh giá rủi ro**: Phân tích các commit và thay đổi trong mã nguồn để cảnh báo sớm các rủi ro tiềm ẩn.
 - **Gợi ý phân công công việc**: Dựa trên hồ sơ năng lực và nội dung công việc, hệ thống gợi ý thành viên phù hợp nhất để thực hiện.
 - **Quản lý dự án và kho chứa**: Cho phép thêm, quản lý và theo dõi nhiều dự án và repositories.
+
+---
 
 ## 🛠️ Công nghệ sử dụng
 
@@ -49,14 +55,16 @@ Trong các dự án phát triển phần mềm, việc quản lý và phân côn
 - **Cơ sở dữ liệu**: PostgreSQL
 - **CI/CD & Deployment**: Docker (dự kiến)
 
+---
+
 ## 🏗️ Kiến trúc hệ thống
 
 Dự án được xây dựng theo kiến trúc Monorepo, bao gồm 2 thành phần chính:
 
-- `backend/`: Chứa toàn bộ logic nghiệp vụ, API endpoints, xử lý AI và tương tác với cơ sở dữ liệu.
-- `frontend/`: Giao diện người dùng được xây dựng bằng React để tương tác với API từ backend.
+- **`backend/`**: Chứa toàn bộ logic nghiệp vụ, API endpoints, xử lý AI và tương tác với cơ sở dữ liệu.
+- **`frontend/`**: Giao diện người dùng được xây dựng bằng React để tương tác với API từ backend.
 
-**Luồng hoạt động cơ bản**:
+### **Luồng hoạt động cơ bản**
 
 1. Người dùng đăng nhập và thêm một repository từ GitHub vào hệ thống.
 2. Backend thực hiện quá trình đồng bộ hóa dữ liệu (commits, issues, contributors...) từ GitHub API.
@@ -64,15 +72,17 @@ Dự án được xây dựng theo kiến trúc Monorepo, bao gồm 2 thành ph�
 4. Các mô hình AI xử lý dữ liệu đã đồng bộ (ví dụ: phân loại commit) và lưu lại kết quả.
 5. Frontend gọi API từ backend để hiển thị các thông tin phân tích trên giao diện cho người dùng.
 
+---
+
 ## 🚀 Hướng dẫn Cài đặt và Chạy dự án
 
-### Yêu cầu
+### **Yêu cầu**
 
 - Python 3.9+ và Poetry
 - Node.js 18+ và npm/yarn
 - PostgreSQL Server
 
-### 1. Cài đặt Backend
+### **1. Cài đặt Backend**
 
 ```bash
 # 1. Di chuyển vào thư mục backend
@@ -94,7 +104,7 @@ alembic upgrade head
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 2. Cài đặt Frontend
+### **2. Cài đặt Frontend**
 
 ```bash
 # 1. Mở một terminal khác, di chuyển vào thư mục frontend
@@ -112,9 +122,11 @@ npm run dev
 
 Sau khi hoàn tất, truy cập `http://localhost:5173` (hoặc cổng mà Vite cung cấp) trên trình duyệt để sử dụng ứng dụng.
 
+---
+
 ## 📂 Cấu trúc thư mục
 
-```
+```plaintext
 .
 ├── backend/        # Source code của Backend (FastAPI)
 │   ├── ai/         # Các logic về mô hình AI, training, prediction
@@ -138,7 +150,9 @@ Sau khi hoàn tất, truy cập `http://localhost:5173` (hoặc cổng mà Vite 
 
 ---
 
-**Sinh viên thực hiện**: Vũ Phan Hoài Sang, Lê Trọng Nghĩa
-**Giảng viên hướng dẫn**: ThS. Đặng Thị Kim Giao
-**Trường**: TRƯỜNG ĐẠI HỌC NGOẠI NGỮ - TIN HỌC TP.HỒ CHÍ MINH (HUFLIT)
-**Năm**: 2025
+## 📌 Thông tin dự án
+
+- **Sinh viên thực hiện**: Vũ Phan Hoài Sang, Lê Trọng Nghĩa
+- **Giảng viên hướng dẫn**: ThS. Đặng Thị Kim Giao
+- **Trường**: TRƯỜNG ĐẠI HỌC NGOẠI NGỮ - TIN HỌC TP.HỒ CHÍ MINH (HUFLIT)
+- **Năm**: 2025
