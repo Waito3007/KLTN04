@@ -132,7 +132,7 @@ const AppLayout = ({ children, showSidebar = true }) => {
                     </Text>
                     <HeartFilled style={{ color: '#ff4d4f' }} />
                     <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
-                      by Team KLTN04
+                      by SangVu, NghiaLe
                     </Text>
                   </Space>
                   

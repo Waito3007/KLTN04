@@ -145,7 +145,7 @@ const MainLayout = ({
         </div>
       </Content>
 
-      {/* Footer */}
+      {/* Footer
       <Footer style={{
         textAlign: 'center',
         padding: '24px 50px',
@@ -214,7 +214,7 @@ const MainLayout = ({
             © 2025 KLTN04 Project. Powered by React + FastAPI + AI
           </Text>
         </Space>
-      </Footer>
+      </Footer> */}
     </Layout>
   );
 };
