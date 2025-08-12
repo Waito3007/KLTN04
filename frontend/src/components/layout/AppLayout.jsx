@@ -3,55 +3,45 @@ import { Layout, ConfigProvider, App, Typography, Space, Divider } from 'antd';
 import { GithubOutlined, HeartFilled, RocketOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
+import { useAuth } from './useAuth';
 import { Toast } from '@components/common';
+import { ROUTES, MESSAGES } from '@constants/auth';
 
 const { Content, Footer } = Layout;
 const { Text, Link } = Typography;
 
 const AppLayout = ({ children, showSidebar = true }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   // Các trang không hiển thị sidebar
-  const noSidebarPages = ['/login', '/auth-success', '/'];
+  const noSidebarPages = [ROUTES.PUBLIC.LOGIN, ROUTES.PUBLIC.AUTH_SUCCESS, ROUTES.PUBLIC.HOME];
 
   // Kiểm tra xem có nên hiển thị sidebar không
   const shouldShowSidebar = showSidebar && !noSidebarPages.includes(location.pathname);
-
-  // Load user data từ localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem('github_profile') || localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-  }, [location.pathname]);
 
   // Toggle sidebar
   const handleSidebarToggle = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  // Logout handler
+  // Logout handler - đơn giản hóa vì logic đã được xử lý trong AuthContext
   const handleLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem('github_profile');
-    localStorage.removeItem('user');
-    localStorage.removeItem('access_token');
-    
-    // Show toast
-    Toast.success('Đăng xuất thành công!');
-    
-    // Navigate to login
-    navigate('/login');
-    
-    // Clear user state
-    setUser(null);
+    try {
+      // Gọi logout từ AuthContext (đã xử lý localStorage cleanup)
+      logout();
+      
+      // Show toast
+      Toast.success(MESSAGES.AUTH.LOGOUT_SUCCESS);
+      
+      // Navigate to login
+      navigate(ROUTES.PUBLIC.LOGIN);
+    } catch (error) {
+      console.error('Lỗi khi đăng xuất:', error);
+      Toast.error(MESSAGES.AUTH.LOGOUT_ERROR);
+    }
   };
 
   // Responsive sidebar collapse

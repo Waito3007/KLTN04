@@ -2,11 +2,13 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Toast } from '@components/common';
+import { useAuth } from '@components/layout/useAuth';
 import MainLayout from '@components/layout/MainLayout';
 
 const AuthSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -22,18 +24,29 @@ const AuthSuccess = () => {
         avatar_url: params.get("avatar_url"),
       };
       
-      // Lưu dữ liệu với cả hai key để tương thích với cả Dashboard cũ và mới
-      localStorage.setItem("github_profile", JSON.stringify(profile));
-      localStorage.setItem("user", JSON.stringify(profile));
-      localStorage.setItem("access_token", token);
+      try {
+        // Sử dụng AuthContext login thay vì trực tiếp localStorage
+        login(profile);
+        
+        // Cũng lưu access_token riêng để tương thích với API calls
+        localStorage.setItem("access_token", token);
 
-      // Chuyển hướng ngay lập tức, để Dashboard xử lý đồng bộ
-      Toast.success("Đăng nhập thành công!");
-      navigate("/dashboard");
+        // Thêm một delay nhỏ để đảm bảo AuthContext đã được cập nhật
+        setTimeout(() => {
+          Toast.success("Đăng nhập thành công!");
+          navigate("/dashboard");
+        }, 100);
+        
+      } catch (error) {
+        console.error("Lỗi khi đăng nhập:", error);
+        Toast.error("Có lỗi xảy ra khi đăng nhập!");
+        navigate("/login");
+      }
     } else {
+      Toast.error("Không tìm thấy thông tin xác thực!");
       navigate("/login");
     }
-  }, [location, navigate]);
+  }, [location, navigate, login]);
 
   return (
     <MainLayout variant="glass" centered={true}>

@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, Typography, Empty, Tag, List, Select } from 'antd';
 import { Pie } from 'react-chartjs-2';
 import CommitList from './CommitList';
@@ -14,6 +13,23 @@ const BranchCommitAnalysis = ({
   selectedMember,
   setSelectedMember,
 }) => {
+  const filtered = useMemo(() => {
+    return branchAnalysis?.commits
+      ? selectedMember
+        ? branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember)
+        : branchAnalysis.commits
+      : [];
+  }, [branchAnalysis?.commits, selectedMember]);
+
+  const typeCount = useMemo(() => {
+    const count = {};
+    filtered.forEach(c => {
+      const type = c.analysis?.type || 'other';
+      count[type] = (count[type] || 0) + 1;
+    });
+    return count;
+  }, [filtered]);
+
   if (branchAnalysisLoading) {
     return <Loading variant="circle" size="small" />;
   }
@@ -26,25 +42,6 @@ const BranchCommitAnalysis = ({
     return <Empty description="Chưa có dữ liệu commit cho nhánh này." />;
   }
 
-  let typeCount = {};
-  let filtered = selectedMember
-    ? branchAnalysis.commits.filter(c => (c.author_name || 'Không rõ') === selectedMember)
-    : branchAnalysis.commits;
-  
-  // Debug logging
-  console.log('🔍 BranchCommitAnalysis Debug:', {
-    totalCommits: branchAnalysis.commits?.length || 0,
-    selectedMember,
-    filteredCommits: filtered.length,
-    summary: branchAnalysis.summary
-  });
-  
-  filtered.forEach(c => {
-    const type = c.analysis?.type || 'other';
-    typeCount[type] = (typeCount[type] || 0) + 1;
-  });
-  
-  console.log('📊 Commit Type Count:', typeCount);
   const pieLabels = Object.keys(typeCount);
   const pieValues = Object.values(typeCount);
 

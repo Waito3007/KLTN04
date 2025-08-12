@@ -1,47 +1,132 @@
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "@pages/Login";
-import AuthSuccess from "@pages/AuthSuccess";
-import DashboardModern from "@pages/DashboardModern";
-import ComponentDemo from "@pages/ComponentDemo";
-import RepoDetails from "@pages/RepoDetails";
-import SyncPage from "@pages/SyncPage";
-import RepositoryList from "@pages/RepositoryList";
-import RepositoryAnalysis from "@pages/RepositoryAnalysis";
-import CommitTable from "@components/commits/CommitTable";
-import TestPage from "@pages/TestPage";
+import { Spin } from "antd";
 import ErrorBoundary from "@components/ErrorBoundary";
-import RepoSyncManager from "@components/repo/RepoSyncManager";
 import AppLayout from "@components/layout/AppLayout";
+import { AuthProvider } from "@components/layout/AuthContext";
+import ProtectedRoute from "@components/auth/ProtectedRoute";
+import PublicRoute from "@components/auth/PublicRoute";
+
+// Sử dụng React.lazy để import động các component
+const Login = React.lazy(() => import("@pages/Login"));
+const AuthSuccess = React.lazy(() => import("@pages/AuthSuccess"));
+const DashboardModern = React.lazy(() => import("@pages/DashboardModern"));
+const ComponentDemo = React.lazy(() => import("@pages/ComponentDemo"));
+const RepoDetails = React.lazy(() => import("@pages/RepoDetails"));
+const SyncPage = React.lazy(() => import("@pages/SyncPage"));
+const RepositoryList = React.lazy(() => import("@pages/RepositoryList"));
+const RepositoryAnalysis = React.lazy(() => import("@pages/RepositoryAnalysis"));
+const CommitTable = React.lazy(() => import("@components/commits/CommitTable"));
+const TestPage = React.lazy(() => import("@pages/TestPage"));
+const RepoSyncManager = React.lazy(() => import("@components/repo/RepoSyncManager"));
+
+// Component Loading được cải thiện
+const LoadingSpinner = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '50vh'
+  }}>
+    <Spin size="large" tip="Đang tải..." />
+  </div>
+);
 
 function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <AppLayout>
-          <Routes>
-            {/* ✅ Trang mặc định là Login */}
-            <Route path="/" element={<Login />} />
+      <AuthProvider>
+        <Router>
+          <AppLayout>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {/* ✅ Public Routes - chỉ truy cập được khi chưa đăng nhập */}
+                <Route path="/" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
+                
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
+                
+                <Route path="/auth-success" element={
+                  <PublicRoute redirectTo="/dashboard">
+                    <AuthSuccess />
+                  </PublicRoute>
+                } />
 
-            {/* Các route chính */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth-success" element={<AuthSuccess />} />
-            <Route path="/dashboard" element={<DashboardModern />} />
-            <Route path="/repositories" element={<RepositoryList />} />
-            <Route path="/analysis" element={<RepositoryAnalysis />} />
-            <Route path="/demo" element={<ComponentDemo />} />
-            <Route path="/sync" element={<SyncPage />} />
-            <Route path="/repo-sync" element={<RepoSyncManager />} />
-            <Route path="/repo/:owner/:repo" element={<RepoDetails />} />
-            <Route path="/repo-details" element={<RepoDetails />} />
-            <Route path="/commits" element={<CommitTable />} />
-            <Route path="/test" element={<TestPage />} />
+                {/* ✅ Protected Routes - chỉ truy cập được khi đã đăng nhập */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <DashboardModern />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/repositories" element={
+                  <ProtectedRoute>
+                    <RepositoryList />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/analysis" element={
+                  <ProtectedRoute>
+                    <RepositoryAnalysis />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/demo" element={
+                  <ProtectedRoute>
+                    <ComponentDemo />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/sync" element={
+                  <ProtectedRoute>
+                    <SyncPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/repo-sync" element={
+                  <ProtectedRoute>
+                    <RepoSyncManager />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/repo/:owner/:repo" element={
+                  <ProtectedRoute>
+                    <RepoDetails />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/repo-details" element={
+                  <ProtectedRoute>
+                    <RepoDetails />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/commits" element={
+                  <ProtectedRoute>
+                    <CommitTable />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/test" element={
+                  <ProtectedRoute>
+                    <TestPage />
+                  </ProtectedRoute>
+                } />
 
-            {/* Fallback route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-
-          </Routes>
-        </AppLayout>
-      </Router>
+                {/* Fallback route */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </Suspense>
+          </AppLayout>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
