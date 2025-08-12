@@ -1,5 +1,5 @@
 // src/pages/AuthSuccess.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Toast } from '@components/common';
 import { useAuth } from '@components/layout/useAuth';
@@ -10,7 +10,13 @@ const AuthSuccess = () => {
   const location = useLocation();
   const { login } = useAuth();
 
+  // Flag để đảm bảo Toast và login chỉ chạy 1 lần
+  const didLogin = useRef(false);
+
   useEffect(() => {
+    if (didLogin.current) return;
+    didLogin.current = true;
+
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
     const username = params.get("username");
@@ -23,20 +29,13 @@ const AuthSuccess = () => {
         email,
         avatar_url: params.get("avatar_url"),
       };
-      
       try {
-        // Sử dụng AuthContext login thay vì trực tiếp localStorage
         login(profile);
-        
-        // Cũng lưu access_token riêng để tương thích với API calls
         localStorage.setItem("access_token", token);
-
-        // Thêm một delay nhỏ để đảm bảo AuthContext đã được cập nhật
         setTimeout(() => {
           Toast.success("Đăng nhập thành công!");
           navigate("/dashboard");
         }, 100);
-        
       } catch (error) {
         console.error("Lỗi khi đăng nhập:", error);
         Toast.error("Có lỗi xảy ra khi đăng nhập!");

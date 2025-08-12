@@ -244,7 +244,7 @@ const AppSidebar = ({
       <div style={headerStyle}>
         <div style={logoStyle}>
           <RocketOutlined style={{ fontSize: collapsed ? '24px' : '28px' }} />
-          {!collapsed && <span>KLTN04</span>}
+          {!collapsed && <span>MENU</span>}
         </div>
         {!collapsed && (
           <Button
@@ -308,6 +308,7 @@ const AppSidebar = ({
                 <Text 
                   type="secondary" 
                   style={{ 
+                    color: theme === 'dark' ? '#ffffff' : '#1f2937',
                     fontSize: '12px',
                     display: 'block',
                     overflow: 'hidden',
