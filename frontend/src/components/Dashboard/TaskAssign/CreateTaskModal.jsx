@@ -14,10 +14,12 @@ import {
   Col, 
   Space, 
   Typography,
-  Alert 
+  Alert,
+  Spin 
 } from 'antd';
 import { UserOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import axios from 'axios'; // Thêm axios để gọi API
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -46,18 +48,78 @@ const CreateTaskModal = ({
 }) => {
   const [form] = Form.useForm();
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [collaborators, setCollaborators] = useState([]); // State lưu danh sách thành viên
+  const [loadingCollaborators, setLoadingCollaborators] = useState(false); // State loading
 
   // Reset form khi modal mở/đóng
   useEffect(() => {
     if (visible) {
       form.resetFields();
-      // Set default values
       form.setFieldsValue({
         status: 'TODO',
-        priority: 'MEDIUM'
+        priority: 'MEDIUM',
       });
+
+      // Load danh sách thành viên trong repo
+      if (selectedRepo) {
+        fetchCollaborators(selectedRepo.owner, selectedRepo.name);
+      }
     }
-  }, [visible, form]);
+  }, [visible, form, selectedRepo]);
+
+  // Hàm gọi API lấy danh sách thành viên
+  const fetchCollaborators = async (owner, repo) => {
+    setLoadingCollaborators(true);
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; // Lấy URL từ biến môi trường
+      const token = localStorage.getItem('access_token'); // Lấy token từ localStorage
+      const ownerString = typeof owner === 'string' ? owner : owner?.login || 'unknown';
+
+      // Gọi API lấy danh sách cộng tác viên từ database
+      const response = await axios.get(`${apiBaseUrl}/github/${ownerString}/${repo}/collaborators`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Gửi token trong header
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      if (response.data.collaborators && response.data.collaborators.length > 0) {
+        setCollaborators(response.data.collaborators);
+      } else {
+        // Nếu không có cộng tác viên, hiển thị nút để đồng bộ thủ công
+        setCollaborators([]);
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách thành viên từ database:', error);
+      setCollaborators([]);
+    } finally {
+      setLoadingCollaborators(false);
+    }
+  };
+
+  const syncCollaborators = async (owner, repo) => {
+    setLoadingCollaborators(true);
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; // Lấy URL từ biến môi trường
+      const token = localStorage.getItem('access_token'); // Lấy token từ localStorage
+      const ownerString = typeof owner === 'string' ? owner : owner?.login || 'unknown';
+
+      // Gọi API đồng bộ cộng tác viên
+      const response = await axios.post(`${apiBaseUrl}/github/${ownerString}/${repo}/collaborators/sync`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Gửi token trong header
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      setCollaborators(response.data.collaborators || []);
+    } catch (error) {
+      console.error('Lỗi khi đồng bộ danh sách thành viên:', error);
+      setCollaborators([]);
+    } finally {
+      setLoadingCollaborators(false);
+    }
+  };
 
   // Validation rules - defensive programming
   const validationRules = {
@@ -229,12 +291,18 @@ const CreateTaskModal = ({
             <Form.Item
               name="assignee_github_username"
               label="Người thực hiện"
-              rules={validationRules.assignee}
             >
-              <Input
-                placeholder="GitHub username"
-                prefix={<UserOutlined />}
-              />
+              {loadingCollaborators ? (
+                <Spin />
+              ) : (
+                <Select placeholder="Chọn người thực hiện">
+                  {Array.isArray(collaborators) && collaborators.map((collab) => (
+                    <Option key={collab.login} value={collab.login}>
+                      {collab.login}
+                    </Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
           </Col>
           
@@ -254,6 +322,39 @@ const CreateTaskModal = ({
             </Form.Item>
           </Col>
         </Row>
+
+        {/* Nếu không có cộng tác viên, hiển thị nút cập nhật */}
+        {Array.isArray(collaborators) && collaborators.length === 0 && !loadingCollaborators && (
+          <Alert
+            message="Không tìm thấy cộng tác viên nào."
+            description={
+              <Space>
+                <span>Vui lòng nhấn nút bên dưới để đồng bộ danh sách cộng tác viên từ GitHub.</span>
+                <button
+                  onClick={() => syncCollaborators(selectedRepo.owner, selectedRepo.name)}
+                  style={{ backgroundColor: '#1890ff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Đồng bộ cộng tác viên
+                </button>
+              </Space>
+            }
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
+        {/* Nút đồng bộ chủ động */}
+        {Array.isArray(collaborators) && collaborators.length > 0 && (
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            <button
+              onClick={() => syncCollaborators(selectedRepo.owner, selectedRepo.name)}
+              style={{ backgroundColor: '#1890ff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Đồng bộ cộng tác viên
+            </button>
+          </div>
+        )}
 
         {/* Helper Text */}
         <div style={{ marginTop: 16 }}>

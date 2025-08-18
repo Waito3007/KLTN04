@@ -78,14 +78,6 @@ const AreaAnalysis = ({
           )}
           style={{ paddingLeft: 0 }}
         />
-        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text type="secondary">Tổng số commit: {summary.total_commits || 0}</Text>
-          {areaAnalysis?.branch_name && (
-            <Tag color="blue" size="small">
-              Branch: {areaAnalysis.branch_name}
-            </Tag>
-          )}
-        </div>
       </div>
     );
   };
@@ -97,12 +89,12 @@ const AreaAnalysis = ({
           <Text strong>Phân tích lĩnh vực công nghệ</Text>
           {selectedBranch && (
             <Tag color="blue" style={{ marginLeft: 8 }}>
-              📊 Branch: {selectedBranch}
+              Nhánh Phân Tích: {selectedBranch}
             </Tag>
           )}
           {areaAnalysis?.branch_name && (
             <Tag color="green" style={{ fontSize: '12px' }}>
-              🎯 Analyzed: {areaAnalysis.branch_name}
+              Đã Phân Tích: {areaAnalysis.branch_name}
             </Tag>
           )}
         </div>
@@ -161,13 +153,13 @@ const AreaAnalysis = ({
           border: '1px solid #e9ecef'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Text strong style={{ color: '#6366f1' }}>📊 Tóm tắt phân tích cho branch:</Text>
+            <Text strong style={{ color: '#6366f1' }}>Nhánh Phân Tích</Text>
             <Tag color="blue">{areaAnalysis.branch_name}</Tag>
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            <Text type="secondary">👥 Thành viên: {areaAnalysis.total_members}</Text>
-            <Text type="secondary">📝 Commits phân tích: {areaAnalysis.total_commits_analyzed}</Text>
-            <Text type="secondary">🎯 Lĩnh vực: {Object.keys(areaAnalysis.area_distribution || {}).length}</Text>
+            <Text type="secondary">Thành viên: {areaAnalysis.total_members}</Text>
+            <Text type="secondary">Commits phân tích: {areaAnalysis.total_commits_analyzed}</Text>
+            <Text type="secondary">Lĩnh vực: {Object.keys(areaAnalysis.area_distribution || {}).length}</Text>
           </div>
         </div>
       )}

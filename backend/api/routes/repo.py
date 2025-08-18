@@ -7,7 +7,9 @@ from services.repo_service import (
     get_user_repos_from_database, get_repositories_by_owner, get_repository_stats,
     get_repo_id_by_owner_and_name
 )
-from services.collaborator_service import get_collaborators_by_repo
+from services.collaborator_service import (
+    get_collaborators_by_repo, sync_repository_collaborators
+)
 
 repo_router = APIRouter()
 
@@ -131,3 +133,42 @@ async def get_repo_collaborators(owner: str, repo: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching collaborators: {str(e)}")
+
+# Sync collaborators từ GitHub API và lấy danh sách cập nhật từ database
+@repo_router.post("/github/{owner}/{repo}/collaborators/sync")
+async def sync_and_get_collaborators(owner: str, repo: str, request: Request):
+    """
+    Sync collaborators from GitHub API and fetch updated list from database
+    
+    Args:
+        owner: Repository owner
+        repo: Repository name
+        request: HTTP request object
+
+    Returns:
+        JSON response with updated collaborator list
+    """
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
+
+    try:
+        # Fetch repository ID from database
+        repo_id = await get_repo_id_by_owner_and_name(owner, repo)
+        if not repo_id:
+            raise HTTPException(status_code=404, detail=f"Repository {owner}/{repo} not found in database")
+
+        # Sync collaborators from GitHub API
+        sync_result = await sync_repository_collaborators(owner, repo, token.split(" ")[1])
+
+        # Fetch updated collaborators from database
+        collaborators = await get_collaborators_by_repo(repo_id)
+
+        return {
+            "repository": f"{owner}/{repo}",
+            "collaborators": collaborators,
+            "sync_result": sync_result,
+            "count": len(collaborators)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error syncing and fetching collaborators: {str(e)}")

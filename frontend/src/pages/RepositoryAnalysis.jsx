@@ -397,7 +397,7 @@ const RepositoryAnalysisPage = () => {
         <Row align="middle" justify="space-between">
           <Col>
             <Title level={2} style={{ margin: 0, color: '#1e293b' }}>
-              <BarChartOutlined /> Repository Analysis
+              <BarChartOutlined /> Phân tích Repository
             </Title>
             <Text type="secondary" style={{ fontSize: '16px' }}>
               Phân tích chi tiết repositories và thành viên dự án

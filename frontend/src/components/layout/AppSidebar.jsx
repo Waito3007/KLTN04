@@ -123,7 +123,7 @@ const AppSidebar = ({
         {
           key: 'repo-analysis',
           icon: <BarChartOutlined />,
-          label: 'Repository Analysis',
+          label: 'Phân tích Repository',
           onClick: () => navigate('/analysis')
         },
         {
