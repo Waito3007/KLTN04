@@ -30,6 +30,8 @@ from services.area_analysis_service import AreaAnalysisService
 from services.risk_analysis_service import RiskAnalysisService
 from services.han_ai_service import HANAIService
 from services.task_service import TaskService
+from interfaces.service_factory import service_factory, get_area_analysis_service, get_risk_analysis_service, get_task_service
+from interfaces import IAreaAnalysisService, IRiskAnalysisService, ITaskService
 
 # Import OAuth authentication system
 from core.security import get_current_user, get_current_user_optional, CurrentUser
@@ -41,6 +43,11 @@ risk_analysis_service_instance = RiskAnalysisService()
 han_ai_service_instance = HANAIService()
 multifusion_v2_service_instance = MultiFusionV2Service() # Add this line
 task_service_instance = TaskService()  # Add task service instance
+
+# Register services with factory
+service_factory.register_service(IAreaAnalysisService, area_analysis_service_instance)
+service_factory.register_service(IRiskAnalysisService, risk_analysis_service_instance)
+service_factory.register_service(ITaskService, task_service_instance)
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
@@ -64,11 +71,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 def get_multifusion_commitanalyst_service() -> MultifusionCommitAnalystService:
     return multifusion_commitanalyst_service_instance
 
-def get_area_analysis_service() -> AreaAnalysisService:
-    return area_analysis_service_instance
+# Use service factory for interface-based dependencies
+# def get_area_analysis_service() -> AreaAnalysisService:
+#     return area_analysis_service_instance
 
-def get_risk_analysis_service() -> RiskAnalysisService:
-    return risk_analysis_service_instance
+# def get_risk_analysis_service() -> RiskAnalysisService:
+#     return risk_analysis_service_instance
 
 def get_han_ai_service() -> HANAIService:
     return han_ai_service_instance
@@ -77,9 +85,10 @@ def get_han_ai_service() -> HANAIService:
 def get_multifusion_v2_service() -> MultiFusionV2Service:
     return multifusion_v2_service_instance
 
-def get_task_service() -> TaskService:
-    """Dependency để lấy TaskService instance"""
-    return task_service_instance
+# Use service factory for interface-based dependencies
+# def get_task_service() -> TaskService:
+#     """Dependency để lấy TaskService instance"""
+#     return task_service_instance
 
 async def get_current_user_dict(
     authorization: Optional[str] = Header(None)

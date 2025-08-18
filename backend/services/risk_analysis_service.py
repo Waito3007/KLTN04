@@ -5,6 +5,7 @@ import json
 from sklearn.preprocessing import StandardScaler
 import os
 from typing import Dict, Any
+from interfaces.risk_analysis_service_interface import IRiskAnalysisService
 
 # Define the MultiFusionModel architecture (copied from train.py)
 class MultiFusionModel(nn.Module):
@@ -28,7 +29,7 @@ class MultiFusionModel(nn.Module):
         logits = self.classifier(fusion)
         return logits
 
-class RiskAnalysisService:
+class RiskAnalysisService(IRiskAnalysisService):
     _instance = None
 
     def __new__(cls):

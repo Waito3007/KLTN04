@@ -15,6 +15,8 @@ from transformers import RobertaTokenizer, RobertaModel
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 import os
+from interfaces.multifusion_commit_analyst_service_interface import IMultiFusionCommitAnalystService
+from interfaces.multifusion_v2_service_interface import IMultiFusionV2Service
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ class MultiModalFusionModel(nn.Module):
         logits = self.classifier(combined_features)
         return logits
 
-class MultiFusionV2Service:
+class MultiFusionV2Service(IMultiFusionV2Service):
     _instance = None
 
     def __new__(cls):
@@ -260,7 +262,7 @@ def extract_commit_numeric_features(commit):
     return features
 
 # dịch vụ commit analyst cho MultiFusion
-class MultifusionCommitAnalystService:
+class MultifusionCommitAnalystService(IMultiFusionCommitAnalystService):
     def __init__(self, db: Session):
         self.db = db
         self.multifusion_v2_service = MultiFusionV2Service()

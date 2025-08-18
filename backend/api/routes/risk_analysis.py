@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
-from services.risk_analysis_service import RiskAnalysisService
 from schemas.commit import CommitAreaAnalysisRequest # Reusing schema for now, might need a dedicated one
 import logging
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from services.member_analysis_service import MemberAnalysisService
-from api.deps import get_risk_analysis_service
+from interfaces.service_factory import get_risk_analysis_service
+from interfaces import IRiskAnalysisService
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ risk_analysis_router = APIRouter(prefix="/api/risk-analysis", tags=["Risk Analys
 @risk_analysis_router.post("/predict")
 async def predict_commit_risk(
     commit_data: CommitAreaAnalysisRequest,
-    risk_analysis_service: RiskAnalysisService = Depends(get_risk_analysis_service)
+    risk_analysis_service: IRiskAnalysisService = Depends(get_risk_analysis_service)
 ) -> Dict[str, str]:
     """
     Phân tích độ rủi ro của một commit dựa trên message và diff.
@@ -41,7 +41,7 @@ async def get_full_risk_analysis(
     limit_per_member: int = 1000, # Increased default limit for commits per member
     branch_name: str = None, # Optional branch filter
     db: Session = Depends(get_db),
-    risk_analysis_service: RiskAnalysisService = Depends(get_risk_analysis_service)
+    risk_analysis_service: IRiskAnalysisService = Depends(get_risk_analysis_service)
 ):
     """
     Thực hiện phân tích rủi ro toàn diện cho tất cả thành viên trong một repository.

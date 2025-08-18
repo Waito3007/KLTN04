@@ -13,6 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from db.models.project_tasks import project_tasks, TaskStatus, TaskPriority
 from db.models.repositories import repositories
 from schemas.task import TaskCreate, TaskUpdate, TaskFilter, TaskResponse, TaskListResponse
+from interfaces.task_service_interface import ITaskService
 from core.task_exceptions import (
     TaskNotFoundError, TaskValidationError, TaskPermissionError,
     TaskLimitExceededError, TaskStatusTransitionError, TaskRepositoryError,
@@ -35,7 +36,7 @@ VALID_STATUS_TRANSITIONS = {
 logger = logging.getLogger(__name__)
 
 
-class TaskService:
+class TaskService(ITaskService):
     """
     Service class chứa tất cả logic nghiệp vụ cho Task management
     Tuân thủ nguyên tắc Single Responsibility và Defensive Programming
