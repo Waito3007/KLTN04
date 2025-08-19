@@ -86,7 +86,7 @@ class TaskCommitService(ITaskCommitService):
         self, 
         task_id: int
     ) -> List[Dict[str, Any]]:
-        """Get all commits related to a specific task"""
+        """Get all commits related to a specific task by parsing SHAs from description"""
         try:
             with engine.connect() as conn:
                 # Get task information
@@ -98,16 +98,73 @@ class TaskCommitService(ITaskCommitService):
                 
                 repo_owner = task_result.repo_owner
                 repo_name = task_result.repo_name
-                assignee_username = task_result.assignee_github_username
-                task_title = task_result.title
+                description = task_result.description or ""
                 
-                if not all([repo_owner, repo_name, assignee_username]):
+                if not all([repo_owner, repo_name]):
                     return []
                 
-                # Search for related commits
-                return await self.search_commits_by_pattern(
-                    repo_owner, repo_name, assignee_username, task_title
+                # Parse commit SHAs from task description
+                import re
+                # Look for patterns like "Linked commits:" or "Manually linked commits:" followed by SHA list
+                commit_patterns = [
+                    r"Linked commits:\s*([a-f0-9,\s]+)",
+                    r"Manually linked commits:\s*([a-f0-9,\s]+)"
+                ]
+                
+                commit_shas = []
+                for pattern in commit_patterns:
+                    matches = re.findall(pattern, description, re.IGNORECASE)
+                    for match in matches:
+                        # Split by comma and clean up
+                        shas = [sha.strip() for sha in match.split(',') if sha.strip()]
+                        commit_shas.extend(shas)
+                
+                # Remove duplicates and ensure valid SHA format (at least 7 chars)
+                commit_shas = list(set([sha for sha in commit_shas if len(sha) >= 7]))
+                
+                if not commit_shas:
+                    return []
+                
+                # Get repository ID
+                repo_query = select(repositories).where(
+                    and_(
+                        repositories.c.owner == repo_owner,
+                        repositories.c.name == repo_name
+                    )
                 )
+                repo_result = conn.execute(repo_query).fetchone()
+                
+                if not repo_result:
+                    return []
+                
+                repo_id = repo_result.id
+                
+                # Get commit details from database
+                commits_query = select(commits).where(
+                    and_(
+                        commits.c.repo_id == repo_id,
+                        commits.c.sha.in_(commit_shas)
+                    )
+                ).order_by(commits.c.committer_date.desc())
+                
+                results = conn.execute(commits_query).fetchall()
+                
+                # Convert to list of dictionaries
+                commit_list = []
+                for row in results:
+                    commit_list.append({
+                        "sha": row.sha,
+                        "message": row.message,
+                        "author_name": row.author_name,
+                        "author_email": row.author_email,
+                        "committed_date": row.committer_date.isoformat() if row.committer_date else None,
+                        "insertions": row.insertions or 0,
+                        "deletions": row.deletions or 0,
+                        "files_changed": row.files_changed or 0,
+                        "url": f"https://github.com/{repo_owner}/{repo_name}/commit/{row.sha}"
+                    })
+                
+                return commit_list
                 
         except Exception as e:
             logger.error(f"Error getting task related commits for task {task_id}: {e}")
