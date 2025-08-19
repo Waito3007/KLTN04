@@ -49,6 +49,12 @@ def load_ai_models():
         risk_service = RiskAnalysisService()
         logger.info("✅ Risk Analysis Service loaded successfully.")
         
+        # Load Task Commit Service
+        logger.info("🔄 Loading Task Commit Service...")
+        from services.task_commit_service import TaskCommitService
+        task_commit_service = TaskCommitService()
+        logger.info("✅ Task Commit Service loaded successfully.")
+        
         # Load HAN AI Service
         logger.info("🔄 Loading HAN AI Service...")
         from services.han_ai_service import HANAIService
@@ -79,6 +85,28 @@ def load_ai_models():
         logger.error(f"❌ Error loading AI models: {e}")
         # Don't raise here - let the app continue even if some models fail
 
+def register_services():
+    """Register services with the service factory"""
+    try:
+        logger.info("🔄 Registering services with factory...")
+        
+        from interfaces.service_factory import service_factory
+        from interfaces import IAreaAnalysisService, IRiskAnalysisService
+        from interfaces.task_commit_service import ITaskCommitService
+        from services.area_analysis_service import AreaAnalysisService
+        from services.risk_analysis_service import RiskAnalysisService
+        from services.task_commit_service import TaskCommitService
+        
+        # Register services
+        service_factory.register_service(IAreaAnalysisService, AreaAnalysisService())
+        service_factory.register_service(IRiskAnalysisService, RiskAnalysisService())
+        service_factory.register_service(ITaskCommitService, TaskCommitService())
+        
+        logger.info("✅ Services registered successfully.")
+        
+    except Exception as e:
+        logger.error(f"❌ Error registering services: {e}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -87,6 +115,9 @@ async def lifespan(app: FastAPI):
         
         # Load AI models after database connection
         load_ai_models()
+        
+        # Register services with factory
+        register_services()
         
         yield  # Chỉ yield nếu connect thành công
     except Exception as e:

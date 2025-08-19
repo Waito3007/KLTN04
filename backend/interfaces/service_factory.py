@@ -5,6 +5,7 @@ Hỗ trợ Dependency Injection và dễ dàng testing với mock objects
 
 from typing import Dict, Type, Any, Optional
 from interfaces import IAreaAnalysisService, IRiskAnalysisService, ITaskService
+from interfaces.task_commit_service import ITaskCommitService
 
 
 class ServiceFactory:
@@ -70,3 +71,8 @@ def get_risk_analysis_service() -> IRiskAnalysisService:
 def get_task_service() -> ITaskService:
     """Dependency injection cho TaskService"""
     return service_factory.get_service(ITaskService)
+
+
+def get_task_commit_service() -> ITaskCommitService:
+    """Dependency injection cho TaskCommitService"""
+    return service_factory.get_service(ITaskCommitService)
