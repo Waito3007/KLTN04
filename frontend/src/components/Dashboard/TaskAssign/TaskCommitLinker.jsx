@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Button, List, Checkbox, message, Card, Typography, Space, Tag, Spin, Input, Pagination, Select } from 'antd';
-import { LinkOutlined, CodeOutlined, UserOutlined, CalendarOutlined, SearchOutlined, TeamOutlined } from '@ant-design/icons';
+import { Modal, Button, List, Checkbox, message, Card, Typography, Space, Tag, Spin, Input, Pagination, Select, DatePicker, Switch, Row, Col } from 'antd';
+import { LinkOutlined, CodeOutlined, UserOutlined, CalendarOutlined, SearchOutlined, TeamOutlined, FilterOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
+const { RangePicker } = DatePicker;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked }) => {
@@ -21,6 +23,10 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
   // Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
+
+  // Filter states
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [showLinkedCommits, setShowLinkedCommits] = useState(false);
 
   // Author selection states
   const [availableAuthors, setAvailableAuthors] = useState([]);
@@ -66,7 +72,7 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
   }, [selectedRepo, selectedAuthor]);
 
   // Lấy danh sách commit của người được chọn với phân trang và tìm kiếm
-  const fetchUserCommits = useCallback(async (page = 1, search = '') => {
+  const fetchUserCommits = useCallback(async (page = 1, search = '', fromDate = null, toDate = null) => {
     if (!selectedAuthor || !selectedRepo) return;
     
     setLoading(true);
@@ -81,6 +87,14 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
       
       if (search.trim()) {
         params.append('search', search.trim());
+      }
+      
+      if (fromDate) {
+        params.append('from_date', fromDate.toISOString());
+      }
+      
+      if (toDate) {
+        params.append('to_date', toDate.toISOString());
       }
       
       // Lấy token từ localStorage
@@ -140,10 +154,11 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
 
   useEffect(() => {
     if (visible && selectedAuthor && selectedRepo) {
-      fetchUserCommits(1, '');
+      fetchUserCommits(1, '', null, null);
       fetchLinkedCommits();
       setCurrentPage(1);
       setSearchQuery('');
+      setDateRange([null, null]);
       setSelectedCommitIds([]);
     }
   }, [visible, selectedAuthor, selectedRepo, fetchUserCommits, fetchLinkedCommits]);
@@ -155,20 +170,29 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
     setSelectedCommitIds([]);
     setCurrentPage(1);
     setSearchQuery('');
+    setDateRange([null, null]);
   }, []);
 
   // Hàm tìm kiếm
   const handleSearch = useCallback(async (value) => {
     setSearchLoading(true);
     setSearchQuery(value);
-    await fetchUserCommits(1, value);
+    const [fromDate, toDate] = dateRange;
+    await fetchUserCommits(1, value, fromDate, toDate);
     setSearchLoading(false);
-  }, [fetchUserCommits]);
+  }, [fetchUserCommits, dateRange]);
+
+  // Hàm filter theo ngày
+  const handleDateRangeChange = useCallback(async (dates) => {
+    setDateRange(dates);
+    await fetchUserCommits(1, searchQuery, dates?.[0], dates?.[1]);
+  }, [fetchUserCommits, searchQuery]);
 
   // Hàm thay đổi trang
   const handlePageChange = useCallback(async (page) => {
-    await fetchUserCommits(page, searchQuery);
-  }, [fetchUserCommits, searchQuery]);
+    const [fromDate, toDate] = dateRange;
+    await fetchUserCommits(page, searchQuery, fromDate, toDate);
+  }, [fetchUserCommits, searchQuery, dateRange]);
 
   const handleCommitSelection = (commitSha, checked) => {
     if (checked) {
@@ -304,21 +328,44 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
 
         {/* Danh sách commit đã liên kết */}
         {linkedCommits.length > 0 && (
-          <Card size="small" title="Commit đã liên kết" type="inner">
+          <Card 
+            size="small" 
+            title={
+              <Space>
+                <Tag color="blue">{linkedCommits.length} commit đã liên kết</Tag>
+                <Switch
+                  checkedChildren={<EyeOutlined />}
+                  unCheckedChildren={<EyeInvisibleOutlined />}
+                  checked={showLinkedCommits}
+                  onChange={setShowLinkedCommits}
+                  size="small"
+                />
+                <Text type="secondary">Hiển thị commits đã liên kết</Text>
+              </Space>
+            }
+            type="inner"
+            style={{ display: showLinkedCommits ? 'block' : 'none' }}
+          >
             <List
               size="small"
               dataSource={linkedCommits}
               renderItem={(commit) => (
-                <List.Item>
+                <List.Item style={{ backgroundColor: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: '4px', marginBottom: '4px' }}>
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    <Text strong>{commit.message}</Text>
                     <Space>
+                      <Tag color="success" style={{ fontSize: '10px' }}>ĐÃ LIÊN KẾT</Tag>
+                      <Text strong>{commit.message}</Text>
+                    </Space>
+                    <Space wrap>
                       <Tag color="blue">{commit.sha?.substring(0, 8)}</Tag>
                       <Text type="secondary">
                         <UserOutlined /> {commit.author_name}
                       </Text>
                       <Text type="secondary">
                         <CalendarOutlined /> {formatDate(commit.committed_date)}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: '11px' }}>
+                        +{commit.insertions || 0} -{commit.deletions || 0} | {commit.files_changed || 0} files
                       </Text>
                     </Space>
                   </Space>
@@ -331,14 +378,66 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
         {/* Tìm kiếm commit */}
         <Card size="small" title="Tìm kiếm và liên kết commit" type="inner">
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Input.Search
-              placeholder="Tìm kiếm commit theo message, SHA hoặc tác giả..."
-              allowClear
-              enterButton={<SearchOutlined />}
-              loading={searchLoading}
-              onSearch={handleSearch}
-              style={{ marginBottom: 16 }}
-            />
+            {/* Bộ lọc và tìm kiếm */}
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Row gutter={[12, 12]} align="middle">
+                    <Col flex="auto">
+                      <Input.Search
+                        placeholder="Tìm kiếm commit theo message, SHA hoặc tác giả..."
+                        allowClear
+                        enterButton={<SearchOutlined />}
+                        loading={searchLoading}
+                        onSearch={handleSearch}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </Col>
+                  </Row>
+                  
+                  <Row gutter={[12, 12]} align="middle">
+                    <Col>
+                      <Space align="center">
+                        <FilterOutlined />
+                        <Text strong>Lọc theo ngày:</Text>
+                      </Space>
+                    </Col>
+                    <Col flex="auto">
+                      <RangePicker
+                        style={{ width: '100%' }}
+                        placeholder={['Từ ngày', 'Đến ngày']}
+                        format="DD/MM/YYYY"
+                        value={[
+                          dateRange[0] ? dayjs(dateRange[0]) : null,
+                          dateRange[1] ? dayjs(dateRange[1]) : null
+                        ]}
+                        onChange={(dates) => {
+                          const convertedDates = dates ? [
+                            dates[0] ? dates[0].toDate() : null,
+                            dates[1] ? dates[1].toDate() : null
+                          ] : [null, null];
+                          handleDateRangeChange(convertedDates);
+                        }}
+                        allowClear
+                      />
+                    </Col>
+                    <Col>
+                      <Button 
+                        onClick={() => {
+                          setDateRange([null, null]);
+                          setSearchQuery('');
+                          fetchUserCommits(1, '', null, null);
+                        }}
+                        size="small"
+                      >
+                        Xóa bộ lọc
+                      </Button>
+                    </Col>
+                  </Row>
+                </Space>
+              </Col>
+            </Row>
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -350,8 +449,8 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
             ) : commits.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <Text type="secondary">
-                  {searchQuery 
-                    ? `Không tìm thấy commit nào với từ khóa "${searchQuery}"`
+                  {searchQuery || dateRange[0] || dateRange[1]
+                    ? `Không tìm thấy commit nào với bộ lọc hiện tại`
                     : selectedAuthor
                       ? `Không tìm thấy commit nào của ${selectedAuthor}`
                       : 'Vui lòng chọn tác giả để xem commits'
@@ -360,34 +459,81 @@ const TaskCommitLinker = ({ task, selectedRepo, visible, onClose, onCommitLinked
               </div>
             ) : (
               <>
+                {/* Thống kê kết quả */}
+                <div style={{ marginBottom: 16 }}>
+                  <Space wrap>
+                    <Tag color="processing">
+                      Tổng: {totalCommits} commits
+                    </Tag>
+                    <Tag color="success">
+                      Chưa liên kết: {commits.filter(c => !isCommitLinked(c.sha)).length}
+                    </Tag>
+                    <Tag color="warning">
+                      Đã liên kết: {commits.filter(c => isCommitLinked(c.sha)).length}
+                    </Tag>
+                    {selectedCommitIds.length > 0 && (
+                      <Tag color="blue">
+                        Đã chọn: {selectedCommitIds.length}
+                      </Tag>
+                    )}
+                  </Space>
+                </div>
+
                 <List
                   size="small"
-                  dataSource={commits.filter(commit => !isCommitLinked(commit.sha))}
-                  renderItem={(commit) => (
-                    <List.Item>
-                      <Checkbox
-                        checked={selectedCommitIds.includes(commit.sha)}
-                        onChange={(e) => handleCommitSelection(commit.sha, e.target.checked)}
-                        disabled={isCommitLinked(commit.sha)}
+                  dataSource={commits}
+                  renderItem={(commit) => {
+                    const isLinked = isCommitLinked(commit.sha);
+                    return (
+                      <List.Item
+                        style={{
+                          backgroundColor: isLinked ? '#fff2e8' : 'white',
+                          border: isLinked ? '1px solid #ffbb96' : '1px solid #f0f0f0',
+                          borderRadius: '4px',
+                          marginBottom: '4px',
+                          opacity: isLinked ? 0.7 : 1
+                        }}
                       >
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                          <Text strong>{commit.message}</Text>
-                          <Space>
-                            <Tag color="green">{commit.sha?.substring(0, 8)}</Tag>
-                            <Text type="secondary">
-                              <UserOutlined /> {commit.author_name}
-                            </Text>
-                            <Text type="secondary">
-                              <CalendarOutlined /> {formatDate(commit.committed_date)}
-                            </Text>
-                            <Text type="secondary">
-                              +{commit.insertions} -{commit.deletions} files: {commit.files_changed}
-                            </Text>
+                        <Checkbox
+                          checked={selectedCommitIds.includes(commit.sha)}
+                          onChange={(e) => handleCommitSelection(commit.sha, e.target.checked)}
+                          disabled={isLinked}
+                          style={{ width: '100%' }}
+                        >
+                          <Space direction="vertical" style={{ width: '100%' }}>
+                            <Space>
+                              {isLinked && (
+                                <Tag color="orange" size="small" style={{ fontSize: '10px' }}>
+                                  ĐÃ LIÊN KẾT
+                                </Tag>
+                              )}
+                              <Text 
+                                strong 
+                                style={{ 
+                                  textDecoration: isLinked ? 'line-through' : 'none',
+                                  color: isLinked ? '#8c8c8c' : 'inherit'
+                                }}
+                              >
+                                {commit.message}
+                              </Text>
+                            </Space>
+                            <Space wrap>
+                              <Tag color={isLinked ? "default" : "green"}>{commit.sha?.substring(0, 8)}</Tag>
+                              <Text type="secondary">
+                                <UserOutlined /> {commit.author_name}
+                              </Text>
+                              <Text type="secondary">
+                                <CalendarOutlined /> {formatDate(commit.committed_date)}
+                              </Text>
+                              <Text type="secondary" style={{ fontSize: '11px' }}>
+                                +{commit.insertions || 0} -{commit.deletions || 0} | {commit.files_changed || 0} files
+                              </Text>
+                            </Space>
                           </Space>
-                        </Space>
-                      </Checkbox>
-                    </List.Item>
-                  )}
+                        </Checkbox>
+                      </List.Item>
+                    );
+                  }}
                 />
                 
                 {/* Pagination */}

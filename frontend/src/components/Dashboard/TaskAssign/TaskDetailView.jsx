@@ -95,17 +95,6 @@ const TaskDetailView = ({ task, selectedRepo, formatDate, formatDueDate, getPrio
           {priorityConfig.label}
         </Tag>
       </Space>
-
-      {/* Description */}
-      {task.description && (
-        <div>
-          <Text strong>Mô tả:</Text>
-          <div style={{ marginTop: 8, padding: 12, backgroundColor: '#fafafa', borderRadius: 6 }}>
-            <Text>{task.description}</Text>
-          </div>
-        </div>
-      )}
-
       <Divider />
 
       {/* Task Details */}
