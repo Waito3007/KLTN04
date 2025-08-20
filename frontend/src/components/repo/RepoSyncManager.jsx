@@ -37,6 +37,8 @@ import {
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { repoSyncAPI } from "@services/api";
+import { STORAGE_KEYS } from '@constants/storageKeys';
+import { debounce } from 'lodash';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -89,6 +91,7 @@ const RepoSyncManager = () => {
   const [eventsDrawerVisible, setEventsDrawerVisible] = useState(false);
   const [selectedRepoEvents, setSelectedRepoEvents] = useState(null);
   const wsRef = useRef(null);
+  const progressTimeoutsRef = useRef([]);
   
   // New progress states
   const [globalSyncProgress, setGlobalSyncProgress] = useState({
@@ -159,7 +162,7 @@ const RepoSyncManager = () => {
           }));
           break;
           
-        case 'sync_complete':
+        case 'sync_complete': {
           if (data.success) {
             targetRepo.sync_status = 'sync_completed';
             targetRepo.sync_progress = 100;
@@ -175,13 +178,14 @@ const RepoSyncManager = () => {
             }));
             
             // Auto-clear completed status after 5 seconds
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
               setRepoProgresses(prev => {
                 const newState = { ...prev };
                 delete newState[repo_key];
                 return newState;
               });
             }, 5000);
+            progressTimeoutsRef.current.push(timeoutId);
           } else {
             targetRepo.sync_status = 'sync_failed';
             targetRepo.sync_progress = 0;
@@ -194,17 +198,19 @@ const RepoSyncManager = () => {
             }));
             
             // Auto-clear failed status after 10 seconds
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
               setRepoProgresses(prev => {
                 const newState = { ...prev };
                 delete newState[repo_key];
                 return newState;
               });
             }, 10000);
+            progressTimeoutsRef.current.push(timeoutId);
           }
           break;
-          
-        case 'sync_error':
+        }
+        
+        case 'sync_error': {
           targetRepo.sync_status = 'sync_failed';
           targetRepo.sync_progress = 0;
           targetRepo.sync_stage = `Error: ${data.error}`;
@@ -216,14 +222,16 @@ const RepoSyncManager = () => {
           }));
           
           // Auto-clear error status after 10 seconds
-          setTimeout(() => {
+          const timeoutId = setTimeout(() => {
             setRepoProgresses(prev => {
               const newState = { ...prev };
               delete newState[repo_key];
               return newState;
             });
           }, 10000);
+          progressTimeoutsRef.current.push(timeoutId);
           break;
+        }
       }
       
       // Create new repositories object
@@ -324,7 +332,7 @@ const RepoSyncManager = () => {
     console.log('📊 Setting up polling fallback');
     
     // Kiểm tra token trước khi setup polling
-    const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       console.log('⚠️ No access token found, skipping polling setup');
       wsRef.current = { 
@@ -352,7 +360,7 @@ const RepoSyncManager = () => {
 
   const connectWebSocket = useCallback(() => {
     // Kiểm tra token trước khi kết nối WebSocket
-    const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       console.log('⚠️ No access token found, skipping WebSocket connection');
       setupPollingFallback();
@@ -471,7 +479,7 @@ const RepoSyncManager = () => {
 
   const fetchSyncStatus = async () => {
     // Kiểm tra token trước khi gọi API
-    const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       console.log('⚠️ No access token found, skipping sync status fetch');
       setSyncStatus({
@@ -593,6 +601,13 @@ const RepoSyncManager = () => {
       setSyncing(prev => ({ ...prev, [repoKey]: false }));
     }
   };
+
+  const debouncedHandleSyncRepository = useCallback(
+    debounce((repo) => {
+      handleSyncRepository(repo);
+    }, 300),
+    []
+  );
 
   const handleSyncAllRepos = async () => {
     if (!syncStatus?.repositories) {
@@ -894,7 +909,7 @@ const RepoSyncManager = () => {
               size="small"
               icon={<SyncOutlined />}
               loading={syncing[repoKey]}
-              onClick={() => handleSyncRepository(repo)}
+              onClick={() => debouncedHandleSyncRepository(repo)}
             >
               Đồng bộ
             </Button>
@@ -1185,7 +1200,7 @@ const RepoSyncManager = () => {
             </div>
             
             <Timeline mode="left">
-              {selectedRepoEvents.events.map((event, index) => {
+              {selectedRepoEvents?.events?.length > 0 && selectedRepoEvents.events.map((event, index) => {
                 const getEventIcon = (eventType) => {
                   switch (eventType) {
                     case 'sync_start':

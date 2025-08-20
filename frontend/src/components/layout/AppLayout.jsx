@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, ConfigProvider, App, Typography, Space, Divider } from 'antd';
+import React, { useState, useEffect } from 'react'; // Removed unused useRef
+import { Layout, ConfigProvider, App, Typography, Space, Divider, notification } from 'antd';
 import { GithubOutlined, HeartFilled, RocketOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
 import { useAuth } from './useAuth';
 import { Toast } from '@components/common';
+
 import { ROUTES, MESSAGES } from '@constants/auth';
+import { STORAGE_KEYS } from '@constants/storageKeys';
 
 const { Content, Footer } = Layout;
 const { Text, Link } = Typography;
+
+const AppNotification = {
+  success: (config) => notification.success(config),
+  error: (config) => notification.error(config),
+  info: (config) => notification.info(config),
+  warning: (config) => notification.warning(config),
+};
 
 const AppLayout = ({ children, showSidebar = true }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -45,19 +54,27 @@ const AppLayout = ({ children, showSidebar = true }) => {
   };
 
   // Responsive sidebar collapse
+  // Debounce resize event để tránh render nhiều lần không cần thiết
   useEffect(() => {
+    let resizeTimeout = null;
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarCollapsed(true);
-      } else if (window.innerWidth > 1200) {
-        setSidebarCollapsed(false);
-      }
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (window.innerWidth < 768) {
+          setSidebarCollapsed(true);
+        } else if (window.innerWidth > 1200) {
+          setSidebarCollapsed(false);
+        }
+      }, 150); // debounce 150ms
     };
 
     window.addEventListener('resize', handleResize);
     handleResize(); // Check initial size
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+    };
   }, []);
 
   const layoutStyle = {
@@ -169,4 +186,5 @@ const AppLayout = ({ children, showSidebar = true }) => {
   );
 };
 
+export { AppLayout, AppNotification };
 export default AppLayout;

@@ -22,9 +22,12 @@ const ProtectedRoute = ({ children, redirectTo = ROUTES.PUBLIC.LOGIN }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh'
+        height: '100vh',
+        position: 'relative',
       }}>
-        <Spin size="large" tip={MESSAGES.LOADING.CHECKING_AUTH} />
+        <div style={{ position: 'absolute', zIndex: 1 }}>
+          <Spin size="large" tip={MESSAGES.LOADING.CHECKING_AUTH} />
+        </div>
       </div>
     );
   }

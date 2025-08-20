@@ -19,6 +19,7 @@ const RepositoryAnalysis = React.lazy(() => import("@pages/RepositoryAnalysis"))
 const CommitTable = React.lazy(() => import("@components/commits/CommitTable"));
 const TestPage = React.lazy(() => import("@pages/TestPage"));
 const RepoSyncManager = React.lazy(() => import("@components/repo/RepoSyncManager"));
+const SyncManagerPage = React.lazy(() => import("@pages/SyncManagerPage"));
 
 // Component Loading được cải thiện
 const LoadingSpinner = () => (
@@ -26,9 +27,12 @@ const LoadingSpinner = () => (
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '50vh'
+    height: '50vh',
+    position: 'relative',
   }}>
-    <Spin size="large" tip="Đang tải..." />
+    <div style={{ position: 'absolute', zIndex: 1 }}>
+      <Spin size="large" tip="Đang tải..." />
+    </div>
   </div>
 );
 
@@ -93,6 +97,12 @@ function App() {
                 <Route path="/repo-sync" element={
                   <ProtectedRoute>
                     <RepoSyncManager />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/sync-manager" element={
+                  <ProtectedRoute>
+                    <SyncManagerPage />
                   </ProtectedRoute>
                 } />
                 
