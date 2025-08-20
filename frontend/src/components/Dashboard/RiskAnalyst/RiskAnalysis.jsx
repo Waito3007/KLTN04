@@ -41,8 +41,8 @@ const RiskAnalysis = ({
 
     if (!summary) return <Empty description="Không có dữ liệu." />;
 
-    const labels = ['lowrisk', 'highrisk', 'unknown'];
-    const data = labels.map(label => summary[label] || 0);
+    const labels = ['Rủi ro thấp', 'Rủi ro cao'];
+    const data = ['lowrisk', 'highrisk'].map(label => summary[label] || 0);
 
     return (
       <div style={{ width: 320 }}>
@@ -64,10 +64,10 @@ const RiskAnalysis = ({
           }}
         />
         <List
-          dataSource={labels.map(label => [label, summary[label] || 0])}
+          dataSource={['lowrisk', 'highrisk'].map((label, index) => [labels[index], summary[label] || 0])}
           renderItem={([label, value]) => (
             <List.Item>
-              <Tag color={label === 'lowrisk' ? 'green' : label === 'highrisk' ? 'red' : 'default'} style={{ fontSize: 15 }}>
+              <Tag color={label === 'Rủi ro thấp' ? 'green' : label === 'Rủi ro cao' ? 'red' : 'default'} style={{ fontSize: 15 }}>
                 {label}
               </Tag>
               : <Text>{value}</Text>
@@ -75,14 +75,6 @@ const RiskAnalysis = ({
           )}
           style={{ paddingLeft: 0 }}
         />
-        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text type="secondary">Tổng số commit: {summary.total_commits || 0}</Text>
-          {riskAnalysis?.branch_name && (
-            <Tag color="blue" size="small">
-              Branch: {riskAnalysis.branch_name}
-            </Tag>
-          )}
-        </div>
       </div>
     );
   };
@@ -94,12 +86,12 @@ const RiskAnalysis = ({
           <Text strong>Phân tích rủi ro</Text>
           {selectedBranch && (
             <Tag color="blue" style={{ marginLeft: 8 }}>
-              📊 Branch: {selectedBranch}
+              Nhánh Phân Tích: {selectedBranch}
             </Tag>
           )}
           {riskAnalysis?.branch_name && (
             <Tag color="green" style={{ fontSize: '12px' }}>
-              🎯 Analyzed: {riskAnalysis.branch_name}
+              Đã Phân Tích: {riskAnalysis.branch_name}
             </Tag>
           )}
         </div>
@@ -162,8 +154,8 @@ const RiskAnalysis = ({
             <Tag color="blue">{riskAnalysis.branch_name}</Tag>
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            <Text type="secondary">👥 Thành viên: {riskAnalysis.total_members}</Text>
-            <Text type="secondary">📝 Commits phân tích: {riskAnalysis.total_commits_analyzed}</Text>
+            <Text type="secondary">Thành viên: {riskAnalysis.total_members}</Text>
+            <Text type="secondary">Commits phân tích: {riskAnalysis.total_commits_analyzed}</Text>
             <div style={{ display: 'flex', gap: 8 }}>
               <Tag color="green" size="small">Low: {riskAnalysis.risk_distribution?.lowrisk || 0}</Tag>
               <Tag color="red" size="small">High: {riskAnalysis.risk_distribution?.highrisk || 0}</Tag>

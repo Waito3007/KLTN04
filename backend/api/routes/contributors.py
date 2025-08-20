@@ -60,7 +60,35 @@ async def get_repository_collaborators(
             )
         }
         
+        if not has_synced_data:
+            # Nếu không có dữ liệu, tự động đồng bộ từ GitHub
+            logger.info(f"No collaborators found for {owner}/{repo}. Attempting to sync from GitHub.")
+            try:
+                sync_result = await sync_repository_collaborators(
+                    owner=owner,
+                    repo=repo,
+                    github_token=authorization
+                )
+                collaborators = sync_result.get("collaborators", [])
+                has_synced_data = len(collaborators) > 0
+                response["collaborators"] = collaborators
+                response["count"] = len(collaborators)
+                response["has_synced_data"] = has_synced_data
+                response["message"] = (
+                    f"Synced {len(collaborators)} collaborators from GitHub" if has_synced_data 
+                    else "No collaborators found even after syncing from GitHub."
+                )
+            except Exception as sync_error:
+                logger.error(f"Error syncing collaborators for {owner}/{repo}: {sync_error}")
+                response["message"] = "Failed to sync collaborators from GitHub."
+        
         logger.info(f"Retrieved {len(collaborators)} collaborators for {owner}/{repo}")
+        # Đảm bảo luôn trả về dữ liệu mới
+        if isinstance(response, dict):
+            logger.warning("Response object is a dict, skipping headers modification.")
+        else:
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
         return response
         
     except Exception as e:
@@ -106,22 +134,23 @@ async def sync_repository_collaborators_endpoint(
         repo_result = await database.fetch_one(repo_query)
         
         if not repo_result:
+            logger.error(f"Repository {owner}/{repo} not found in database. Query result: {repo_result}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Repository {owner}/{repo} not found in database"
             )
-        
-        # Sync collaborators using the service
-        sync_result = await sync_repository_collaborators(
-            owner=owner,
-            repo=repo,
-            github_token=github_token
-        )
-        
-        if sync_result.get("status") == "error":
+
+        try:
+            sync_result = await sync_repository_collaborators(
+                owner=owner,
+                repo=repo,
+                github_token=github_token
+            )
+        except Exception as sync_error:
+            logger.error(f"Error syncing collaborators for {owner}/{repo}: {sync_error}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Sync failed: {sync_result.get('error', 'Unknown error')}"
+                detail=f"Sync failed: {str(sync_error)}"
             )
         
         logger.info(f"Successfully synced collaborators for {owner}/{repo}")

@@ -57,17 +57,18 @@ async def get_project_tasks(
                 and_(
                     project_tasks.c.repo_owner == owner,
                     project_tasks.c.repo_name == repo
-                )            ).order_by(project_tasks.c.created_at.desc())
-            
+                )
+            ).order_by(project_tasks.c.created_at.desc())
+
             result = conn.execute(query)
             tasks = []
-            
+
             for row in result:
                 task_dict = {
                     "id": row.id,
                     "title": row.title,
                     "description": row.description,
-                    "assignee": row.assignee_github_username,  # Use correct field name
+                    "assignee_github_username": row.assignee_github_username,  # Đảm bảo trường này được trả về
                     "priority": row.priority if row.priority else "MEDIUM",  # Already string
                     "status": row.status if row.status else "TODO",  # Already string
                     "due_date": row.due_date,
@@ -77,7 +78,7 @@ async def get_project_tasks(
                     "updated_at": row.updated_at
                 }
                 tasks.append(task_dict)
-            
+
             return tasks
     except Exception as e:
         print(f"Database error: {e}")

@@ -251,7 +251,7 @@ const Dashboard = () => {
 
                 {/* Repository Diagnosis */}
                 <Card 
-                  title="Repository Analysis"
+                  title="Phân tích Repository"
                   style={{ borderRadius: theme.borderRadius.large }}
                 >
                   <RepoDiagnosisPanel />

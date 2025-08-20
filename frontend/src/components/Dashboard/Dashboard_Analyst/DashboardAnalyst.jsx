@@ -134,22 +134,23 @@ const StatisticItem = ({ title, value, suffix, precision = 1 }) => (
 
 // --- Analysis Sections ---
 
-const ProgressSection = ({ data }) => {
+const ProgressSection = ({ data, llm }) => {
+  const [llmModalVisible, setLlmModalVisible] = useState(false);
   if (!data || data.total_commits === 0) return <Typography.Text type="secondary">Không có dữ liệu tiến độ.</Typography.Text>;
   const commitTypes = data.commits_by_type ? Object.entries(data.commits_by_type) : [];
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
       <Row gutter={16}>
-        <Col span={12}><StatisticItem title="Total Commits" value={data.total_commits} precision={0} /></Col>
-        <Col span={12}><StatisticItem title="Velocity" value={data.velocity} suffix="c/day" /></Col>
+        <Col span={12}><StatisticItem title="Tổng số Commit" value={data.total_commits} precision={0} /></Col>
+        <Col span={12}><StatisticItem title="Tốc độ" value={data.velocity} suffix="commit/ngày" /></Col>
       </Row>
       <div>
-        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>Productivity Score</Typography.Text>
+        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>Điểm năng suất</Typography.Text>
         <Progress percent={data.productivity_score} strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }} />
       </div>
       {commitTypes.length > 0 && (
          <div>
-          <Typography.Text strong style={{ fontSize: '12px' }}>Commit Types:</Typography.Text>
+          <Typography.Text strong style={{ fontSize: '12px' }}>Loại Commit:</Typography.Text>
           <div style={{ marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {commitTypes.map(([type, count]) => <Tag key={type}>{type}: {count}</Tag>)}
           </div>
@@ -157,8 +158,45 @@ const ProgressSection = ({ data }) => {
       )}
       {data.recommendations?.length > 0 && (
         <div>
-          <Typography.Text strong style={{ fontSize: '12px' }}>Gợi ý:</Typography.Text>
-          <List size="small" dataSource={data.recommendations.slice(0,2)} renderItem={item => <List.Item style={{padding: '2px 0', fontSize: '12px', border: 'none' }}>- {item}</List.Item>} />
+          <Typography.Text strong style={{ fontSize: '12px' }}>Gợi ý hành động:</Typography.Text>
+          <List
+            size="small"
+            dataSource={data.recommendations.slice(0,2)}
+            renderItem={item => (
+              <List.Item style={{padding: '2px 0', fontSize: '12px', border: 'none' }}>
+                <Typography.Text>- {item}</Typography.Text>
+                <Typography.Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>Hành động đề xuất: {item.includes('tăng tần suất') ? 'Xem xét lịch trình commit và cải thiện năng suất.' : 'Kiểm tra chất lượng code và tối ưu hóa quy trình.'}</Typography.Text>
+              </List.Item>
+            )}
+          />
+        </div>
+      )}
+      {/* LLM synthesized suggestions (if available) */}
+      {llm && (llm.action_items || llm.overall_recommendation || llm.prioritized_assignment_changes) && (
+        <div>
+          <Typography.Text strong style={{ fontSize: '12px' }}>Gợi ý nâng cao (LLM):</Typography.Text>
+          <div style={{ marginTop: 6 }}>
+            {Array.isArray(llm.action_items) && llm.action_items.slice(0,3).map((it, idx) => (
+              <div key={idx} style={{ fontSize: '12px', padding: '4px 0' }}>• {it}</div>
+            ))}
+            {llm.overall_recommendation && (
+              <div style={{ fontSize: '12px', color: '#0f172a', marginTop: 6 }}>{llm.overall_recommendation}</div>
+            )}
+            <div style={{ marginTop: 8 }}>
+              <Button type="link" onClick={() => setLlmModalVisible(true)} style={{ padding: 0 }}>Xem chi tiết LLM</Button>
+            </div>
+            <Modal
+              title="Chi tiết gợi ý LLM"
+              open={llmModalVisible}
+              onCancel={() => setLlmModalVisible(false)}
+              footer={null}
+              width={640}
+            >
+              <div style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
+                {typeof llm === 'string' ? llm : JSON.stringify(llm, null, 2)}
+              </div>
+            </Modal>
+          </div>
         </div>
       )}
     </Space>
@@ -170,8 +208,8 @@ const RisksSection = ({ data }) => {
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
       <Row gutter={16}>
-        <Col span={12}><StatisticItem title="Risk Score" value={data.risk_score} suffix="%" /></Col>
-        <Col span={12}><StatisticItem title="High-Risk Commits" value={data.high_risk_commits?.length || 0} precision={0} /></Col>
+        <Col span={12}><StatisticItem title="Điểm rủi ro" value={data.risk_score} suffix="%" /></Col>
+        <Col span={12}><StatisticItem title="Commit rủi ro cao" value={data.high_risk_commits?.length || 0} precision={0} /></Col>
       </Row>
       {data.critical_areas?.length > 0 && (
         <div>
@@ -199,16 +237,16 @@ const ProductivitySection = ({ data, onDeveloperClick }) => {
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
       <Row gutter={16}>
-        <Col span={12}><StatisticItem title="Lines Changed" value={summary.total_lines_changed} precision={0} /></Col>
-        <Col span={12}><StatisticItem title="Fix Ratio" value={summary.fix_ratio} suffix="%" /></Col>
+        <Col span={12}><StatisticItem title="Số dòng thay đổi" value={summary.total_lines_changed} precision={0} /></Col>
+        <Col span={12}><StatisticItem title="Tỷ lệ sửa lỗi" value={summary.fix_ratio} suffix="%" /></Col>
       </Row>
       <Row gutter={16}>
-        <Col span={12}><StatisticItem title="Active Contributors" value={summary.active_contributors} precision={0} /></Col>
-        <Col span={12}><StatisticItem title="Avg. Commit Size" value={summary.average_commit_size} precision={0} suffix="lines" /></Col>
+        <Col span={12}><StatisticItem title="Người đóng góp tích cực" value={summary.active_contributors} precision={0} /></Col>
+        <Col span={12}><StatisticItem title="Kích thước commit trung bình" value={summary.average_commit_size} precision={0} suffix="dòng" /></Col>
       </Row>
       {memberMetrics.length > 0 && (
         <div>
-          <Typography.Text strong style={{ fontSize: '12px' }}>Top Contributors (click to view DNA):</Typography.Text>
+          <Typography.Text strong style={{ fontSize: '12px' }}>Người đóng góp hàng đầu (nhấn để xem DNA):</Typography.Text>
           <List
             size="small"
             dataSource={memberMetrics}
@@ -217,7 +255,7 @@ const ProductivitySection = ({ data, onDeveloperClick }) => {
                 style={{padding: '2px 0', fontSize: '12px', border: 'none', cursor: 'pointer' }}
                 onClick={() => onDeveloperClick(name)}
               >
-                <Typography.Link>{name}: {metrics.commits} commits, {metrics.lines_added + metrics.lines_removed} lines</Typography.Link>
+                <Typography.Link>{name}: {metrics.commits} commits, {metrics.lines_added + metrics.lines_removed} dòng</Typography.Link>
               </List.Item>
             )}
           />
@@ -247,8 +285,8 @@ const AssignmentSection = ({ data }) => {
 };
 
 const DnaProfileDisplay = ({ dna, loading }) => {
-  if (loading) return <Loading variant="circle" size="small" message="Analyzing DNA..." />;
-  if (!dna) return <p>Select a developer to see their DNA profile.</p>;
+  if (loading) return <Loading variant="circle" size="small" message="Đang phân tích DNA..." />;
+  if (!dna) return <p>Chọn một nhà phát triển để xem hồ sơ DNA của họ.</p>;
   if (dna.message) return <Alert message={dna.message} type="info" />;
 
   const { work_rhythm, contribution_style, tech_expertise, risk_profile } = dna;
@@ -266,12 +304,12 @@ const DnaProfileDisplay = ({ dna, loading }) => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
-      <Card title="Work Pattern & Rhythm">
-        <Statistic title="Primary Style" valueRender={() => getPrimaryStyleTag(contribution_style.primary_style)} />
-        <Statistic title="Commit Frequency" value={work_rhythm.commit_frequency} suffix="commits/day" />
-        <Statistic title="Avg. Commit Size" value={risk_profile.avg_commit_size} precision={0} suffix="lines" />
+      <Card title="Mẫu hình & Nhịp độ làm việc">
+        <Statistic title="Phong cách chính" valueRender={() => getPrimaryStyleTag(contribution_style.primary_style)} />
+        <Statistic title="Tần suất commit" value={work_rhythm.commit_frequency} suffix="commits/ngày" />
+        <Statistic title="Kích thước commit trung bình" value={risk_profile.avg_commit_size} precision={0} suffix="lines" />
       </Card>
-      <Card title="Contribution Style">
+      <Card title="Phong cách đóng góp">
         {Object.entries(contribution_style.distribution).map(([type, count]) => (
           <div key={type} style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{type}</span>
@@ -279,19 +317,19 @@ const DnaProfileDisplay = ({ dna, loading }) => {
           </div>
         ))}
       </Card>
-      <Card title="Technical Expertise">
-        <Typography.Text strong>Areas:</Typography.Text>
+      <Card title="Chuyên môn kỹ thuật">
+        <Typography.Text strong>Khu vực:</Typography.Text>
         <div style={{ margin: '8px 0' }}>
           {Object.keys(tech_expertise.areas).map(area => <Tag key={area} color="blue">{area}</Tag>)}
         </div>
-        <Typography.Text strong>Languages:</Typography.Text>
+        <Typography.Text strong>Ngôn ngữ:</Typography.Text>
         <div style={{ marginTop: '8px' }}>
           {Object.keys(tech_expertise.languages).map(lang => <Tag key={lang} color="geekblue">{lang}</Tag>)}
         </div>
       </Card>
-      <Card title="Risk Profile">
+      <Card title="Hồ sơ rủi ro">
         <Progress percent={risk_profile.high_risk_percentage} steps={5} strokeColor={['#52c41a', '#faad14', '#f5222d']} />
-        <Statistic title="High Risk Commits" value={`${risk_profile.high_risk_percentage}%`} />
+        <Statistic title="Commit rủi ro cao" value={`${risk_profile.high_risk_percentage}%`} />
       </Card>
     </Space>
   );
@@ -524,7 +562,7 @@ const DashboardAnalyst = forwardRef(({ selectedRepoId, repositories, onBranchCha
                         <LineChartOutlined /> Tiến độ dự án
                       </div>
                     ),
-                    children: <ProgressSection data={analyticsData.progress} />
+                    children: <ProgressSection data={analyticsData.progress} llm={analyticsData.llm} />
                   },
                   {
                     key: 'risks',
@@ -641,7 +679,7 @@ const DashboardAnalyst = forwardRef(({ selectedRepoId, repositories, onBranchCha
                 {
                   key: 'progress',
                   label: <><LineChartOutlined /> Tiến độ</>,
-                  children: <ProgressSection data={analyticsData.progress} />
+                  children: <ProgressSection data={analyticsData.progress} llm={analyticsData.llm} />
                 },
                 {
                   key: 'risks',

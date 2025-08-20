@@ -12,6 +12,8 @@ from dataclasses import dataclass
 import asyncio
 import json
 import logging
+import os
+import httpx
 from statistics import mean, median
 
 from services.multifusion_commitanalyst_service import MultiFusionV2Service
@@ -104,6 +106,59 @@ class DashboardAnalyticsService:
                 logger.error(f"Productivity metrics failed: {productivity_metrics}")
                 productivity_metrics = {}
             
+            # Try to synthesize higher-level, actionable recommendations using Gemini LLM
+            llm_payload = None
+            llm_result = None
+            try:
+                gemini_api_key = os.getenv('GEMINI_API_KEY')
+                gemini_api_url = os.getenv('GEMINI_API_URL')
+                if gemini_api_key and gemini_api_url:
+                    prompt = {
+                        "progress": {
+                            "total_commits": progress_analysis.total_commits,
+                            "velocity": progress_analysis.velocity,
+                            "productivity_score": progress_analysis.productivity_score,
+                            "commits_by_type": progress_analysis.commits_by_type,
+                            "commits_by_area": progress_analysis.commits_by_area
+                        },
+                        "risks": {
+                            "risk_score": risk_analysis.risk_score,
+                            "critical_areas": risk_analysis.critical_areas,
+                            "high_risk_commits_count": len(risk_analysis.high_risk_commits)
+                        },
+                        "assignments": [
+                            {
+                                "member_id": s.member_id,
+                                "member_name": s.member_name,
+                                "workload_score": s.workload_score,
+                                "skill_match_score": s.skill_match_score,
+                                "expertise": s.expertise_areas
+                            } for s in assignment_suggestions
+                        ],
+                        "instructions": "Return a JSON object with keys: action_items (list of strings), prioritized_assignment_changes (list of {member_id, action, reason}), overall_recommendation (string)."
+                    }
+
+                    llm_payload = json.dumps(prompt)
+                    # Call Gemini via helper
+                    llm_raw = await self._call_gemini(llm_payload)
+                    if llm_raw:
+                        try:
+                            llm_result = json.loads(llm_raw) if isinstance(llm_raw, str) else llm_raw
+                        except Exception:
+                            llm_result = {"overall_recommendation": str(llm_raw)}
+            except Exception as e:
+                logger.exception("LLM synthesis error: %s", e)
+
+            # Merge LLM suggestions (if any) into progress recommendations
+            progress_dict = progress_analysis.__dict__.copy()
+            merged_recs = list(progress_dict.get('recommendations', []) or [])
+            if llm_result and isinstance(llm_result.get('action_items'), list):
+                merged_recs.extend([str(x) for x in llm_result.get('action_items')])
+            elif llm_result and llm_result.get('overall_recommendation'):
+                merged_recs.append(str(llm_result.get('overall_recommendation')))
+
+            progress_dict['recommendations'] = merged_recs
+
             return {
                 "repository": {
                     "owner": repo_owner,
@@ -115,10 +170,11 @@ class DashboardAnalyticsService:
                     "start_date": (datetime.now() - timedelta(days=days_back)).isoformat(),
                     "end_date": datetime.now().isoformat()
                 },
-                "progress": progress_analysis.__dict__,
+                "progress": progress_dict,
                 "risks": risk_analysis.__dict__,
                 "assignment_suggestions": [s.__dict__ for s in assignment_suggestions],
                 "productivity_metrics": productivity_metrics,  # Đã là dict đúng format
+                "llm": llm_result,
                 "generated_at": datetime.now().isoformat()
             }
             
@@ -1025,6 +1081,48 @@ class DashboardAnalyticsService:
             return 0.0
         
         return mean(weekly_commits.values())
+
+    async def _call_gemini(self, prompt_json: str) -> Optional[str]:
+        """Call Gemini LLM endpoint. Expect prompt_json to be a JSON-stringified object.
+        Returns raw text (often JSON) or None on failure.
+        Requires GEMINI_API_KEY and GEMINI_API_URL in env.
+        """
+        api_key = os.getenv('GEMINI_API_KEY')
+        api_url = os.getenv('GEMINI_API_URL')
+        if not api_key or not api_url:
+            logger.debug("Gemini API not configured; skipping LLM call")
+            return None
+
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+
+        payload = {
+            'input': json.loads(prompt_json),
+            'max_output_tokens': 512
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(api_url, headers=headers, json=payload)
+                resp.raise_for_status()
+                data = resp.json()
+                # Try common keys
+                if isinstance(data, dict):
+                    if 'output' in data:
+                        return data['output']
+                    if 'text' in data:
+                        return data['text']
+                    if 'response' in data:
+                        return data['response']
+                    if 'choices' in data and isinstance(data['choices'], list) and data['choices']:
+                        first = data['choices'][0]
+                        return first.get('message') or first.get('text')
+                return json.dumps(data)
+        except Exception as e:
+            logger.exception("Gemini call failed: %s", e)
+            return None
 
     async def get_developer_dna(self, repo_id: int, author_name: str, days_back: int, force_refresh: bool = False) -> Dict[str, Any]:
         """

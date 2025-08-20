@@ -5,6 +5,7 @@ import json
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import os
 from typing import Dict, Any, List
+from interfaces.area_analysis_service_interface import IAreaAnalysisService
 
 # Assuming the model is saved in this path relative to the backend directory
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'ai', 'models', 'multifusion', 'areaAnalyst', 'best_area_classifier.pt')
@@ -32,7 +33,7 @@ class MultiFusionAreaModel(nn.Module):
         logits = self.classifier(fusion)
         return logits
 
-class AreaAnalysisService:
+class AreaAnalysisService(IAreaAnalysisService):
     _instance = None
 
     def __new__(cls):
