@@ -226,20 +226,6 @@ const CreateTaskModal = ({
           />
         </Form.Item>
 
-        {/* Task Description */}
-        <Form.Item
-          name="description"
-          label="Mô tả"
-          rules={validationRules.description}
-        >
-          <TextArea
-            placeholder="Nhập mô tả chi tiết cho task (tùy chọn)"
-            rows={4}
-            showCount
-            maxLength={1000}
-          />
-        </Form.Item>
-
         {/* Status and Priority */}
         <Row gutter={16}>
           <Col span={12}>
